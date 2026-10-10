@@ -172,6 +172,7 @@
   }
   html {
     @apply font-sans text-body;
+    scroll-padding-top: 4rem;
   }
 }
 

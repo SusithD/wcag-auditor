@@ -55,7 +55,12 @@ export function SusStep({
       </StepHeading>
       <div className="space-y-5">
         {materials.sus_items.map((text, i) => (
-          <fieldset key={text}>
+          <fieldset
+            key={text}
+            aria-describedby={
+              error && scores[i] === null ? "sus-error" : undefined
+            }
+          >
             <legend className="mb-1 text-body font-medium">
               {i + 1}. {text}
             </legend>
@@ -85,7 +90,7 @@ export function SusStep({
           </fieldset>
         ))}
       </div>
-      <FormError message={error} />
+      <FormError message={error} id="sus-error" />
       <Button type="submit" className="mt-6" size="lg">
         Continue
       </Button>

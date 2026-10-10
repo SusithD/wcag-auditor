@@ -4,2549 +4,2599 @@
  */
 
 export interface paths {
-  "/health": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Health */
+        get: operations["health_health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Health */
-    get: operations["health_health_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/runs/{run_id}/overview": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/runs/{run_id}/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Overview */
+        get: operations["overview_runs__run_id__overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Overview */
-    get: operations["overview_runs__run_id__overview_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/runs/{run_id}/report.csv": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/runs/{run_id}/report.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Report Csv */
+        get: operations["report_csv_runs__run_id__report_csv_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Report Csv */
-    get: operations["report_csv_runs__run_id__report_csv_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/runs/{run_id}/exports": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/runs/{run_id}/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Exports */
+        get: operations["exports_runs__run_id__exports_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Exports */
-    get: operations["exports_runs__run_id__exports_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/runs/{run_id}/findings": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/runs/{run_id}/findings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Findings */
+        get: operations["list_findings_runs__run_id__findings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List Findings */
-    get: operations["list_findings_runs__run_id__findings_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/runs/{run_id}/compare": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/runs/{run_id}/compare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Compare */
+        get: operations["compare_runs__run_id__compare_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Compare */
-    get: operations["compare_runs__run_id__compare_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/findings/{finding_id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/findings/{finding_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Patch Finding */
+        patch: operations["patch_finding_findings__finding_id__patch"];
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Patch Finding */
-    patch: operations["patch_finding_findings__finding_id__patch"];
-    trace?: never;
-  };
-  "/runs/{run_id}/assets/{viewport}/crop/{key}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/runs/{run_id}/assets/{viewport}/crop/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Crop */
+        get: operations["crop_runs__run_id__assets__viewport__crop__key__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Crop */
-    get: operations["crop_runs__run_id__assets__viewport__crop__key__get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/runs/{run_id}/assets/{viewport}/focus/{index}/{state}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/runs/{run_id}/assets/{viewport}/focus/{index}/{state}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Focus Image */
+        get: operations["focus_image_runs__run_id__assets__viewport__focus__index___state__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Focus Image */
-    get: operations["focus_image_runs__run_id__assets__viewport__focus__index___state__get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/catalogue": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/catalogue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Catalogue */
+        get: operations["catalogue_catalogue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Catalogue */
-    get: operations["catalogue_catalogue_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/eval": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/eval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Evals */
+        get: operations["list_evals_eval_get"];
+        put?: never;
+        /** Create Eval */
+        post: operations["create_eval_eval_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List Evals */
-    get: operations["list_evals_eval_get"];
-    put?: never;
-    /** Create Eval */
-    post: operations["create_eval_eval_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/eval/{eval_id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/eval/{eval_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Eval */
+        get: operations["get_eval_eval__eval_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get Eval */
-    get: operations["get_eval_eval__eval_id__get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/eval/{eval_id}/events": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/eval/{eval_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Eval Events */
+        get: operations["eval_events_eval__eval_id__events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Eval Events */
-    get: operations["eval_events_eval__eval_id__events_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/eval/{eval_id}/export.csv": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/eval/{eval_id}/export.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export Csv */
+        get: operations["export_csv_eval__eval_id__export_csv_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Export Csv */
-    get: operations["export_csv_eval__eval_id__export_csv_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/eval/{eval_id}/export.tex": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/eval/{eval_id}/export.tex": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export Tex */
+        get: operations["export_tex_eval__eval_id__export_tex_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Export Tex */
-    get: operations["export_tex_eval__eval_id__export_tex_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/study/materials": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/materials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Materials */
+        get: operations["materials_study_materials_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Materials */
-    get: operations["materials_study_materials_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/study/config": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Config */
+        get: operations["config_study_config_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Config */
-    get: operations["config_study_config_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/study/prepare": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/prepare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Prepare */
+        post: operations["prepare_study_prepare_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Prepare */
-    post: operations["prepare_study_prepare_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/study/sessions": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Session */
+        post: operations["create_session_study_sessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Create Session */
-    post: operations["create_session_study_sessions_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/study/sessions/{code}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/sessions/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Session */
+        get: operations["get_session_study_sessions__code__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get Session */
-    get: operations["get_session_study_sessions__code__get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/study/sessions/{code}/consent": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/sessions/{code}/consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Give Consent */
+        post: operations["give_consent_study_sessions__code__consent_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Give Consent */
-    post: operations["give_consent_study_sessions__code__consent_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/study/sessions/{code}/demographics": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/sessions/{code}/demographics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Give Demographics */
+        post: operations["give_demographics_study_sessions__code__demographics_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Give Demographics */
-    post: operations["give_demographics_study_sessions__code__demographics_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/study/sessions/{code}/tasks/{index}/open": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/sessions/{code}/tasks/{index}/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Open Task */
+        post: operations["open_task_study_sessions__code__tasks__index__open_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Open Task */
-    post: operations["open_task_study_sessions__code__tasks__index__open_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/study/sessions/{code}/tasks/{index}/submit": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/sessions/{code}/tasks/{index}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit Task */
+        post: operations["submit_task_study_sessions__code__tasks__index__submit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Submit Task */
-    post: operations["submit_task_study_sessions__code__tasks__index__submit_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/study/sessions/{code}/sus/{block}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/sessions/{code}/sus/{block}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit Sus */
+        post: operations["submit_sus_study_sessions__code__sus__block__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Submit Sus */
-    post: operations["submit_sus_study_sessions__code__sus__block__post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/study/sessions/{code}/break": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/sessions/{code}/break": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Finish Break */
+        post: operations["finish_break_study_sessions__code__break_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Finish Break */
-    post: operations["finish_break_study_sessions__code__break_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/study/sessions/{code}/debrief": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/sessions/{code}/debrief": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit Debrief */
+        post: operations["submit_debrief_study_sessions__code__debrief_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Submit Debrief */
-    post: operations["submit_debrief_study_sessions__code__debrief_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/study/admin/tasks": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/admin/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Runs */
+        get: operations["admin_runs_study_admin_runs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Admin Tasks */
-    get: operations["admin_tasks_study_admin_tasks_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/study/admin/tasks/{task_row_id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/admin/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin Tasks */
+        get: operations["admin_tasks_study_admin_tasks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    /** Rate Task */
-    patch: operations["rate_task_study_admin_tasks__task_row_id__patch"];
-    trace?: never;
-  };
-  "/study/admin/export/{kind}.csv": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/admin/tasks/{task_row_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Rate Task */
+        patch: operations["rate_task_study_admin_tasks__task_row_id__patch"];
+        trace?: never;
     };
-    /** Export */
-    get: operations["export_study_admin_export__kind__csv_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/uploads": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/study/admin/export/{kind}.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export */
+        get: operations["export_study_admin_export__kind__csv_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Create Upload */
-    post: operations["create_upload_uploads_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/runs": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Upload */
+        post: operations["create_upload_uploads_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List Runs */
-    get: operations["list_runs_runs_get"];
-    put?: never;
-    /** Create Run */
-    post: operations["create_run_runs_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/runs/{run_id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Runs */
+        get: operations["list_runs_runs_get"];
+        put?: never;
+        /** Create Run */
+        post: operations["create_run_runs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get Run */
-    get: operations["get_run_runs__run_id__get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/runs/{run_id}/cancel": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/runs/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Run */
+        get: operations["get_run_runs__run_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Cancel Run */
-    post: operations["cancel_run_runs__run_id__cancel_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/runs/{run_id}/events": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/runs/{run_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel Run */
+        post: operations["cancel_run_runs__run_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Run Events */
-    get: operations["run_events_runs__run_id__events_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/runs/{run_id}/assets/{viewport}/screenshot": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/runs/{run_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Run Events */
+        get: operations["run_events_runs__run_id__events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Screenshot */
-    get: operations["screenshot_runs__run_id__assets__viewport__screenshot_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/runs/{run_id}/report.{ext}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/runs/{run_id}/assets/{viewport}/screenshot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Screenshot */
+        get: operations["screenshot_runs__run_id__assets__viewport__screenshot_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Report */
-    get: operations["report_runs__run_id__report__ext__get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/runs/{run_id}/report.{ext}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Report */
+        get: operations["report_runs__run_id__report__ext__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    /** AdminTask */
-    AdminTask: {
-      /** Id */
-      id: number;
-      /** Participant Code */
-      participant_code: string;
-      /** Synthetic */
-      synthetic: boolean;
-      /** Task Index */
-      task_index: number;
-      /** Block */
-      block: number;
-      /** Task Id */
-      task_id: string;
-      /** Sc */
-      sc: string;
-      /** Condition */
-      condition: string;
-      /** Seconds */
-      seconds: number | null;
-      /** Fix Text */
-      fix_text: string | null;
-      /** Success */
-      success: boolean | null;
-      /** Notes */
-      notes: string | null;
-      /** Rubric */
-      rubric: {
-        [key: string]: unknown;
-      };
-      /** Reported By Condition */
-      reported_by_condition: boolean;
+    schemas: {
+        /** AdminRun */
+        AdminRun: {
+            /** Task Id */
+            task_id: string;
+            /** Condition */
+            condition: string;
+            /** Run Id */
+            run_id: string;
+        };
+        /** AdminTask */
+        AdminTask: {
+            /** Id */
+            id: number;
+            /** Participant Code */
+            participant_code: string;
+            /** Synthetic */
+            synthetic: boolean;
+            /** Task Index */
+            task_index: number;
+            /** Block */
+            block: number;
+            /** Task Id */
+            task_id: string;
+            /** Sc */
+            sc: string;
+            /** Condition */
+            condition: string;
+            /** Seconds */
+            seconds: number | null;
+            /** Fix Text */
+            fix_text: string | null;
+            /** Success */
+            success: boolean | null;
+            /** Notes */
+            notes: string | null;
+            /** Rubric */
+            rubric: {
+                [key: string]: unknown;
+            };
+            /** Reported By Condition */
+            reported_by_condition: boolean;
+        };
+        /** BBoxOut */
+        BBoxOut: {
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+            /** W */
+            w: number;
+            /** H */
+            h: number;
+        };
+        /** Body_create_upload_uploads_post */
+        Body_create_upload_uploads_post: {
+            /** Files */
+            files: string[];
+        };
+        /** Catalogue */
+        Catalogue: {
+            /** Entries */
+            entries: components["schemas"]["CatalogueEntry"][];
+            /** Coverage Claim */
+            coverage_claim: string;
+        };
+        /** CatalogueEntry */
+        CatalogueEntry: {
+            /** Sc */
+            sc: string;
+            /** Name */
+            name: string;
+            /** Level */
+            level: string;
+            /** Unit */
+            unit: string;
+            /** Inputs */
+            inputs: string;
+            /** Procedure */
+            procedure: string;
+            /** Threshold */
+            threshold: string;
+            /** Detectability */
+            detectability: string;
+            /** Tier */
+            tier: string;
+            /** Act */
+            act: string;
+        };
+        /** CompareOut */
+        CompareOut: {
+            /** Hybrid */
+            hybrid: components["schemas"]["FindingOut"][];
+            /** Rule Only */
+            rule_only: components["schemas"]["FindingOut"][];
+            /** Pairs */
+            pairs: components["schemas"]["ComparePair"][];
+            /** Only Hybrid */
+            only_hybrid: string[];
+            /** Only Rule Only */
+            only_rule_only: string[];
+        };
+        /** ComparePair */
+        ComparePair: {
+            /** Hybrid */
+            hybrid: string;
+            /** Rule Only */
+            rule_only: string;
+        };
+        /** Consent */
+        Consent: {
+            /** Statements */
+            statements: boolean[];
+            /** Optional */
+            optional?: {
+                [key: string]: boolean;
+            };
+        };
+        /** CoverageCellOut */
+        CoverageCellOut: {
+            /** Sc */
+            sc: string;
+            /**
+             * Rule Verdict
+             * @enum {string}
+             */
+            rule_verdict: "automated" | "needs-review" | "not-assessable" | "none";
+            /**
+             * Pixel Verdict
+             * @enum {string}
+             */
+            pixel_verdict: "automated" | "needs-review" | "not-assessable" | "none";
+            /**
+             * Hybrid Verdict
+             * @enum {string}
+             */
+            hybrid_verdict: "automated" | "needs-review" | "not-assessable" | "none";
+        };
+        /** DebriefSubmission */
+        DebriefSubmission: {
+            /** Answers */
+            answers: string[];
+        };
+        /** DeltaRow */
+        DeltaRow: {
+            /** Stratum */
+            stratum: string;
+            /** Sc */
+            sc: string;
+            /** Low */
+            low: number | null;
+            /** High */
+            high: number | null;
+            /** Margin */
+            margin: number;
+            /** Non Inferior */
+            non_inferior: boolean | null;
+        };
+        /** Demographics */
+        Demographics: {
+            /** Answers */
+            answers: {
+                [key: string]: string;
+            };
+        };
+        /** EvalCell */
+        EvalCell: {
+            /** Condition */
+            condition: string;
+            /** Stratum */
+            stratum: string;
+            /** Sc */
+            sc: string;
+            /** Tp */
+            tp: number;
+            /** Fp */
+            fp: number;
+            /** Fn */
+            fn: number;
+            /** Duplicates */
+            duplicates: number;
+            /** Precision */
+            precision: number | null;
+            /** Recall */
+            recall: number | null;
+            /** F1 */
+            f1: number | null;
+            /** Precision Ci */
+            precision_ci: number[] | null;
+            /** Recall Ci */
+            recall_ci: number[] | null;
+            /** F1 Ci */
+            f1_ci: number[] | null;
+        };
+        /** EvalCreated */
+        EvalCreated: {
+            /** Eval Id */
+            eval_id: number;
+        };
+        /** EvalDetail */
+        EvalDetail: {
+            summary: components["schemas"]["EvalSummary"];
+            view: components["schemas"]["EvalView"] | null;
+        };
+        /** EvalMeta */
+        EvalMeta: {
+            /** Items Scored */
+            items_scored: number;
+            /** Items Unlabelled */
+            items_unlabelled: number;
+            /** Seed */
+            seed: number;
+            /** Resamples */
+            resamples: number;
+            /** Conditions */
+            conditions: string[];
+            /** Include Needs Review */
+            include_needs_review: boolean;
+            /** Benchmark Sha */
+            benchmark_sha: string | null;
+            /** Truth Sha */
+            truth_sha: string | null;
+            /** Protocol Sha */
+            protocol_sha: string | null;
+            /** Rule Only Scs */
+            rule_only_scs: string[];
+        };
+        /** EvalRequest */
+        EvalRequest: {
+            /** Conditions */
+            conditions?: ("rule_only" | "pixel" | "hybrid")[];
+            /**
+             * Include Needs Review
+             * @default true
+             */
+            include_needs_review: boolean;
+            /**
+             * Bootstrap
+             * @default 10000
+             */
+            bootstrap: number;
+        };
+        /** EvalSummary */
+        EvalSummary: {
+            /** Id */
+            id: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "queued" | "running" | "done" | "failed";
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "run" | "import";
+            /** Conditions */
+            conditions: string[];
+            /** Error */
+            error: string | null;
+            /** Done */
+            done: number | null;
+            /** Total */
+            total: number | null;
+        };
+        /** EvalView */
+        EvalView: {
+            meta: components["schemas"]["EvalMeta"];
+            /** Cells */
+            cells: components["schemas"]["EvalCell"][];
+            /** Mcnemar A */
+            mcnemar_a: string | null;
+            /** Mcnemar B */
+            mcnemar_b: string | null;
+            /** Mcnemar */
+            mcnemar: components["schemas"]["McNemarRow"][];
+            /** Delta Precision */
+            delta_precision: components["schemas"]["DeltaRow"][];
+        };
+        /** EvidenceRow */
+        EvidenceRow: {
+            /** Label */
+            label: string;
+            /** Value */
+            value: string;
+        };
+        /** ExportInfo */
+        ExportInfo: {
+            /**
+             * Format
+             * @enum {string}
+             */
+            format: "json" | "html" | "pdf" | "csv";
+            /** Url */
+            url: string;
+            /** Size Bytes */
+            size_bytes: number;
+            /** Pages */
+            pages: number | null;
+        };
+        /** FindingOut */
+        FindingOut: {
+            /** Id */
+            id: number;
+            /** Key */
+            key: string;
+            /**
+             * Viewport
+             * @enum {string}
+             */
+            viewport: "desktop" | "mobile";
+            /** Sc */
+            sc: string;
+            bbox: components["schemas"]["BBoxOut"] | null;
+            /** Focus Index */
+            focus_index: number | null;
+            /**
+             * Severity
+             * @enum {string}
+             */
+            severity: "critical" | "serious" | "minor";
+            /**
+             * Tier
+             * @enum {string}
+             */
+            tier: "automated" | "needs-review" | "not-assessable";
+            /** Score */
+            score: number;
+            /**
+             * Provenance
+             * @enum {string}
+             */
+            provenance: "rule" | "pixel" | "both";
+            /** Element */
+            element: string;
+            guidance: components["schemas"]["GuidanceOut"] | null;
+            /** Evidence Rows */
+            evidence_rows: components["schemas"]["EvidenceRow"][];
+            /** Has Crop */
+            has_crop: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "fixed" | "ignored";
+        };
+        /** FindingPatch */
+        FindingPatch: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "fixed" | "ignored";
+        };
+        /** FixSubmission */
+        FixSubmission: {
+            /** Fix Text */
+            fix_text: string;
+        };
+        /** GuidanceOut */
+        GuidanceOut: {
+            /** Sc Title */
+            sc_title: string;
+            /** Level */
+            level: string;
+            /** Understanding */
+            understanding: string;
+            /** What Failed */
+            what_failed: string;
+            /** Nearest Passing */
+            nearest_passing: string;
+            /** Fix Css */
+            fix_css: string;
+            /** Fix Html */
+            fix_html: string;
+            /** Techniques */
+            techniques: components["schemas"]["Technique"][];
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
+        /** Materials */
+        Materials: {
+            /** Opening */
+            opening: string[];
+            /** Consent Statements */
+            consent_statements: string[];
+            /** Optional Consents */
+            optional_consents: {
+                [key: string]: string;
+            };
+            /** Demographics */
+            demographics: {
+                [key: string]: string[];
+            };
+            /** Sus Items */
+            sus_items: string[];
+            /** Debrief Questions */
+            debrief_questions: string[];
+            /** Closing */
+            closing: string[];
+        };
+        /** McNemarRow */
+        McNemarRow: {
+            /** Stratum */
+            stratum: string;
+            /** Sc */
+            sc: string;
+            /** Both Correct */
+            both_correct: number;
+            /** Only A Correct */
+            only_a_correct: number;
+            /** Only B Correct */
+            only_b_correct: number;
+            /** Both Wrong */
+            both_wrong: number;
+            /** P Value */
+            p_value: number | null;
+            /** P Adjusted */
+            p_adjusted: number | null;
+            /** Note */
+            note: string | null;
+        };
+        /** Overview */
+        Overview: {
+            /**
+             * Viewport
+             * @enum {string}
+             */
+            viewport: "desktop" | "mobile";
+            /** Url */
+            url: string;
+            /** Title */
+            title: string | null;
+            /** Screenshot Width */
+            screenshot_width: number;
+            /** Screenshot Height */
+            screenshot_height: number;
+            /** Focus Stops */
+            focus_stops: number;
+            /** Condition */
+            condition: string;
+            /** Coverage */
+            coverage: components["schemas"]["CoverageCellOut"][];
+            /** Available Viewports */
+            available_viewports: ("desktop" | "mobile")[];
+        };
+        /** Prepared */
+        Prepared: {
+            /** Queued */
+            queued: number;
+            /** Ready */
+            ready: number;
+            /** Total */
+            total: number;
+        };
+        /** RatingPatch */
+        RatingPatch: {
+            /** Success */
+            success?: boolean | null;
+            /** Notes */
+            notes?: string | null;
+        };
+        /** RunCreate */
+        RunCreate: {
+            /** Url */
+            url?: string | null;
+            /** Upload Id */
+            upload_id?: string | null;
+            /** Folder */
+            folder?: string | null;
+            /** Viewports */
+            viewports?: ("desktop" | "mobile")[];
+            /**
+             * Condition
+             * @default hybrid
+             * @enum {string}
+             */
+            condition: "hybrid" | "rule_only";
+            /**
+             * Max Focus Steps
+             * @default 15
+             */
+            max_focus_steps: number;
+        };
+        /** RunCreated */
+        RunCreated: {
+            /** Run Id */
+            run_id: string;
+        };
+        /** RunSummary */
+        RunSummary: {
+            /** Id */
+            id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Source Kind
+             * @enum {string}
+             */
+            source_kind: "url" | "upload" | "folder";
+            /** Source */
+            source: string;
+            /** Viewports */
+            viewports: ("desktop" | "mobile")[];
+            /**
+             * Condition
+             * @enum {string}
+             */
+            condition: "hybrid" | "rule_only";
+            /** Status */
+            status: string;
+            /** Stage Status */
+            stage_status: {
+                [key: string]: unknown;
+            };
+            /** Error */
+            error: string | null;
+            counts: components["schemas"]["SeverityCounts"];
+            /** Available Viewports */
+            available_viewports: ("desktop" | "mobile")[];
+        };
+        /** SessionCreate */
+        SessionCreate: {
+            /** Code */
+            code: string;
+        };
+        /** SessionState */
+        SessionState: {
+            /** Code */
+            code: string;
+            /** Synthetic */
+            synthetic: boolean;
+            /** Step */
+            step: number;
+            /** Total Steps */
+            total_steps: number;
+            next: components["schemas"]["StepInfo"];
+            /** Tasks */
+            tasks: components["schemas"]["TaskSummary"][];
+            /** Block Condition */
+            block_condition: ("rule_only" | "hybrid") | null;
+        };
+        /** SeverityCounts */
+        SeverityCounts: {
+            /**
+             * Critical
+             * @default 0
+             */
+            critical: number;
+            /**
+             * Serious
+             * @default 0
+             */
+            serious: number;
+            /**
+             * Minor
+             * @default 0
+             */
+            minor: number;
+            /**
+             * Needs Review
+             * @default 0
+             */
+            needs_review: number;
+        };
+        /** StepInfo */
+        StepInfo: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "consent" | "demographics" | "task" | "sus" | "break" | "debrief" | "done";
+            /** Task Index */
+            task_index?: number | null;
+            /** Block */
+            block?: number | null;
+            /** Position In Block */
+            position_in_block?: number | null;
+            /**
+             * Block Size
+             * @default 4
+             */
+            block_size: number;
+        };
+        /** StudyConfig */
+        StudyConfig: {
+            /** Ethics Approved */
+            ethics_approved: boolean;
+            /** Real Participants Enabled */
+            real_participants_enabled: boolean;
+            /** Prepared */
+            prepared: number;
+            /** Total Runs */
+            total_runs: number;
+        };
+        /** SusSubmission */
+        SusSubmission: {
+            /** Scores */
+            scores: number[];
+        };
+        /** TaskSummary */
+        TaskSummary: {
+            /** Task Index */
+            task_index: number;
+            /** Block */
+            block: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "open" | "submitted";
+        };
+        /** TaskView */
+        TaskView: {
+            /** Task Index */
+            task_index: number;
+            /** Block */
+            block: number;
+            /** Position In Block */
+            position_in_block: number;
+            /** Block Size */
+            block_size: number;
+            /** Brief */
+            brief: string;
+            /**
+             * Condition
+             * @enum {string}
+             */
+            condition: "rule_only" | "hybrid";
+            /** Run Id */
+            run_id: string;
+            /**
+             * Viewport
+             * @enum {string}
+             */
+            viewport: "desktop" | "mobile";
+        };
+        /** Technique */
+        Technique: {
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+            /** Url */
+            url: string;
+        };
+        /** UploadResult */
+        UploadResult: {
+            /** Upload Id */
+            upload_id: string;
+            /** Viewports */
+            viewports: ("desktop" | "mobile")[];
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
+        };
     };
-    /** BBoxOut */
-    BBoxOut: {
-      /** X */
-      x: number;
-      /** Y */
-      y: number;
-      /** W */
-      w: number;
-      /** H */
-      h: number;
-    };
-    /** Body_create_upload_uploads_post */
-    Body_create_upload_uploads_post: {
-      /** Files */
-      files: string[];
-    };
-    /** Catalogue */
-    Catalogue: {
-      /** Entries */
-      entries: components["schemas"]["CatalogueEntry"][];
-      /** Coverage Claim */
-      coverage_claim: string;
-    };
-    /** CatalogueEntry */
-    CatalogueEntry: {
-      /** Sc */
-      sc: string;
-      /** Name */
-      name: string;
-      /** Level */
-      level: string;
-      /** Unit */
-      unit: string;
-      /** Inputs */
-      inputs: string;
-      /** Procedure */
-      procedure: string;
-      /** Threshold */
-      threshold: string;
-      /** Detectability */
-      detectability: string;
-      /** Tier */
-      tier: string;
-      /** Act */
-      act: string;
-    };
-    /** CompareOut */
-    CompareOut: {
-      /** Hybrid */
-      hybrid: components["schemas"]["FindingOut"][];
-      /** Rule Only */
-      rule_only: components["schemas"]["FindingOut"][];
-      /** Pairs */
-      pairs: components["schemas"]["ComparePair"][];
-      /** Only Hybrid */
-      only_hybrid: string[];
-      /** Only Rule Only */
-      only_rule_only: string[];
-    };
-    /** ComparePair */
-    ComparePair: {
-      /** Hybrid */
-      hybrid: string;
-      /** Rule Only */
-      rule_only: string;
-    };
-    /** Consent */
-    Consent: {
-      /** Statements */
-      statements: boolean[];
-      /** Optional */
-      optional?: {
-        [key: string]: boolean;
-      };
-    };
-    /** CoverageCellOut */
-    CoverageCellOut: {
-      /** Sc */
-      sc: string;
-      /**
-       * Rule Verdict
-       * @enum {string}
-       */
-      rule_verdict: "automated" | "needs-review" | "not-assessable" | "none";
-      /**
-       * Pixel Verdict
-       * @enum {string}
-       */
-      pixel_verdict: "automated" | "needs-review" | "not-assessable" | "none";
-      /**
-       * Hybrid Verdict
-       * @enum {string}
-       */
-      hybrid_verdict: "automated" | "needs-review" | "not-assessable" | "none";
-    };
-    /** DebriefSubmission */
-    DebriefSubmission: {
-      /** Answers */
-      answers: string[];
-    };
-    /** DeltaRow */
-    DeltaRow: {
-      /** Stratum */
-      stratum: string;
-      /** Sc */
-      sc: string;
-      /** Low */
-      low: number | null;
-      /** High */
-      high: number | null;
-      /** Margin */
-      margin: number;
-      /** Non Inferior */
-      non_inferior: boolean | null;
-    };
-    /** Demographics */
-    Demographics: {
-      /** Answers */
-      answers: {
-        [key: string]: string;
-      };
-    };
-    /** EvalCell */
-    EvalCell: {
-      /** Condition */
-      condition: string;
-      /** Stratum */
-      stratum: string;
-      /** Sc */
-      sc: string;
-      /** Tp */
-      tp: number;
-      /** Fp */
-      fp: number;
-      /** Fn */
-      fn: number;
-      /** Duplicates */
-      duplicates: number;
-      /** Precision */
-      precision: number | null;
-      /** Recall */
-      recall: number | null;
-      /** F1 */
-      f1: number | null;
-      /** Precision Ci */
-      precision_ci: number[] | null;
-      /** Recall Ci */
-      recall_ci: number[] | null;
-      /** F1 Ci */
-      f1_ci: number[] | null;
-    };
-    /** EvalCreated */
-    EvalCreated: {
-      /** Eval Id */
-      eval_id: number;
-    };
-    /** EvalDetail */
-    EvalDetail: {
-      summary: components["schemas"]["EvalSummary"];
-      view: components["schemas"]["EvalView"] | null;
-    };
-    /** EvalMeta */
-    EvalMeta: {
-      /** Items Scored */
-      items_scored: number;
-      /** Items Unlabelled */
-      items_unlabelled: number;
-      /** Seed */
-      seed: number;
-      /** Resamples */
-      resamples: number;
-      /** Conditions */
-      conditions: string[];
-      /** Include Needs Review */
-      include_needs_review: boolean;
-      /** Benchmark Sha */
-      benchmark_sha: string | null;
-      /** Truth Sha */
-      truth_sha: string | null;
-      /** Protocol Sha */
-      protocol_sha: string | null;
-      /** Rule Only Scs */
-      rule_only_scs: string[];
-    };
-    /** EvalRequest */
-    EvalRequest: {
-      /** Conditions */
-      conditions?: ("rule_only" | "pixel" | "hybrid")[];
-      /**
-       * Include Needs Review
-       * @default true
-       */
-      include_needs_review: boolean;
-      /**
-       * Bootstrap
-       * @default 10000
-       */
-      bootstrap: number;
-    };
-    /** EvalSummary */
-    EvalSummary: {
-      /** Id */
-      id: number;
-      /**
-       * Created At
-       * Format: date-time
-       */
-      created_at: string;
-      /**
-       * Status
-       * @enum {string}
-       */
-      status: "queued" | "running" | "done" | "failed";
-      /**
-       * Source
-       * @enum {string}
-       */
-      source: "run" | "import";
-      /** Conditions */
-      conditions: string[];
-      /** Error */
-      error: string | null;
-      /** Done */
-      done: number | null;
-      /** Total */
-      total: number | null;
-    };
-    /** EvalView */
-    EvalView: {
-      meta: components["schemas"]["EvalMeta"];
-      /** Cells */
-      cells: components["schemas"]["EvalCell"][];
-      /** Mcnemar A */
-      mcnemar_a: string | null;
-      /** Mcnemar B */
-      mcnemar_b: string | null;
-      /** Mcnemar */
-      mcnemar: components["schemas"]["McNemarRow"][];
-      /** Delta Precision */
-      delta_precision: components["schemas"]["DeltaRow"][];
-    };
-    /** EvidenceRow */
-    EvidenceRow: {
-      /** Label */
-      label: string;
-      /** Value */
-      value: string;
-    };
-    /** ExportInfo */
-    ExportInfo: {
-      /**
-       * Format
-       * @enum {string}
-       */
-      format: "json" | "html" | "pdf" | "csv";
-      /** Url */
-      url: string;
-      /** Size Bytes */
-      size_bytes: number;
-      /** Pages */
-      pages: number | null;
-    };
-    /** FindingOut */
-    FindingOut: {
-      /** Id */
-      id: number;
-      /** Key */
-      key: string;
-      /**
-       * Viewport
-       * @enum {string}
-       */
-      viewport: "desktop" | "mobile";
-      /** Sc */
-      sc: string;
-      bbox: components["schemas"]["BBoxOut"] | null;
-      /** Focus Index */
-      focus_index: number | null;
-      /**
-       * Severity
-       * @enum {string}
-       */
-      severity: "critical" | "serious" | "minor";
-      /**
-       * Tier
-       * @enum {string}
-       */
-      tier: "automated" | "needs-review" | "not-assessable";
-      /** Score */
-      score: number;
-      /**
-       * Provenance
-       * @enum {string}
-       */
-      provenance: "rule" | "pixel" | "both";
-      /** Element */
-      element: string;
-      guidance: components["schemas"]["GuidanceOut"] | null;
-      /** Evidence Rows */
-      evidence_rows: components["schemas"]["EvidenceRow"][];
-      /** Has Crop */
-      has_crop: boolean;
-      /**
-       * Status
-       * @enum {string}
-       */
-      status: "open" | "fixed" | "ignored";
-    };
-    /** FindingPatch */
-    FindingPatch: {
-      /**
-       * Status
-       * @enum {string}
-       */
-      status: "open" | "fixed" | "ignored";
-    };
-    /** FixSubmission */
-    FixSubmission: {
-      /** Fix Text */
-      fix_text: string;
-    };
-    /** GuidanceOut */
-    GuidanceOut: {
-      /** Sc Title */
-      sc_title: string;
-      /** Level */
-      level: string;
-      /** Understanding */
-      understanding: string;
-      /** What Failed */
-      what_failed: string;
-      /** Nearest Passing */
-      nearest_passing: string;
-      /** Fix Css */
-      fix_css: string;
-      /** Fix Html */
-      fix_html: string;
-      /** Techniques */
-      techniques: components["schemas"]["Technique"][];
-    };
-    /** HTTPValidationError */
-    HTTPValidationError: {
-      /** Detail */
-      detail?: components["schemas"]["ValidationError"][];
-    };
-    /** Materials */
-    Materials: {
-      /** Opening */
-      opening: string[];
-      /** Consent Statements */
-      consent_statements: string[];
-      /** Optional Consents */
-      optional_consents: {
-        [key: string]: string;
-      };
-      /** Demographics */
-      demographics: {
-        [key: string]: string[];
-      };
-      /** Sus Items */
-      sus_items: string[];
-      /** Debrief Questions */
-      debrief_questions: string[];
-      /** Closing */
-      closing: string[];
-    };
-    /** McNemarRow */
-    McNemarRow: {
-      /** Stratum */
-      stratum: string;
-      /** Sc */
-      sc: string;
-      /** Both Correct */
-      both_correct: number;
-      /** Only A Correct */
-      only_a_correct: number;
-      /** Only B Correct */
-      only_b_correct: number;
-      /** Both Wrong */
-      both_wrong: number;
-      /** P Value */
-      p_value: number | null;
-      /** P Adjusted */
-      p_adjusted: number | null;
-      /** Note */
-      note: string | null;
-    };
-    /** Overview */
-    Overview: {
-      /**
-       * Viewport
-       * @enum {string}
-       */
-      viewport: "desktop" | "mobile";
-      /** Url */
-      url: string;
-      /** Title */
-      title: string | null;
-      /** Screenshot Width */
-      screenshot_width: number;
-      /** Screenshot Height */
-      screenshot_height: number;
-      /** Focus Stops */
-      focus_stops: number;
-      /** Condition */
-      condition: string;
-      /** Coverage */
-      coverage: components["schemas"]["CoverageCellOut"][];
-      /** Available Viewports */
-      available_viewports: ("desktop" | "mobile")[];
-    };
-    /** Prepared */
-    Prepared: {
-      /** Queued */
-      queued: number;
-      /** Ready */
-      ready: number;
-      /** Total */
-      total: number;
-    };
-    /** RatingPatch */
-    RatingPatch: {
-      /** Success */
-      success?: boolean | null;
-      /** Notes */
-      notes?: string | null;
-    };
-    /** RunCreate */
-    RunCreate: {
-      /** Url */
-      url?: string | null;
-      /** Upload Id */
-      upload_id?: string | null;
-      /** Folder */
-      folder?: string | null;
-      /** Viewports */
-      viewports?: ("desktop" | "mobile")[];
-      /**
-       * Condition
-       * @default hybrid
-       * @enum {string}
-       */
-      condition: "hybrid" | "rule_only";
-      /**
-       * Max Focus Steps
-       * @default 15
-       */
-      max_focus_steps: number;
-    };
-    /** RunCreated */
-    RunCreated: {
-      /** Run Id */
-      run_id: string;
-    };
-    /** RunSummary */
-    RunSummary: {
-      /** Id */
-      id: string;
-      /**
-       * Created At
-       * Format: date-time
-       */
-      created_at: string;
-      /**
-       * Source Kind
-       * @enum {string}
-       */
-      source_kind: "url" | "upload" | "folder";
-      /** Source */
-      source: string;
-      /** Viewports */
-      viewports: ("desktop" | "mobile")[];
-      /**
-       * Condition
-       * @enum {string}
-       */
-      condition: "hybrid" | "rule_only";
-      /** Status */
-      status: string;
-      /** Stage Status */
-      stage_status: {
-        [key: string]: unknown;
-      };
-      /** Error */
-      error: string | null;
-      counts: components["schemas"]["SeverityCounts"];
-      /** Available Viewports */
-      available_viewports: ("desktop" | "mobile")[];
-    };
-    /** SessionCreate */
-    SessionCreate: {
-      /** Code */
-      code: string;
-    };
-    /** SessionState */
-    SessionState: {
-      /** Code */
-      code: string;
-      /** Synthetic */
-      synthetic: boolean;
-      /** Step */
-      step: number;
-      /** Total Steps */
-      total_steps: number;
-      next: components["schemas"]["StepInfo"];
-      /** Tasks */
-      tasks: components["schemas"]["TaskSummary"][];
-      /** Block Condition */
-      block_condition: ("rule_only" | "hybrid") | null;
-    };
-    /** SeverityCounts */
-    SeverityCounts: {
-      /**
-       * Critical
-       * @default 0
-       */
-      critical: number;
-      /**
-       * Serious
-       * @default 0
-       */
-      serious: number;
-      /**
-       * Minor
-       * @default 0
-       */
-      minor: number;
-      /**
-       * Needs Review
-       * @default 0
-       */
-      needs_review: number;
-    };
-    /** StepInfo */
-    StepInfo: {
-      /**
-       * Kind
-       * @enum {string}
-       */
-      kind:
-        | "consent"
-        | "demographics"
-        | "task"
-        | "sus"
-        | "break"
-        | "debrief"
-        | "done";
-      /** Task Index */
-      task_index?: number | null;
-      /** Block */
-      block?: number | null;
-      /** Position In Block */
-      position_in_block?: number | null;
-      /**
-       * Block Size
-       * @default 4
-       */
-      block_size: number;
-    };
-    /** StudyConfig */
-    StudyConfig: {
-      /** Ethics Approved */
-      ethics_approved: boolean;
-      /** Real Participants Enabled */
-      real_participants_enabled: boolean;
-      /** Prepared */
-      prepared: number;
-      /** Total Runs */
-      total_runs: number;
-    };
-    /** SusSubmission */
-    SusSubmission: {
-      /** Scores */
-      scores: number[];
-    };
-    /** TaskSummary */
-    TaskSummary: {
-      /** Task Index */
-      task_index: number;
-      /** Block */
-      block: number;
-      /**
-       * Status
-       * @enum {string}
-       */
-      status: "pending" | "open" | "submitted";
-    };
-    /** TaskView */
-    TaskView: {
-      /** Task Index */
-      task_index: number;
-      /** Block */
-      block: number;
-      /** Position In Block */
-      position_in_block: number;
-      /** Block Size */
-      block_size: number;
-      /** Brief */
-      brief: string;
-      /**
-       * Condition
-       * @enum {string}
-       */
-      condition: "rule_only" | "hybrid";
-      /** Run Id */
-      run_id: string;
-      /**
-       * Viewport
-       * @enum {string}
-       */
-      viewport: "desktop" | "mobile";
-    };
-    /** Technique */
-    Technique: {
-      /** Id */
-      id: string;
-      /** Title */
-      title: string;
-      /** Url */
-      url: string;
-    };
-    /** UploadResult */
-    UploadResult: {
-      /** Upload Id */
-      upload_id: string;
-      /** Viewports */
-      viewports: ("desktop" | "mobile")[];
-    };
-    /** ValidationError */
-    ValidationError: {
-      /** Location */
-      loc: (string | number)[];
-      /** Message */
-      msg: string;
-      /** Error Type */
-      type: string;
-      /** Input */
-      input?: unknown;
-      /** Context */
-      ctx?: Record<string, never>;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  health_health_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            [key: string]: string;
-          };
-        };
-      };
-    };
-  };
-  overview_runs__run_id__overview_get: {
-    parameters: {
-      query: {
-        viewport: "desktop" | "mobile";
-      };
-      header?: never;
-      path: {
-        run_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Overview"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  report_csv_runs__run_id__report_csv_get: {
-    parameters: {
-      query: {
-        viewport: "desktop" | "mobile";
-      };
-      header?: never;
-      path: {
-        run_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  exports_runs__run_id__exports_get: {
-    parameters: {
-      query: {
-        viewport: "desktop" | "mobile";
-      };
-      header?: never;
-      path: {
-        run_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ExportInfo"][];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  list_findings_runs__run_id__findings_get: {
-    parameters: {
-      query: {
-        viewport: "desktop" | "mobile";
-        sc?: string | null;
-        severity?: string | null;
-        provenance?: string | null;
-        tier?: string | null;
-      };
-      header?: never;
-      path: {
-        run_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["FindingOut"][];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  compare_runs__run_id__compare_get: {
-    parameters: {
-      query: {
-        viewport: "desktop" | "mobile";
-      };
-      header?: never;
-      path: {
-        run_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["CompareOut"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  patch_finding_findings__finding_id__patch: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        finding_id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["FindingPatch"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["FindingOut"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  crop_runs__run_id__assets__viewport__crop__key__get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        run_id: string;
-        viewport: "desktop" | "mobile";
-        key: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  focus_image_runs__run_id__assets__viewport__focus__index___state__get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        run_id: string;
-        viewport: "desktop" | "mobile";
-        index: number;
-        state: "on" | "off";
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  catalogue_catalogue_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Catalogue"];
-        };
-      };
-    };
-  };
-  list_evals_eval_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["EvalSummary"][];
-        };
-      };
-    };
-  };
-  create_eval_eval_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["EvalRequest"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["EvalCreated"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  get_eval_eval__eval_id__get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        eval_id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["EvalDetail"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  eval_events_eval__eval_id__events_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        eval_id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  export_csv_eval__eval_id__export_csv_get: {
-    parameters: {
-      query: {
-        condition: "rule_only" | "pixel" | "hybrid";
-        stratum: string;
-      };
-      header?: never;
-      path: {
-        eval_id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  export_tex_eval__eval_id__export_tex_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        eval_id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  materials_study_materials_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Materials"];
-        };
-      };
-    };
-  };
-  config_study_config_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["StudyConfig"];
-        };
-      };
-    };
-  };
-  prepare_study_prepare_post: {
-    parameters: {
-      query?: never;
-      header?: {
-        "x-study-token"?: string | null;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Prepared"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  create_session_study_sessions_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SessionCreate"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SessionState"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  get_session_study_sessions__code__get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        code: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SessionState"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  give_consent_study_sessions__code__consent_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        code: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["Consent"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SessionState"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  give_demographics_study_sessions__code__demographics_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        code: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["Demographics"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SessionState"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  open_task_study_sessions__code__tasks__index__open_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        code: string;
-        index: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["TaskView"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  submit_task_study_sessions__code__tasks__index__submit_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        code: string;
-        index: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["FixSubmission"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SessionState"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  submit_sus_study_sessions__code__sus__block__post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        code: string;
-        block: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SusSubmission"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SessionState"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  finish_break_study_sessions__code__break_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        code: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SessionState"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  submit_debrief_study_sessions__code__debrief_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        code: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["DebriefSubmission"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SessionState"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  admin_tasks_study_admin_tasks_get: {
-    parameters: {
-      query?: never;
-      header?: {
-        "x-study-token"?: string | null;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AdminTask"][];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  rate_task_study_admin_tasks__task_row_id__patch: {
-    parameters: {
-      query?: never;
-      header?: {
-        "x-study-token"?: string | null;
-      };
-      path: {
-        task_row_id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RatingPatch"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AdminTask"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  export_study_admin_export__kind__csv_get: {
-    parameters: {
-      query?: never;
-      header?: {
-        "x-study-token"?: string | null;
-      };
-      path: {
-        kind: "sessions" | "tasks" | "sus";
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  create_upload_uploads_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "multipart/form-data": components["schemas"]["Body_create_upload_uploads_post"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["UploadResult"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  list_runs_runs_get: {
-    parameters: {
-      query?: {
-        limit?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["RunSummary"][];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  create_run_runs_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RunCreate"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["RunCreated"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  get_run_runs__run_id__get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        run_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["RunSummary"];
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  cancel_run_runs__run_id__cancel_post: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        run_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": {
-            [key: string]: boolean;
-          };
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  run_events_runs__run_id__events_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        run_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  screenshot_runs__run_id__assets__viewport__screenshot_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        run_id: string;
-        viewport: "desktop" | "mobile";
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  report_runs__run_id__report__ext__get: {
-    parameters: {
-      query: {
-        viewport: "desktop" | "mobile";
-      };
-      header?: never;
-      path: {
-        run_id: string;
-        ext: "json" | "html" | "pdf";
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+    health_health_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
+                };
+            };
+        };
+    };
+    overview_runs__run_id__overview_get: {
+        parameters: {
+            query: {
+                viewport: "desktop" | "mobile";
+            };
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Overview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    report_csv_runs__run_id__report_csv_get: {
+        parameters: {
+            query: {
+                viewport: "desktop" | "mobile";
+            };
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    exports_runs__run_id__exports_get: {
+        parameters: {
+            query: {
+                viewport: "desktop" | "mobile";
+            };
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportInfo"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_findings_runs__run_id__findings_get: {
+        parameters: {
+            query: {
+                viewport: "desktop" | "mobile";
+                sc?: string | null;
+                severity?: string | null;
+                provenance?: string | null;
+                tier?: string | null;
+            };
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FindingOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    compare_runs__run_id__compare_get: {
+        parameters: {
+            query: {
+                viewport: "desktop" | "mobile";
+            };
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompareOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_finding_findings__finding_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                finding_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FindingPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FindingOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crop_runs__run_id__assets__viewport__crop__key__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+                viewport: "desktop" | "mobile";
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    focus_image_runs__run_id__assets__viewport__focus__index___state__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+                viewport: "desktop" | "mobile";
+                index: number;
+                state: "on" | "off";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    catalogue_catalogue_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Catalogue"];
+                };
+            };
+        };
+    };
+    list_evals_eval_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvalSummary"][];
+                };
+            };
+        };
+    };
+    create_eval_eval_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EvalRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvalCreated"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_eval_eval__eval_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eval_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvalDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    eval_events_eval__eval_id__events_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eval_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_csv_eval__eval_id__export_csv_get: {
+        parameters: {
+            query: {
+                condition: "rule_only" | "pixel" | "hybrid";
+                stratum: string;
+            };
+            header?: never;
+            path: {
+                eval_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_tex_eval__eval_id__export_tex_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eval_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    materials_study_materials_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Materials"];
+                };
+            };
+        };
+    };
+    config_study_config_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudyConfig"];
+                };
+            };
+        };
+    };
+    prepare_study_prepare_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-study-token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Prepared"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_session_study_sessions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_session_study_sessions__code__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    give_consent_study_sessions__code__consent_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Consent"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    give_demographics_study_sessions__code__demographics_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Demographics"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    open_task_study_sessions__code__tasks__index__open_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+                index: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskView"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_task_study_sessions__code__tasks__index__submit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+                index: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FixSubmission"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_sus_study_sessions__code__sus__block__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+                block: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SusSubmission"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    finish_break_study_sessions__code__break_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_debrief_study_sessions__code__debrief_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DebriefSubmission"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_runs_study_admin_runs_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-study-token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminRun"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_tasks_study_admin_tasks_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-study-token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTask"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rate_task_study_admin_tasks__task_row_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-study-token"?: string | null;
+            };
+            path: {
+                task_row_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RatingPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTask"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_study_admin_export__kind__csv_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-study-token"?: string | null;
+            };
+            path: {
+                kind: "sessions" | "tasks" | "sus";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_upload_uploads_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_create_upload_uploads_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_runs_runs_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_run_runs_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunCreated"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_run_runs__run_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_run_runs__run_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: boolean;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_events_runs__run_id__events_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    screenshot_runs__run_id__assets__viewport__screenshot_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+                viewport: "desktop" | "mobile";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    report_runs__run_id__report__ext__get: {
+        parameters: {
+            query: {
+                viewport: "desktop" | "mobile";
+            };
+            header?: never;
+            path: {
+                run_id: string;
+                ext: "json" | "html" | "pdf";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
 }

@@ -75,7 +75,10 @@ export function ReportScreen({
   const router = useRouter();
   const queryClient = useQueryClient();
   const { state, update } = useReportState();
-  const wide = useMediaQuery("(min-width: 1280px)", true);
+  const wide = useMediaQuery(
+    embedded ? "(min-width: 1760px)" : "(min-width: 1280px)",
+    true,
+  );
   const medium = useMediaQuery("(min-width: 1024px)", true);
   const [pairMode, setPairMode] = useState<PairMode>("page");
   const [tab, setTab] = useState("canvas");
@@ -295,7 +298,7 @@ export function ReportScreen({
   );
 
   const banner =
-    run.status === "partial" ? (
+    run.status === "partial" && !embedded ? (
       <Alert className="m-3">
         <AlertTitle>
           {available.length === 1

@@ -256,22 +256,16 @@ test("both conditions render the same interface for the same task and the rule-o
   }
   async function structure() {
     const snap = await page.locator("main").ariaSnapshot();
-    const roles = snap
+    return snap
       .split("\n")
-      .map((l) => l.trim().replace(/^- /, "").split(/[ :]/)[0])
-      .filter((r) =>
-        [
-          "navigation",
-          "complementary",
-          "region",
-          "heading",
-          "toolbar",
-          "group",
-          "textbox",
-          "main",
-        ].includes(r),
-      );
-    return [...new Set(roles)].sort();
+      .map((l) => l.trim().replace(/^- /, ""))
+      .filter((l) =>
+        /^(navigation|complementary|region|heading|toolbar|group|textbox|tablist|table)\b/.test(
+          l,
+        ),
+      )
+      .map((l) => l.replace(/:$/, "").replace(/\s*\[.*\]$/, ""))
+      .filter((l) => !/\d\.\d|\d+ findings|\d+ of \d+ /.test(l));
   }
 
   // SYN09 (rule-only first) and SYN03 (hybrid first) both start with task T3 (focus not obscured).
@@ -291,24 +285,57 @@ test("both conditions render the same interface for the same task and the rule-o
   expect(hybridBoxes).toBeGreaterThan(0);
 });
 
-test("the rule-only report shows only rule findings and says which criteria it did not assess", async ({
+test("a refresh on a task step keeps the same task and the focus lands on its heading", async ({
+  page,
   request,
 }) => {
-  const runs = await (await request.get("/api/runs?limit=100")).json();
-  const ruleOnly = runs.filter(
-    (r: { condition: string; source: string }) =>
-      r.condition === "rule_only" && r.source.includes("synth"),
+  await page.setViewportSize({ width: 1600, height: 1000 });
+  await advance(request, "SYN12", "task");
+  await page.goto("/study/SYN12");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Task 1 of 4" }),
+  ).toBeFocused();
+  await expect(page).toHaveTitle(/Task 1 of 4/);
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Task 1 of 4" }),
+  ).toBeVisible();
+  const state = await (await request.get("/api/study/sessions/SYN12")).json();
+  expect(state.next.task_index).toBe(1);
+  expect(state.tasks[0].status).toBe("open");
+});
+
+test("study runs are hidden from the public list, and the rule-only report shows only rule findings and says which criteria it did not assess", async ({
+  request,
+}) => {
+  expect(await (await request.get("/api/runs?limit=100")).json()).not.toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        condition: "rule_only",
+        source: expect.stringContaining("study"),
+      }),
+    ]),
   );
-  expect(ruleOnly.length).toBe(8);
+  const runs = await (
+    await request.get("/api/study/admin/runs", { headers: TOKEN })
+  ).json();
+  const ruleOnly = runs.filter(
+    (r: { condition: string }) => r.condition === "rule_only",
+  );
+  const hybridRuns = runs.filter(
+    (r: { condition: string }) => r.condition === "hybrid",
+  );
+  expect(ruleOnly).toHaveLength(8);
+  expect(hybridRuns).toHaveLength(8);
   for (const run of ruleOnly) {
     const findings = await (
-      await request.get(`/api/runs/${run.id}/findings?viewport=desktop`)
+      await request.get(`/api/runs/${run.run_id}/findings?viewport=desktop`)
     ).json();
     expect(
       findings.every((f: { provenance: string }) => f.provenance === "rule"),
     ).toBe(true);
     const overview = await (
-      await request.get(`/api/runs/${run.id}/overview?viewport=desktop`)
+      await request.get(`/api/runs/${run.run_id}/overview?viewport=desktop`)
     ).json();
     const checked = overview.coverage.filter(
       (c: { hybrid_verdict: string }) => c.hybrid_verdict === "automated",
@@ -320,11 +347,6 @@ test("the rule-only report shows only rule findings and says which criteria it d
       ),
     ).toHaveLength(0);
   }
-  const hybridRuns = runs.filter(
-    (r: { condition: string; source: string }) =>
-      r.condition === "hybrid" && r.source.includes("synth"),
-  );
-  expect(hybridRuns.length).toBe(8);
 });
 
 test("the study admin page rates fixes and exports, and every participant step passes axe in dark mode", async ({
@@ -352,7 +374,7 @@ test("the study admin page rates fixes and exports, and every participant step p
   expect(text).toContain("rubric_expected_fix");
   await scan(page);
 
-  for (const kind of [
+  const kinds = [
     "consent",
     "demographics",
     "task",
@@ -360,17 +382,23 @@ test("the study admin page rates fixes and exports, and every participant step p
     "break",
     "debrief",
     "done",
-  ]) {
-    const code = `SYN${String(8 + ["consent", "demographics", "task", "sus", "break", "debrief", "done"].indexOf(kind) + 1).padStart(2, "0")}`;
+  ];
+  for (const [n, kind] of kinds.entries()) {
+    const code = `SYN${String(8 + n + 1).padStart(2, "0")}`;
     await advance(request, code, kind);
-    await page.goto(`/study/${code}`);
-    await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
-    if (kind === "task")
+    for (const scheme of ["light", "dark"] as const) {
+      await page.emulateMedia({ colorScheme: scheme });
+      await page.goto(`/study/${code}`);
       await expect(
-        page.getByRole("img", {
-          name: /Full-page screenshot of the task page/,
-        }),
+        page.getByRole("heading", { level: 1 }).first(),
       ).toBeVisible();
-    await scan(page);
+      if (kind === "task")
+        await expect(
+          page.getByRole("img", {
+            name: /Full-page screenshot of the task page/,
+          }),
+        ).toBeVisible();
+      await scan(page);
+    }
   }
 });

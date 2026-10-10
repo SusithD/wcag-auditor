@@ -1,4 +1,5 @@
 import csv
+import io
 import shutil
 import sys
 from collections import Counter
@@ -354,3 +355,229 @@ def test_real_participants_exist_only_if_ethics_approval_is_recorded_in_the_note
         if r["synthetic"] == "0"
     ]
     assert approved or not real
+
+
+def test_study_runs_are_hidden_from_the_public_list_and_cannot_be_cancelled(tmp_path: Path) -> None:
+    with make_client(tmp_path) as c:
+        seed_runs(c)
+        assert c.get("/runs").json() == []
+        with cast(Any, c.app).state.sessions() as session:
+            from sqlalchemy import select
+
+            run_id = session.scalars(select(StudyRun.run_id)).first()
+        assert c.post(f"/runs/{run_id}/cancel").status_code == 403
+
+
+def test_a_double_submit_or_a_double_session_start_is_a_clean_conflict_not_a_500(
+    tmp_path: Path,
+) -> None:
+    from concurrent.futures import ThreadPoolExecutor
+
+    with make_client(tmp_path) as c:
+        seed_runs(c)
+        with ThreadPoolExecutor(2) as pool:
+            codes = [
+                f.result().status_code
+                for f in [
+                    pool.submit(c.post, "/study/sessions", json={"code": "SYN06"}) for _ in range(2)
+                ]
+            ]
+        assert codes == [200, 200]
+        c.post("/study/sessions/SYN06/consent", json={"statements": [True] * 6})
+        demo = {k: v[0] for k, v in c.get("/study/materials").json()["demographics"].items()}
+        c.post("/study/sessions/SYN06/demographics", json={"answers": demo})
+        c.post("/study/sessions/SYN06/tasks/1/open")
+        first = c.post("/study/sessions/SYN06/tasks/1/submit", json={"fix_text": "one"})
+        second = c.post("/study/sessions/SYN06/tasks/1/submit", json={"fix_text": "two"})
+        assert first.status_code == 200 and second.status_code == 409
+        tasks = c.get("/study/admin/tasks", headers={"X-Study-Token": TOKEN}).json()
+        assert next(t for t in tasks if t["task_index"] == 1)["fix_text"] == "one"
+
+
+def test_prepare_with_a_missing_folder_queues_nothing(tmp_path: Path) -> None:
+    import yaml
+
+    study = tmp_path / "study"
+    study.mkdir()
+    data = yaml.safe_load((STUDY / "tasks.yaml").read_text())
+    data["tasks"] = data["tasks"][:2]
+    data["tasks"][1]["folder"] = "fixtures/does/not/exist"
+    (study / "tasks.yaml").write_text(yaml.safe_dump(data))
+    shutil.copy(STUDY / "assignments.csv", study / "assignments.csv")
+    with make_client(tmp_path / "x", study_dir=study) as c:
+        r = c.post("/study/prepare", headers={"X-Study-Token": TOKEN})
+        assert r.status_code == 422
+        with cast(Any, c.app).state.sessions() as session:
+            from sqlalchemy import select
+
+            assert session.scalars(select(StudyRun)).all() == []
+            assert session.scalars(select(Run)).all() == []
+
+
+def test_exports_neutralise_formulas_and_round_trip_commas_quotes_and_newlines(
+    tmp_path: Path,
+) -> None:
+    risky = ["=1+1", "  @cmd", "-2", "a,b", 'say "hi"', "line1\nline2", "+3", "\t=x"]
+    with make_client(tmp_path) as c:
+        seed_runs(c)
+        c.post("/study/sessions", json={"code": "SYN07"})
+        c.post("/study/sessions/SYN07/consent", json={"statements": [True] * 6})
+        demo = {k: v[0] for k, v in c.get("/study/materials").json()["demographics"].items()}
+        c.post("/study/sessions/SYN07/demographics", json={"answers": demo})
+        for i, text in enumerate(risky[:4], start=1):
+            c.post(f"/study/sessions/SYN07/tasks/{i}/open")
+            c.post(f"/study/sessions/SYN07/tasks/{i}/submit", json={"fix_text": text})
+        h = {"X-Study-Token": TOKEN}
+        rows = list(
+            csv.DictReader(c.get("/study/admin/export/tasks.csv", headers=h).text.splitlines())
+        )
+        by_index = {int(r["task_index"]): r["fix_text"] for r in rows if r["fix_text"]}
+        assert by_index[1] == "'=1+1" and by_index[3] == "'-2"
+        assert by_index[2] == "'" + "@cmd" or by_index[2] == "@cmd"
+        assert by_index[4] == "a,b"
+        tasks = c.get("/study/admin/tasks", headers=h).json()
+        c.patch(
+            f"/study/admin/tasks/{tasks[0]['id']}",
+            json={"success": True, "notes": risky[5]},
+            headers=h,
+        )
+        c.patch(
+            f"/study/admin/tasks/{tasks[1]['id']}",
+            json={"success": False, "notes": risky[4]},
+            headers=h,
+        )
+        text = c.get("/study/admin/export/tasks.csv", headers=h).text
+        parsed = list(csv.DictReader(io.StringIO(text)))
+        notes = {r["task_index"]: r["notes"] for r in parsed if r["notes"]}
+        assert notes["1"] == "line1\nline2" and notes["2"] == 'say "hi"'
+
+
+def test_timing_comes_from_the_server_clock_and_client_values_are_ignored(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from datetime import UTC, datetime, timedelta
+
+    import app.study_api as api
+
+    now = [datetime(2026, 10, 10, 12, 0, 0, tzinfo=UTC)]
+    monkeypatch.setattr(api, "_now", lambda: now[0])
+    with make_client(tmp_path) as c:
+        seed_runs(c)
+        c.post("/study/sessions", json={"code": "SYN08"})
+        c.post("/study/sessions/SYN08/consent", json={"statements": [True] * 6})
+        demo = {k: v[0] for k, v in c.get("/study/materials").json()["demographics"].items()}
+        c.post("/study/sessions/SYN08/demographics", json={"answers": demo})
+        c.post("/study/sessions/SYN08/tasks/1/open", json={"opened_at": "2000-01-01T00:00:00Z"})
+        now[0] += timedelta(seconds=90)
+        c.post("/study/sessions/SYN08/tasks/1/open")
+        now[0] += timedelta(seconds=30)
+        r = c.post(
+            "/study/sessions/SYN08/tasks/1/submit",
+            json={"fix_text": "x", "seconds": 1, "submitted_at": "2000-01-01T00:00:00Z"},
+        )
+        assert r.status_code == 200
+        task = next(
+            t
+            for t in c.get("/study/admin/tasks", headers={"X-Study-Token": TOKEN}).json()
+            if t["task_index"] == 1
+        )
+        assert task["seconds"] == 120.0
+
+
+def test_a_hybrid_first_session_runs_end_to_end_in_the_assigned_order(tmp_path: Path) -> None:
+    with make_client(tmp_path) as c:
+        seed_runs(c)
+        full_session(c, "SYN03")
+        study = st.Study(STUDY)
+        assignment = study.assignments["SYN03"]
+        tasks = [
+            t
+            for t in c.get("/study/admin/tasks", headers={"X-Study-Token": TOKEN}).json()
+            if t["participant_code"] == "SYN03"
+        ]
+        assert [t["task_id"] for t in tasks] == list(assignment.task_order)
+        assert [t["condition"] for t in tasks] == ["hybrid"] * 4 + ["rule_only"] * 4
+        sus = list(
+            csv.DictReader(
+                c.get(
+                    "/study/admin/export/sus.csv", headers={"X-Study-Token": TOKEN}
+                ).text.splitlines()
+            )
+        )
+        assert [(r["block"], r["condition"]) for r in sus] == [("1", "hybrid"), ("2", "rule_only")]
+
+
+def test_a_questionnaire_cannot_be_submitted_twice_and_the_session_survives_a_refresh(
+    tmp_path: Path,
+) -> None:
+    with make_client(tmp_path) as c:
+        seed_runs(c)
+        c.post("/study/sessions", json={"code": "SYN10"})
+        c.post("/study/sessions/SYN10/consent", json={"statements": [True] * 6})
+        demo = {k: v[0] for k, v in c.get("/study/materials").json()["demographics"].items()}
+        c.post("/study/sessions/SYN10/demographics", json={"answers": demo})
+        for i in range(1, 5):
+            c.post(f"/study/sessions/SYN10/tasks/{i}/open")
+            c.post(f"/study/sessions/SYN10/tasks/{i}/submit", json={"fix_text": "x"})
+        assert c.post("/study/sessions/SYN10/sus/1", json={"scores": [3] * 10}).status_code == 200
+        assert c.post("/study/sessions/SYN10/sus/1", json={"scores": [5] * 10}).status_code == 409
+        again = c.post("/study/sessions", json={"code": "SYN10"}).json()
+        assert again["next"]["kind"] == "break" and again == c.get("/study/sessions/SYN10").json()
+        sus = list(
+            csv.DictReader(
+                c.get(
+                    "/study/admin/export/sus.csv", headers={"X-Study-Token": TOKEN}
+                ).text.splitlines()
+            )
+        )
+        assert [r["sus_score"] for r in sus] == ["50.0"]
+
+
+def test_only_one_session_exists_after_a_concurrent_start(tmp_path: Path) -> None:
+    from concurrent.futures import ThreadPoolExecutor
+
+    from app.models import StudySession
+    from sqlalchemy import select
+
+    with make_client(tmp_path) as c:
+        seed_runs(c)
+        with ThreadPoolExecutor(4) as pool:
+            codes = [
+                f.result().status_code
+                for f in [
+                    pool.submit(c.post, "/study/sessions", json={"code": "SYN11"}) for _ in range(4)
+                ]
+            ]
+        assert set(codes) == {200}
+        with cast(Any, c.app).state.sessions() as session:
+            assert (
+                len(
+                    session.scalars(
+                        select(StudySession).where(StudySession.participant_code == "SYN11")
+                    ).all()
+                )
+                == 1
+            )
+
+
+def test_the_pilot_notes_template_is_in_the_notes() -> None:
+    notes = (ROOT / "NOTES.md").read_text()
+    assert "**Pilot notes template" in notes
+    for label in (
+        "Session:",
+        "Recording and consent:",
+        "Per task",
+        "Rubric:",
+        "Tool defects:",
+        "SUS and debrief:",
+        "Decisions:",
+    ):
+        assert label in notes.split("**Pilot notes template", 1)[1]
+
+
+def test_admin_can_list_the_study_runs_that_the_public_list_hides(tmp_path: Path) -> None:
+    with make_client(tmp_path) as c:
+        seed_runs(c)
+        assert c.get("/study/admin/runs").status_code == 403
+        runs = c.get("/study/admin/runs", headers={"X-Study-Token": TOKEN}).json()
+        assert len(runs) == 16 and {r["condition"] for r in runs} == {"rule_only", "hybrid"}

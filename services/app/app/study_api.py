@@ -5,6 +5,7 @@ import csv
 import hmac
 import io
 import re
+import threading
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
@@ -14,6 +15,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app import study as st
@@ -21,6 +23,7 @@ from app.config import Settings
 from app.jobs import Job, auditor_argv
 from app.models import Run, StudyRun, StudySession, StudyTask, SusResponse
 
+_prepare_lock = threading.Lock()
 CODE = re.compile(r"^[A-Za-z0-9_-]{2,24}$")
 StepKind = Literal["consent", "demographics", "task", "sus", "break", "debrief", "done"]
 
@@ -125,6 +128,12 @@ class AdminTask(BaseModel):
     reported_by_condition: bool
 
 
+class AdminRun(BaseModel):
+    task_id: str
+    condition: str
+    run_id: str
+
+
 class RatingPatch(BaseModel):
     success: bool | None = None
     notes: str | None = None
@@ -151,7 +160,7 @@ def build_study_router(settings: Settings) -> APIRouter:
             raise HTTPException(
                 403, "Study administration is disabled: STUDY_ADMIN_TOKEN is not set"
             )
-        if x_study_token is None or not hmac.compare_digest(x_study_token, token):
+        if x_study_token is None or not hmac.compare_digest(x_study_token.encode(), token.encode()):
             raise HTTPException(403, "Wrong study administration token")
 
     def load(session: Session, code: str) -> tuple[StudySession, st.Assignment]:
@@ -161,6 +170,10 @@ def build_study_router(settings: Settings) -> APIRouter:
         ).first()
         if assignment is None or row is None:
             raise HTTPException(404, "Unknown participant code")
+        if not assignment.synthetic and not settings.study_ethics_approved:
+            raise HTTPException(
+                403, "Real participants are not enabled: ethics approval is not recorded"
+            )
         return row, assignment
 
     def state(session: Session, row: StudySession, a: st.Assignment) -> SessionState:
@@ -247,50 +260,55 @@ def build_study_router(settings: Settings) -> APIRouter:
         )
 
     def _ready_count(session: Session) -> int:
-        count = 0
-        for sr in session.scalars(select(StudyRun)):
-            run = session.get(Run, sr.run_id)
-            if run is not None and run.status == "done":
-                count += 1
-        return count
+        return len(
+            session.scalars(
+                select(StudyRun.run_id)
+                .join(Run, Run.id == StudyRun.run_id)
+                .where(Run.status == "done")
+            ).all()
+        )
 
     @router.post("/prepare", response_model=Prepared, dependencies=[Depends(admin)])
     def prepare(request: Request) -> Prepared:
-        queued = 0
-        with request.app.state.sessions() as session:
+        with _prepare_lock, request.app.state.sessions() as session:
             existing = {(r.task_id, r.condition): r for r in session.scalars(select(StudyRun))}
+            planned: list[tuple[st.Task, str, Path]] = []
             for task in study.tasks.values():
+                folder = (Path(__file__).resolve().parents[3] / task.folder).resolve()
+                if not (folder / "meta.json").is_file():
+                    raise HTTPException(422, f"Task {task.id}: capture folder is missing")
                 for condition in st.CONDITIONS:
-                    key = (task.id, condition)
-                    if key in existing:
-                        run = session.get(Run, existing[key].run_id)
+                    sr = existing.get((task.id, condition))
+                    if sr is not None:
+                        run = session.get(Run, sr.run_id)
                         if run is not None and run.status in {"done", "queued", "running"}:
                             continue
-                        session.delete(existing[key])
+                        session.delete(sr)
                         session.flush()
-                    folder = (Path(__file__).resolve().parents[3] / task.folder).resolve()
-                    if not (folder / "meta.json").is_file():
-                        raise HTTPException(422, f"Task {task.id}: capture folder is missing")
-                    run_id = uuid.uuid4().hex
-                    out = settings.runs_dir / run_id
-                    out.mkdir(parents=True)
-                    argv = auditor_argv(
-                        "audit", "--out", str(out), "--condition", condition,
-                        "--folder", str(folder), "--no-pdf",
-                    )  # fmt: skip
-                    session.add(
-                        Run(
-                            id=run_id, source_kind="folder", source=str(folder),
-                            viewports=["desktop"], condition=condition, status="queued",
-                            stage_status={},
-                        )
-                    )  # fmt: skip
-                    session.add(StudyRun(task_id=task.id, condition=condition, run_id=run_id))
-                    request.app.state.jobs.submit(Job(run_id, argv))
-                    queued += 1
+                    planned.append((task, condition, folder))
+            jobs: list[Job] = []
+            for task, condition, folder in planned:
+                run_id = uuid.uuid4().hex
+                out = settings.runs_dir / run_id
+                out.mkdir(parents=True)
+                argv = auditor_argv(
+                    "audit", "--out", str(out), "--condition", condition,
+                    "--folder", str(folder), "--no-pdf",
+                )  # fmt: skip
+                session.add(
+                    Run(
+                        id=run_id, source_kind="folder", source=f"study task {run_id[:8]}",
+                        viewports=["desktop"], condition=condition, status="queued",
+                        stage_status={},
+                    )
+                )  # fmt: skip
+                session.add(StudyRun(task_id=task.id, condition=condition, run_id=run_id))
+                jobs.append(Job(run_id, argv))
             session.commit()
+            for job in jobs:
+                request.app.state.jobs.submit(job)
             ready = _ready_count(session)
-        return Prepared(queued=queued, ready=ready, total=len(study.tasks) * len(st.CONDITIONS))
+        return Prepared(queued=len(jobs), ready=ready, total=len(study.tasks) * len(st.CONDITIONS))
 
     @router.post("/sessions", response_model=SessionState)
     def create_session(body: SessionCreate, request: Request) -> SessionState:
@@ -318,20 +336,26 @@ def build_study_router(settings: Settings) -> APIRouter:
                     started_at=_now(),
                     step=0,
                 )
-                session.add(row)
-                session.flush()
-                for index in range(1, 2 * st.BLOCK_SIZE + 1):
-                    task = study.task_for(assignment, index)
-                    session.add(
-                        StudyTask(
-                            session_id=row.id,
-                            task_id=task.id,
-                            condition=study.condition_for(assignment, index),
-                            task_index=index,
-                            block=1 if index <= st.BLOCK_SIZE else 2,
+                try:
+                    session.add(row)
+                    session.flush()
+                    for index in range(1, 2 * st.BLOCK_SIZE + 1):
+                        task = study.task_for(assignment, index)
+                        session.add(
+                            StudyTask(
+                                session_id=row.id,
+                                task_id=task.id,
+                                condition=study.condition_for(assignment, index),
+                                task_index=index,
+                                block=1 if index <= st.BLOCK_SIZE else 2,
+                            )
                         )
-                    )
-                session.commit()
+                    session.commit()
+                except IntegrityError:
+                    session.rollback()
+                    row = session.scalars(
+                        select(StudySession).where(StudySession.participant_code == code)
+                    ).one()
             return state(session, row, assignment)
 
     @router.get("/sessions/{code}", response_model=SessionState)
@@ -383,12 +407,12 @@ def build_study_router(settings: Settings) -> APIRouter:
             row, a = load(session, code)
             require(row, "task", task_index=index)
             task = get_task(session, row, index)
-            if task.opened_at is None:
-                task.opened_at = _now()
-                session.commit()
             sr = session.get(StudyRun, (task.task_id, task.condition))
             if sr is None:
                 raise HTTPException(409, "The study pages are not prepared")
+            if task.opened_at is None:
+                task.opened_at = _now()
+                session.commit()
             return TaskView(
                 task_index=index,
                 block=task.block,
@@ -411,6 +435,8 @@ def build_study_router(settings: Settings) -> APIRouter:
             task = get_task(session, row, index)
             if task.opened_at is None:
                 raise HTTPException(409, "Open the task before submitting")
+            if task.submitted_at is not None:
+                raise HTTPException(409, "This task was already submitted")
             task.submitted_at = _now()
             task.fix_text = text
             advance(row)
@@ -432,7 +458,11 @@ def build_study_router(settings: Settings) -> APIRouter:
                     )
                 )
             advance(row)
-            session.commit()
+            try:
+                session.commit()
+            except IntegrityError:
+                session.rollback()
+                raise HTTPException(409, "This questionnaire was already submitted") from None
             return state(session, row, a)
 
     @router.post("/sessions/{code}/break", response_model=SessionState)
@@ -458,6 +488,16 @@ def build_study_router(settings: Settings) -> APIRouter:
 
     def reported(task: st.Task, condition: str) -> bool:
         return condition in task.rubric.get("reported_by", [])
+
+    @router.get("/admin/runs", response_model=list[AdminRun], dependencies=[Depends(admin)])
+    def admin_runs(request: Request) -> list[AdminRun]:
+        with request.app.state.sessions() as session:
+            return [
+                AdminRun(task_id=r.task_id, condition=r.condition, run_id=r.run_id)
+                for r in session.scalars(
+                    select(StudyRun).order_by(StudyRun.task_id, StudyRun.condition)
+                )
+            ]
 
     @router.get("/admin/tasks", response_model=list[AdminTask], dependencies=[Depends(admin)])
     def admin_tasks(request: Request) -> list[AdminTask]:
@@ -511,7 +551,7 @@ def build_study_router(settings: Settings) -> APIRouter:
 
     def _cell(value: Any) -> Any:
         text = "" if value is None else str(value)
-        return "'" + text if text[:1] in {"=", "+", "-", "@", "\t", "\r"} else value
+        return "'" + text if text.lstrip()[:1] in {"=", "+", "-", "@", "\t", "\r", "\n"} else value
 
     @router.get("/admin/export/{kind}.csv", dependencies=[Depends(admin)])
     def export(kind: Literal["sessions", "tasks", "sus"], request: Request) -> PlainTextResponse:

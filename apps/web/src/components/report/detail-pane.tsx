@@ -30,6 +30,7 @@ type Props = {
   saving: boolean;
   saveError: boolean;
   empty: boolean;
+  readOnly?: boolean;
 };
 
 function CopyButton({ text, label }: { text: string; label: string }) {
@@ -66,6 +67,7 @@ export function DetailPane({
   saving,
   saveError,
   empty,
+  readOnly = false,
 }: Props) {
   if (!finding) {
     return (
@@ -250,30 +252,32 @@ export function DetailPane({
       </div>
 
       <footer className="flex flex-wrap items-center justify-between gap-2 border-t p-3">
-        <div className="flex gap-1" role="group" aria-label="Finding status">
-          <Button
-            size="sm"
-            variant={finding.status === "fixed" ? "secondary" : "outline"}
-            aria-pressed={finding.status === "fixed"}
-            disabled={saving}
-            onClick={() =>
-              onStatus(finding.status === "fixed" ? "open" : "fixed")
-            }
-          >
-            {finding.status === "fixed" ? "Fixed" : "Mark fixed"}
-          </Button>
-          <Button
-            size="sm"
-            variant={finding.status === "ignored" ? "secondary" : "outline"}
-            aria-pressed={finding.status === "ignored"}
-            disabled={saving}
-            onClick={() =>
-              onStatus(finding.status === "ignored" ? "open" : "ignored")
-            }
-          >
-            {finding.status === "ignored" ? "Ignored" : "Ignore"}
-          </Button>
-        </div>
+        {readOnly ? null : (
+          <div className="flex gap-1" role="group" aria-label="Finding status">
+            <Button
+              size="sm"
+              variant={finding.status === "fixed" ? "secondary" : "outline"}
+              aria-pressed={finding.status === "fixed"}
+              disabled={saving}
+              onClick={() =>
+                onStatus(finding.status === "fixed" ? "open" : "fixed")
+              }
+            >
+              {finding.status === "fixed" ? "Fixed" : "Mark fixed"}
+            </Button>
+            <Button
+              size="sm"
+              variant={finding.status === "ignored" ? "secondary" : "outline"}
+              aria-pressed={finding.status === "ignored"}
+              disabled={saving}
+              onClick={() =>
+                onStatus(finding.status === "ignored" ? "open" : "ignored")
+              }
+            >
+              {finding.status === "ignored" ? "Ignored" : "Ignore"}
+            </Button>
+          </div>
+        )}
         <div className="flex items-center gap-1">
           <Button
             size="sm"

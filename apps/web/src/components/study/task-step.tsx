@@ -59,7 +59,7 @@ export function TaskStep({ code, index }: { code: string; index: number }) {
       <FormError message="This task could not be opened. Ask the researcher for help." />
     );
   }
-  if (!view.data || !run.data) {
+  if (!view.data) {
     return (
       <div aria-busy="true">
         <Skeleton className="h-96 w-full" />
@@ -70,6 +70,7 @@ export function TaskStep({ code, index }: { code: string; index: number }) {
 
   function done(event: React.FormEvent) {
     event.preventDefault();
+    if (submit.isPending) return;
     if (!fix.trim()) {
       setError("Write or describe your proposed fix before you finish.");
       document.getElementById("fix-text")?.focus();
@@ -96,12 +97,22 @@ export function TaskStep({ code, index }: { code: string; index: number }) {
       </header>
       <div className="grid gap-4 xl:grid-cols-[1fr_360px]">
         <div className="min-w-0 overflow-hidden rounded-lg border">
-          <ReportScreen
-            run={run.data}
-            headingRef={{ current: null }}
-            embedded
-            className="h-[72dvh]"
-          />
+          {run.data ? (
+            <ReportScreen
+              run={run.data}
+              headingRef={{ current: null }}
+              embedded
+              className="h-[72dvh]"
+            />
+          ) : run.isError ? (
+            <p role="alert" className="p-4 text-body">
+              The report could not be loaded. Ask the researcher for help.
+            </p>
+          ) : (
+            <div className="p-4" aria-busy="true">
+              <Skeleton className="h-96 w-full" />
+            </div>
+          )}
         </div>
         <form
           onSubmit={done}
@@ -116,16 +127,25 @@ export function TaskStep({ code, index }: { code: string; index: number }) {
           </p>
           <textarea
             id="fix-text"
-            aria-describedby="fix-help"
+            aria-describedby={error ? "fix-help fix-error" : "fix-help"}
+            aria-invalid={error ? true : undefined}
             rows={10}
             value={fix}
             onChange={(e) => setFix(e.target.value)}
             className="block w-full rounded-md border border-input bg-background p-2 font-mono text-body"
           />
-          <FormError message={error} />
-          <Button type="submit" size="lg" aria-disabled={submit.isPending}>
+          <FormError message={error} id="fix-error" />
+          <Button
+            type="submit"
+            size="lg"
+            aria-disabled={submit.isPending}
+            className="aria-disabled:opacity-60"
+          >
             Done
           </Button>
+          <output aria-live="polite" className="sr-only">
+            {submit.isPending ? "Saving your fix" : ""}
+          </output>
         </form>
       </div>
     </div>

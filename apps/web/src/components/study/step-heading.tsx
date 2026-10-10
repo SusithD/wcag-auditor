@@ -27,9 +27,15 @@ export function StepHeading({
   );
 }
 
-export function FormError({ message }: { message: string | null }) {
+export function FormError({
+  message,
+  id,
+}: {
+  message: string | null;
+  id?: string;
+}) {
   return message ? (
-    <p role="alert" className="mt-4 text-body text-destructive">
+    <p id={id} role="alert" className="mt-4 text-body text-destructive">
       {message}
     </p>
   ) : null;

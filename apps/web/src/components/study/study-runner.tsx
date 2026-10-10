@@ -12,6 +12,26 @@ import {
 import { SusStep } from "./sus-step";
 import { TaskStep } from "./task-step";
 
+function stepTitle(step: {
+  kind: string;
+  task_index?: number | null;
+  block?: number | null;
+  position_in_block?: number | null;
+}) {
+  if (step.kind === "task")
+    return `Task ${step.position_in_block ?? step.task_index} of 4`;
+  if (step.kind === "sus") return `Questionnaire ${step.block} of 2`;
+  return (
+    {
+      consent: "Before we start",
+      demographics: "About you",
+      break: "Break",
+      debrief: "Debrief",
+      done: "Thank you",
+    }[step.kind] ?? "Study"
+  );
+}
+
 export function StudyRunner({ code }: { code: string }) {
   const session = useSession(code);
   const materials = useMaterials();
@@ -43,9 +63,12 @@ export function StudyRunner({ code }: { code: string }) {
     <div
       className={`mx-auto w-full px-6 py-8 ${wide ? "max-w-[1700px]" : "max-w-3xl"}`}
     >
-      <title>{`Study - ${state.code}`}</title>
+      <title>{`${stepTitle(step)} - study`}</title>
       {state.synthetic ? (
-        <p className="mb-4 rounded-md border bg-muted px-3 py-2 text-caption">
+        <p
+          role="note"
+          className="mb-4 rounded-md border bg-muted px-3 py-2 text-caption"
+        >
           Synthetic session: no real participant data is collected.
         </p>
       ) : null}

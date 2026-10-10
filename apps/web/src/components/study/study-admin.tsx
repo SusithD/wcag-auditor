@@ -64,11 +64,16 @@ export function StudyAdmin() {
   }
 
   async function rate(task: AdminTask, success: boolean | null, notes: string) {
-    await fetch(`/api/study/admin/tasks/${task.id}`, {
+    const res = await fetch(`/api/study/admin/tasks/${task.id}`, {
       method: "PATCH",
       headers: headers(saved),
       body: JSON.stringify({ success, notes }),
     });
+    setMessage(
+      res.ok
+        ? `Saved ${task.participant_code} ${task.task_id}`
+        : "Saving failed",
+    );
     client.invalidateQueries({ queryKey: ["study", "admin", saved] });
   }
 
@@ -150,11 +155,9 @@ export function StudyAdmin() {
               </Button>
             ))}
           </div>
-          {message ? (
-            <p role="status" className="mt-2 text-body">
-              {message}
-            </p>
-          ) : null}
+          <p role="status" className="mt-2 text-body">
+            {message}
+          </p>
           <div
             role="region"
             aria-label="Task ratings"
@@ -262,7 +265,9 @@ function RatingRow({
           id={`notes-${task.id}`}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          onBlur={() => onRate(task, task.success, notes)}
+          onBlur={() =>
+            notes !== (task.notes ?? "") && onRate(task, task.success, notes)
+          }
         />
       </td>
     </tr>

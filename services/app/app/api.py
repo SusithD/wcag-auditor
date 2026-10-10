@@ -20,7 +20,7 @@ from sqlalchemy import select
 
 from app.config import Settings
 from app.jobs import CANCELLED, TIMED_OUT, Job, JobResult, auditor_argv
-from app.models import Run
+from app.models import Run, StudyRun
 
 Viewport = Literal["desktop", "mobile"]
 Condition = Literal["hybrid", "rule_only"]
@@ -293,7 +293,13 @@ def build_router(settings: Settings) -> APIRouter:
         request: Request, limit: Annotated[int, Query(ge=1, le=100)] = 20
     ) -> list[RunSummary]:
         with request.app.state.sessions() as session:
-            rows = session.scalars(select(Run).order_by(Run.created_at.desc()).limit(limit))
+            hidden = select(StudyRun.run_id)
+            rows = session.scalars(
+                select(Run)
+                .where(Run.id.not_in(hidden))
+                .order_by(Run.created_at.desc())
+                .limit(limit)
+            )
             return [summarise(r) for r in rows]
 
     @router.get("/runs/{run_id}", response_model=RunSummary)
@@ -308,6 +314,9 @@ def build_router(settings: Settings) -> APIRouter:
     @router.post("/runs/{run_id}/cancel", status_code=202)
     def cancel_run(run_id: str, request: Request) -> dict[str, bool]:
         run_dir(run_id)
+        with request.app.state.sessions() as session:
+            if session.scalars(select(StudyRun).where(StudyRun.run_id == run_id)).first():
+                raise HTTPException(403, "Study runs cannot be cancelled")
         cancelled: bool = request.app.state.jobs.cancel(run_id)
         if cancelled:
             with request.app.state.sessions() as session:

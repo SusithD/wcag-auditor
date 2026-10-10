@@ -69,6 +69,10 @@ export function ConsentStep({
             <input
               ref={i === 0 ? first : undefined}
               type="checkbox"
+              aria-invalid={error && !required[i] ? true : undefined}
+              aria-describedby={
+                error && !required[i] ? "consent-error" : undefined
+              }
               className="mt-0.5 size-4 shrink-0"
               checked={required[i]}
               onChange={(e) =>
@@ -97,7 +101,7 @@ export function ConsentStep({
           </Label>
         ))}
       </fieldset>
-      <FormError message={error} />
+      <FormError message={error} id="consent-error" />
       <Button type="submit" className="mt-6" size="lg">
         Continue
       </Button>
@@ -155,6 +159,10 @@ export function DemographicsStep({
             <select
               id={`demo-${key}`}
               value={answers[key] ?? ""}
+              aria-invalid={error && !answers[key] ? true : undefined}
+              aria-describedby={
+                error && !answers[key] ? "demo-error" : undefined
+              }
               onChange={(e) =>
                 setAnswers({ ...answers, [key]: e.target.value })
               }
@@ -170,7 +178,7 @@ export function DemographicsStep({
           </div>
         ))}
       </div>
-      <FormError message={error} />
+      <FormError message={error} id="demo-error" />
       <Button type="submit" className="mt-6" size="lg">
         Continue
       </Button>

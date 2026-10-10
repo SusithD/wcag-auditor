@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useStudyConfig } from "@/hooks/use-study";
-import { FormError } from "./step-heading";
 
 export function StudyEntry() {
   const router = useRouter();
@@ -79,7 +78,6 @@ export function StudyEntry() {
             {error}
           </p>
         ) : null}
-        <FormError message={null} />
         <Button type="submit" size="lg" className="mt-4" aria-disabled={busy}>
           Start
         </Button>
