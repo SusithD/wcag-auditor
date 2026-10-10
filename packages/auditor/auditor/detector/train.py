@@ -196,6 +196,23 @@ def extra_callbacks(callbacks: list[Any]) -> Iterator[None]:
             m.RandomSampler = original_sampler
 
 
+def resolve_resume(out: Path, epochs: int, stop_after_epoch: int | None) -> Path | None:
+    """Latest per-epoch checkpoint in `out`, or None for a fresh start. Refuses when the phase
+    (or the whole run) is already complete, so a restart can never overwrite later checkpoints."""
+    found = sorted(
+        (int(p.stem.split("_")[1]), p)
+        for p in out.glob("checkpoint_*.ckpt")
+        if p.stem.split("_")[1].isdigit()
+    )
+    if not found:
+        return None
+    done, path = found[-1][0] + 1, found[-1][1]
+    limit = min(epochs, stop_after_epoch) if stop_after_epoch is not None else epochs
+    if done >= limit:
+        raise SystemExit(f"{path.name} already covers {done} epochs; this phase ends at {limit}")
+    return path
+
+
 def checkpoint_epoch(path: Path | None) -> int:
     if path is None:
         return 0
@@ -315,12 +332,21 @@ def main() -> None:
     ap.add_argument("--device", default="mps")
     ap.add_argument("--resume", type=Path, default=None)
     ap.add_argument(
+        "--resume-latest",
+        action="store_true",
+        help="resume from the newest checkpoint_N.ckpt in --out if there is one",
+    )
+    ap.add_argument(
         "--stop-after-epoch",
         type=int,
         default=None,
         help="stop cleanly after this epoch; the schedule still covers --epochs (ADR-028)",
     )
     args = ap.parse_args()
+    if args.resume_latest:
+        if args.resume is not None:
+            ap.error("--resume and --resume-latest are exclusive")
+        args.resume = resolve_resume(args.out, args.epochs, args.stop_after_epoch)
     train(
         args.dataset,
         args.out,

@@ -112,3 +112,35 @@ def test_three_epochs_equal_two_epochs_plus_a_resumed_epoch(tmp_path: Path, work
     assert any(not torch.equal(a[k], first_epoch[k]) for k in a)
     different = [k for k in a if not torch.equal(a[k], b[k])]
     assert different == []
+
+
+def test_a_mid_phase_restart_resumes_from_the_latest_checkpoint(tmp_path: Path) -> None:
+    from auditor.detector.train import resolve_resume, train
+
+    data = make_dataset(tmp_path / "data")
+    common: dict[str, Any] = {
+        "model": "nano", "batch_size": 2, "resolution": SIZE,
+        "seed": 11, "device": "cpu", "num_workers": 0,
+    }  # fmt: skip
+    straight = train(data, tmp_path / "straight", epochs=4, **common)
+    run = tmp_path / "run"
+    assert resolve_resume(run, 4, 2) is None
+    train(data, run, epochs=4, stop_after_epoch=1, **common)
+    interrupted = resolve_resume(run, 4, 2)
+    assert interrupted == run / "checkpoint_0.ckpt"
+    train(data, run, epochs=4, stop_after_epoch=2, resume=interrupted, **common)
+    with pytest.raises(SystemExit):
+        resolve_resume(run, 4, 2)
+    phase2 = resolve_resume(run, 4, None)
+    assert phase2 == run / "checkpoint_1.ckpt"
+    before = (run / "checkpoint_1.ckpt").read_bytes()
+    train(data, run, epochs=4, resume=phase2, **common)
+    assert (run / "checkpoint_1.ckpt").read_bytes() == before
+    with pytest.raises(SystemExit):
+        resolve_resume(run, 4, None)
+
+    import torch
+
+    a, b = weights(latest_checkpoint(straight)), weights(latest_checkpoint(run))
+    assert latest_checkpoint(run).stem == "checkpoint_3"
+    assert [k for k in a if not torch.equal(a[k], b[k])] == []

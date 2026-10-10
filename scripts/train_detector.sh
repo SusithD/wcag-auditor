@@ -8,13 +8,15 @@ export PYTORCH_ENABLE_MPS_FALLBACK=1
 train=(uv run python -m auditor.detector.train --dataset "$dataset" --out "$out" --model nano --epochs 20 --batch-size 8 --resolution 576 --device mps)
 case $phase in
   phase1)
-    [ -e "$out/checkpoint_9.ckpt" ] && { echo "phase 1 already finished: $out/checkpoint_9.ckpt exists" >&2; exit 1; }
-    exec caffeinate -i "${train[@]}" --stop-after-epoch 10
+    exec caffeinate -i "${train[@]}" --stop-after-epoch 10 --resume-latest
     ;;
   phase2)
     [ -e "$out/checkpoint_9.ckpt" ] || { echo "no epoch-10 checkpoint in $out; run phase 1 first" >&2; exit 1; }
-    [ -e "$out/ema_epoch10.pth" ] || cp "$out/last_ema.pth" "$out/ema_epoch10.pth"
-    exec caffeinate -i "${train[@]}" --resume "$out/checkpoint_9.ckpt"
+    if [ ! -e "$out/ema_epoch10.pth" ]; then
+      [ "$out/last_ema.pth" -nt "$out/checkpoint_9.ckpt" ] || { echo "last_ema.pth is missing or older than checkpoint_9.ckpt" >&2; exit 1; }
+      cp "$out/last_ema.pth" "$out/ema_epoch10.pth"
+    fi
+    exec caffeinate -i "${train[@]}" --resume-latest
     ;;
   export-phase1)
     [ -e "$out/ema_epoch10.pth" ] || cp "$out/last_ema.pth" "$out/ema_epoch10.pth"
