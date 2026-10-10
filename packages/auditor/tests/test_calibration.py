@@ -46,9 +46,21 @@ def test_page_findings_are_correct_when_they_overlap_a_truth_box_and_focus_findi
         finding("2.5.8", (0, 0, 24, 24), 0.9),
     ]
     pts = points_for_item(truth(), fs, "hybrid", 0.3, 0.5)
-    assert [(x.sc, x.correct) for x in pts] == [
-        ("1.4.3", True), ("1.4.3", False), ("1.4.3", True), ("2.4.7", True), ("2.4.7", False),
+    assert sorted((x.sc, x.score, x.correct) for x in pts) == [
+        ("1.4.3", 0.7, False), ("1.4.3", 0.8, False), ("1.4.3", 0.9, True),
+        ("2.4.7", 0.6, False), ("2.4.7", 0.6, True),
     ]  # fmt: skip
+
+
+def test_duplicates_on_a_claimed_box_and_findings_on_skipped_stops_are_handled_like_scoring() -> (
+    None
+):
+    t = truth()
+    dup = [finding("1.4.3", (12, 11, 98, 19), 0.9), finding("1.4.3", (14, 12, 90, 18), 0.8)]
+    assert [x.correct for x in points_for_item(t, dup, "hybrid", 0.3, 0.5)] == [True, False]
+    assert points_for_item(t, [finding("2.4.7", (0, 0, 5, 5), 0.6, 7)], "hybrid", 0.3, 0.5) == []
+    zero = finding("1.4.3", (12, 11, 0, 0), 0.9)
+    assert points_for_item(t, [zero], "hybrid", 0.3, 0.5) == []
 
 
 def test_ece_and_brier_match_a_hand_computation() -> None:

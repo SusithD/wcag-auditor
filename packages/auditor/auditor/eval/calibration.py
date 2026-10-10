@@ -45,24 +45,39 @@ def points_for_item(
     iou_min: float,
     containment_min: float,
 ) -> list[Point]:
-    """One point per finding on a criterion the item is scored on; a finding is correct when
-    it lands on a ground-truth positive (page criteria: same overlap rule as scoring, focus
-    criteria: the stop is positive)."""
+    """One point per finding on a criterion the item is scored on. Page criteria: findings are
+    matched one-to-one to ground-truth boxes (highest score first, same overlap rule as
+    scoring), so a duplicate on an already-claimed box is incorrect, as in the precision
+    tables. Focus criteria: correct when the stop is a labelled positive; findings on stops
+    that scoring skips (excluded stops) are left out."""
     out: list[Point] = []
-    for f in findings:
+    claimed: dict[str, set[int]] = {}
+    for f in sorted(
+        findings,
+        key=lambda x: (-x.score, x.sc, x.bbox.x if x.bbox else 0, x.bbox.y if x.bbox else 0),
+    ):
         if f.sc not in truth.scored_scs:
             continue
         if f.sc in FOCUS_SCS:
-            if f.focus_index is None:
+            if f.focus_index is None or f.focus_index not in truth.stops:
                 continue
-            correct = bool(truth.stops.get(f.focus_index, {}).get(f.sc, False))
-        elif f.sc in PAGE_SCS and f.bbox is not None:
-            correct = any(
-                iou(f.bbox, t) >= iou_min
-                or containment(f.bbox, t) >= containment_min
-                or containment(t, f.bbox) >= containment_min
-                for t in truth.page_boxes.get(f.sc, [])
-            )
+            if f.sc not in truth.stops[f.focus_index]:
+                continue
+            correct = bool(truth.stops[f.focus_index][f.sc])
+        elif f.sc in PAGE_SCS and f.bbox is not None and f.bbox.w > 0 and f.bbox.h > 0:
+            used = claimed.setdefault(f.sc, set())
+            correct = False
+            for k, t in enumerate(truth.page_boxes.get(f.sc, [])):
+                if k in used:
+                    continue
+                if (
+                    iou(f.bbox, t) >= iou_min
+                    or containment(f.bbox, t) >= containment_min
+                    or containment(t, f.bbox) >= containment_min
+                ):
+                    used.add(k)
+                    correct = True
+                    break
         else:
             continue
         out.append(
@@ -144,9 +159,13 @@ def markdown(summary: dict[str, Any]) -> str:
     lines = [
         "# Confidence calibration",
         "",
-        "Module scores of every assessable finding (automated and needs-review tiers) against "
-        "ground truth. A finding is correct when it lands on a labelled positive. ECE uses "
-        "ten equal-width bins; Brier is the mean squared error of the score as a probability.",
+        "Module scores of every assessable finding (automated and needs-review tiers, before "
+        "the tier policy is applied, so n differs from the precision tables) against ground "
+        "truth. A page finding is correct when it is matched one-to-one to a labelled box "
+        "(duplicates on a claimed box are incorrect); a focus finding is correct when its stop "
+        "is a labelled positive. The pixel and hybrid conditions share the same pixel "
+        "findings, so the rows are not additive. ECE uses ten equal-width bins; Brier is the "
+        "mean squared error of the score as a probability.",
         "",
         "| condition | stratum | findings | accuracy | mean score | ECE | Brier |",
         "|---|---|---|---|---|---|---|",
