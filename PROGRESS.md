@@ -10,7 +10,7 @@ Claude Code updates this file at the end of every milestone. Status: `todo` · `
 | M2 rules + eval harness | m2-rules-eval | todo | | **Unblocked 2026-10-10:** GT sealed (`SEAL_LOG.md` line `benchmark \| GT`, sha256 b859a6de…e20). Baseline run: `baseline_runs/20261010T064722Z_snapshot` (errors=0). Do this next after M1b. Harness must implement ADR-013 matching (IoU or containment, duplicates merged). |
 | M3 frames + DOM elements | m3-elements | done | 2026-10-10 | merged; real-page limitation → ADR-012 |
 | M1b capture-time geometry | m1b-capture-geometry | done | 2026-10-10 | geometry_source capture/rerender/unavailable; goldens regenerated (see NOTES) |
-| M4 static modules | m4-static-modules | todo | | synthetic via DomElementSource; acceptance on synthetic only. Modules take any `ElementSource` (do not assume DOM). |
+| M4 static modules | m4-static-modules | in-progress | | synthetic via DomElementSource; acceptance on synthetic only. Modules take any `ElementSource` (do not assume DOM). |
 | M5 focus + drag modules | m5-focus-modules | todo | | focus SCs use meta.json focus rects (all strata) |
 | M10a OCR text source | m10a-ocr | todo | | ADR-012: RapidOCR (`ocr` extra, now core) → `PixelElementSource` text lines; 1.4.3 recall on real fixtures reported (no threshold) |
 | M10 detector | m10-detector | todo | | GATE: researcher OK before overnight training. Now before M6 (ADR-012). Adds detector boxes to `PixelElementSource`. |
