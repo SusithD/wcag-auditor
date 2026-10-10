@@ -4,18 +4,20 @@ Quality bar: Linear, Vercel, Raycast. Calm, dense, monochrome chrome; the screen
 
 ## 1. Tokens
 
-**Neutrals (Tailwind zinc).** bg `zinc-50 / zinc-950`; surface `white / zinc-900`; muted `zinc-100 / zinc-800`; border `zinc-200 / zinc-800`; text `zinc-900 / zinc-50`; text-muted `zinc-500 / zinc-400`. Primary action = `zinc-900` on light, `zinc-50` on dark (no coloured primary button).
+**Neutrals (Tailwind zinc).** bg `zinc-50 / zinc-950`; surface `white / zinc-900`; muted `zinc-100 / zinc-800`; border `zinc-200 / zinc-800`; text `zinc-900 / zinc-50`; text-muted `zinc-600 / zinc-400` (zinc-500 is only 4.40:1 on muted surfaces; ADR-010). Primary action = `zinc-900` on light, `zinc-50` on dark (no coloured primary button).
 
 **Accent (focus and selection only).** `blue-600` light, `blue-400` dark.
 
 **Severity.** Encoded by colour **and** glyph **and** stroke style; never colour alone.
 
-| Level | Light fg | Dark fg | Ratio on surface (light) | Glyph | Box stroke |
+| Level | Light fg | Dark fg | Ratio on white / zinc-50 / zinc-100 | Glyph | Box stroke |
 |---|---|---|---|---|---|
-| Critical | `#B91C1C` red-700 | `#FCA5A5` | 6.5:1 | ● | solid 2px |
-| Serious | `#B45309` amber-700 | `#FCD34D` | 5.3:1 | ▲ | dashed 2px |
-| Minor | `#1D4ED8` blue-700 | `#93C5FD` | 7.7:1 | ■ | dotted 2px |
-| Needs review | `#52525B` zinc-600 | `#A1A1AA` | 7.3:1 | ◇ | solid 1.5px |
+| Critical | `#B91C1C` red-700 | `#FCA5A5` | 6.47 / 6.20 / 5.89 | ● | solid 2px |
+| Serious | `#B45309` amber-700 | `#FCD34D` | 5.02 / 4.81 / 4.57 | ▲ | dashed 2px |
+| Minor | `#1D4ED8` blue-700 | `#93C5FD` | 6.70 / 6.42 / 6.10 | ■ | dotted 2px |
+| Needs review | `#52525B` zinc-600 | `#A1A1AA` | 7.73 / 7.41 / 7.03 | ◇ | solid 1.5px |
+
+All pass 4.5:1 on every light surface (serious is the tightest at 4.57 on zinc-100; never put serious text on anything darker than zinc-100).
 
 Tints: fill `/8`, hover `/16`. Box strokes on screenshots sit on a 4 px white (light) or black (dark) halo so they reach 3:1 against any background. `forced-colors`: strokes use `Highlight`/`CanvasText`.
 

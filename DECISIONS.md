@@ -49,6 +49,14 @@ Evidence: M3 NOTES. Consequences: the detector moves back onto the critical path
 Context: synthetic 1.4.3 truth boxes are whole text blocks (e.g. 640×60) while text findings are line boxes (437×16, IoU 0.18). Real ground truth follows R3 (one box per text run), so the mismatch is synthetic-only, but the rule must be one rule.
 Decision: a page-SC finding matches a truth box if IoU ≥ `thresholds.iou_match` **or** the finding lies ≥ `thresholds.containment` (0.5) of its own area inside the truth box. Several findings matched to the same truth box count as **one TP**; the extras are **merged duplicates**, not FPs (reported separately as `duplicates` in metrics.json). A truth box with no match is one FN. Applies to 1.4.3, 1.4.11, 2.5.7, 2.5.8 in all strata. The IoU sensitivity sweep (M8) reports both the IoU-only and the IoU-or-containment rule so the choice is visible in Chapter 5.
 
+## ADR-028 Researcher decisions on the open questions (2026-10-10, researcher; recorded by the planner)
+Supersedes the defaults in ADR-014 (tier policy), ADR-017 (default ring) and ADR-018 (training size) where they conflict.
+1. **Headline tier policy (ADR-014): count both tiers.** Headline tables count every finding the report shows a developer, `automated` + `needs-review`, for **every** condition (rule-only therefore includes axe `incomplete`; `--include-needs-review` becomes the default). Automated-only is reported as a secondary, stricter table in Chapter 5. `not-assessable` never counts. Rationale: the developer sees both tiers; real-page 1.4.3 recall from OCR is about 0.82 with both tiers and near 0 with automated only.
+2. **Default focus ring (ADR-017): match the sealed truth.** Headline sets `ua_default_ring_exempt: false` (default rings judged by R5/O4, as the ground truth was labelled under Protocol §5.6). The exempt variant is reported as a sensitivity row. CHECK_CATALOGUE's 2.4.13 row is corrected; Chapter 5 states the divergence from WCAG 2.4.13's user-agent exception as a protocol limitation.
+3. **Detector training (ADR-018): one night.** RF-DETR Nano, 560 px, **8k train / 1k val** (eTLD+1 held out as before), **12 epochs**, batch 8, EMA, seed fixed; expected about 12 h at the measured 2.23 img/s. Run with `caffeinate -i`, per-epoch checkpoints, resume on interruption. Report hardware (M5 Pro, 48 GB), wall time and per-class mAP. The researcher starts it (Claude Code prepares the command and stops).
+4. **M9: ethics not yet approved.** Build and test the study flow with synthetic participants only; no real participant data, no pilot, until approval is recorded in NOTES.md.
+Consequences: rerun `make eval` with the new defaults; regenerate tables, figures and calibration; update the eval screen fixture; record old-vs-new headline numbers in NOTES.md.
+
 ## ADR-014 Evaluation harness scoring policy (2026-10-10, M2)
 Context: PLAN §8 fixes the units but leaves several scoring choices open.
 Decisions:
