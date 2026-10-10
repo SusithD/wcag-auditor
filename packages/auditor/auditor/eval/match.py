@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from auditor.eval.units import containment, iou
+from auditor.geometry import containment, iou
 from auditor.schema import BBox
 
 

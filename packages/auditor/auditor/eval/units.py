@@ -6,27 +6,12 @@ from pathlib import Path
 from typing import Any
 
 from auditor import protocol
+from auditor.geometry import containment, iou
 from auditor.schema import BBox, Capture
 
 SCS = ["1.4.3", "1.4.11", "2.4.7", "2.4.11", "2.4.12", "2.4.13", "2.5.7", "2.5.8"]
 FOCUS_SCS = ["2.4.7", "2.4.11", "2.4.12", "2.4.13"]
 PAGE_SCS = [sc for sc in SCS if sc not in FOCUS_SCS]
-
-
-def iou(a: BBox, b: BBox) -> float:
-    iw = max(0.0, min(a.x + a.w, b.x + b.w) - max(a.x, b.x))
-    ih = max(0.0, min(a.y + a.h, b.y + b.h) - max(a.y, b.y))
-    inter = iw * ih
-    union = a.w * a.h + b.w * b.h - inter
-    return inter / union if union > 0 else 0.0
-
-
-def containment(inner: BBox, outer: BBox) -> float:
-    """Fraction of `inner`'s own area lying inside `outer`."""
-    iw = max(0.0, min(inner.x + inner.w, outer.x + outer.w) - max(inner.x, outer.x))
-    ih = max(0.0, min(inner.y + inner.h, outer.y + outer.h) - max(inner.y, outer.y))
-    area = inner.w * inner.h
-    return (iw * ih) / area if area > 0 else 0.0
 
 
 def stop_truth(judgment: dict[str, Any]) -> dict[str, bool]:

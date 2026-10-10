@@ -63,6 +63,9 @@ class Heuristics(_Frozen):
     ua_focus_ring_rgb: list[int]
     ua_ring_min_share: float
     ua_default_ring_exempt: bool
+    ocr_tile_height_px: int
+    ocr_tile_overlap_px: int
+    ocr_large_ink_height_px: int
 
 
 class ContrastSeverity(_Frozen):

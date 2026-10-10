@@ -63,6 +63,9 @@ def _windows(width: int, size: int) -> list[tuple[int, int]]:
 def _is_large(style: dict[str, Any], ctx: ModuleContext) -> bool | None:
     size, weight = style.get("font_size_px"), style.get("font_weight")
     if size is None or weight is None:
+        line = style.get("ink_height_px")
+        if line is not None and line >= ctx.protocol.heuristics.ocr_large_ink_height_px:
+            return True
         return None
     lt = ctx.protocol.thresholds.large_text
     return bool(size >= lt.min_px or (size >= lt.min_px_bold and weight >= lt.bold_weight))
@@ -112,7 +115,7 @@ def run(ctx: ModuleContext) -> list[Finding]:
         if measured is None:
             continue
         ratio, fg, bg, window_x, source = measured
-        large = _is_large(el.style, ctx) if source == "dom" else None
+        large = _is_large(el.style, ctx)
         threshold = th.large_text if large else th.text
         if ratio >= threshold:
             continue
