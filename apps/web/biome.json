@@ -46,9 +46,7 @@
   },
   "overrides": [
     {
-      "includes": [
-        "src/components/ui/**"
-      ],
+      "includes": ["src/components/ui/**"],
       "linter": {
         "rules": {
           "security": {
@@ -81,9 +79,7 @@
       }
     },
     {
-      "includes": [
-        "src/app/globals.css"
-      ],
+      "includes": ["src/app/globals.css"],
       "linter": {
         "rules": {
           "complexity": {
