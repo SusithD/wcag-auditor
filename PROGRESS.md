@@ -10,7 +10,7 @@ Claude Code updates this file at the end of every milestone. Status: `todo` · `
 | M2 rules + eval harness | m2-rules-eval | done | 2026-10-10 | rule_only byte-equal to baseline golden (5/5 fixtures, 40/40 random synth); make eval reproducible (sha 9ee96346…); see NOTES M2, ADR-014/015 |
 | M3 frames + DOM elements | m3-elements | done | 2026-10-10 | merged; real-page limitation → ADR-012 |
 | M1b capture-time geometry | m1b-capture-geometry | done | 2026-10-10 | geometry_source capture/rerender/unavailable; goldens regenerated (see NOTES) |
-| M4 static modules | m4-static-modules | todo | | synthetic via DomElementSource; acceptance on synthetic only. Modules take any `ElementSource` (do not assume DOM). |
+| M4 static modules | m4-static-modules | done | 2026-10-10 | synthetic desktop: 1.4.3 15/15, 1.4.11 20/20, 2.5.8 52/52, 0 FP (pinned test); ADR-016; pixel condition in eval |
 | M5 focus + drag modules | m5-focus-modules | todo | | focus SCs use meta.json focus rects (all strata) |
 | M10a OCR text source | m10a-ocr | todo | | ADR-012: RapidOCR (`ocr` extra, now core) → `PixelElementSource` text lines; 1.4.3 recall on real fixtures reported (no threshold) |
 | M10 detector | m10-detector | todo | | GATE: researcher OK before overnight training. Now before M6 (ADR-012). Adds detector boxes to `PixelElementSource`. |

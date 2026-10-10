@@ -131,6 +131,6 @@ def test_baseline_golden_files_match_their_recorded_sha256() -> None:
         for line in (GOLDEN / "SOURCE.md").read_text().splitlines()
         if line.endswith(".json") and len(line.split()) == 2
     )
-    assert len(recorded) == 5
+    assert len(recorded) == 6
     for name, digest in recorded.items():
         assert hashlib.sha256((GOLDEN / name).read_bytes()).hexdigest() == digest

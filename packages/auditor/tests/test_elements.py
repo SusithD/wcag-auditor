@@ -15,7 +15,7 @@ FOLDERS = sorted(p.parent for p in FIXTURES.glob("**/meta.json") if "golden" not
 
 
 def test_golden_exists_for_every_fixture() -> None:
-    assert len(FOLDERS) == 5
+    assert len(FOLDERS) == 6
     assert {f"{f.name}.json" for f in FOLDERS} == {p.name for p in GOLDEN.glob("*.json")}
 
 
@@ -33,6 +33,7 @@ def _close(a: Any, b: Any, tol: float = 1.0) -> bool:
 
 EXPECTED_KINDS = {
     "synth_sc1-4-3_001": {"text": 2},
+    "synth_sc1-4-11_026": {"input": 2, "text": 5},
     "synth_sc2-4-13_091": {"button": 1, "text": 4},
     "synth_sc2-5-8_126": {"button": 4, "text": 7},
 }

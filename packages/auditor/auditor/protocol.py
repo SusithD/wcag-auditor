@@ -53,6 +53,9 @@ class Heuristics(_Frozen):
     focus_obscured_sample_points: int
     contrast_window_px: int
     edge_gradient_threshold: int
+    ring_outside_gap_px: int
+    ring_corner_skip_px: int
+    ring_inset_px: int
 
 
 class ContrastSeverity(_Frozen):

@@ -1,0 +1,63 @@
+{
+  "page_id": "synth_1.4.11_001",
+  "viewport": "desktop",
+  "capture_timestamp": "2026-10-04T05:21:20+00:00",
+  "annotator": "generator@v1.1.0",
+  "protocol_version": "1.0",
+  "generator_version": "1.1.0",
+  "generator_notes": "Input border #989898 against #FFFFFF at 2.885:1 (target 2.9:1, intended=fail)",
+  "test_elements": [
+    {
+      "id": "e-1",
+      "role": "text-input",
+      "bbox": {
+        "x": 80,
+        "y": 220,
+        "w": 320,
+        "h": 40
+      }
+    },
+    {
+      "id": "e-2",
+      "role": "text-input",
+      "bbox": {
+        "x": 80,
+        "y": 296,
+        "w": 320,
+        "h": 40
+      }
+    }
+  ],
+  "annotations": [
+    {
+      "annotation_id": "a-0001",
+      "sc": "1.4.11",
+      "severity": "minor",
+      "confidence": "high",
+      "bbox": {
+        "x": 80,
+        "y": 220,
+        "w": 320,
+        "h": 40
+      },
+      "boundary": true,
+      "note": "Input border at 2.88:1 (threshold 3.0:1)",
+      "element_id": "e-1"
+    },
+    {
+      "annotation_id": "a-0002",
+      "sc": "1.4.11",
+      "severity": "minor",
+      "confidence": "high",
+      "bbox": {
+        "x": 80,
+        "y": 296,
+        "w": 320,
+        "h": 40
+      },
+      "boundary": true,
+      "note": "Input border at 2.88:1 (threshold 3.0:1)",
+      "element_id": "e-2"
+    }
+  ]
+}
