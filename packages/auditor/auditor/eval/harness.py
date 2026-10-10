@@ -19,8 +19,9 @@ from auditor.eval.units import (
     real_truth,
     synthetic_truth,
 )
-from auditor.rules.rulemap import COVERED_SCS
-from auditor.schema import BBox, Capture
+from auditor.fusion import apply_policy, fuse
+from auditor.rules.rulemap import COVERED_SCS, to_findings
+from auditor.schema import BBox, Capture, Finding
 
 SKIP_PARTS = {"golden", "sites", "vectors", "baseline_golden"}
 SWEEP_IOU = [i / 10 for i in range(1, 8)]
@@ -82,6 +83,15 @@ class RulePredictor:
         digest = str(capture.meta.get("screenshot_sha256"))[:12]
         return self.cache / f"{capture.path.name}.{digest}.json"
 
+    def findings(self, capture: Capture) -> list[Finding]:
+        """Schema findings for fusion: boxed, non-empty rule nodes (all tiers)."""
+        raw = [
+            f
+            for f in self.raw(capture)["findings"]
+            if f["bbox"] and f["bbox"]["w"] > 0 and f["bbox"]["h"] > 0
+        ]
+        return to_findings(raw)[0]
+
     def predict(self, capture: Capture) -> Prediction:
         pred = Prediction()
         for f in self.raw(capture)["findings"]:
@@ -102,6 +112,16 @@ class RulePredictor:
             self._runner.close()
 
 
+def to_prediction(findings: list[Finding]) -> Prediction:
+    pred = Prediction()
+    for f in findings:
+        if f.focus_index is not None:
+            pred.stops.setdefault(f.sc, set()).add(f.focus_index)
+        elif f.bbox is not None:
+            pred.page_boxes.setdefault(f.sc, []).append(f.bbox)
+    return pred
+
+
 class PixelPredictor:
     """Pixel-channel modules over the element source each capture allows (ADR-012): stored or
     re-rendered DOM geometry when it exists, OCR text lines otherwise.
@@ -118,7 +138,7 @@ class PixelPredictor:
         self.source_counts = {"dom": 0, "pixel": 0}
         self.needs_review_excluded = 0
 
-    def predict(self, capture: Capture) -> Prediction:
+    def findings(self, capture: Capture) -> list[Finding]:
         from auditor.elements.dom import GeometryUnavailable
         from auditor.modules import MODULES, ModuleContext
 
@@ -130,19 +150,15 @@ class PixelPredictor:
             elements = source.elements(capture)
         self.source_counts[name] += 1
         ctx = ModuleContext.load(capture, elements, has_geometry=name == "dom")
-        pred = Prediction()
-        for sc, run in MODULES.items():
-            for finding in run(ctx):
-                if finding.tier == "not-assessable":
-                    continue
-                if finding.tier == "needs-review" and not self.cfg.include_needs_review:
-                    self.needs_review_excluded += 1
-                    continue
-                if finding.focus_index is not None:
-                    pred.stops.setdefault(sc, set()).add(finding.focus_index)
-                elif finding.bbox is not None:
-                    pred.page_boxes.setdefault(sc, []).append(finding.bbox)
-        return pred
+        return [f for run in MODULES.values() for f in run(ctx) if f.tier != "not-assessable"]
+
+    def predict(self, capture: Capture, found: list[Finding] | None = None) -> Prediction:
+        found = self.findings(capture) if found is None else found
+        kept = apply_policy(found, self.cfg.include_needs_review)
+        self.needs_review_excluded += sum(1 for f in found if f.tier == "needs-review") - sum(
+            1 for f in kept if f.tier == "needs-review"
+        )
+        return to_prediction(kept)
 
     def close(self) -> None:
         self.sources.close()
@@ -187,7 +203,7 @@ def _page_features(capture: Capture) -> dict[str, Any]:
     }
 
 
-SUPPORTED_CONDITIONS = {"rule_only", "pixel"}
+SUPPORTED_CONDITIONS = {"rule_only", "pixel", "hybrid"}
 ALL_SCS = ["1.4.3", "1.4.11", "2.4.7", "2.4.11", "2.4.12", "2.4.13", "2.5.7", "2.5.8"]
 
 
@@ -223,8 +239,9 @@ def run_eval(cfg: EvalConfig) -> dict[str, Any]:
     unlabelled = 0
     base = MatchConfig(match.iou, match.containment, True)
     pixel: PixelPredictor | None = None
+    needs_pixel = bool({"pixel", "hybrid"} & set(cfg.conditions))
     try:
-        pixel = PixelPredictor(cfg) if "pixel" in cfg.conditions else None
+        pixel = PixelPredictor(cfg) if needs_pixel else None
         for folder in discover(cfg.benchmark):
             capture = Capture.from_folder(folder)
             truth, raw_truth = _truth_for(capture, gt, excluded)
@@ -233,9 +250,13 @@ def run_eval(cfg: EvalConfig) -> dict[str, Any]:
                 continue
             preds: dict[str, Prediction] = {}
             try:
+                pixel_found = pixel.findings(capture) if pixel is not None else []
                 for cond in cfg.conditions:
                     if cond == "pixel" and pixel is not None:
-                        preds[cond] = pixel.predict(capture)
+                        preds[cond] = pixel.predict(capture, pixel_found)
+                    elif cond == "hybrid" and pixel is not None:
+                        fused = fuse(predictor.findings(capture) + pixel_found, proto)
+                        preds[cond] = to_prediction(apply_policy(fused, cfg.include_needs_review))
                     else:
                         preds[cond] = predictor.predict(capture)
             except Exception as exc:

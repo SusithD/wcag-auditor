@@ -1,0 +1,106 @@
+[
+  {
+    "id": "f001",
+    "sc": "1.4.3",
+    "bbox": {
+      "x": 100.0,
+      "y": 100.0,
+      "w": 200.0,
+      "h": 20.0
+    },
+    "focus_index": null,
+    "severity": "minor",
+    "tier": "automated",
+    "score": 1.0,
+    "provenance": "both",
+    "evidence": {
+      "members": {
+        "rule": 1,
+        "pixel": 2
+      },
+      "rule": {
+        "rule": "color-contrast"
+      },
+      "pixel": {
+        "ratio": 4.4
+      }
+    },
+    "guidance_key": "1.4.3/contrast"
+  },
+  {
+    "id": "f002",
+    "sc": "1.4.3",
+    "bbox": {
+      "x": 400.0,
+      "y": 300.0,
+      "w": 50.0,
+      "h": 20.0
+    },
+    "focus_index": null,
+    "severity": "minor",
+    "tier": "automated",
+    "score": 0.8,
+    "provenance": "pixel",
+    "evidence": {
+      "members": {
+        "rule": 0,
+        "pixel": 1
+      },
+      "pixel": {
+        "ratio": 4.2
+      }
+    },
+    "guidance_key": "1.4.3/contrast"
+  },
+  {
+    "id": "f003",
+    "sc": "2.4.7",
+    "bbox": null,
+    "focus_index": 3,
+    "severity": "serious",
+    "tier": "automated",
+    "score": 0.9,
+    "provenance": "pixel",
+    "evidence": {
+      "members": {
+        "rule": 0,
+        "pixel": 2
+      },
+      "pixel": {
+        "state_contrast_max": 1.2
+      }
+    },
+    "guidance_key": "2.4.7/focus-visible"
+  },
+  {
+    "id": "f004",
+    "sc": "2.5.8",
+    "bbox": {
+      "x": 10.0,
+      "y": 10.0,
+      "w": 18.0,
+      "h": 18.0
+    },
+    "focus_index": null,
+    "severity": "serious",
+    "tier": "automated",
+    "score": 1.0,
+    "provenance": "both",
+    "evidence": {
+      "members": {
+        "rule": 1,
+        "pixel": 1
+      },
+      "rule": {
+        "rule": "target-size"
+      },
+      "pixel": {
+        "size_px": {
+          "w": 18,
+          "h": 18
+        }
+      }
+    },
+    "guidance_key": "2.5.8/target-size"
+  }
+]

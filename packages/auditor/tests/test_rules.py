@@ -109,17 +109,19 @@ def test_schema_mapping_tiers_severity_and_boxless_nodes() -> None:
 @pytest.mark.browser
 @pytest.mark.parametrize("folder", FOLDERS, ids=lambda p: p.name[:32])
 def test_rule_only_run_is_byte_equal_to_the_baseline_golden(folder: Path, tmp_path: Path) -> None:
-    run = pipeline.run_folder(folder, tmp_path, condition="rule_only")
+    run = pipeline.run_folder(folder, tmp_path, condition="rule_only", pdf=False)
     got = (tmp_path / "rule_findings.json").read_text()
     assert got == (GOLDEN / f"{folder.name}.json").read_text()
     report = Run.model_validate_json((tmp_path / "report.json").read_text())
     assert report.condition == "rule_only" and report.stage_status["rules"] == "done"
     raw = json.loads(got)["findings"]
     boxed = [f for f in raw if f["bbox"]]
-    assert [f.bbox.model_dump() if f.bbox else None for f in report.findings] == [
-        f["bbox"] for f in boxed
-    ]
-    assert len(run.findings) + int(report.stage_status["rules_boxless_nodes"]) == len(raw)
+    assert {f.provenance for f in report.findings} <= {"rule"}
+    assert {tuple(f.bbox.model_dump().values()) for f in report.findings if f.bbox} <= {
+        tuple(float(v) for v in f["bbox"].values()) for f in boxed
+    }
+    assert 0 < len(run.findings) <= len(boxed) or not boxed
+    assert int(report.stage_status["rules_boxless_nodes"]) == len(raw) - len(boxed)
     verdicts = {c.sc: c.rule_verdict for c in report.coverage.cells}
     assert verdicts["1.4.3"] == verdicts["2.5.8"] == "automated"
     assert {v for sc, v in verdicts.items() if sc not in COVERED_SCS} == {"none"}

@@ -1,0 +1,8 @@
+{
+  "axe": "c24f097bd2f451d4f933e8bc7d8d539f8672a2ebcb5cc9f9f3eec8ca9470a0c1",
+  "chromium": "chromium 153.0.8010.12",
+  "git_sha": "4f14d5ff623e9a3aa13b93ec5eaddb48cd3c4c92",
+  "model_sha": null,
+  "playwright": "1.63.0",
+  "protocol_sha": "e8c35965328ca3bbc71795dd93d812f20077aaba4c5a021f2c2f0df1c396be77"
+}
