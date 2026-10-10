@@ -70,8 +70,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def health() -> dict[str, str]:
         return {"status": "ok"}
 
-    app.include_router(build_router(cfg))
     app.include_router(build_report_router(cfg))
+    app.include_router(build_router(cfg))
     return app
 
 

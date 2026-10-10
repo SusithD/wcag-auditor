@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import csv
+import io
 import json
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, HTTPException, Query, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel
 from sqlalchemy import select
 
@@ -84,6 +86,13 @@ class Overview(BaseModel):
     available_viewports: list[Viewport]
 
 
+class ExportInfo(BaseModel):
+    format: Literal["json", "html", "pdf", "csv"]
+    url: str
+    size_bytes: int
+    pages: int | None
+
+
 class FindingPatch(BaseModel):
     status: Status
 
@@ -158,6 +167,104 @@ def build_report_router(settings: Settings) -> APIRouter:
     def _focus_files(run_id: str, viewport: str) -> list[Path]:
         folder = _capture_folders(run_dir(run_id)).get(viewport)
         return sorted(folder.glob("focus-*-off.png")) if folder else []
+
+    def _csv(run_id: str, viewport: str, request: Request) -> str:
+        report = _load_report(run_dir(run_id), viewport)
+        with request.app.state.sessions() as session:
+            capture = capture_for(session, run_id, viewport)
+            rows = (
+                session.scalars(
+                    select(FindingRow)
+                    .where(FindingRow.capture_id == capture.id)
+                    .order_by(FindingRow.key)
+                ).all()
+                if capture
+                else []
+            )
+            out = io.StringIO()
+            writer = csv.writer(out)
+            writer.writerow(
+                [
+                    "id",
+                    "sc",
+                    "severity",
+                    "tier",
+                    "provenance",
+                    "score",
+                    "element",
+                    "measured",
+                    "required",
+                    "status",
+                    "x",
+                    "y",
+                    "w",
+                    "h",
+                ]
+            )
+            for r in rows:
+                f = to_out(r, viewport, report)
+                ev = f.evidence_rows
+                box = f.bbox
+                writer.writerow(
+                    [
+                        f.key,
+                        f.sc,
+                        f.severity,
+                        f.tier,
+                        f.provenance,
+                        f"{f.score:.2f}",
+                        f.element,
+                        ev[0].value if ev else "",
+                        ev[1].value if len(ev) > 1 else "",
+                        f.status,
+                        box.x if box else "",
+                        box.y if box else "",
+                        box.w if box else "",
+                        box.h if box else "",
+                    ]
+                )
+            return out.getvalue()
+
+    @router.get("/runs/{run_id}/report.csv")
+    def report_csv(run_id: str, viewport: Viewport, request: Request) -> Response:
+        return Response(
+            _csv(run_id, viewport, request),
+            media_type="text/csv",
+            headers={"Content-Disposition": f'attachment; filename="findings-{viewport}.csv"'},
+        )
+
+    @router.get("/runs/{run_id}/exports", response_model=list[ExportInfo])
+    def exports(run_id: str, viewport: Viewport, request: Request) -> list[ExportInfo]:
+        base = run_dir(run_id) / viewport
+        out: list[ExportInfo] = []
+        for ext in ("json", "html", "pdf"):
+            path = base / f"report.{ext}"
+            if not path.is_file():
+                continue
+            pages = None
+            if ext == "pdf":
+                from pypdf import PdfReader
+
+                pages = len(PdfReader(path).pages)
+            out.append(
+                ExportInfo(
+                    format=ext,
+                    url=f"/runs/{run_id}/report.{ext}?viewport={viewport}",
+                    size_bytes=path.stat().st_size,
+                    pages=pages,
+                )
+            )
+        if out:
+            text = _csv(run_id, viewport, request)
+            out.append(
+                ExportInfo(
+                    format="csv",
+                    url=f"/runs/{run_id}/report.csv?viewport={viewport}",
+                    size_bytes=len(text.encode()),
+                    pages=None,
+                )
+            )
+        return out
 
     @router.get("/runs/{run_id}/findings", response_model=list[FindingOut])
     def list_findings(

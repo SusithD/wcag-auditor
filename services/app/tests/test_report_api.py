@@ -48,6 +48,17 @@ def test_overview_findings_filters_patch_and_assets(tmp_path: Path) -> None:
         assert c.get(f"/runs/{run_id}/assets/mobile/focus/99/on").status_code == 404
         assert c.get(f"/runs/{run_id}/assets/mobile/focus/-1/on").status_code == 404
 
+        exports = {
+            e["format"]: e
+            for e in c.get(f"/runs/{run_id}/exports", params={"viewport": "mobile"}).json()
+        }
+        assert set(exports) == {"json", "html", "csv"} and exports["html"]["size_bytes"] > 1000
+        csv_text = c.get(f"/runs/{run_id}/report.csv", params={"viewport": "mobile"})
+        assert csv_text.status_code == 200 and csv_text.text.splitlines()[0].startswith(
+            "id,sc,severity"
+        )
+        assert len(csv_text.text.strip().splitlines()) == 19
+
 
 def test_report_endpoints_404_before_the_run_has_a_report(tmp_path: Path) -> None:
     with client(tmp_path) as c:
