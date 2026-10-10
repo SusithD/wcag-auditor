@@ -37,7 +37,23 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 >
                   wcag-auditor
                 </Link>
-                <ThemeToggle />
+                <div className="flex items-center gap-1">
+                  <nav aria-label="Main" className="flex gap-1">
+                    <Link
+                      href="/"
+                      className="inline-flex min-h-7 items-center rounded-md px-2.5 text-body hover:bg-muted"
+                    >
+                      New audit
+                    </Link>
+                    <Link
+                      href="/eval"
+                      className="inline-flex min-h-7 items-center rounded-md px-2.5 text-body hover:bg-muted"
+                    >
+                      Evaluation
+                    </Link>
+                  </nav>
+                  <ThemeToggle />
+                </div>
               </header>
               <main id="main" tabIndex={-1} className="flex-1 outline-none">
                 {children}

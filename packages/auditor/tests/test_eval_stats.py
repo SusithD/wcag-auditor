@@ -119,3 +119,12 @@ def test_delta_precision_with_a_real_difference_is_detected() -> None:
         "combined"
     ]["1.4.3"]
     assert delta["low"] > 0.3 and delta["non_inferior"] is True
+
+
+def test_the_mcnemar_pair_is_hybrid_against_rule_only_whatever_the_order() -> None:
+    from auditor.eval.harness import mcnemar_pair
+
+    assert mcnemar_pair(["rule_only", "pixel", "hybrid"]) == ("hybrid", "rule_only")
+    assert mcnemar_pair(["hybrid", "rule_only"]) == ("hybrid", "rule_only")
+    assert mcnemar_pair(["pixel", "rule_only"]) == ("pixel", "rule_only")
+    assert mcnemar_pair(["rule_only"]) is None

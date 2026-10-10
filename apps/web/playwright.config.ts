@@ -1,3 +1,4 @@
+import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { defineConfig } from "@playwright/test";
@@ -5,7 +6,7 @@ import { defineConfig } from "@playwright/test";
 const port = Number(process.env.WEB_PORT ?? 3000);
 const apiPort = Number(process.env.API_PORT ?? 8100);
 const root = resolve(__dirname, "../..");
-const dataDir = join(tmpdir(), `wcag-auditor-e2e-${apiPort}`);
+const dataDir = mkdtempSync(join(tmpdir(), `wcag-auditor-e2e-${apiPort}-`));
 
 export default defineConfig({
   testDir: "./e2e",
@@ -25,6 +26,8 @@ export default defineConfig({
         DATA_DIR: dataDir,
         AUDIT_PDF: "0",
         FOLDER_ROOTS: join(root, "fixtures"),
+        EVAL_IMPORT_DIRS: join(root, "eval", "fixtures"),
+        BENCHMARK_DIR: join(root, "fixtures"),
       },
     },
     {

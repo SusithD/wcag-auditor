@@ -62,7 +62,11 @@
       }
     },
     {
-      "includes": ["src/components/report/**"],
+      "includes": [
+        "src/components/report/**",
+        "src/components/views/**",
+        "src/components/eval/**"
+      ],
       "linter": {
         "rules": {
           "a11y": {

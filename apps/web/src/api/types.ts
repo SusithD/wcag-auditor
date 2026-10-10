@@ -89,6 +89,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/runs/{run_id}/compare": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Compare */
+    get: operations["compare_runs__run_id__compare_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/findings/{finding_id}": {
     parameters: {
       query?: never;
@@ -132,6 +149,109 @@ export interface paths {
     };
     /** Focus Image */
     get: operations["focus_image_runs__run_id__assets__viewport__focus__index___state__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/catalogue": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Catalogue */
+    get: operations["catalogue_catalogue_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/eval": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Evals */
+    get: operations["list_evals_eval_get"];
+    put?: never;
+    /** Create Eval */
+    post: operations["create_eval_eval_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/eval/{eval_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Eval */
+    get: operations["get_eval_eval__eval_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/eval/{eval_id}/events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Eval Events */
+    get: operations["eval_events_eval__eval_id__events_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/eval/{eval_id}/export.csv": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Export Csv */
+    get: operations["export_csv_eval__eval_id__export_csv_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/eval/{eval_id}/export.tex": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Export Tex */
+    get: operations["export_tex_eval__eval_id__export_tex_get"];
     put?: never;
     post?: never;
     delete?: never;
@@ -280,6 +400,56 @@ export interface components {
       /** Files */
       files: string[];
     };
+    /** Catalogue */
+    Catalogue: {
+      /** Entries */
+      entries: components["schemas"]["CatalogueEntry"][];
+      /** Coverage Claim */
+      coverage_claim: string;
+    };
+    /** CatalogueEntry */
+    CatalogueEntry: {
+      /** Sc */
+      sc: string;
+      /** Name */
+      name: string;
+      /** Level */
+      level: string;
+      /** Unit */
+      unit: string;
+      /** Inputs */
+      inputs: string;
+      /** Procedure */
+      procedure: string;
+      /** Threshold */
+      threshold: string;
+      /** Detectability */
+      detectability: string;
+      /** Tier */
+      tier: string;
+      /** Act */
+      act: string;
+    };
+    /** CompareOut */
+    CompareOut: {
+      /** Hybrid */
+      hybrid: components["schemas"]["FindingOut"][];
+      /** Rule Only */
+      rule_only: components["schemas"]["FindingOut"][];
+      /** Pairs */
+      pairs: components["schemas"]["ComparePair"][];
+      /** Only Hybrid */
+      only_hybrid: string[];
+      /** Only Rule Only */
+      only_rule_only: string[];
+    };
+    /** ComparePair */
+    ComparePair: {
+      /** Hybrid */
+      hybrid: string;
+      /** Rule Only */
+      rule_only: string;
+    };
     /** CoverageCellOut */
     CoverageCellOut: {
       /** Sc */
@@ -299,6 +469,140 @@ export interface components {
        * @enum {string}
        */
       hybrid_verdict: "automated" | "needs-review" | "not-assessable" | "none";
+    };
+    /** DeltaRow */
+    DeltaRow: {
+      /** Stratum */
+      stratum: string;
+      /** Sc */
+      sc: string;
+      /** Low */
+      low: number | null;
+      /** High */
+      high: number | null;
+      /** Margin */
+      margin: number;
+      /** Non Inferior */
+      non_inferior: boolean | null;
+    };
+    /** EvalCell */
+    EvalCell: {
+      /** Condition */
+      condition: string;
+      /** Stratum */
+      stratum: string;
+      /** Sc */
+      sc: string;
+      /** Tp */
+      tp: number;
+      /** Fp */
+      fp: number;
+      /** Fn */
+      fn: number;
+      /** Duplicates */
+      duplicates: number;
+      /** Precision */
+      precision: number | null;
+      /** Recall */
+      recall: number | null;
+      /** F1 */
+      f1: number | null;
+      /** Precision Ci */
+      precision_ci: number[] | null;
+      /** Recall Ci */
+      recall_ci: number[] | null;
+      /** F1 Ci */
+      f1_ci: number[] | null;
+    };
+    /** EvalCreated */
+    EvalCreated: {
+      /** Eval Id */
+      eval_id: number;
+    };
+    /** EvalDetail */
+    EvalDetail: {
+      summary: components["schemas"]["EvalSummary"];
+      view: components["schemas"]["EvalView"] | null;
+    };
+    /** EvalMeta */
+    EvalMeta: {
+      /** Items Scored */
+      items_scored: number;
+      /** Items Unlabelled */
+      items_unlabelled: number;
+      /** Seed */
+      seed: number;
+      /** Resamples */
+      resamples: number;
+      /** Conditions */
+      conditions: string[];
+      /** Include Needs Review */
+      include_needs_review: boolean;
+      /** Benchmark Sha */
+      benchmark_sha: string | null;
+      /** Truth Sha */
+      truth_sha: string | null;
+      /** Protocol Sha */
+      protocol_sha: string | null;
+      /** Rule Only Scs */
+      rule_only_scs: string[];
+    };
+    /** EvalRequest */
+    EvalRequest: {
+      /** Conditions */
+      conditions?: ("rule_only" | "pixel" | "hybrid")[];
+      /**
+       * Include Needs Review
+       * @default false
+       */
+      include_needs_review: boolean;
+      /**
+       * Bootstrap
+       * @default 10000
+       */
+      bootstrap: number;
+    };
+    /** EvalSummary */
+    EvalSummary: {
+      /** Id */
+      id: number;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "queued" | "running" | "done" | "failed";
+      /**
+       * Source
+       * @enum {string}
+       */
+      source: "run" | "import";
+      /** Conditions */
+      conditions: string[];
+      /** Error */
+      error: string | null;
+      /** Done */
+      done: number | null;
+      /** Total */
+      total: number | null;
+    };
+    /** EvalView */
+    EvalView: {
+      meta: components["schemas"]["EvalMeta"];
+      /** Cells */
+      cells: components["schemas"]["EvalCell"][];
+      /** Mcnemar A */
+      mcnemar_a: string | null;
+      /** Mcnemar B */
+      mcnemar_b: string | null;
+      /** Mcnemar */
+      mcnemar: components["schemas"]["McNemarRow"][];
+      /** Delta Precision */
+      delta_precision: components["schemas"]["DeltaRow"][];
     };
     /** EvidenceRow */
     EvidenceRow: {
@@ -398,6 +702,27 @@ export interface components {
     HTTPValidationError: {
       /** Detail */
       detail?: components["schemas"]["ValidationError"][];
+    };
+    /** McNemarRow */
+    McNemarRow: {
+      /** Stratum */
+      stratum: string;
+      /** Sc */
+      sc: string;
+      /** Both Correct */
+      both_correct: number;
+      /** Only A Correct */
+      only_a_correct: number;
+      /** Only B Correct */
+      only_b_correct: number;
+      /** Both Wrong */
+      both_wrong: number;
+      /** P Value */
+      p_value: number | null;
+      /** P Adjusted */
+      p_adjusted: number | null;
+      /** Note */
+      note: string | null;
     };
     /** Overview */
     Overview: {
@@ -704,6 +1029,39 @@ export interface operations {
       };
     };
   };
+  compare_runs__run_id__compare_get: {
+    parameters: {
+      query: {
+        viewport: "desktop" | "mobile";
+      };
+      header?: never;
+      path: {
+        run_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CompareOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   patch_finding_findings__finding_id__patch: {
     parameters: {
       query?: never;
@@ -781,6 +1139,206 @@ export interface operations {
         viewport: "desktop" | "mobile";
         index: number;
         state: "on" | "off";
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  catalogue_catalogue_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Catalogue"];
+        };
+      };
+    };
+  };
+  list_evals_eval_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EvalSummary"][];
+        };
+      };
+    };
+  };
+  create_eval_eval_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EvalRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EvalCreated"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_eval_eval__eval_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        eval_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EvalDetail"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  eval_events_eval__eval_id__events_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        eval_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  export_csv_eval__eval_id__export_csv_get: {
+    parameters: {
+      query: {
+        condition: "rule_only" | "pixel" | "hybrid";
+        stratum: string;
+      };
+      header?: never;
+      path: {
+        eval_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  export_tex_eval__eval_id__export_tex_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        eval_id: number;
       };
       cookie?: never;
     };

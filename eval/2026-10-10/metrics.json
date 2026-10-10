@@ -1439,24 +1439,22 @@
   }
  },
  "mcnemar": {
-  "a": "rule_only",
-  "b": "pixel",
+  "a": "hybrid",
+  "b": "rule_only",
   "bh_adjusted": {
    "combined": {
-    "1.4.11": 0.003125,
-    "1.4.3": 0.3271756853376116,
-    "2.4.11": 0.0001220703125,
-    "2.4.12": 7.450580596923828e-09,
-    "2.4.13": 5.5950078277539e-13,
-    "2.4.7": 1.5670372950547497e-05,
-    "2.5.7": 0.08333333333333333,
-    "2.5.8": 0.38331031799316406
+    "1.4.11": 0.002734375,
+    "1.4.3": 0.3876953125,
+    "2.4.11": 0.0001068115234375,
+    "2.4.12": 6.51925802230835e-09,
+    "2.4.13": 4.895631849284662e-13,
+    "2.4.7": 1.371157633172906e-05,
+    "2.5.7": 0.07291666666666667
    },
    "real": {
-    "1.4.3": 0.00016276041666666666,
-    "2.4.13": 7.58950193931156e-12,
-    "2.4.7": 0.00012199272473688951,
-    "2.5.8": 0.38331031799316406
+    "1.4.3": 0.125,
+    "2.4.13": 5.69212645448367e-12,
+    "2.4.7": 9.149454355266714e-05
    },
    "synthetic": {
     "1.4.11": 0.004557291666666667,
@@ -1474,58 +1472,59 @@
     "1.4.11": {
      "both_correct": 83,
      "both_wrong": 27,
-     "only_a_correct": 0,
-     "only_b_correct": 10,
+     "only_a_correct": 10,
+     "only_b_correct": 0,
      "p_value": 0.001953125
     },
     "1.4.3": {
-     "both_correct": 32,
+     "both_correct": 42,
      "both_wrong": 71,
-     "only_a_correct": 14,
-     "only_b_correct": 8,
-     "p_value": 0.28627872467041016
+     "only_a_correct": 8,
+     "only_b_correct": 4,
+     "p_value": 0.3876953125
     },
     "2.4.11": {
      "both_correct": 1169,
      "both_wrong": 11,
-     "only_a_correct": 0,
-     "only_b_correct": 15,
+     "only_a_correct": 15,
+     "only_b_correct": 0,
      "p_value": 6.103515625e-05
     },
     "2.4.12": {
      "both_correct": 1165,
      "both_wrong": 15,
-     "only_a_correct": 0,
-     "only_b_correct": 30,
+     "only_a_correct": 30,
+     "only_b_correct": 0,
      "p_value": 1.862645149230957e-09
     },
     "2.4.13": {
      "both_correct": 766,
      "both_wrong": 225,
-     "only_a_correct": 50,
-     "only_b_correct": 156,
+     "only_a_correct": 156,
+     "only_b_correct": 50,
      "p_value": 6.993759784692374e-14
     },
     "2.4.7": {
      "both_correct": 1020,
      "both_wrong": 42,
-     "only_a_correct": 39,
-     "only_b_correct": 91,
+     "only_a_correct": 91,
+     "only_b_correct": 39,
      "p_value": 5.876389856455311e-06
     },
     "2.5.7": {
      "both_correct": 110,
      "both_wrong": 0,
-     "only_a_correct": 0,
-     "only_b_correct": 5,
+     "only_a_correct": 5,
+     "only_b_correct": 0,
      "p_value": 0.0625
     },
     "2.5.8": {
-     "both_correct": 100,
-     "both_wrong": 4,
-     "only_a_correct": 8,
-     "only_b_correct": 13,
-     "p_value": 0.38331031799316406
+     "both_correct": 108,
+     "both_wrong": 17,
+     "note": "degenerate: no discordant pairs, so the test has no information",
+     "only_a_correct": 0,
+     "only_b_correct": 0,
+     "p_value": null
     }
    },
    "real": {
@@ -1538,11 +1537,11 @@
      "p_value": null
     },
     "1.4.3": {
-     "both_correct": 15,
+     "both_correct": 25,
      "both_wrong": 71,
-     "only_a_correct": 14,
-     "only_b_correct": 0,
-     "p_value": 0.0001220703125
+     "only_a_correct": 0,
+     "only_b_correct": 4,
+     "p_value": 0.125
     },
     "2.4.11": {
      "both_correct": 1169,
@@ -1563,15 +1562,15 @@
     "2.4.13": {
      "both_correct": 754,
      "both_wrong": 225,
-     "only_a_correct": 50,
-     "only_b_correct": 148,
+     "only_a_correct": 148,
+     "only_b_correct": 50,
      "p_value": 1.89737548482789e-12
     },
     "2.4.7": {
      "both_correct": 1012,
      "both_wrong": 42,
-     "only_a_correct": 39,
-     "only_b_correct": 84,
+     "only_a_correct": 84,
+     "only_b_correct": 39,
      "p_value": 6.099636236844476e-05
     },
     "2.5.7": {
@@ -1583,61 +1582,62 @@
      "p_value": null
     },
     "2.5.8": {
-     "both_correct": 75,
-     "both_wrong": 4,
-     "only_a_correct": 8,
-     "only_b_correct": 13,
-     "p_value": 0.38331031799316406
+     "both_correct": 83,
+     "both_wrong": 17,
+     "note": "degenerate: no discordant pairs, so the test has no information",
+     "only_a_correct": 0,
+     "only_b_correct": 0,
+     "p_value": null
     }
    },
    "synthetic": {
     "1.4.11": {
      "both_correct": 10,
      "both_wrong": 0,
-     "only_a_correct": 0,
-     "only_b_correct": 10,
+     "only_a_correct": 10,
+     "only_b_correct": 0,
      "p_value": 0.001953125
     },
     "1.4.3": {
      "both_correct": 17,
      "both_wrong": 0,
-     "only_a_correct": 0,
-     "only_b_correct": 8,
+     "only_a_correct": 8,
+     "only_b_correct": 0,
      "p_value": 0.0078125
     },
     "2.4.11": {
      "both_correct": 0,
      "both_wrong": 0,
-     "only_a_correct": 0,
-     "only_b_correct": 15,
+     "only_a_correct": 15,
+     "only_b_correct": 0,
      "p_value": 6.103515625e-05
     },
     "2.4.12": {
      "both_correct": 0,
      "both_wrong": 0,
-     "only_a_correct": 0,
-     "only_b_correct": 30,
+     "only_a_correct": 30,
+     "only_b_correct": 0,
      "p_value": 1.862645149230957e-09
     },
     "2.4.13": {
      "both_correct": 12,
      "both_wrong": 0,
-     "only_a_correct": 0,
-     "only_b_correct": 8,
+     "only_a_correct": 8,
+     "only_b_correct": 0,
      "p_value": 0.0078125
     },
     "2.4.7": {
      "both_correct": 8,
      "both_wrong": 0,
-     "only_a_correct": 0,
-     "only_b_correct": 7,
+     "only_a_correct": 7,
+     "only_b_correct": 0,
      "p_value": 0.015625
     },
     "2.5.7": {
      "both_correct": 10,
      "both_wrong": 0,
-     "only_a_correct": 0,
-     "only_b_correct": 5,
+     "only_a_correct": 5,
+     "only_b_correct": 0,
      "p_value": 0.0625
     },
     "2.5.8": {

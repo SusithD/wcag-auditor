@@ -29,6 +29,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { prefersReducedMotion } from "@/hooks/use-media-query";
+import type { SyncBus } from "@/lib/compare";
 import {
   ariaLabel,
   cycle,
@@ -54,6 +55,8 @@ type Props = {
   pairMode: PairMode;
   onPairMode: (mode: PairMode) => void;
   focusStops: number;
+  label?: string;
+  sync?: { bus: SyncBus; id: string };
 };
 
 export function Canvas({
@@ -67,6 +70,8 @@ export function Canvas({
   pairMode,
   onPairMode,
   focusStops,
+  label,
+  sync,
 }: Props) {
   const wrapper = useRef<ReactZoomPanPinchRef>(null);
   const frame = useRef<HTMLDivElement>(null);
@@ -79,6 +84,7 @@ export function Canvas({
   const [loaded, setLoaded] = useState(false);
   const raf = useRef(0);
   const autoFit = useRef(true);
+  const applying = useRef(false);
   const [dismissedKey, setDismissedKey] = useState<string | null>(null);
 
   const boxes = useMemo(
@@ -194,13 +200,32 @@ export function Canvas({
       state: { scale: number; positionX: number; positionY: number },
     ) => {
       svg.current?.style.setProperty("--inv", String(1 / state.scale));
+      if (sync && !applying.current) {
+        sync.bus.publish(sync.id, {
+          x: state.positionX,
+          y: state.positionY,
+          scale: state.scale,
+        });
+      }
       cancelAnimationFrame(raf.current);
       raf.current = requestAnimationFrame(() =>
         setView({ scale: state.scale, x: state.positionX, y: state.positionY }),
       );
     },
-    [],
+    [sync],
   );
+
+  useEffect(() => {
+    if (!sync) return;
+    return sync.bus.subscribe(sync.id, (v) => {
+      applying.current = true;
+      autoFit.current = false;
+      wrapper.current?.setTransform(v.x, v.y, v.scale, 0);
+      setTimeout(() => {
+        applying.current = false;
+      }, 80);
+    });
+  }, [sync]);
 
   function focusBox(key: string | undefined) {
     if (!key) return;
@@ -256,7 +281,7 @@ export function Canvas({
     }
   }
 
-  const alt = `Full-page screenshot of ${url}, ${viewport} viewport, ${findings.length} findings; use the findings table for details`;
+  const alt = `${label ? `${label}: ` : ""}Full-page screenshot of ${url}, ${viewport} viewport, ${findings.length} findings; use the findings table for details`;
   const canPair = selected?.focus_index != null && focusStops > 0;
 
   return (
@@ -322,7 +347,7 @@ export function Canvas({
                   className="absolute inset-0"
                   style={{ ["--inv" as string]: 1 }}
                   role="group"
-                  aria-label={`${boxes.length} findings on the page`}
+                  aria-label={`${label ? `${label}: ` : ""}${boxes.length} findings on the page`}
                 >
                   {painted.map((f) => {
                     const b = f.bbox;
@@ -457,7 +482,7 @@ export function Canvas({
 
         <div
           role="toolbar"
-          aria-label="Canvas controls"
+          aria-label={`${label ? `${label} ` : ""}canvas controls`}
           className="absolute inset-x-0 bottom-3 mx-auto flex w-max max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-1 rounded-lg border bg-popover p-1 shadow-md"
         >
           {pairMode === "page" ? (
@@ -524,7 +549,7 @@ export function Canvas({
             size="sm"
             value={[pairMode === "page" ? "page" : pairMode]}
             onValueChange={(v) => v[0] && onPairMode(v[0] as PairMode)}
-            aria-label="Focus pair view"
+            aria-label={`${label ? `${label} ` : ""}focus pair view`}
           >
             <ToggleGroupItem value="page" aria-label="Page view">
               Page

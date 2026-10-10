@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { RunNav } from "@/components/views/run-nav";
 import { useExports } from "@/hooks/use-report-data";
 import { formatBytes, type ReportView, type Viewport } from "@/lib/report";
 import { middleTruncate } from "@/lib/url";
@@ -60,6 +61,7 @@ export function TopBar({
           {middleTruncate(subject, 80)}
         </p>
       </div>
+      <RunNav runId={runId} current="report" query={`?vp=${viewport}`} />
       <Badge variant="outline">
         {condition === "hybrid" ? "Hybrid" : "Rule-only"}
       </Badge>
