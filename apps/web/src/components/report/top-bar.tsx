@@ -17,6 +17,7 @@ import { formatBytes, type ReportView, type Viewport } from "@/lib/report";
 import { middleTruncate } from "@/lib/url";
 
 type Props = {
+  embedded?: boolean;
   runId: string;
   subject: string;
   condition: string;
@@ -31,6 +32,7 @@ type Props = {
 const NAMES = { json: "JSON", html: "HTML", pdf: "PDF", csv: "CSV" } as const;
 
 export function TopBar({
+  embedded = false,
   runId,
   subject,
   condition,
@@ -61,7 +63,9 @@ export function TopBar({
           {middleTruncate(subject, 80)}
         </p>
       </div>
-      <RunNav runId={runId} current="report" query={`?vp=${viewport}`} />
+      {embedded ? null : (
+        <RunNav runId={runId} current="report" query={`?vp=${viewport}`} />
+      )}
       <Badge variant="outline">
         {condition === "hybrid" ? "Hybrid" : "Rule-only"}
       </Badge>
@@ -90,32 +94,34 @@ export function TopBar({
         <ToggleGroupItem value="canvas">Canvas</ToggleGroupItem>
         <ToggleGroupItem value="table">Table</ToggleGroupItem>
       </ToggleGroup>
-      <DropdownMenu onOpenChange={(o) => o && setOpened(true)}>
-        <DropdownMenuTrigger render={<Button variant="outline" size="sm" />}>
-          <Download aria-hidden="true" />
-          Export
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="min-w-56">
-          {exports.isPending ? (
-            <DropdownMenuItem disabled>Preparing exports</DropdownMenuItem>
-          ) : exports.isError || !exports.data?.length ? (
-            <DropdownMenuItem disabled>No exports available</DropdownMenuItem>
-          ) : (
-            exports.data.map((e) => (
-              <DropdownMenuItem
-                key={e.format}
-                render={<a href={`/api${e.url}`} download />}
-              >
-                <span className="flex-1">{NAMES[e.format]}</span>
-                <span className="font-mono text-label text-muted-foreground">
-                  {e.pages ? `${e.pages} pages, ` : ""}
-                  {formatBytes(e.size_bytes)}
-                </span>
-              </DropdownMenuItem>
-            ))
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {embedded ? null : (
+        <DropdownMenu onOpenChange={(o) => o && setOpened(true)}>
+          <DropdownMenuTrigger render={<Button variant="outline" size="sm" />}>
+            <Download aria-hidden="true" />
+            Export
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-56">
+            {exports.isPending ? (
+              <DropdownMenuItem disabled>Preparing exports</DropdownMenuItem>
+            ) : exports.isError || !exports.data?.length ? (
+              <DropdownMenuItem disabled>No exports available</DropdownMenuItem>
+            ) : (
+              exports.data.map((e) => (
+                <DropdownMenuItem
+                  key={e.format}
+                  render={<a href={`/api${e.url}`} download />}
+                >
+                  <span className="flex-1">{NAMES[e.format]}</span>
+                  <span className="font-mono text-label text-muted-foreground">
+                    {e.pages ? `${e.pages} pages, ` : ""}
+                    {formatBytes(e.size_bytes)}
+                  </span>
+                </DropdownMenuItem>
+              ))
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </div>
   );
 }

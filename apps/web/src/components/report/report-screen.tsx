@@ -64,9 +64,13 @@ function isTyping(target: EventTarget | null) {
 export function ReportScreen({
   run,
   headingRef,
+  embedded = false,
+  className = "h-[calc(100dvh-3rem)]",
 }: {
   run: RunSummary;
   headingRef: React.RefObject<HTMLHeadingElement | null>;
+  embedded?: boolean;
+  className?: string;
 }) {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -209,6 +213,10 @@ export function ReportScreen({
   }
 
   const loading = overview.isPending || findingsQuery.isPending;
+  const checkedCount = (overview.data?.coverage ?? []).filter(
+    (c) =>
+      c.hybrid_verdict === "automated" || c.hybrid_verdict === "needs-review",
+  ).length;
   const rail = (
     <CriteriaRail
       counts={counts}
@@ -261,7 +269,7 @@ export function ReportScreen({
       <Canvas
         runId={run.id}
         viewport={vp}
-        url={overview.data?.url ?? subject}
+        url={embedded ? "the task page" : (overview.data?.url ?? subject)}
         size={{
           w: overview.data?.screenshot_width ?? 1,
           h: overview.data?.screenshot_height ?? 1,
@@ -276,8 +284,10 @@ export function ReportScreen({
       {all.length === 0 ? (
         <div className="pointer-events-none absolute inset-3 rounded-lg border-2 border-emerald-600 motion-safe:animate-[pulse_1.2s_ease-in-out_1] dark:border-emerald-400">
           <p className="pointer-events-auto m-4 inline-block rounded-md bg-background p-3 text-body">
-            No violations found in the 8 in-scope criteria. The coverage view
-            shows what was checked.
+            {checkedCount === 8
+              ? "No violations found in the 8 in-scope criteria."
+              : `No violations found in the ${checkedCount} of 8 criteria this report checks. The other ${8 - checkedCount} were not assessed, so this is not a clean result for them.`}{" "}
+            {embedded ? "" : "The coverage view shows what was checked."}
           </p>
         </div>
       ) : null}
@@ -422,11 +432,12 @@ export function ReportScreen({
   );
 
   return (
-    <div className="flex h-[calc(100dvh-3rem)] flex-col">
+    <div className={`flex ${className} flex-col`}>
       {skip}
       <TopBar
         runId={run.id}
-        subject={subject}
+        subject={embedded ? "Task page" : subject}
+        embedded={embedded}
         condition={run.condition}
         viewport={vp}
         viewports={available}

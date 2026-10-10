@@ -260,6 +260,261 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/study/materials": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Materials */
+    get: operations["materials_study_materials_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/study/config": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Config */
+    get: operations["config_study_config_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/study/prepare": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Prepare */
+    post: operations["prepare_study_prepare_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/study/sessions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create Session */
+    post: operations["create_session_study_sessions_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/study/sessions/{code}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Session */
+    get: operations["get_session_study_sessions__code__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/study/sessions/{code}/consent": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Give Consent */
+    post: operations["give_consent_study_sessions__code__consent_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/study/sessions/{code}/demographics": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Give Demographics */
+    post: operations["give_demographics_study_sessions__code__demographics_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/study/sessions/{code}/tasks/{index}/open": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Open Task */
+    post: operations["open_task_study_sessions__code__tasks__index__open_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/study/sessions/{code}/tasks/{index}/submit": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Submit Task */
+    post: operations["submit_task_study_sessions__code__tasks__index__submit_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/study/sessions/{code}/sus/{block}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Submit Sus */
+    post: operations["submit_sus_study_sessions__code__sus__block__post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/study/sessions/{code}/break": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Finish Break */
+    post: operations["finish_break_study_sessions__code__break_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/study/sessions/{code}/debrief": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Submit Debrief */
+    post: operations["submit_debrief_study_sessions__code__debrief_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/study/admin/tasks": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Admin Tasks */
+    get: operations["admin_tasks_study_admin_tasks_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/study/admin/tasks/{task_row_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Rate Task */
+    patch: operations["rate_task_study_admin_tasks__task_row_id__patch"];
+    trace?: never;
+  };
+  "/study/admin/export/{kind}.csv": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Export */
+    get: operations["export_study_admin_export__kind__csv_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/uploads": {
     parameters: {
       query?: never;
@@ -384,6 +639,39 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** AdminTask */
+    AdminTask: {
+      /** Id */
+      id: number;
+      /** Participant Code */
+      participant_code: string;
+      /** Synthetic */
+      synthetic: boolean;
+      /** Task Index */
+      task_index: number;
+      /** Block */
+      block: number;
+      /** Task Id */
+      task_id: string;
+      /** Sc */
+      sc: string;
+      /** Condition */
+      condition: string;
+      /** Seconds */
+      seconds: number | null;
+      /** Fix Text */
+      fix_text: string | null;
+      /** Success */
+      success: boolean | null;
+      /** Notes */
+      notes: string | null;
+      /** Rubric */
+      rubric: {
+        [key: string]: unknown;
+      };
+      /** Reported By Condition */
+      reported_by_condition: boolean;
+    };
     /** BBoxOut */
     BBoxOut: {
       /** X */
@@ -450,6 +738,15 @@ export interface components {
       /** Rule Only */
       rule_only: string;
     };
+    /** Consent */
+    Consent: {
+      /** Statements */
+      statements: boolean[];
+      /** Optional */
+      optional?: {
+        [key: string]: boolean;
+      };
+    };
     /** CoverageCellOut */
     CoverageCellOut: {
       /** Sc */
@@ -470,6 +767,11 @@ export interface components {
        */
       hybrid_verdict: "automated" | "needs-review" | "not-assessable" | "none";
     };
+    /** DebriefSubmission */
+    DebriefSubmission: {
+      /** Answers */
+      answers: string[];
+    };
     /** DeltaRow */
     DeltaRow: {
       /** Stratum */
@@ -484,6 +786,13 @@ export interface components {
       margin: number;
       /** Non Inferior */
       non_inferior: boolean | null;
+    };
+    /** Demographics */
+    Demographics: {
+      /** Answers */
+      answers: {
+        [key: string]: string;
+      };
     };
     /** EvalCell */
     EvalCell: {
@@ -553,7 +862,7 @@ export interface components {
       conditions?: ("rule_only" | "pixel" | "hybrid")[];
       /**
        * Include Needs Review
-       * @default false
+       * @default true
        */
       include_needs_review: boolean;
       /**
@@ -679,6 +988,11 @@ export interface components {
        */
       status: "open" | "fixed" | "ignored";
     };
+    /** FixSubmission */
+    FixSubmission: {
+      /** Fix Text */
+      fix_text: string;
+    };
     /** GuidanceOut */
     GuidanceOut: {
       /** Sc Title */
@@ -702,6 +1016,27 @@ export interface components {
     HTTPValidationError: {
       /** Detail */
       detail?: components["schemas"]["ValidationError"][];
+    };
+    /** Materials */
+    Materials: {
+      /** Opening */
+      opening: string[];
+      /** Consent Statements */
+      consent_statements: string[];
+      /** Optional Consents */
+      optional_consents: {
+        [key: string]: string;
+      };
+      /** Demographics */
+      demographics: {
+        [key: string]: string[];
+      };
+      /** Sus Items */
+      sus_items: string[];
+      /** Debrief Questions */
+      debrief_questions: string[];
+      /** Closing */
+      closing: string[];
     };
     /** McNemarRow */
     McNemarRow: {
@@ -747,6 +1082,22 @@ export interface components {
       coverage: components["schemas"]["CoverageCellOut"][];
       /** Available Viewports */
       available_viewports: ("desktop" | "mobile")[];
+    };
+    /** Prepared */
+    Prepared: {
+      /** Queued */
+      queued: number;
+      /** Ready */
+      ready: number;
+      /** Total */
+      total: number;
+    };
+    /** RatingPatch */
+    RatingPatch: {
+      /** Success */
+      success?: boolean | null;
+      /** Notes */
+      notes?: string | null;
     };
     /** RunCreate */
     RunCreate: {
@@ -810,6 +1161,27 @@ export interface components {
       /** Available Viewports */
       available_viewports: ("desktop" | "mobile")[];
     };
+    /** SessionCreate */
+    SessionCreate: {
+      /** Code */
+      code: string;
+    };
+    /** SessionState */
+    SessionState: {
+      /** Code */
+      code: string;
+      /** Synthetic */
+      synthetic: boolean;
+      /** Step */
+      step: number;
+      /** Total Steps */
+      total_steps: number;
+      next: components["schemas"]["StepInfo"];
+      /** Tasks */
+      tasks: components["schemas"]["TaskSummary"][];
+      /** Block Condition */
+      block_condition: ("rule_only" | "hybrid") | null;
+    };
     /** SeverityCounts */
     SeverityCounts: {
       /**
@@ -832,6 +1204,85 @@ export interface components {
        * @default 0
        */
       needs_review: number;
+    };
+    /** StepInfo */
+    StepInfo: {
+      /**
+       * Kind
+       * @enum {string}
+       */
+      kind:
+        | "consent"
+        | "demographics"
+        | "task"
+        | "sus"
+        | "break"
+        | "debrief"
+        | "done";
+      /** Task Index */
+      task_index?: number | null;
+      /** Block */
+      block?: number | null;
+      /** Position In Block */
+      position_in_block?: number | null;
+      /**
+       * Block Size
+       * @default 4
+       */
+      block_size: number;
+    };
+    /** StudyConfig */
+    StudyConfig: {
+      /** Ethics Approved */
+      ethics_approved: boolean;
+      /** Real Participants Enabled */
+      real_participants_enabled: boolean;
+      /** Prepared */
+      prepared: number;
+      /** Total Runs */
+      total_runs: number;
+    };
+    /** SusSubmission */
+    SusSubmission: {
+      /** Scores */
+      scores: number[];
+    };
+    /** TaskSummary */
+    TaskSummary: {
+      /** Task Index */
+      task_index: number;
+      /** Block */
+      block: number;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "pending" | "open" | "submitted";
+    };
+    /** TaskView */
+    TaskView: {
+      /** Task Index */
+      task_index: number;
+      /** Block */
+      block: number;
+      /** Position In Block */
+      position_in_block: number;
+      /** Block Size */
+      block_size: number;
+      /** Brief */
+      brief: string;
+      /**
+       * Condition
+       * @enum {string}
+       */
+      condition: "rule_only" | "hybrid";
+      /** Run Id */
+      run_id: string;
+      /**
+       * Viewport
+       * @enum {string}
+       */
+      viewport: "desktop" | "mobile";
     };
     /** Technique */
     Technique: {
@@ -1339,6 +1790,482 @@ export interface operations {
       header?: never;
       path: {
         eval_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  materials_study_materials_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Materials"];
+        };
+      };
+    };
+  };
+  config_study_config_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StudyConfig"];
+        };
+      };
+    };
+  };
+  prepare_study_prepare_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "x-study-token"?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Prepared"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_session_study_sessions_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SessionCreate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionState"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_session_study_sessions__code__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionState"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  give_consent_study_sessions__code__consent_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Consent"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionState"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  give_demographics_study_sessions__code__demographics_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Demographics"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionState"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  open_task_study_sessions__code__tasks__index__open_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+        index: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TaskView"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  submit_task_study_sessions__code__tasks__index__submit_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+        index: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FixSubmission"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionState"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  submit_sus_study_sessions__code__sus__block__post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+        block: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SusSubmission"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionState"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  finish_break_study_sessions__code__break_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionState"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  submit_debrief_study_sessions__code__debrief_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DebriefSubmission"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionState"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  admin_tasks_study_admin_tasks_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        "x-study-token"?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminTask"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  rate_task_study_admin_tasks__task_row_id__patch: {
+    parameters: {
+      query?: never;
+      header?: {
+        "x-study-token"?: string | null;
+      };
+      path: {
+        task_row_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RatingPatch"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminTask"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  export_study_admin_export__kind__csv_get: {
+    parameters: {
+      query?: never;
+      header?: {
+        "x-study-token"?: string | null;
+      };
+      path: {
+        kind: "sessions" | "tasks" | "sus";
       };
       cookie?: never;
     };
