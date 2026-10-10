@@ -62,6 +62,15 @@ export function currentStage(events: StageEvent[]): StageEvent | null {
   return null;
 }
 
+function progressIndex(order: string[], events: StageEvent[]) {
+  let index = 0;
+  for (const ev of events) {
+    const at = order.indexOf(ev.stage);
+    if (at > index) index = at;
+  }
+  return index;
+}
+
 export function buildSteps(
   viewports: string[],
   captures: boolean,
@@ -69,15 +78,14 @@ export function buildSteps(
   status: string,
 ): Step[] {
   const order = stepOrder(viewports, captures);
-  const current = currentStage(events);
   const finished = status === "done" || status === "partial";
   const failed =
     status === "failed" ||
     status === "cancelled" ||
-    current?.stage.startsWith("failed");
-  const index = finished
-    ? order.length
-    : Math.max(0, order.indexOf(current?.stage ?? "queued"));
+    events.some(
+      (ev) => ev.stage.startsWith("failed") && ev.stage !== "failed:run",
+    );
+  const index = finished ? order.length : progressIndex(order, events);
   return order.map((id, i) => {
     let state: Step["status"] = "pending";
     if (i < index) state = "done";

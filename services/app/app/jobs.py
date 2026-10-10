@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
+import os
+import signal
 import sys
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
@@ -25,8 +28,8 @@ class JobResult:
 OnFinish = Callable[[JobResult], Awaitable[None]]
 OnStart = Callable[[str], Awaitable[None]]
 
-CANCELLED = -15
-TIMED_OUT = -9
+CANCELLED = 1001
+TIMED_OUT = 1002
 
 
 class JobRunner:
@@ -49,9 +52,10 @@ class JobRunner:
 
     def cancel(self, run_id: str) -> bool:
         """Drop a queued job or kill the running one; the result reports CANCELLED."""
-        if run_id == self._running and self._proc is not None:
+        if run_id == self._running:
             self._cancelled.add(run_id)
-            self._proc.kill()
+            if self._proc is not None:
+                self._kill(self._proc)
             return True
         if any(job.run_id == run_id for job in self._queue._queue):  # type: ignore[attr-defined]
             self._cancelled.add(run_id)
@@ -73,6 +77,11 @@ class JobRunner:
 
     async def join(self) -> None:
         await self._queue.join()
+
+    @staticmethod
+    def _kill(proc: asyncio.subprocess.Process) -> None:
+        with contextlib.suppress(ProcessLookupError, PermissionError):
+            os.killpg(proc.pid, signal.SIGKILL)
 
     async def _loop(self) -> None:
         while True:
@@ -99,16 +108,19 @@ class JobRunner:
             *job.argv,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
+            start_new_session=True,
         )
         self._proc = proc
+        if job.run_id in self._cancelled:
+            self._kill(proc)
         try:
             out, _ = await asyncio.wait_for(proc.communicate(), self._timeout_s)
         except TimeoutError:
-            proc.kill()
+            self._kill(proc)
             out, _ = await proc.communicate()
             return JobResult(job.run_id, TIMED_OUT, out.decode(errors="replace"))
         except asyncio.CancelledError:
-            proc.kill()
+            self._kill(proc)
             await proc.wait()
             raise
         code = CANCELLED if job.run_id in self._cancelled else proc.returncode or 0

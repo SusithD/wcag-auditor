@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 const TAGS = [
   "wcag2a",
@@ -85,4 +85,64 @@ for (const scheme of ["light", "dark"] as const) {
       expect(results.violations).toEqual([]);
     });
   }
+}
+
+const FOLDER = resolve(
+  __dirname,
+  "../../../fixtures/real/real_com_011_mobile_20261004T054738Z",
+);
+
+async function scan(page: Page) {
+  const results = await new AxeBuilder({ page })
+    .withTags(TAGS)
+    .disableRules(["color-contrast-enhanced"])
+    .analyze();
+  expect(results.violations).toEqual([]);
+}
+
+for (const scheme of ["light", "dark"] as const) {
+  test(`form states have zero axe violations (${scheme})`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.goto("/");
+    await page.locator("form[data-ready=true]").waitFor();
+    await page.getByRole("button", { name: "Advanced" }).click();
+    await page.getByLabel("Web address").fill("ftp://x");
+    await page.getByRole("button", { name: /^Audit/ }).click();
+    await expect(page.getByText(/starts with http/)).toBeVisible();
+    await scan(page);
+    await page.getByRole("tab", { name: "Screenshots" }).click();
+    await scan(page);
+  });
+
+  test(`a real queued run and the finished report have zero axe violations (${scheme})`, async ({
+    page,
+    request,
+  }) => {
+    test.setTimeout(150_000);
+    await page.emulateMedia({ colorScheme: scheme });
+    const first = await request.post("/api/runs", { data: { folder: FOLDER } });
+    const second = await request.post("/api/runs", {
+      data: { folder: FOLDER },
+    });
+    const firstId = (await first.json()).run_id;
+    const secondId = (await second.json()).run_id;
+    await page.goto(`/runs/${secondId}`);
+    await expect(
+      page.getByRole("navigation", { name: "Audit steps" }),
+    ).toBeVisible();
+    await scan(page);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Audit report" }),
+    ).toBeVisible({
+      timeout: 120_000,
+    });
+    await expect(
+      page.getByRole("img", { name: /Full-page screenshot/ }),
+    ).toBeVisible();
+    await scan(page);
+    await page.goto(`/runs/${firstId}`);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Audit report" }),
+    ).toBeVisible();
+  });
 }

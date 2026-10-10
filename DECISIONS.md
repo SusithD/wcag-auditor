@@ -97,3 +97,13 @@ The evaluation harness gains the `hybrid` condition: rule findings (boxed, non-e
 - **Tier promotion.** A needs-review pixel member joined to an automated rule member yields an automated finding; the pixel member's measurement stays in the evidence. This can raise hybrid precision above or below rule-only; the measured effect is in NOTES (M6).
 - **Coverage counts.** CHECK_CATALOGUE counts six criteria as reliable with a detector and no DOM geometry; without a detector the OCR-only source gives four automated and five with any verdict (the benchmark's real pages). The acceptance figure of six is therefore not reachable until M10 ships a model or captures carry `elements.json`; the pinned test asserts 4 / 5 (ADR-012).
 - **Shared browser.** The rule runner, the DOM element source and the PDF export now share one Playwright driver (`auditor/browser.py`, reference counted). Two `sync_playwright()` starts in one thread raise, which silently dropped two synthetic items from the first hybrid evaluation (`items_failed`).
+
+## ADR-023 Web shell: API proxy, run execution and form-control contrast (2026-10-10, M7a)
+Context: M7a needs the browser to reach the FastAPI service, run progress without Celery or Redis (CLAUDE.md), and a form that passes the app's own 1.4.11.
+Decisions:
+- **Same-origin proxy.** A Next route handler (`app/api/[...path]`) forwards to `API_URL` at request time, streams bodies (SSE, multipart) and drops `cookie`/`host`. Rewrites were rejected because they are fixed at build time, which breaks the e2e setup that picks its own API port.
+- **One `auditor audit` subprocess per run.** The service queues a subprocess (in-process runner, one job at a time) that writes `events.jsonl` (one JSON event per stage, per viewport) and `summary.json`; SSE tails the file and ends on the terminal status. Cancel kills the process group; a timeout (default 900 s) does the same. Cancel and timeout use out-of-band return codes (1001, 1002) so a real SIGKILL is not mislabelled. Runs left queued or running by a previous process are failed on startup.
+- **Folder source is allow-listed** (`FOLDER_ROOTS`, default `fixtures/`) so the API cannot read arbitrary paths; uploads are re-encoded to PNG, capped at 25 MB and 60 Mpx, one image per viewport (width <= 600 is mobile). Screenshot-only runs have no DOM, so the rule channel is skipped (`stage_status.rules = skipped`) and `rule_only` is rejected for them.
+- **Input border token.** `--input` is `#71717a` (light) and `#8b8b94` (dark), not zinc-200/zinc-800: a field boundary at 1.2:1 fails 1.4.11. This departs from the DESIGN_SPEC section 1 border token for form controls only.
+- Type scale and radii remapped so shadcn's `text-sm` is 13/20 and radii are 4/6/8/10 px as specified.
+

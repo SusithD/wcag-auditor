@@ -173,10 +173,12 @@ export function RunView({ runId }: { runId: string }) {
     refetchInterval: (query) =>
       query.state.data && TERMINAL.has(query.state.data.status) ? false : 1500,
   });
-  const { events } = useRunEvents(runId, true);
+  const terminalNow = run ? TERMINAL.has(run.status) : false;
+  const { events } = useRunEvents(runId, !terminalNow);
   const heading = useRef<HTMLHeadingElement>(null);
   const wasRunning = useRef(false);
   const [viewport, setViewport] = useState<Viewport | undefined>();
+  const [cancelError, setCancelError] = useState<string | null>(null);
 
   const terminal = run ? TERMINAL.has(run.status) : false;
   useEffect(() => {
@@ -187,7 +189,7 @@ export function RunView({ runId }: { runId: string }) {
     }
   }, [run, terminal]);
 
-  if (isError) {
+  if (isError && !run) {
     return (
       <div className="mx-auto max-w-160 px-6 py-12">
         <h1 ref={heading} tabIndex={-1} className="text-h2 font-semibold">
@@ -223,12 +225,18 @@ export function RunView({ runId }: { runId: string }) {
   const sofar = terminal ? run.counts : findingsSoFar(events);
   const subject =
     run.source_kind === "url" ? run.source : run.source.split("/").slice(-1)[0];
-  const alt = `Full-page screenshot of ${subject}${shownViewport ? `, ${shownViewport} viewport` : ""}`;
+  const total =
+    run.counts.critical +
+    run.counts.serious +
+    run.counts.minor +
+    run.counts.needs_review;
+  const alt = `Full-page screenshot of ${subject}${shownViewport ? `, ${shownViewport} viewport` : ""}${terminal ? `, ${total} findings; open the HTML report for the findings list` : ""}`;
 
   if (terminal) {
     const failedAll = run.status === "failed" || run.status === "cancelled";
     return (
       <div className="mx-auto w-full max-w-5xl px-6 py-8">
+        <title>{`${failedAll ? "Audit failed" : "Audit report"} - ${subject}`}</title>
         <p
           className="font-mono text-label text-muted-foreground"
           title={subject}
@@ -305,6 +313,7 @@ export function RunView({ runId }: { runId: string }) {
 
   return (
     <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-8 lg:grid-cols-[240px_1fr_240px]">
+      <title>{`Auditing - ${subject}`}</title>
       <div className="lg:col-span-3">
         <p
           className="font-mono text-label text-muted-foreground"
@@ -341,6 +350,11 @@ export function RunView({ runId }: { runId: string }) {
             <SeverityTriplet counts={sofar} />
           </div>
         </div>
+        {cancelError ? (
+          <p role="alert" className="text-body text-destructive">
+            {cancelError}
+          </p>
+        ) : null}
         <AlertDialog>
           <AlertDialogTrigger render={<Button variant="ghost" />}>
             Cancel audit
@@ -357,9 +371,12 @@ export function RunView({ runId }: { runId: string }) {
               <AlertDialogCancel>Keep auditing</AlertDialogCancel>
               <AlertDialogAction
                 onClick={async () => {
-                  await api.POST("/runs/{run_id}/cancel", {
+                  const { error } = await api.POST("/runs/{run_id}/cancel", {
                     params: { path: { run_id: runId } },
                   });
+                  setCancelError(
+                    error ? "The audit could not be cancelled" : null,
+                  );
                   await queryClient.invalidateQueries({
                     queryKey: ["run", runId],
                   });

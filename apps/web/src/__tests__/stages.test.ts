@@ -56,6 +56,28 @@ describe("stage model", () => {
     expect(failed.find((s) => s.id === "rules")?.status).toBe("failed");
   });
 
+  it("never moves backwards when a second viewport restarts the pipeline", () => {
+    const events = [
+      ev("module:2.5.8", "desktop"),
+      ev("fusion", "desktop"),
+      ev("rules", "mobile"),
+    ];
+    const steps = buildSteps(["desktop", "mobile"], false, events, "running");
+    expect(steps.find((s) => s.id === "fusion")?.status).toBe("current");
+    expect(steps.find((s) => s.id === "rules")?.status).toBe("done");
+  });
+
+  it("marks the furthest step failed, not the first, when a viewport fails", () => {
+    const events = [
+      ev("queued"),
+      ev("rules", "mobile"),
+      ev("failed:mobile", "mobile", "boom"),
+    ];
+    const steps = buildSteps(["mobile"], false, events, "running");
+    expect(steps.find((s) => s.id === "queued")?.status).toBe("done");
+    expect(steps.find((s) => s.id === "rules")?.status).toBe("failed");
+  });
+
   it("ignores bookkeeping events when finding the current stage", () => {
     const events = [
       ev("rules"),

@@ -3,25 +3,28 @@
 import { useEffect, useState } from "react";
 import type { StageEvent } from "@/lib/stages";
 
+const TERMINAL_STAGES = new Set(["done", "partial", "failed", "cancelled"]);
+
 export function useRunEvents(runId: string, enabled: boolean) {
   const [events, setEvents] = useState<StageEvent[]>([]);
-  const [connected, setConnected] = useState(false);
 
   useEffect(() => {
     if (!enabled) return;
     const source = new EventSource(`/api/runs/${runId}/events`);
-    source.onopen = () => setConnected(true);
+    source.onopen = () => setEvents([]);
     source.addEventListener("stage", (message) => {
       const event = JSON.parse(
         (message as MessageEvent<string>).data,
       ) as StageEvent;
       setEvents((previous) => [...previous, event]);
-      if (event.stage === "done" || event.stage.startsWith("failed"))
-        setConnected(true);
+      if (
+        TERMINAL_STAGES.has(event.stage) ||
+        event.stage.startsWith("failed:run")
+      )
+        source.close();
     });
-    source.onerror = () => setConnected(false);
     return () => source.close();
   }, [runId, enabled]);
 
-  return { events, connected };
+  return { events };
 }

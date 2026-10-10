@@ -13,3 +13,10 @@ Every approach that was tried and rejected, with the fixture or measurement that
 - **2026-10-10, M5.** R5 ring completeness judged over every column of a side. Killed by the synthetic 2.4.13 corpus (8 false positives): rounded corners (radius 6 + offset 2) shortened the ring. Replaced by the central half of each side.
 - **2026-10-10, M5.** Treating a stop inside a fixed header as covered by that header. Killed by review: every link in a sticky nav fired 2.4.11/2.4.12. Replaced by `contains_refs`.
 - **2026-10-10, M6.** Fusion as connected components over all same-criterion findings (IoU or containment either way). Killed by the sealed benchmark: nested axe elements chained into one finding and hybrid real-stratum 1.4.3 TP fell below rule-only (621 vs 653; delta-precision CI [-0.049, -0.014], nearly outside the -0.05 margin). Replaced by rule-element-centred fusion (ADR-021).
+
+## M7a: shadcn CLI imports `cn` from an unvetted npm package (2026-10-10)
+`pnpm dlx shadcn@latest add progress radio-group alert label` generated `import { cn } from "cn"` and added the `cn` package. Replaced with the owned `@/lib/utils` helper and removed the dependency. Check generated imports after every `shadcn add`.
+
+## M7a: Next rewrites for the API proxy (2026-10-10)
+`rewrites()` are evaluated at build time, so the API address could not be chosen when starting the e2e servers. Replaced by a runtime route handler (ADR-023).
+

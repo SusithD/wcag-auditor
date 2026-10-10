@@ -1,5 +1,10 @@
 const UPSTREAM = process.env.API_URL ?? "http://127.0.0.1:8000";
-const DROP_REQUEST = new Set(["host", "connection", "content-length"]);
+const DROP_REQUEST = new Set([
+  "host",
+  "connection",
+  "content-length",
+  "cookie",
+]);
 const DROP_RESPONSE = new Set([
   "content-encoding",
   "content-length",
@@ -27,7 +32,10 @@ async function proxy(request: Request, { params }: Context) {
   if (hasBody) init.duplex = "half";
   let upstream: Response;
   try {
-    upstream = await fetch(`${UPSTREAM}/${path.join("/")}${search}`, init);
+    upstream = await fetch(
+      `${UPSTREAM}/${path.map(encodeURIComponent).join("/")}${search}`,
+      init,
+    );
   } catch {
     return Response.json(
       { detail: "The audit service is not reachable" },

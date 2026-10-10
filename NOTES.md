@@ -116,3 +116,27 @@ State before M6: M0-M5, M1b and M10a merged and pushed; M10 blocked at the train
 - **Reviewers.** correctness, protocol, tests, ui-a11y and thesis-evidence ran; every must-fix was applied (single-pass template substitution, nested evidence, pixel-derived severity, empty-box filtering, stale-output cleanup, PDF non-fatal, axe-summary evidence for rule-only findings, report accessibility: non-scaling strokes with halos, labels, forced-colors and print styles, scroll regions, 24 px link targets). The report passes axe (WCAG 2.x A/AA, best-practice) with zero violations in light and dark on a real, a synthetic and a clean report.
 - **Golden.** `fixtures/golden/fusion/hand_built.json` is new in this milestone.
 - Needs planning: ADR-017 (default focus ring) and ADR-018 (training size) still wait for the researcher.
+
+## M7a web shell, New Audit, run progress (2026-10-10, branch m7a-web-shell)
+
+State before M7a: M0-M6, M1b, M10a merged and pushed; M10 blocked at the training gate.
+Scope item -> delivery:
+| Item | Delivered by | State |
+|---|---|---|
+| App shell (top bar, theme toggle, skip link, landmarks) | `app/layout.tsx` | done |
+| `/` New Audit: URL tab, validation, paste prefix, viewport toggles, Advanced (condition, focus budget), Audit + Kbd, recent runs table | `components/audit/new-audit-form.tsx`, `recent-runs.tsx` | done |
+| Screenshots tab: real file input, drop zone, upload progress | same | done; progress is one aggregate bar, not per file |
+| Optional focus-pair upload | none | NOT DONE |
+| Favicon on blur | none | NOT DONE |
+| `/runs/[id]` progress: stepper, one live region, skeleton canvas, 200 ms cross-fade, cancel dialog, focus to heading on done | `run-view.tsx`, `lib/stages.ts`, `hooks/use-run-events.ts` | done; the eight criteria are one grouped step |
+| Boxes appearing per module (30 ms stagger) | none (needs per-module findings in the event stream) | NOT DONE (M7b) |
+| Landing state after done (screenshot, counts, links to HTML/JSON) | `run-view.tsx` | done as a minimal landing; panes are M7b |
+| API client from generated types, TanStack Query | `api/client.ts` (openapi-fetch on `types.ts`), `lib/query.tsx` | done |
+| Endpoints POST /runs, /uploads, GET /runs, /runs/{id}, /events (SSE), assets, report.{json,html,pdf}, cancel | `services/app/app/api.py`, `jobs.py` | done |
+| Carry-overs: axe gate to AA+AAA set, input-border contrast, radius/type remap, atomic report writes, job timeouts, CI `--all-packages` | `e2e/axe.spec.ts`, `globals.css`, `pipeline.py`, `jobs.py`, `ci.yml` | done |
+
+- **Tests.** services/app 22 passed (folder run with SSE, uploads, cancel queued and running, timeout, failed run, traversal, startup reconciliation); vitest 31 passed (URL normalisation, stage model); Playwright e2e 13 passed: fixture-folder run to report with the screenshot visible, queued-run cancel, keyboard-only form completed through a real URL capture, axe (WCAG 2.x A/AA/AAA tags, `color-contrast-enhanced` off) on `/`, a real queued run, the finished report, form error and Screenshots-tab states, light and dark.
+- **Reviews.** correctness, tests and ui-a11y ran; must-fix items applied: SSE replay and reconnect, stepper going backwards or marking the wrong step failed, cancel/timeout sentinels, orphaned subprocess trees, queued-cancel DB state, upload decompression cap, rule-only on screenshots, 500s on bad folder meta, double submit, focus after a failed submit, double upload bar, per-route titles.
+- **Deviation.** PLAN lists `PATCH /findings/{id}` and `/catalogue` among the endpoints; they belong to M7b/M7c and are not built.
+- Needs planning: none new. ADR-017 and ADR-018 still wait for the researcher.
+

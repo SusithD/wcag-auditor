@@ -7,6 +7,7 @@ from pathlib import Path
 from alembic import command
 from alembic.config import Config
 from fastapi import FastAPI
+from sqlalchemy import select
 
 from app.api import build_router, status_from_result
 from app.config import Settings
@@ -30,6 +31,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.engine = engine
         app.state.sessions = make_session_factory(engine)
         sessions = app.state.sessions
+        with sessions() as session:
+            for row in session.scalars(select(Run).where(Run.status.in_(["queued", "running"]))):
+                row.status, row.error = "failed", "Interrupted by a service restart"
+            session.commit()
 
         async def on_start(run_id: str) -> None:
             with sessions() as session:

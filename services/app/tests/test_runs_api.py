@@ -130,3 +130,91 @@ def test_cancel_a_queued_run(tmp_path: Path) -> None:
         assert c.post(f"/runs/{second}/cancel").json() == {"cancelled": True}
         assert wait_for_terminal(c, second)["status"] == "cancelled"
         assert wait_for_terminal(c, first)["status"] == "done"
+
+
+def test_a_run_whose_capture_cannot_be_read_ends_failed_with_a_reason(tmp_path: Path) -> None:
+    import shutil
+
+    folder = tmp_path / "capture"
+    shutil.copytree(REAL, folder)
+    (folder / "screenshot.png").write_bytes(b"not a png")
+    settings = Settings(
+        data_dir=tmp_path / "data",
+        db_url=f"sqlite:///{tmp_path / 'app.db'}",
+        folder_roots=(tmp_path.resolve(),),
+        pdf=False,
+    )
+    with TestClient(create_app(settings)) as c:
+        run_id = c.post("/runs", json={"folder": str(folder)}).json()["run_id"]
+        body = wait_for_terminal(c, run_id)
+        assert body["status"] == "failed" and body["error"]
+
+
+def test_uploads_over_the_size_limit_and_fake_images_are_rejected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import app.api as api
+
+    with client(tmp_path) as c:
+        fake = c.post("/uploads", files=[("files", ("x.png", b"GIF89a-not-really", "image/png"))])
+        assert fake.status_code == 422
+        monkeypatch.setattr(api, "MAX_UPLOAD_BYTES", 1000)
+        big = c.post("/uploads", files=[("files", ("x.png", png(800, 800), "image/png"))])
+        assert big.status_code == 413
+        assert c.post("/uploads", files=[]).status_code == 422
+
+
+def test_asset_and_folder_paths_cannot_escape(tmp_path: Path) -> None:
+    with client(tmp_path) as c:
+        run_id = c.post("/runs", json={"folder": str(REAL)}).json()["run_id"]
+        assert c.get(f"/runs/{run_id}/assets/tablet/screenshot").status_code == 422
+        assert c.get(f"/runs/{run_id}/assets/%2e%2e/screenshot").status_code in {404, 422}
+        assert c.get(f"/runs/{run_id}/report.exe", params={"viewport": "mobile"}).status_code == 422
+        outside = str(FIXTURES / ".." / "pyproject.toml")
+        assert c.post("/runs", json={"folder": outside}).status_code == 422
+        assert (
+            c.post("/runs", json={"folder": str(FIXTURES / ".." / "services")}).status_code == 422
+        )
+        wait_for_terminal(c, run_id)
+
+
+def test_rule_only_on_screenshots_and_bad_inputs_are_rejected_not_500(tmp_path: Path) -> None:
+    import shutil
+
+    bad = tmp_path / "bad"
+    shutil.copytree(REAL, bad)
+    (bad / "meta.json").write_text("{not json")
+    settings = Settings(
+        data_dir=tmp_path / "d",
+        db_url=f"sqlite:///{tmp_path / 'a.db'}",
+        folder_roots=(tmp_path.resolve(), FIXTURES.resolve()),
+        pdf=False,
+    )
+    with TestClient(create_app(settings)) as c:
+        up = c.post("/uploads", files=[("files", ("p.png", png(1440, 900), "image/png"))]).json()
+        r = c.post("/runs", json={"upload_id": up["upload_id"], "condition": "rule_only"})
+        assert r.status_code == 422
+        assert c.post("/runs", json={"folder": str(bad)}).status_code == 422
+        assert c.get("/runs", params={"limit": -1}).status_code == 422
+        assert c.get("/runs", params={"limit": 0}).status_code == 422
+
+
+def test_runs_left_queued_by_a_previous_process_are_failed_on_startup(tmp_path: Path) -> None:
+    from app.models import Run
+
+    with client(tmp_path) as c, c.app.state.sessions() as session:  # type: ignore[attr-defined]
+        session.add(
+            Run(
+                id="b" * 32,
+                source_kind="folder",
+                source="x",
+                viewports=["mobile"],
+                condition="hybrid",
+                status="running",
+                stage_status={},
+            )
+        )
+        session.commit()
+    with client(tmp_path) as c:
+        body = c.get(f"/runs/{'b' * 32}").json()
+        assert body["status"] == "failed" and "restart" in body["error"]

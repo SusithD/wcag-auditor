@@ -4,6 +4,7 @@ import asyncio
 import io
 import json
 import re
+import shutil
 import uuid
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
@@ -11,7 +12,7 @@ from pathlib import Path
 from typing import Annotated, Any, Literal
 from urllib.parse import urlsplit
 
-from fastapi import APIRouter, File, HTTPException, Request, UploadFile
+from fastapi import APIRouter, File, HTTPException, Query, Request, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from PIL import Image
 from pydantic import BaseModel, Field
@@ -25,6 +26,7 @@ Viewport = Literal["desktop", "mobile"]
 Condition = Literal["hybrid", "rule_only"]
 HEX = re.compile(r"^[0-9a-f]{32}$")
 MAX_UPLOAD_BYTES = 25 * 1024 * 1024
+MAX_UPLOAD_PIXELS = 60_000_000
 MOBILE_MAX_WIDTH = 600
 TERMINAL = {"done", "failed", "cancelled", "partial"}
 STAGE_FILES = {"report.json", "report.html", "report.pdf"}
@@ -158,50 +160,59 @@ def build_router(settings: Settings) -> APIRouter:
             available_viewports=sorted(available),
         )
 
+    def _store_upload(raw: bytes, name: str | None, base: Path, seen: list[Viewport]) -> Viewport:
+        try:
+            with Image.open(io.BytesIO(raw)) as image:
+                width, height = image.size
+                if width * height > MAX_UPLOAD_PIXELS:
+                    raise HTTPException(413, f"{name} has too many pixels")
+                image.load()
+                rgb = image.convert("RGB")
+        except HTTPException:
+            raise
+        except Exception as exc:
+            raise HTTPException(422, f"{name} is not an image") from exc
+        vp: Viewport = "mobile" if width <= MOBILE_MAX_WIDTH else "desktop"
+        if vp in seen:
+            raise HTTPException(422, f"Two {vp} screenshots; upload one per viewport")
+        folder = base / vp
+        folder.mkdir(parents=True)
+        rgb.save(folder / "screenshot.png")
+        meta: dict[str, Any] = {
+            "origin": "upload",
+            "viewport": vp,
+            "viewport_spec": {
+                "width": width,
+                "height": min(height, 900 if vp == "desktop" else 844),
+                "is_mobile": vp == "mobile",
+                "has_touch": vp == "mobile",
+                "device_scale_factor": 1,
+            },
+            "url": name or "uploaded screenshot",
+            "title": name,
+            "capture_timestamp": datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ"),
+            "screenshot_mode": "full_page",
+            "focus_steps": [],
+        }
+        (folder / "meta.json").write_text(json.dumps(meta, indent=2))
+        return vp
+
     @router.post("/uploads", response_model=UploadResult)
-    async def create_upload(
-        request: Request, files: Annotated[list[UploadFile], File()]
-    ) -> UploadResult:
+    async def create_upload(files: Annotated[list[UploadFile], File()]) -> UploadResult:
         if not files:
             raise HTTPException(422, "Choose at least one screenshot")
         upload_id = uuid.uuid4().hex
         base = settings.uploads_dir / upload_id
         seen: list[Viewport] = []
-        for item in files:
-            raw = await item.read(MAX_UPLOAD_BYTES + 1)
-            if len(raw) > MAX_UPLOAD_BYTES:
-                raise HTTPException(413, f"{item.filename} is larger than 25 MB")
-            try:
-                with Image.open(io.BytesIO(raw)) as image:
-                    width, height = image.size
-                    image.verify()
-            except Exception as exc:
-                raise HTTPException(422, f"{item.filename} is not an image") from exc
-            vp: Viewport = "mobile" if width <= MOBILE_MAX_WIDTH else "desktop"
-            if vp in seen:
-                raise HTTPException(422, f"Two {vp} screenshots; upload one per viewport")
-            seen.append(vp)
-            folder = base / vp
-            folder.mkdir(parents=True)
-            with Image.open(io.BytesIO(raw)) as image:
-                image.convert("RGB").save(folder / "screenshot.png")
-            meta: dict[str, Any] = {
-                "origin": "upload",
-                "viewport": vp,
-                "viewport_spec": {
-                    "width": width,
-                    "height": min(height, 900 if vp == "desktop" else 844),
-                    "is_mobile": vp == "mobile",
-                    "has_touch": vp == "mobile",
-                    "device_scale_factor": 1,
-                },
-                "url": item.filename or "uploaded screenshot",
-                "title": item.filename,
-                "capture_timestamp": datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ"),
-                "screenshot_mode": "full_page",
-                "focus_steps": [],
-            }
-            (folder / "meta.json").write_text(json.dumps(meta, indent=2))
+        try:
+            for item in files:
+                raw = await item.read(MAX_UPLOAD_BYTES + 1)
+                if len(raw) > MAX_UPLOAD_BYTES:
+                    raise HTTPException(413, f"{item.filename} is larger than 25 MB")
+                seen.append(await asyncio.to_thread(_store_upload, raw, item.filename, base, seen))
+        except HTTPException:
+            shutil.rmtree(base, ignore_errors=True)
+            raise
         return UploadResult(upload_id=upload_id, viewports=sorted(seen))
 
     @router.post("/runs", response_model=RunCreated, status_code=201)
@@ -235,6 +246,8 @@ def build_router(settings: Settings) -> APIRouter:
                 or not (settings.uploads_dir / body.upload_id).is_dir()
             ):
                 raise HTTPException(404, "Unknown upload")
+            if body.condition == "rule_only":
+                raise HTTPException(422, "Rule-only needs a page capture; screenshots have no DOM")
             kind, source = "upload", body.upload_id
             base = settings.uploads_dir / body.upload_id
             chosen = [vp for vp in viewports if (base / vp).is_dir()]
@@ -252,7 +265,12 @@ def build_router(settings: Settings) -> APIRouter:
                 raise HTTPException(422, "That folder is not an allowed capture folder")
             kind, source = "folder", str(folder.resolve())
             argv += ["--folder", source]
-            viewports = [json.loads((folder / "meta.json").read_text())["viewport"]]
+            try:
+                viewports = [json.loads((folder / "meta.json").read_text())["viewport"]]
+            except (KeyError, ValueError, OSError) as exc:
+                raise HTTPException(422, "The capture folder has an unreadable meta.json") from exc
+            if viewports[0] not in {"desktop", "mobile"}:
+                raise HTTPException(422, "The capture folder has an unknown viewport")
         out.mkdir(parents=True)
         with request.app.state.sessions() as session:
             session.add(
@@ -271,11 +289,11 @@ def build_router(settings: Settings) -> APIRouter:
         return RunCreated(run_id=run_id)
 
     @router.get("/runs", response_model=list[RunSummary])
-    def list_runs(request: Request, limit: int = 20) -> list[RunSummary]:
+    def list_runs(
+        request: Request, limit: Annotated[int, Query(ge=1, le=100)] = 20
+    ) -> list[RunSummary]:
         with request.app.state.sessions() as session:
-            rows = session.scalars(
-                select(Run).order_by(Run.created_at.desc()).limit(min(limit, 100))
-            )
+            rows = session.scalars(select(Run).order_by(Run.created_at.desc()).limit(limit))
             return [summarise(r) for r in rows]
 
     @router.get("/runs/{run_id}", response_model=RunSummary)
@@ -290,7 +308,14 @@ def build_router(settings: Settings) -> APIRouter:
     @router.post("/runs/{run_id}/cancel", status_code=202)
     def cancel_run(run_id: str, request: Request) -> dict[str, bool]:
         run_dir(run_id)
-        return {"cancelled": request.app.state.jobs.cancel(run_id)}
+        cancelled: bool = request.app.state.jobs.cancel(run_id)
+        if cancelled:
+            with request.app.state.sessions() as session:
+                row = session.get(Run, run_id)
+                if row is not None and row.status == "queued":
+                    row.status = "cancelled"
+                    session.commit()
+        return {"cancelled": cancelled}
 
     @router.get("/runs/{run_id}/events")
     async def run_events(run_id: str, request: Request) -> StreamingResponse:
@@ -303,7 +328,7 @@ def build_router(settings: Settings) -> APIRouter:
             sent = 0
             yield _sse({"stage": "queued", "viewport": None, "detail": None})
             while True:
-                events = _read_events(out)
+                events = await asyncio.to_thread(_read_events, out)
                 for ev in events[sent:]:
                     yield _sse(ev)
                 sent = len(events)
@@ -311,7 +336,7 @@ def build_router(settings: Settings) -> APIRouter:
                     row = session.get(Run, run_id)
                     status = row.status if row else "failed"
                 if status in TERMINAL:
-                    if sent == len(_read_events(out)):
+                    if sent == len(await asyncio.to_thread(_read_events, out)):
                         yield _sse({"stage": status, "viewport": None, "detail": None})
                         return
                     continue

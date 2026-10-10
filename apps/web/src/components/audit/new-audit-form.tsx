@@ -7,6 +7,7 @@ import {
   type ClipboardEvent,
   type DragEvent,
   type FormEvent,
+  useEffect,
   useId,
   useRef,
   useState,
@@ -21,11 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Kbd } from "@/components/ui/kbd";
 import { Label } from "@/components/ui/label";
-import {
-  Progress,
-  ProgressIndicator,
-  ProgressTrack,
-} from "@/components/ui/progress";
+import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -79,6 +76,14 @@ export function NewAuditForm() {
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [ready, setReady] = useState(false);
+  const alertRef = useRef<HTMLParagraphElement>(null);
+  const hasError = formError !== null;
+
+  useEffect(() => setReady(true), []);
+  useEffect(() => {
+    if (hasError) alertRef.current?.focus();
+  }, [hasError]);
 
   const errorId = `${ids}-url-error`;
 
@@ -108,6 +113,7 @@ export function NewAuditForm() {
 
   async function submit(event?: FormEvent) {
     event?.preventDefault();
+    if (submitting) return;
     setFormError(null);
     if (viewports.length === 0) {
       setFormError("Select at least one viewport");
@@ -160,6 +166,7 @@ export function NewAuditForm() {
   return (
     <form
       noValidate
+      data-ready={ready}
       onSubmit={submit}
       onKeyDown={(e) => {
         if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) void submit();
@@ -224,7 +231,10 @@ export function NewAuditForm() {
               aria-label="Selected screenshots"
             >
               {files.map((f) => (
-                <li key={f.name} className="flex justify-between gap-3">
+                <li
+                  key={`${f.name}-${f.size}-${f.lastModified}`}
+                  className="flex justify-between gap-3"
+                >
                   <span className="truncate">{f.name}</span>
                   <span className="font-mono text-label text-muted-foreground">
                     {(f.size / 1024).toFixed(0)} KB
@@ -237,16 +247,18 @@ export function NewAuditForm() {
             <Progress
               value={Math.round(progress * 100)}
               aria-label="Upload progress"
-            >
-              <ProgressTrack>
-                <ProgressIndicator />
-              </ProgressTrack>
-            </Progress>
+            />
           ) : null}
         </TabsContent>
       </Tabs>
 
-      <fieldset className="mt-4" disabled={submitting}>
+      <fieldset
+        className="mt-4"
+        disabled={submitting}
+        aria-describedby={
+          formError?.includes("viewport") ? `${ids}-form-error` : undefined
+        }
+      >
         <legend className="mb-2 text-body font-medium">Viewports</legend>
         <ToggleGroup
           multiple
@@ -306,12 +318,24 @@ export function NewAuditForm() {
       </Collapsible>
 
       {formError ? (
-        <p role="alert" className="mt-4 text-body text-destructive">
+        <p
+          ref={alertRef}
+          id={`${ids}-form-error`}
+          role="alert"
+          tabIndex={-1}
+          className="mt-4 text-body text-destructive outline-none"
+        >
           {formError}
         </p>
       ) : null}
 
-      <Button type="submit" size="lg" className="mt-6" disabled={submitting}>
+      <Button
+        type="submit"
+        size="lg"
+        className="mt-6 aria-disabled:pointer-events-none aria-disabled:opacity-60"
+        aria-disabled={submitting}
+        aria-keyshortcuts="Control+Enter Meta+Enter"
+      >
         {submitting ? (
           <Loader2 aria-hidden="true" className="animate-spin" />
         ) : null}

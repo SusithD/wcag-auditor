@@ -7,6 +7,7 @@ test("a fixture-folder run shows progress and lands on the report with the scree
   page,
   request,
 }) => {
+  test.setTimeout(150_000);
   const listing = await request.get("/api/runs");
   expect(listing.ok()).toBe(true);
   const folder = `${FIXTURE}/real_com_011_mobile_20261004T054738Z`;
@@ -31,10 +32,49 @@ test("a fixture-folder run shows progress and lands on the report with the scree
   ).toBeVisible();
 });
 
+test("a queued run can be cancelled from the progress screen after confirming", async ({
+  page,
+  request,
+}) => {
+  test.setTimeout(150_000);
+  const first = await request.post("/api/runs", {
+    data: { folder: `${FIXTURE}/real_com_003_desktop_20261004T054402Z` },
+  });
+  const second = await request.post("/api/runs", {
+    data: { folder: `${FIXTURE}/real_com_011_mobile_20261004T054738Z` },
+  });
+  const queuedId = (await second.json()).run_id;
+  await page.goto(`/runs/${queuedId}`);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Auditing" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Cancel audit" }).click();
+  await page
+    .getByRole("alertdialog")
+    .getByRole("button", { name: "Cancel audit" })
+    .click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Audit cancelled" }),
+  ).toBeVisible();
+  const body = await (await request.get(`/api/runs/${queuedId}`)).json();
+  expect(body.status).toBe("cancelled");
+  const firstId = (await first.json()).run_id;
+  await expect
+    .poll(
+      async () =>
+        (await (await request.get(`/api/runs/${firstId}`)).json()).status,
+      {
+        timeout: 120_000,
+      },
+    )
+    .toBe("done");
+});
+
 test("progress shows the stepper, one live region and a cancel confirmation", async ({
   page,
   request,
 }) => {
+  test.setTimeout(150_000);
   const folder = `${FIXTURE}/real_com_003_desktop_20261004T054402Z`;
   const created = await request.post("/api/runs", { data: { folder } });
   const { run_id } = await created.json();
@@ -59,7 +99,7 @@ test("the New Audit form can be completed with the keyboard alone", async ({
   page,
 }) => {
   await page.goto("/");
-  await page.waitForLoadState("networkidle");
+  await page.locator("form[data-ready=true]").waitFor();
   const urlField = page.getByLabel("Web address");
 
   async function tabTo(locator: ReturnType<typeof page.locator>, max = 14) {
@@ -106,7 +146,7 @@ test("selecting no viewport is rejected inline without leaving the page", async 
   page,
 }) => {
   await page.goto("/");
-  await page.waitForLoadState("networkidle");
+  await page.locator("form[data-ready=true]").waitFor();
   await page.getByLabel("Web address").fill("example.com");
   await page.getByRole("button", { name: "Desktop" }).click();
   await page.getByRole("button", { name: "Mobile" }).click();
