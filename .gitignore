@@ -7,6 +7,8 @@ CLAUDE.md
 CLAUDE.local.md
 MILESTONES.md
 setup.sh
+autopilot.sh
+.autopilot-logs/
 data/
 eval/**/*.png
 node_modules/

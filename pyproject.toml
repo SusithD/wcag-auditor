@@ -1,0 +1,41 @@
+[project]
+name = "wcag-auditor-workspace"
+version = "0.0.0"
+requires-python = ">=3.12,<3.13"
+dependencies = ["auditor", "wcag-auditor-app"]
+
+[dependency-groups]
+dev = [
+  "ruff>=0.8",
+  "mypy>=1.13",
+  "pytest>=8",
+  "pytest-cov",
+  "httpx",
+  "types-PyYAML",
+]
+
+[tool.uv.workspace]
+members = ["packages/auditor", "services/app"]
+
+[tool.uv.sources]
+auditor = { workspace = true }
+wcag-auditor-app = { workspace = true }
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["apps", "fixtures", "services/app/alembic"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+exclude = ["apps/", "fixtures/", "services/app/alembic/"]
+
+[tool.pytest.ini_options]
+testpaths = ["packages/auditor", "services/app"]
+markers = ["browser: needs Playwright Chromium"]
+addopts = "-m 'not browser'"

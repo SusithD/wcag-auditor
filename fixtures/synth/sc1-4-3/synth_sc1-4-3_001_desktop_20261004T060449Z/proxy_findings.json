@@ -1,0 +1,73 @@
+{
+  "pageUrl": "file:///Users/susithalwis/Desktop/Final%20Year%20Reserach/04_Data_Collection/synthetic_corpus_v1.1/synth_1.4.3_001/index.html",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "contrast": [
+    {
+      "selector": "html > body > header.site",
+      "textSample": "Synthetic Test Corpus \u2014 page synth_1.4.3",
+      "fgColor": [
+        31,
+        41,
+        55
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 14.68,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "html > body > main.content > div.card > div > span",
+      "textSample": "Reset your password to complete the sign",
+      "fgColor": [
+        120,
+        120,
+        120
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 4.42,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": true,
+      "boundary": true
+    }
+  ],
+  "nonTextContrast": [],
+  "targetSize": [],
+  "focus": [],
+  "dragging": [],
+  "hasFinding": {
+    "1.4.3": true,
+    "1.4.11": false,
+    "2.4.7": false,
+    "2.4.11": false,
+    "2.4.12": false,
+    "2.4.13": false,
+    "2.5.7": false,
+    "2.5.8": false
+  },
+  "counts": {
+    "contrastChecked": 2,
+    "contrastViolations": 1,
+    "nonTextContrastChecked": 0,
+    "nonTextContrastViolations": 0,
+    "targetSizeChecked": 0,
+    "targetSizeViolations": 0,
+    "focusChecked": 0,
+    "focusNotVisible": 0,
+    "focusObscured": 0,
+    "draggingCandidates": 0
+  }
+}

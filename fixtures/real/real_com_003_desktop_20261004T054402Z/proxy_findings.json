@@ -1,0 +1,1147 @@
+{
+  "pageUrl": "https://maltacricket.biz/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "contrast": [
+    {
+      "selector": "div#site-container > a.skip-link",
+      "textSample": "Skip to content",
+      "fgColor": [
+        0,
+        0,
+        0
+      ],
+      "bgColor": [
+        89,
+        82,
+        76
+      ],
+      "ratio": 2.74,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": true,
+      "boundary": false
+    },
+    {
+      "selector": "header#masthead > div.gmr-secondmenuwrap > div.container > div.gmr-logo > div.site-title > a",
+      "textSample": "Malta Cricket",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        70,
+        64,
+        60
+      ],
+      "ratio": 10.2,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#primary-menu > li > a",
+      "textSample": "Auto & Motor",
+      "fgColor": [
+        0,
+        0,
+        0
+      ],
+      "bgColor": [
+        247,
+        241,
+        227
+      ],
+      "ratio": 18.65,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#primary-menu > li > a",
+      "textSample": "Design",
+      "fgColor": [
+        0,
+        0,
+        0
+      ],
+      "bgColor": [
+        247,
+        241,
+        227
+      ],
+      "ratio": 18.65,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#primary-menu > li > a > span",
+      "textSample": "More \u00bb",
+      "fgColor": [
+        0,
+        0,
+        0
+      ],
+      "bgColor": [
+        247,
+        241,
+        227
+      ],
+      "ratio": 18.65,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "main#main > header > h1.page-title",
+      "textSample": "Malta Cricket",
+      "fgColor": [
+        85,
+        85,
+        85
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 7.46,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "article#post-642 > div.gmr-box-content > div.item-article > header.entry-header > h2.entry-title > a",
+      "textSample": "Tea Symbolic Logo Concept: How a Cafe Br",
+      "fgColor": [
+        0,
+        0,
+        0
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 21,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "article#post-642 > div.gmr-box-content > div.item-article > header.entry-header > div.dater > span.month",
+      "textSample": "Aug",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        255,
+        87,
+        34
+      ],
+      "ratio": 3.16,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": true,
+      "boundary": false
+    },
+    {
+      "selector": "article#post-642 > div.gmr-box-content > div.item-article > header.entry-header > div.dater > span.day",
+      "textSample": "27th",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        255,
+        87,
+        34
+      ],
+      "ratio": 3.16,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": true,
+      "boundary": false
+    },
+    {
+      "selector": "article#post-642 > div.gmr-box-content > div.item-article > div.entry-content",
+      "textSample": "Why a Tea Symbolic Logo Concept Could Be",
+      "fgColor": [
+        85,
+        85,
+        85
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 7.46,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "article#post-794 > div.gmr-box-content > div.item-article > header.entry-header > h2.entry-title > a",
+      "textSample": "Questions About  You Must Know the Answe",
+      "fgColor": [
+        0,
+        0,
+        0
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 21,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "article#post-794 > div.gmr-box-content > div.item-article > header.entry-header > div.dater > span.month",
+      "textSample": "Dec",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        255,
+        87,
+        34
+      ],
+      "ratio": 3.16,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": true,
+      "boundary": false
+    },
+    {
+      "selector": "article#post-794 > div.gmr-box-content > div.item-article > header.entry-header > div.dater > span.day",
+      "textSample": "19th",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        255,
+        87,
+        34
+      ],
+      "ratio": 3.16,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": true,
+      "boundary": false
+    },
+    {
+      "selector": "article#post-794 > div.gmr-box-content > div.item-article > div.entry-content",
+      "textSample": "Making the most of Returns: The Benefits",
+      "fgColor": [
+        85,
+        85,
+        85
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 7.46,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#search-2 > form.search-form > label > span.screen-reader-text",
+      "textSample": "Search for:",
+      "fgColor": [
+        85,
+        85,
+        85
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 7.46,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "aside#secondary > div.widget > h4.widget-title",
+      "textSample": "More Inspiration",
+      "fgColor": [
+        85,
+        85,
+        85
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 7.46,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "li#listpost > div.idblog-rp-link > a",
+      "textSample": "Tea Symbolic Logo Concept: How a Cafe Br",
+      "fgColor": [
+        0,
+        0,
+        0
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 21,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "li#listpost > div.idblog-rp-link > a",
+      "textSample": "Questions About  You Must Know the Answe",
+      "fgColor": [
+        0,
+        0,
+        0
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 21,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "footer#colophon > div.container > div.site-info > div.footer-text > span.footer-left",
+      "textSample": "Copyright \u00a9",
+      "fgColor": [
+        242,
+        242,
+        242
+      ],
+      "bgColor": [
+        70,
+        64,
+        60
+      ],
+      "ratio": 9.11,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div.container > div.site-info > div.footer-text > span.footer-left > a > em",
+      "textSample": "Malta Cricket Explores Life\u2019s Big Questi",
+      "fgColor": [
+        236,
+        240,
+        241
+      ],
+      "bgColor": [
+        70,
+        64,
+        60
+      ],
+      "ratio": 8.89,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+      "textSample": "Contact Us",
+      "fgColor": [
+        236,
+        240,
+        241
+      ],
+      "bgColor": [
+        70,
+        64,
+        60
+      ],
+      "ratio": 8.89,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+      "textSample": "Disclaimer",
+      "fgColor": [
+        236,
+        240,
+        241
+      ],
+      "bgColor": [
+        70,
+        64,
+        60
+      ],
+      "ratio": 8.89,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+      "textSample": "DMCA",
+      "fgColor": [
+        236,
+        240,
+        241
+      ],
+      "bgColor": [
+        70,
+        64,
+        60
+      ],
+      "ratio": 8.89,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+      "textSample": "Privacy Policy",
+      "fgColor": [
+        236,
+        240,
+        241
+      ],
+      "bgColor": [
+        70,
+        64,
+        60
+      ],
+      "ratio": 8.89,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+      "textSample": "Terms and Conditions",
+      "fgColor": [
+        236,
+        240,
+        241
+      ],
+      "bgColor": [
+        70,
+        64,
+        60
+      ],
+      "ratio": 8.89,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#catapult-cookie-bar",
+      "textSample": "This site uses cookies",
+      "fgColor": [
+        221,
+        221,
+        221
+      ],
+      "bgColor": [
+        70,
+        70,
+        70
+      ],
+      "ratio": 6.95,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "button#catapultCookie",
+      "textSample": "No problem",
+      "fgColor": [
+        221,
+        221,
+        221
+      ],
+      "bgColor": [
+        200,
+        35,
+        44
+      ],
+      "ratio": 4.14,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": true,
+      "boundary": false
+    },
+    {
+      "selector": "div#catapult-cookie-bar > a",
+      "textSample": "More information",
+      "fgColor": [
+        221,
+        221,
+        221
+      ],
+      "bgColor": [
+        70,
+        70,
+        70
+      ],
+      "ratio": 6.95,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#sidr-id-primary-menu > li > a",
+      "textSample": "Auto & Motor",
+      "fgColor": [
+        51,
+        51,
+        51
+      ],
+      "bgColor": [
+        248,
+        248,
+        248
+      ],
+      "ratio": 11.9,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#sidr-id-primary-menu > li > a",
+      "textSample": "Design",
+      "fgColor": [
+        51,
+        51,
+        51
+      ],
+      "bgColor": [
+        248,
+        248,
+        248
+      ],
+      "ratio": 11.9,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#sidr-id-primary-menu > li > a > span",
+      "textSample": "More \u00bb",
+      "fgColor": [
+        51,
+        51,
+        51
+      ],
+      "bgColor": [
+        248,
+        248,
+        248
+      ],
+      "ratio": 11.9,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#secondmenus > div.sidr-inner",
+      "textSample": "undefined",
+      "fgColor": [
+        51,
+        51,
+        51
+      ],
+      "bgColor": [
+        248,
+        248,
+        248
+      ],
+      "ratio": 11.9,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    }
+  ],
+  "nonTextContrast": [
+    {
+      "selector": "div#search-2 > form.search-form > label > input.search-field",
+      "borderColor": [
+        236,
+        240,
+        241
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 1.15,
+      "threshold": 3,
+      "isViolation": true,
+      "boundary": false
+    }
+  ],
+  "targetSize": [
+    {
+      "selector": "div#site-container > a.skip-link",
+      "width": 1,
+      "height": 1,
+      "meetsSize": false,
+      "spacingExempt": true,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "header#masthead > div.gmr-secondmenuwrap > div.container > div.gmr-logo > div.site-title > a",
+      "width": 134,
+      "height": 20,
+      "meetsSize": false,
+      "spacingExempt": true,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#primary-menu > li > a",
+      "width": 121,
+      "height": 50,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#primary-menu > li > a",
+      "width": 74,
+      "height": 50,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#primary-menu > li > a",
+      "width": 73,
+      "height": 50,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "article#post-642 > div.gmr-box-content > div.content-thumbnail > a",
+      "width": 200,
+      "height": 160,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "article#post-642 > div.gmr-box-content > div.item-article > header.entry-header > h2.entry-title > a",
+      "width": 400,
+      "height": 49,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "article#post-794 > div.gmr-box-content > div.item-article > header.entry-header > h2.entry-title > a",
+      "width": 451,
+      "height": 25,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#search-2 > form.search-form > label > input.search-field",
+      "width": 305,
+      "height": 43,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "li#listpost > div.idblog-rp-link > a",
+      "width": 173,
+      "height": 65,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "li#listpost > div.idblog-rp-link > a",
+      "width": 222,
+      "height": 41,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "footer#colophon > div.container > div.site-info > div.footer-text > span.footer-left > a",
+      "width": 222,
+      "height": 17,
+      "meetsSize": false,
+      "spacingExempt": true,
+      "inlineExempt": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+      "width": 61,
+      "height": 17,
+      "meetsSize": false,
+      "spacingExempt": true,
+      "inlineExempt": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+      "width": 59,
+      "height": 17,
+      "meetsSize": false,
+      "spacingExempt": true,
+      "inlineExempt": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+      "width": 35,
+      "height": 17,
+      "meetsSize": false,
+      "spacingExempt": true,
+      "inlineExempt": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+      "width": 75,
+      "height": 17,
+      "meetsSize": false,
+      "spacingExempt": true,
+      "inlineExempt": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+      "width": 123,
+      "height": 17,
+      "meetsSize": false,
+      "spacingExempt": true,
+      "inlineExempt": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "button#catapultCookie",
+      "width": 101,
+      "height": 28,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#catapult-cookie-bar > a",
+      "width": 107,
+      "height": 18,
+      "meetsSize": false,
+      "spacingExempt": true,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#sidr-id-primary-menu > li > a",
+      "width": 260,
+      "height": 36,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#sidr-id-primary-menu > li > a",
+      "width": 260,
+      "height": 36,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#sidr-id-primary-menu > li > a",
+      "width": 260,
+      "height": 46,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    }
+  ],
+  "focus": [
+    {
+      "selector": "div#site-container > a.skip-link",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "header#masthead > div.gmr-secondmenuwrap > div.container > div.gmr-logo > div.site-title > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "ul#primary-menu > li > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "ul#primary-menu > li > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "ul#primary-menu > li > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "article#post-642 > div.gmr-box-content > div.content-thumbnail > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "article#post-642 > div.gmr-box-content > div.item-article > header.entry-header > h2.entry-title > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 1,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": true,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "article#post-794 > div.gmr-box-content > div.item-article > header.entry-header > h2.entry-title > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "div#search-2 > form.search-form > label > input.search-field",
+      "focusVisible": false,
+      "appearanceOk": null,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "li#listpost > div.idblog-rp-link > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "li#listpost > div.idblog-rp-link > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "footer#colophon > div.container > div.site-info > div.footer-text > span.footer-left > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "button#catapultCookie",
+      "focusVisible": false,
+      "appearanceOk": null,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "div#catapult-cookie-bar > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "ul#sidr-id-primary-menu > li > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 5,
+        "totalSamplePoints": 5,
+        "entirelyObscured": true,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "ul#sidr-id-primary-menu > li > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 5,
+        "totalSamplePoints": 5,
+        "entirelyObscured": true,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "ul#sidr-id-primary-menu > li > a",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 5,
+        "totalSamplePoints": 5,
+        "entirelyObscured": true,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    }
+  ],
+  "dragging": [],
+  "hasFinding": {
+    "1.4.3": true,
+    "1.4.11": true,
+    "2.4.7": true,
+    "2.4.11": true,
+    "2.4.12": true,
+    "2.4.13": true,
+    "2.5.7": false,
+    "2.5.8": false
+  },
+  "counts": {
+    "contrastChecked": 32,
+    "contrastViolations": 6,
+    "nonTextContrastChecked": 1,
+    "nonTextContrastViolations": 1,
+    "targetSizeChecked": 22,
+    "targetSizeViolations": 0,
+    "focusChecked": 22,
+    "focusNotVisible": 2,
+    "focusObscured": 4,
+    "draggingCandidates": 0
+  }
+}

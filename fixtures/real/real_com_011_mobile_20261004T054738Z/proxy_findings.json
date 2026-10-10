@@ -1,0 +1,1160 @@
+{
+  "pageUrl": "http://www.bigbucketgames.com/",
+  "viewport": {
+    "width": 980,
+    "height": 2121
+  },
+  "contrast": [
+    {
+      "selector": "ul#navigation > li > a",
+      "textSample": "Games",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        34,
+        37,
+        44
+      ],
+      "ratio": 15.34,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#navigation > li > a",
+      "textSample": "The Company",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        34,
+        37,
+        44
+      ],
+      "ratio": 15.34,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#navigation > li > a",
+      "textSample": "Contact",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        34,
+        37,
+        44
+      ],
+      "ratio": 15.34,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#header > h1",
+      "textSample": "BIG BUCKET",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        52,
+        152,
+        219
+      ],
+      "ratio": 3.15,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": true
+    },
+    {
+      "selector": "section#header > h2",
+      "textSample": "We are a tiny, intercontinental game com",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        52,
+        152,
+        219
+      ],
+      "ratio": 3.15,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": true
+    },
+    {
+      "selector": "section#stagehand > div.game-wrapper > div.game-info > h3 > a",
+      "textSample": "Stagehand",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        155,
+        89,
+        182
+      ],
+      "ratio": 4.67,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#stagehand > div.game-wrapper > div.game-info > div.game-tagline",
+      "textSample": "A Reverse Platformer",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        155,
+        89,
+        182
+      ],
+      "ratio": 4.67,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#stagehand > div.game-wrapper > div.game-info > div.game-description",
+      "textSample": "Stagehand might look like your typical r",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        155,
+        89,
+        182
+      ],
+      "ratio": 4.67,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#stagehand > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "textSample": "iOS",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        90,
+        52,
+        106
+      ],
+      "ratio": 9.84,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > h3 > a",
+      "textSample": "Space Age",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        22,
+        160,
+        133
+      ],
+      "ratio": 3.28,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > div.game-tagline",
+      "textSample": "A Cosmic Adventure",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        22,
+        160,
+        133
+      ],
+      "ratio": 3.28,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > div.game-description",
+      "textSample": "A small band of intergalactic explorers ",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        22,
+        160,
+        133
+      ],
+      "ratio": 3.28,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "textSample": "iOS",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        13,
+        93,
+        77
+      ],
+      "ratio": 7.81,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "textSample": "macOS",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        13,
+        93,
+        77
+      ],
+      "ratio": 7.81,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "textSample": "tvOS",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        13,
+        93,
+        77
+      ],
+      "ratio": 7.81,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#theincident > div.game-wrapper > div.game-info > h3 > a",
+      "textSample": "The Incident",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        52,
+        73,
+        94
+      ],
+      "ratio": 9.29,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#theincident > div.game-wrapper > div.game-info > div.game-tagline",
+      "textSample": "Fast Paced Retro Action",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        52,
+        73,
+        94
+      ],
+      "ratio": 9.29,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#theincident > div.game-wrapper > div.game-info > div.game-description",
+      "textSample": "Run and jump your way to safety from an ",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        52,
+        73,
+        94
+      ],
+      "ratio": 9.29,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#theincident > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "textSample": "iOS",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        30,
+        42,
+        55
+      ],
+      "ratio": 14.57,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#theincident > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "textSample": "macOS",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        30,
+        42,
+        55
+      ],
+      "ratio": 14.57,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#theincident > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "textSample": "tvOS",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        30,
+        42,
+        55
+      ],
+      "ratio": 14.57,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#footer > h3",
+      "textSample": "The Company",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        34,
+        37,
+        44
+      ],
+      "ratio": 15.34,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#the-company-description",
+      "textSample": "Founded in 2010, Big Bucket is a tiny mo",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        34,
+        37,
+        44
+      ],
+      "ratio": 15.34,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-details > div.profile-name",
+      "textSample": "Matt Comi",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        56,
+        59,
+        65
+      ],
+      "ratio": 11.23,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-details > div.profile-location",
+      "textSample": "Perth, Western Australia",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        56,
+        59,
+        65
+      ],
+      "ratio": 11.23,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-details > div.profile-role",
+      "textSample": "CODE",
+      "fgColor": [
+        241,
+        196,
+        15
+      ],
+      "bgColor": [
+        56,
+        59,
+        65
+      ],
+      "ratio": 6.76,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-details > div.profile-name",
+      "textSample": "Neven Mrgan",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        56,
+        59,
+        65
+      ],
+      "ratio": 11.23,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-details > div.profile-location",
+      "textSample": "Portland, Oregon",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        56,
+        59,
+        65
+      ],
+      "ratio": 11.23,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-details > div.profile-role",
+      "textSample": "ART",
+      "fgColor": [
+        241,
+        196,
+        15
+      ],
+      "bgColor": [
+        56,
+        59,
+        65
+      ],
+      "ratio": 6.76,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-details > div.profile-name",
+      "textSample": "Cabel Sasser",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        56,
+        59,
+        65
+      ],
+      "ratio": 11.23,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-details > div.profile-location",
+      "textSample": "Portland, Oregon",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        56,
+        59,
+        65
+      ],
+      "ratio": 11.23,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-details > div.profile-role",
+      "textSample": "MUSIC",
+      "fgColor": [
+        241,
+        196,
+        15
+      ],
+      "bgColor": [
+        56,
+        59,
+        65
+      ],
+      "ratio": 6.76,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#subscribe-notice",
+      "textSample": "Subscribe to the Big Bucket Newsletter",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        34,
+        37,
+        44
+      ],
+      "ratio": 15.34,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "button#submit",
+      "textSample": "SUBSCRIBE",
+      "fgColor": [
+        236,
+        240,
+        241
+      ],
+      "bgColor": [
+        13,
+        14,
+        17
+      ],
+      "ratio": 16.82,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#contact > a",
+      "textSample": "contact@bigbucketgames.com",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        34,
+        37,
+        44
+      ],
+      "ratio": 15.34,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    }
+  ],
+  "nonTextContrast": [
+    {
+      "selector": "input#email",
+      "borderColor": [
+        0,
+        0,
+        0
+      ],
+      "bgColor": [
+        34,
+        37,
+        44
+      ],
+      "ratio": 1.37,
+      "threshold": 3,
+      "isViolation": true,
+      "boundary": false
+    }
+  ],
+  "targetSize": [
+    {
+      "selector": "ul#navigation > li > a",
+      "width": 96,
+      "height": 40,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#navigation > li > a",
+      "width": 192,
+      "height": 40,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "ul#navigation > li > a",
+      "width": 111,
+      "height": 40,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#stagehand > div.game-wrapper > div.game-info > h3 > a",
+      "width": 279,
+      "height": 70,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#stagehand > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "width": 48,
+      "height": 47,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > h3 > a",
+      "width": 273,
+      "height": 70,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "width": 48,
+      "height": 47,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "width": 79,
+      "height": 47,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "width": 60,
+      "height": 47,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#theincident > div.game-wrapper > div.game-info > h3 > a",
+      "width": 320,
+      "height": 70,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#theincident > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "width": 48,
+      "height": 47,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#theincident > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "width": 79,
+      "height": 47,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "section#theincident > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "width": 60,
+      "height": 47,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-more-details > div.profile-twitter > a",
+      "width": 29,
+      "height": 24,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-more-details > div.profile-twitter > a",
+      "width": 29,
+      "height": 24,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-more-details > div.profile-twitter > a",
+      "width": 29,
+      "height": 24,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "input#email",
+      "width": 346,
+      "height": 75,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "button#submit",
+      "width": 178,
+      "height": 75,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#contact > a",
+      "width": 49,
+      "height": 34,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "div#contact > a",
+      "width": 404,
+      "height": 34,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    }
+  ],
+  "focus": [
+    {
+      "selector": "ul#navigation > li > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "ul#navigation > li > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "ul#navigation > li > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "section#stagehand > div.game-wrapper > div.game-info > h3 > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "section#stagehand > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > h3 > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "section#theincident > div.game-wrapper > div.game-info > h3 > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "section#theincident > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "section#theincident > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "section#theincident > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-more-details > div.profile-twitter > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-more-details > div.profile-twitter > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-more-details > div.profile-twitter > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "input#email",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "button#submit",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "div#contact > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "div#contact > a",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    }
+  ],
+  "dragging": [],
+  "hasFinding": {
+    "1.4.3": false,
+    "1.4.11": true,
+    "2.4.7": false,
+    "2.4.11": false,
+    "2.4.12": false,
+    "2.4.13": true,
+    "2.5.7": false,
+    "2.5.8": false
+  },
+  "counts": {
+    "contrastChecked": 35,
+    "contrastViolations": 0,
+    "nonTextContrastChecked": 1,
+    "nonTextContrastViolations": 1,
+    "targetSizeChecked": 20,
+    "targetSizeViolations": 0,
+    "focusChecked": 20,
+    "focusNotVisible": 0,
+    "focusObscured": 0,
+    "draggingCandidates": 0
+  }
+}

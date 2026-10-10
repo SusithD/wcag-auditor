@@ -1,0 +1,55 @@
+{
+  "origin": "synth",
+  "sector": "sc1-4-3",
+  "page_id": 1,
+  "viewport": "desktop",
+  "viewport_spec": {
+    "width": 1440,
+    "height": 900,
+    "is_mobile": false,
+    "has_touch": false,
+    "device_scale_factor": 1
+  },
+  "capture_timestamp": "20261004T060449Z",
+  "url": "file:///Users/susithalwis/Desktop/Final%20Year%20Reserach/04_Data_Collection/synthetic_corpus_v1.1/synth_1.4.3_001/index.html",
+  "final_url": "file:///Users/susithalwis/Desktop/Final%20Year%20Reserach/04_Data_Collection/synthetic_corpus_v1.1/synth_1.4.3_001/index.html",
+  "http_status": 200,
+  "title": "Contrast test",
+  "screenshot_mode": "full_page",
+  "screenshot_sha256": "d303134ce12fee017ce20d6fa2532a483b15912d3f2106c1f1da38646279dc28",
+  "focus_step_count": 0,
+  "focus_steps": [],
+  "focus_run": {
+    "presses": 1,
+    "stop_reason": "left-page"
+  },
+  "layout": {
+    "has_meta_viewport": true,
+    "layout_width": 1440,
+    "scroll_width": 1440,
+    "inner_width": 1440,
+    "visual_viewport_scale": 1
+  },
+  "test_elements_rendered": [
+    {
+      "id": "e-1",
+      "rect": {
+        "x": 80,
+        "y": 200,
+        "w": 640,
+        "h": 60
+      },
+      "occluded_samples": 0,
+      "samples": 25
+    }
+  ],
+  "coordinates": "screenshot.png: 1 px = 1 CSS px. focus-NNN.png: viewport image; a focus step's rect is in CSS px, so its position in the PNG = rect x png_scale (png_scale < 1 when a non-responsive page is shown zoomed out under mobile emulation).",
+  "generator_version": "2.2.0",
+  "protocol_version": "1.0",
+  "tools": {
+    "browser": "chromium 153.0.8010.12",
+    "playwright": "1.63.0"
+  },
+  "synthetic_page_id": "synth_1.4.3_001",
+  "seeded_sc": "1.4.3"
+}

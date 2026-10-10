@@ -1,0 +1,201 @@
+{
+  "pageUrl": "file:///Users/susithalwis/Desktop/Final%20Year%20Reserach/04_Data_Collection/synthetic_corpus_v1.1/synth_2.5.8_001/index.html",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "contrast": [
+    {
+      "selector": "html > body > header.site",
+      "textSample": "Synthetic Test Corpus \u2014 page synth_2.5.8",
+      "fgColor": [
+        31,
+        41,
+        55
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 14.68,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "html > body > main.content > div.card > h1",
+      "textSample": "Toolbar controls",
+      "fgColor": [
+        17,
+        24,
+        39
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 17.74,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "html > body > main.content > div.card > p",
+      "textSample": "Icon-only buttons in a small toolbar.",
+      "fgColor": [
+        31,
+        41,
+        55
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 14.68,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "html > body > main.content > div > button",
+      "textSample": "\ud83d\udd17",
+      "fgColor": [
+        0,
+        0,
+        0
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 21,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    }
+  ],
+  "nonTextContrast": [],
+  "targetSize": [
+    {
+      "selector": "html > body > main.content > div > button",
+      "width": 22,
+      "height": 22,
+      "meetsSize": false,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": true,
+      "boundary": true
+    },
+    {
+      "selector": "html > body > main.content > div > button",
+      "width": 22,
+      "height": 22,
+      "meetsSize": false,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": true,
+      "boundary": true
+    },
+    {
+      "selector": "html > body > main.content > div > button",
+      "width": 22,
+      "height": 22,
+      "meetsSize": false,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": true,
+      "boundary": true
+    },
+    {
+      "selector": "html > body > main.content > div > button",
+      "width": 22,
+      "height": 22,
+      "meetsSize": false,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": true,
+      "boundary": true
+    }
+  ],
+  "focus": [
+    {
+      "selector": "html > body > main.content > div > button",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "html > body > main.content > div > button",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "html > body > main.content > div > button",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    },
+    {
+      "selector": "html > body > main.content > div > button",
+      "focusVisible": true,
+      "appearanceOk": false,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    }
+  ],
+  "dragging": [],
+  "hasFinding": {
+    "1.4.3": false,
+    "1.4.11": false,
+    "2.4.7": false,
+    "2.4.11": false,
+    "2.4.12": false,
+    "2.4.13": true,
+    "2.5.7": false,
+    "2.5.8": true
+  },
+  "counts": {
+    "contrastChecked": 4,
+    "contrastViolations": 0,
+    "nonTextContrastChecked": 0,
+    "nonTextContrastViolations": 0,
+    "targetSizeChecked": 4,
+    "targetSizeViolations": 4,
+    "focusChecked": 4,
+    "focusNotVisible": 0,
+    "focusObscured": 0,
+    "draggingCandidates": 0
+  }
+}

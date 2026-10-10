@@ -1,0 +1,115 @@
+protocol_version: "1.1"
+
+thresholds:
+  contrast:
+    text: 4.5
+    large_text: 3.0
+    non_text: 3.0
+  large_text:
+    min_px: 24
+    min_px_bold: 18.66
+    bold_weight: 700
+  target_size_px: 24
+  focus:
+    visibility_ratio: 1.5
+    ring_min_px: 2
+    ring_min_contrast: 3.0
+    area_factor: 4
+  match:
+    iou: 0.3
+    containment: 0.5
+
+heuristics:
+  # Implementation parameters from PLAN §4.3 / CHECK_CATALOGUE; not Protocol v1.1 values.
+  focus_changed_pixel_delta: 24
+  focus_unsettled_fraction: 0.05
+  focus_obscured_sample_points: 25
+  contrast_window_px: 24
+
+severity:
+  contrast:
+    serious_below: 4.0
+    serious_below_large: 2.7
+  levels: [critical, serious, minor]
+  rules:
+    - id: contrast-below-serious
+      applies_to: ["1.4.3"]
+      level: serious
+    - id: contrast-near-threshold
+      note: "from serious_below up to the text threshold (large text: serious_below_large up to large_text); serious_below itself is minor"
+      applies_to: ["1.4.3"]
+      level: minor
+    - id: non-text-icon-only
+      applies_to: ["1.4.11"]
+      level: serious
+    - id: no-indicator-primary
+      applies_to: ["2.4.7"]
+      level: critical
+    - id: no-indicator-secondary
+      applies_to: ["2.4.7"]
+      level: serious
+    - id: visible-but-fails-area
+      applies_to: ["2.4.13"]
+      level: minor
+    - id: drag-only-control
+      applies_to: ["2.5.7"]
+      level: critical
+    - id: primary-undersized-no-spacing
+      applies_to: ["2.5.8"]
+      level: critical
+
+tiers: [automated, needs-review, not-assessable]
+
+scs: ["1.4.3", "1.4.11", "2.4.7", "2.4.11", "2.4.12", "2.4.13", "2.5.7", "2.5.8"]
+page_scs: ["1.4.3", "1.4.11", "2.5.7", "2.5.8"]
+focus_scs: ["2.4.7", "2.4.11", "2.4.12", "2.4.13"]
+
+rulings:
+  R1:
+    summary: Focus change below visibility_ratio is not a visible indicator; 2.4.7 fails, 2.4.13 n/a
+    enabled: true
+  R2:
+    summary: Transient loaders are capture defects; judge the settled page, low confidence if carousel moved
+    enabled: true
+  R3:
+    summary: One box per link or distinct text run; differing box counts for the same SC are not a disagreement
+    enabled: true
+  R4:
+    summary: 2.4.13 counts only added-indicator pixels; required area is area_factor x (w + h)
+    enabled: true
+  R5:
+    summary: Complete solid ring of ring_min_px with ring_min_contrast on all sides meets 2.4.13 regardless of pixel area; viewport clipping allowed (O1)
+    enabled: true
+    overrides: [R4, O4]
+  R6:
+    summary: "Entirely covered stop fails 2.4.11 and 2.4.12, 2.4.7 and 2.4.13 not assessable and left out of their units; stops not captured (mid-scroll, outside viewport) are excluded and listed as a capture limitation"
+    enabled: true
+    not_assessable_scs: ["2.4.7", "2.4.13"]
+    excluded_not_captured: true
+
+observations:
+  O1:
+    summary: Clipping by the viewport edge is judged on the visible part
+    enabled: true
+  O2:
+    summary: Icon-only controls must reach the non-text contrast threshold
+    enabled: true
+  O3:
+    summary: 2.5.8 inline and spacing exceptions; touching circles satisfy the spacing exception
+    enabled: true
+    spacing_touching_passes: true
+  O4:
+    summary: Changed pixels reaching ring_min_contrast must themselves meet the required area
+    enabled: true
+  O5:
+    summary: Covered by R1 and R2
+    enabled: true
+  O6:
+    summary: A slider with a sufficient handle is identifiable; a low-contrast track alone does not fail 1.4.11
+    enabled: true
+  O7:
+    summary: Drag-only control with no alternative is critical
+    enabled: true
+  O8:
+    summary: Bold means weight at least bold_weight; semibold is not bold
+    enabled: true
