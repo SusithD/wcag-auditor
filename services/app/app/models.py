@@ -49,6 +49,7 @@ class FindingRow(Base):
     capture_id: Mapped[int] = mapped_column(
         ForeignKey("captures.id", ondelete="CASCADE"), index=True
     )
+    key: Mapped[str | None] = mapped_column(String, index=True)
     sc: Mapped[str] = mapped_column(String)
     bbox: Mapped[dict[str, Any] | None]
     focus_index: Mapped[int | None]

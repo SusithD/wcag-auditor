@@ -12,8 +12,10 @@ from sqlalchemy import select
 from app.api import build_router, status_from_result
 from app.config import Settings
 from app.db import make_engine, make_session_factory
+from app.ingest import ingest_run
 from app.jobs import JobResult, JobRunner
 from app.models import Run
+from app.report_api import build_report_router
 
 ALEMBIC_INI = Path(__file__).resolve().parents[1] / "alembic.ini"
 
@@ -50,6 +52,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 if row is not None:
                     row.status, row.error = status, error
                     session.commit()
+                if status in {"done", "partial"}:
+                    ingest_run(session, result.run_id, cfg.runs_dir / result.run_id)
 
         runner = JobRunner(on_finish, on_start, cfg.job_timeout_s)
         runner.start()
@@ -67,6 +71,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"status": "ok"}
 
     app.include_router(build_router(cfg))
+    app.include_router(build_report_router(cfg))
     return app
 
 
