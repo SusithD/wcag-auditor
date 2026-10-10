@@ -35,6 +35,10 @@ strict = true
 plugins = ["pydantic.mypy"]
 exclude = ["apps/", "fixtures/", "services/app/alembic/"]
 
+[[tool.mypy.overrides]]
+module = ["statsmodels.*", "scipy.*"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 testpaths = ["packages/auditor", "services/app"]
 markers = ["browser: needs Playwright Chromium"]

@@ -1,0 +1,85 @@
+{
+ "page_id": "synth_sc2-5-8_126_desktop_20261004T061625Z",
+ "origin": "synth",
+ "viewport": "desktop",
+ "mode": "snapshot",
+ "axe_version": "4.13.0",
+ "covered_scs": [
+  "1.4.3",
+  "2.5.8"
+ ],
+ "not_covered_scs": [
+  "1.4.11",
+  "2.4.7",
+  "2.4.11",
+  "2.4.12",
+  "2.4.13",
+  "2.5.7"
+ ],
+ "findings": [
+  {
+   "sc": "2.5.8",
+   "rule": "target-size",
+   "kind": "violation",
+   "impact": "serious",
+   "bbox": {
+    "x": 120,
+    "y": 240,
+    "w": 22,
+    "h": 22
+   },
+   "target": [
+    "button[title=\"Bold\"]"
+   ],
+   "summary": "Fix any of the following:\n  Target has insufficient size (22px by 22px, should be at least 24px by 24px)\n  Target has insufficient space to its closest neighbors. Safe clickable space has a diameter of 20px instead of at least 24px."
+  },
+  {
+   "sc": "2.5.8",
+   "rule": "target-size",
+   "kind": "violation",
+   "impact": "serious",
+   "bbox": {
+    "x": 142,
+    "y": 240,
+    "w": 22,
+    "h": 22
+   },
+   "target": [
+    "button[title=\"Italic\"]"
+   ],
+   "summary": "Fix any of the following:\n  Target has insufficient size (22px by 22px, should be at least 24px by 24px)\n  Target has insufficient space to its closest neighbors. Safe clickable space has a diameter of 20px instead of at least 24px."
+  },
+  {
+   "sc": "2.5.8",
+   "rule": "target-size",
+   "kind": "violation",
+   "impact": "serious",
+   "bbox": {
+    "x": 164,
+    "y": 240,
+    "w": 22,
+    "h": 22
+   },
+   "target": [
+    "button[title=\"Underline\"]"
+   ],
+   "summary": "Fix any of the following:\n  Target has insufficient size (22px by 22px, should be at least 24px by 24px)\n  Target has insufficient space to its closest neighbors. Safe clickable space has a diameter of 20px instead of at least 24px."
+  },
+  {
+   "sc": "2.5.8",
+   "rule": "target-size",
+   "kind": "violation",
+   "impact": "serious",
+   "bbox": {
+    "x": 186,
+    "y": 240,
+    "w": 22,
+    "h": 22
+   },
+   "target": [
+    "button[title=\"Link\"]"
+   ],
+   "summary": "Fix any of the following:\n  Target has insufficient size (22px by 22px, should be at least 24px by 24px)\n  Target has insufficient space to its closest neighbors. Safe clickable space has a diameter of 20px instead of at least 24px."
+  }
+ ]
+}

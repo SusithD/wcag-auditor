@@ -58,15 +58,75 @@ def capture(
         raise typer.Exit(code=1)
 
 
+def _fmt(v: float | None) -> str:
+    return "n/a" if v is None else f"{v:.3f}"
+
+
 @app.command()
 def eval(
-    benchmark: Annotated[Path, typer.Option()],
-    truth: Annotated[Path, typer.Option()],
+    benchmark: Annotated[Path, typer.Option(help="Folder tree of capture folders")],
+    truth: Annotated[Path | None, typer.Option(help="benchmark_ground_truth.json")] = None,
     out: Annotated[Path, typer.Option()] = Path("eval"),
+    conditions: Annotated[str, typer.Option()] = "rule_only",
+    seed: Annotated[int, typer.Option()] = 20261004,
+    bootstrap: Annotated[int, typer.Option()] = 10000,
+    rule_findings: Annotated[
+        Path | None, typer.Option(help="Precomputed baseline_runs/<id> directory")
+    ] = None,
+    include_needs_review: Annotated[bool, typer.Option()] = False,
+    synthetic_truth: Annotated[str, typer.Option(help="from-folders")] = "from-folders",
 ) -> None:
-    """Score a benchmark against ground truth (implemented in M2)."""
-    console.print("eval: not implemented until M2")
-    raise typer.Exit(code=2)
+    """Score captures against ground truth (real: --truth file or per-folder truth.json;
+    synthetic: each folder's truth.json)."""
+    from auditor.eval.harness import EvalConfig, run_eval
+    from auditor.eval.units import SCS
+
+    if synthetic_truth != "from-folders":
+        console.print("error: --synthetic-truth must be 'from-folders'")
+        raise typer.Exit(code=1)
+    cfg = EvalConfig(
+        benchmark=benchmark,
+        out=out,
+        truth=truth,
+        conditions=[c.strip() for c in conditions.split(",") if c.strip()],
+        seed=seed,
+        bootstrap=bootstrap,
+        rule_findings=rule_findings,
+        include_needs_review=include_needs_review,
+    )
+    try:
+        metrics = run_eval(cfg)
+    except NotImplementedError as exc:
+        console.print(f"error: {exc}")
+        raise typer.Exit(code=2) from exc
+    meta = metrics["meta"]
+    console.print(
+        f"scored {meta['items_scored']} items ({meta['items_unlabelled']} without truth), "
+        f"seed {meta['seed']}, {meta['bootstrap_resamples']} resamples"
+    )
+    from rich.table import Table
+
+    for cond, strata in metrics["metrics"].items():
+        for stratum, cells in strata.items():
+            table = Table(title=f"{cond} / {stratum}")
+            for col in ("SC", "TP", "FP", "FN", "Dup", "P", "R", "F1"):
+                table.add_column(col)
+            for sc in SCS:
+                if sc in cells:
+                    c = cells[sc]
+                    f = _fmt
+                    table.add_row(
+                        sc,
+                        str(c["tp"]),
+                        str(c["fp"]),
+                        str(c["fn"]),
+                        str(c["duplicates"]),
+                        f(c["precision"]),
+                        f(c["recall"]),
+                        f(c["f1"]),
+                    )
+            console.print(table)
+    console.print(f"wrote {out / 'metrics.json'}")
 
 
 if __name__ == "__main__":

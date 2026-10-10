@@ -11,6 +11,8 @@ dependencies = [
   "playwright==1.63.0",
   "pillow>=12",
   "numpy",
+  "scipy>=1.18.1",
+  "statsmodels>=0.15.0",
 ]
 
 [project.scripts]

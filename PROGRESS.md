@@ -7,7 +7,7 @@ Claude Code updates this file at the end of every milestone. Status: `todo` · `
 |---|---|---|---|---|
 | M0 scaffold | m0-scaffold | done | 2026-10-10 | acceptance + reviews passed; merged to main |
 | M1 capture | m1-capture | done | 2026-10-10 | acceptance + reviews passed; merged to main |
-| M2 rules + eval harness | m2-rules-eval | todo | | **Unblocked 2026-10-10:** GT sealed (`SEAL_LOG.md` line `benchmark \| GT`, sha256 b859a6de…e20). Baseline run: `baseline_runs/20261010T064722Z_snapshot` (errors=0). Do this next after M1b. Harness must implement ADR-013 matching (IoU or containment, duplicates merged). |
+| M2 rules + eval harness | m2-rules-eval | done | 2026-10-10 | rule_only byte-equal to baseline golden (5/5 fixtures, 40/40 random synth); make eval reproducible (sha 9ee96346…); see NOTES M2, ADR-014/015 |
 | M3 frames + DOM elements | m3-elements | done | 2026-10-10 | merged; real-page limitation → ADR-012 |
 | M1b capture-time geometry | m1b-capture-geometry | done | 2026-10-10 | geometry_source capture/rerender/unavailable; goldens regenerated (see NOTES) |
 | M4 static modules | m4-static-modules | in-progress | | synthetic via DomElementSource; acceptance on synthetic only. Modules take any `ElementSource` (do not assume DOM). |

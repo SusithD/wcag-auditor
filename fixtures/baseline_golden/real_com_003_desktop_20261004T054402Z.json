@@ -1,0 +1,165 @@
+{
+ "page_id": "real_com_003_desktop_20261004T054402Z",
+ "origin": "real",
+ "viewport": "desktop",
+ "mode": "snapshot",
+ "axe_version": "4.13.0",
+ "covered_scs": [
+  "1.4.3",
+  "2.5.8"
+ ],
+ "not_covered_scs": [
+  "1.4.11",
+  "2.4.7",
+  "2.4.11",
+  "2.4.12",
+  "2.4.13",
+  "2.5.7"
+ ],
+ "findings": [
+  {
+   "sc": "1.4.3",
+   "rule": "color-contrast",
+   "kind": "violation",
+   "impact": "serious",
+   "bbox": {
+    "x": 394,
+    "y": 177,
+    "w": 46,
+    "h": 18
+   },
+   "target": [
+    "#post-642 > .gmr-box-content > .item-article > .entry-header > .dater > .month"
+   ],
+   "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.22 between the foreground and shadow color (foreground color: #ffffff, text-shadow color: #fd5622, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+  },
+  {
+   "sc": "1.4.3",
+   "rule": "color-contrast",
+   "kind": "violation",
+   "impact": "serious",
+   "bbox": {
+    "x": 394,
+    "y": 195,
+    "w": 48,
+    "h": 18
+   },
+   "target": [
+    "#post-642 > .gmr-box-content > .item-article > .entry-header > .dater > .day"
+   ],
+   "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.21 between the foreground and shadow color (foreground color: #ffffff, text-shadow color: #fd5622, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+  },
+  {
+   "sc": "1.4.3",
+   "rule": "color-contrast",
+   "kind": "violation",
+   "impact": "serious",
+   "bbox": {
+    "x": 174,
+    "y": 435,
+    "w": 46,
+    "h": 18
+   },
+   "target": [
+    "#post-794 > .gmr-box-content > .item-article > .entry-header > .dater > .month"
+   ],
+   "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.22 between the foreground and shadow color (foreground color: #ffffff, text-shadow color: #fd5622, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+  },
+  {
+   "sc": "1.4.3",
+   "rule": "color-contrast",
+   "kind": "violation",
+   "impact": "serious",
+   "bbox": {
+    "x": 174,
+    "y": 453,
+    "w": 48,
+    "h": 18
+   },
+   "target": [
+    "#post-794 > .gmr-box-content > .item-article > .entry-header > .dater > .day"
+   ],
+   "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.21 between the foreground and shadow color (foreground color: #ffffff, text-shadow color: #fd5622, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+  },
+  {
+   "sc": "1.4.3",
+   "rule": "color-contrast",
+   "kind": "violation",
+   "impact": "serious",
+   "bbox": {
+    "x": 169,
+    "y": 868,
+    "w": 101,
+    "h": 28
+   },
+   "target": [
+    "#catapultCookie"
+   ],
+   "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.2 between the foreground and shadow color (foreground color: #dddddd, text-shadow color: #c6232c, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+  },
+  {
+   "sc": "1.4.3",
+   "rule": "color-contrast",
+   "kind": "needs-review",
+   "impact": "serious",
+   "bbox": {
+    "x": 900,
+    "y": 163,
+    "w": 305,
+    "h": 43
+   },
+   "target": [
+    ".search-field"
+   ],
+   "summary": "Fix any of the following:\n  Element's background color could not be determined because it is overlapped by another element"
+  },
+  {
+   "sc": "1.4.3",
+   "rule": "color-contrast",
+   "kind": "needs-review",
+   "impact": "serious",
+   "bbox": {
+    "x": 900,
+    "y": 227,
+    "w": 305,
+    "h": 18
+   },
+   "target": [
+    "h4"
+   ],
+   "summary": "Fix any of the following:\n  Element's background color could not be determined because it is overlapped by another element"
+  },
+  {
+   "sc": "1.4.3",
+   "rule": "color-contrast",
+   "kind": "needs-review",
+   "impact": "serious",
+   "bbox": {
+    "x": 997,
+    "y": 312,
+    "w": 173,
+    "h": 65
+   },
+   "target": [
+    "li:nth-child(1) > .idblog-rp-link.clearfix > a[rel=\"bookmark\"]:nth-child(2)"
+   ],
+   "summary": "Fix any of the following:\n  Element's background color could not be determined because it is overlapped by another element"
+  },
+  {
+   "sc": "1.4.3",
+   "rule": "color-contrast",
+   "kind": "needs-review",
+   "impact": "serious",
+   "bbox": {
+    "x": 922,
+    "y": 411,
+    "w": 222,
+    "h": 41
+   },
+   "target": [
+    "li:nth-child(2) > .idblog-rp-link.clearfix > a[rel=\"bookmark\"]:nth-child(2)"
+   ],
+   "summary": "Fix any of the following:\n  Element's background color could not be determined because it is overlapped by another element"
+  }
+ ]
+}
