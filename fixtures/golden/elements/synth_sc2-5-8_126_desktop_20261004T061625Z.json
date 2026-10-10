@@ -1,0 +1,301 @@
+{
+ "elements": [
+  {
+   "bbox_css": {
+    "h": 22.0,
+    "w": 22.0,
+    "x": 120.0,
+    "y": 240.0
+   },
+   "dom_ref": "html > body > main.content > div > button",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "button",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(209, 213, 219)",
+    "border_top_style": "solid",
+    "border_top_width": 1,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13.3333,
+    "font_weight": 400,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute",
+    "unstyled_native": false
+   },
+   "text": "B"
+  },
+  {
+   "bbox_css": {
+    "h": 22.0,
+    "w": 22.0,
+    "x": 142.0,
+    "y": 240.0
+   },
+   "dom_ref": "html > body > main.content > div > button",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "button",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(209, 213, 219)",
+    "border_top_style": "solid",
+    "border_top_width": 1,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13.3333,
+    "font_weight": 400,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute",
+    "unstyled_native": false
+   },
+   "text": "I"
+  },
+  {
+   "bbox_css": {
+    "h": 22.0,
+    "w": 22.0,
+    "x": 164.0,
+    "y": 240.0
+   },
+   "dom_ref": "html > body > main.content > div > button",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "button",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(209, 213, 219)",
+    "border_top_style": "solid",
+    "border_top_width": 1,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13.3333,
+    "font_weight": 400,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute",
+    "unstyled_native": false
+   },
+   "text": "U"
+  },
+  {
+   "bbox_css": {
+    "h": 22.0,
+    "w": 22.0,
+    "x": 186.0,
+    "y": 240.0
+   },
+   "dom_ref": "html > body > main.content > div > button",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "button",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(209, 213, 219)",
+    "border_top_style": "solid",
+    "border_top_width": 1,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13.3333,
+    "font_weight": 400,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute",
+    "unstyled_native": false
+   },
+   "text": "\ud83d\udd17"
+  },
+  {
+   "bbox_css": {
+    "h": 18.0,
+    "w": 358.1,
+    "x": 32.0,
+    "y": 20.0
+   },
+   "dom_ref": "html > body > header.site",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(31, 41, 55)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(31, 41, 55)",
+    "font_size_px": 16,
+    "font_weight": 600,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "Synthetic Test Corpus \u2014 page synth_2.5.8_001"
+  },
+  {
+   "bbox_css": {
+    "h": 28.0,
+    "w": 187.6,
+    "x": 73.0,
+    "y": 121.0
+   },
+   "dom_ref": "html > body > main.content > div.card > h1",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(17, 24, 39)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(17, 24, 39)",
+    "font_size_px": 24,
+    "font_weight": 700,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Toolbar controls"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 219.5,
+    "x": 73.0,
+    "y": 163.0
+   },
+   "dom_ref": "html > body > main.content > div.card > p",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(31, 41, 55)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(31, 41, 55)",
+    "font_size_px": 14,
+    "font_weight": 400,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Icon-only buttons in a small toolbar."
+  },
+  {
+   "bbox_css": {
+    "h": 15.0,
+    "w": 8.9,
+    "x": 126.5,
+    "y": 243.5
+   },
+   "dom_ref": "html > body > main.content > div > button",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(209, 213, 219)",
+    "border_top_style": "solid",
+    "border_top_width": 1,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13.3333,
+    "font_weight": 400,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "B"
+  },
+  {
+   "bbox_css": {
+    "h": 15.0,
+    "w": 3.7,
+    "x": 151.1,
+    "y": 243.5
+   },
+   "dom_ref": "html > body > main.content > div > button",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(209, 213, 219)",
+    "border_top_style": "solid",
+    "border_top_width": 1,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13.3333,
+    "font_weight": 400,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "I"
+  },
+  {
+   "bbox_css": {
+    "h": 15.0,
+    "w": 9.6,
+    "x": 170.2,
+    "y": 243.5
+   },
+   "dom_ref": "html > body > main.content > div > button",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(209, 213, 219)",
+    "border_top_style": "solid",
+    "border_top_width": 1,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13.3333,
+    "font_weight": 400,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "U"
+  },
+  {
+   "bbox_css": {
+    "h": 15.0,
+    "w": 17.0,
+    "x": 188.5,
+    "y": 246.0
+   },
+   "dom_ref": "html > body > main.content > div > button",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(209, 213, 219)",
+    "border_top_style": "solid",
+    "border_top_width": 1,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13.3333,
+    "font_weight": 400,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "\ud83d\udd17"
+  }
+ ],
+ "features": {
+  "edge_density": 0.0121,
+  "element_density": 8.49,
+  "focus_stop_count": 4,
+  "has_sticky": false,
+  "is_non_responsive": false
+ }
+}

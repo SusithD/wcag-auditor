@@ -22,7 +22,7 @@ eval:
 	uv run auditor eval --benchmark $(BENCHMARK_DIR) --truth $(TRUTH_PATH) --out eval/$$(date +%F)
 
 goldens:
-	@echo "No goldens to regenerate yet (first goldens land in M2)."
+	uv run python scripts/regen_goldens.py
 
 gen-types:
 	uv run python -m app.openapi data/openapi.json

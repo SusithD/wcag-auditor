@@ -52,6 +52,7 @@ class Heuristics(_Frozen):
     focus_unsettled_fraction: float
     focus_obscured_sample_points: int
     contrast_window_px: int
+    edge_gradient_threshold: int
 
 
 class ContrastSeverity(_Frozen):

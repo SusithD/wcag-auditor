@@ -34,3 +34,17 @@ Context: DESIGN_SPEC §1 gives text-muted `zinc-500` (#71717a). On `muted`/`seco
 
 ## ADR-011 Protocol heuristics live in a separate `heuristics` block (2026-10-10)
 Context: 24 (changed-pixel delta, sliding window), 0.05 (unsettled fraction) and 25 (obscured sample points) come from PLAN §4.3, not Protocol v1.1. Decision: `protocol.yaml` keeps them under `heuristics`, apart from `thresholds`, so Chapter 3/4 can state which values are protocol and which are implementation choices.
+
+## ADR-012 Real-stratum element geometry comes from pixels, not the re-rendered DOM (2026-10-10, planner)
+Context: M3 found that `dom.html` re-rendered offline does not reproduce real pages' layout (external CSS missing; live `<base href>` also failed because sites have drifted): 0 of 15 focus rects matched a DOM box on both real fixtures. The benchmark captures stored no element geometry at capture time (`proxy_findings.json` has selectors and colours but no rects). Synthetic pages are self-contained and re-render exactly.
+Options: (a) re-capture the real pages with geometry (rejected: live pages have changed since the ground truth was labelled); (b) pixel element source for the real stratum (detector boxes + OCR text lines); (c) drop page-level SCs on the real stratum (rejected: guts RQ2).
+Decision: per-capture element source selection.
+- **Focus SCs (2.4.7, 2.4.11, 2.4.12, 2.4.13), all strata:** use the capture-time focus rects in `meta.json` plus the focus PNGs. Unaffected by this problem.
+- **Page SCs on synthetic pages:** `DomElementSource` (exact).
+- **Page SCs on real benchmark pages:** `PixelElementSource` = OCR text lines (RapidOCR detection, promoted from stretch to core) for 1.4.3 + RF-DETR detector boxes (M10) for 1.4.11 and 2.5.8. 2.5.7 uses DOM *structure* (role=slider, input[type=range], drag libraries) for presence, located on the screenshot via the detector or marked `needs-review` without a box.
+- **New captures made by the app (live mode):** M1b adds capture-time geometry (`elements.json`, from `extract.js` run on the live page at capture time), so `DomElementSource` is exact for everything the app captures from now on.
+Evidence: M3 NOTES. Consequences: the detector moves back onto the critical path for the real stratum (M10 runs before M6); this matches the thesis title (a screenshot-based auditor) and makes the DOM-vs-pixel ablation (ADR-002) a real-vs-synthetic contrast to discuss in Chapter 5. The rule-only baseline is unaffected (it ran on the same snapshot DOM).
+
+## ADR-013 Page-SC matching allows containment for block-level truth (2026-10-10, planner)
+Context: synthetic 1.4.3 truth boxes are whole text blocks (e.g. 640×60) while text findings are line boxes (437×16, IoU 0.18). Real ground truth follows R3 (one box per text run), so the mismatch is synthetic-only, but the rule must be one rule.
+Decision: a page-SC finding matches a truth box if IoU ≥ `thresholds.iou_match` **or** the finding lies ≥ `thresholds.containment` (0.5) of its own area inside the truth box. Several findings matched to the same truth box count as **one TP**; the extras are **merged duplicates**, not FPs (reported separately as `duplicates` in metrics.json). A truth box with no match is one FN. Applies to 1.4.3, 1.4.11, 2.5.7, 2.5.8 in all strata. The IoU sensitivity sweep (M8) reports both the IoU-only and the IoU-or-containment rule so the choice is visible in Chapter 5.

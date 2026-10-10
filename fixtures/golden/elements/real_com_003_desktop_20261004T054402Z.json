@@ -1,0 +1,1759 @@
+{
+ "elements": [
+  {
+   "bbox_css": {
+    "h": 1.0,
+    "w": 1.0,
+    "x": -1.0,
+    "y": 14.0
+   },
+   "dom_ref": "div#site-container > a.skip-link",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "Skip to content"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 80.0,
+    "x": 0.0,
+    "y": 15.0
+   },
+   "dom_ref": "header#masthead > div.gmr-secondmenuwrap > div.container > div.gmr-logo > div.site-title > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(255, 255, 255)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(255, 255, 255)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Malta Cricket"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 38.5,
+    "x": 0.0,
+    "y": 44.0
+   },
+   "dom_ref": "a#gmr-responsive-menu",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "MENU"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 79.7,
+    "x": 40.0,
+    "y": 73.0
+   },
+   "dom_ref": "ul#primary-menu > li > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Auto & Motor"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 41.7,
+    "x": 40.0,
+    "y": 89.0
+   },
+   "dom_ref": "ul#primary-menu > li > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Design"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 40.5,
+    "x": 40.0,
+    "y": 105.0
+   },
+   "dom_ref": "ul#primary-menu > li > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "More \u00bb"
+  },
+  {
+   "bbox_css": {
+    "h": 803.0,
+    "w": 1440.0,
+    "x": 0.0,
+    "y": 134.0
+   },
+   "dom_ref": "article#post-642 > div.gmr-box-content > div.content-thumbnail > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": null
+  },
+  {
+   "bbox_css": {
+    "h": 31.0,
+    "w": 1042.3,
+    "x": 0.0,
+    "y": 958.6
+   },
+   "dom_ref": "article#post-642 > div.gmr-box-content > div.item-article > header.entry-header > h2.entry-title > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 26,
+    "font_weight": 700,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Tea Symbolic Logo Concept: How a Cafe Brand Can Shine with Smart Visual Identity"
+  },
+  {
+   "bbox_css": {
+    "h": 31.0,
+    "w": 605.3,
+    "x": 0.0,
+    "y": 1081.7
+   },
+   "dom_ref": "article#post-794 > div.gmr-box-content > div.item-article > header.entry-header > h2.entry-title > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 26,
+    "font_weight": 700,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Questions About You Must Know the Answers To"
+  },
+  {
+   "bbox_css": {
+    "h": 21.0,
+    "w": 153.0,
+    "x": 0.0,
+    "y": 1183.3
+   },
+   "dom_ref": "div#search-2 > form.search-form > label > input.search-field",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "input",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(118, 118, 118)",
+    "border_top_style": "inset",
+    "border_top_width": 2,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13.3333,
+    "font_weight": 400,
+    "input_type": "search",
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static",
+    "unstyled_native": true
+   },
+   "text": null
+  },
+  {
+   "bbox_css": {
+    "h": 21.0,
+    "w": 58.3,
+    "x": 156.6,
+    "y": 1183.3
+   },
+   "dom_ref": "div#search-2 > form.search-form > input.search-submit",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "button",
+   "style": {
+    "background_color": "rgb(239, 239, 239)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "outset",
+    "border_top_width": 2,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13.3333,
+    "font_weight": 400,
+    "input_type": "submit",
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static",
+    "unstyled_native": true
+   },
+   "text": "Search"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 153.6,
+    "x": 40.0,
+    "y": 1455.8
+   },
+   "dom_ref": "li#listpost > div.idblog-rp-link > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": null
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 506.8,
+    "x": 193.6,
+    "y": 1455.8
+   },
+   "dom_ref": "li#listpost > div.idblog-rp-link > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Tea Symbolic Logo Concept: How a Cafe Brand Can Shine with Smart Visual Identity"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 293.3,
+    "x": 40.0,
+    "y": 1471.8
+   },
+   "dom_ref": "li#listpost > div.idblog-rp-link > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Questions About You Must Know the Answers To"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 257.9,
+    "x": 76.6,
+    "y": 1500.8
+   },
+   "dom_ref": "footer#colophon > div.container > div.site-info > div.footer-text > span.footer-left > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(236, 240, 241)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(236, 240, 241)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Malta Cricket Explores Life\u2019s Big Questions"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 67.4,
+    "x": 40.0,
+    "y": 1529.8
+   },
+   "dom_ref": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(236, 240, 241)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(236, 240, 241)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Contact Us"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 63.1,
+    "x": 40.0,
+    "y": 1545.8
+   },
+   "dom_ref": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(236, 240, 241)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(236, 240, 241)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Disclaimer"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 39.0,
+    "x": 40.0,
+    "y": 1561.8
+   },
+   "dom_ref": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(236, 240, 241)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(236, 240, 241)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "DMCA"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 84.6,
+    "x": 40.0,
+    "y": 1577.8
+   },
+   "dom_ref": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(236, 240, 241)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(236, 240, 241)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Privacy Policy"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 131.0,
+    "x": 40.0,
+    "y": 1593.8
+   },
+   "dom_ref": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(236, 240, 241)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(236, 240, 241)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Terms and Conditions"
+  },
+  {
+   "bbox_css": {
+    "h": 28.0,
+    "w": 96.2,
+    "x": 172.3,
+    "y": 866.0
+   },
+   "dom_ref": "button#catapultCookie",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "button",
+   "style": {
+    "background_color": "rgb(200, 35, 44)",
+    "border_top_color": "rgb(221, 221, 221)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(221, 221, 221)",
+    "font_size_px": 13,
+    "font_weight": 700,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static",
+    "unstyled_native": false
+   },
+   "text": "No problem"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 102.6,
+    "x": 288.5,
+    "y": 871.0
+   },
+   "dom_ref": "div#catapult-cookie-bar > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(221, 221, 221)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(221, 221, 221)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "More information"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 79.7,
+    "x": 40.0,
+    "y": 1622.8
+   },
+   "dom_ref": "ul#sidr-id-primary-menu > li > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Auto & Motor"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 41.7,
+    "x": 40.0,
+    "y": 1638.8
+   },
+   "dom_ref": "ul#sidr-id-primary-menu > li > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Design"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 40.5,
+    "x": 40.0,
+    "y": 1654.8
+   },
+   "dom_ref": "ul#sidr-id-primary-menu > li > a",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "link",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "More \u00bb"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 26.5,
+    "x": -1.0,
+    "y": 14.0
+   },
+   "dom_ref": "div#site-container > a.skip-link",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "Skip to content"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 12.0,
+    "x": -1.0,
+    "y": 30.0
+   },
+   "dom_ref": "div#site-container > a.skip-link",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "Skip to content"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 45.8,
+    "x": -1.0,
+    "y": 46.0
+   },
+   "dom_ref": "div#site-container > a.skip-link",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "Skip to content"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 80.0,
+    "x": 0.0,
+    "y": 15.0
+   },
+   "dom_ref": "header#masthead > div.gmr-secondmenuwrap > div.container > div.gmr-logo > div.site-title > a",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(255, 255, 255)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(255, 255, 255)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Malta Cricket"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 38.5,
+    "x": 0.0,
+    "y": 44.0
+   },
+   "dom_ref": "a#gmr-responsive-menu",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "MENU"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 79.7,
+    "x": 40.0,
+    "y": 73.0
+   },
+   "dom_ref": "ul#primary-menu > li > a",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Auto & Motor"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 41.7,
+    "x": 40.0,
+    "y": 89.0
+   },
+   "dom_ref": "ul#primary-menu > li > a",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Design"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 40.5,
+    "x": 40.0,
+    "y": 105.0
+   },
+   "dom_ref": "ul#primary-menu > li > a > span",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "More \u00bb"
+  },
+  {
+   "bbox_css": {
+    "h": 36.0,
+    "w": 80.0,
+    "x": -1.0,
+    "y": 133.0
+   },
+   "dom_ref": "main#main > header > h1.page-title",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(85, 85, 85)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(85, 85, 85)",
+    "font_size_px": 30,
+    "font_weight": 700,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "Malta Cricket"
+  },
+  {
+   "bbox_css": {
+    "h": 36.0,
+    "w": 103.9,
+    "x": -1.0,
+    "y": 170.0
+   },
+   "dom_ref": "main#main > header > h1.page-title",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(85, 85, 85)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(85, 85, 85)",
+    "font_size_px": 30,
+    "font_weight": 700,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "Malta Cricket"
+  },
+  {
+   "bbox_css": {
+    "h": 31.0,
+    "w": 1042.3,
+    "x": 0.0,
+    "y": 958.6
+   },
+   "dom_ref": "article#post-642 > div.gmr-box-content > div.item-article > header.entry-header > h2.entry-title > a",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 26,
+    "font_weight": 700,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Tea Symbolic Logo Concept: How a Cafe Brand Can Shine with Smart Visual Identity"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 23.8,
+    "x": 0.0,
+    "y": 1012.2
+   },
+   "dom_ref": "article#post-642 > div.gmr-box-content > div.item-article > header.entry-header > div.dater > span.month",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(85, 85, 85)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(85, 85, 85)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Aug"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 26.3,
+    "x": 27.5,
+    "y": 1012.2
+   },
+   "dom_ref": "article#post-642 > div.gmr-box-content > div.item-article > header.entry-header > div.dater > span.day",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(85, 85, 85)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(85, 85, 85)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "27th"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 1418.5,
+    "x": 0.0,
+    "y": 1028.2
+   },
+   "dom_ref": "article#post-642 > div.gmr-box-content > div.item-article > div.entry-content",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(85, 85, 85)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(85, 85, 85)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Why a Tea Symbolic Logo Concept Could Be Your Next Big Career or Business Move? When we talk about the caf\u00e9 industry, it"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 726.4,
+    "x": 0.0,
+    "y": 1044.2
+   },
+   "dom_ref": "article#post-642 > div.gmr-box-content > div.item-article > div.entry-content",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(85, 85, 85)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(85, 85, 85)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Why a Tea Symbolic Logo Concept Could Be Your Next Big Career or Business Move? When we talk about the caf\u00e9 industry, it"
+  },
+  {
+   "bbox_css": {
+    "h": 31.0,
+    "w": 605.3,
+    "x": 0.0,
+    "y": 1081.7
+   },
+   "dom_ref": "article#post-794 > div.gmr-box-content > div.item-article > header.entry-header > h2.entry-title > a",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 26,
+    "font_weight": 700,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Questions About You Must Know the Answers To"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 23.8,
+    "x": 0.0,
+    "y": 1135.3
+   },
+   "dom_ref": "article#post-794 > div.gmr-box-content > div.item-article > header.entry-header > div.dater > span.month",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(85, 85, 85)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(85, 85, 85)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Dec"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 26.3,
+    "x": 27.5,
+    "y": 1135.3
+   },
+   "dom_ref": "article#post-794 > div.gmr-box-content > div.item-article > header.entry-header > div.dater > span.day",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(85, 85, 85)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(85, 85, 85)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "19th"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 1422.8,
+    "x": 0.0,
+    "y": 1151.3
+   },
+   "dom_ref": "article#post-794 > div.gmr-box-content > div.item-article > div.entry-content",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(85, 85, 85)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(85, 85, 85)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Making the most of Returns: The Benefits of Limo Investments In recent times, the limo and luxury transportation market "
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 770.0,
+    "x": 0.0,
+    "y": 1167.3
+   },
+   "dom_ref": "article#post-794 > div.gmr-box-content > div.item-article > div.entry-content",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(85, 85, 85)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(85, 85, 85)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Making the most of Returns: The Benefits of Limo Investments In recent times, the limo and luxury transportation market "
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 41.9,
+    "x": -1.0,
+    "y": 1182.3
+   },
+   "dom_ref": "div#search-2 > form.search-form > label > span.screen-reader-text",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(85, 85, 85)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(85, 85, 85)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "Search for:"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 20.0,
+    "x": -1.0,
+    "y": 1198.3
+   },
+   "dom_ref": "div#search-2 > form.search-form > label > span.screen-reader-text",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(85, 85, 85)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(85, 85, 85)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "Search for:"
+  },
+  {
+   "bbox_css": {
+    "h": 26.0,
+    "w": 171.9,
+    "x": 0.0,
+    "y": 1233.6
+   },
+   "dom_ref": "aside#secondary > div.widget > h4.widget-title",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(85, 85, 85)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(85, 85, 85)",
+    "font_size_px": 22,
+    "font_weight": 700,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "More Inspiration"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 506.8,
+    "x": 193.6,
+    "y": 1455.8
+   },
+   "dom_ref": "li#listpost > div.idblog-rp-link > a",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Tea Symbolic Logo Concept: How a Cafe Brand Can Shine with Smart Visual Identity"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 293.3,
+    "x": 40.0,
+    "y": 1471.8
+   },
+   "dom_ref": "li#listpost > div.idblog-rp-link > a",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Questions About You Must Know the Answers To"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 76.6,
+    "x": 0.0,
+    "y": 1500.8
+   },
+   "dom_ref": "footer#colophon > div.container > div.site-info > div.footer-text > span.footer-left",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(241, 196, 15)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(241, 196, 15)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Copyright \u00a9"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 257.9,
+    "x": 76.6,
+    "y": 1500.8
+   },
+   "dom_ref": "div.container > div.site-info > div.footer-text > span.footer-left > a > em",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(236, 240, 241)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(236, 240, 241)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Malta Cricket Explores Life\u2019s Big Questions"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 67.4,
+    "x": 40.0,
+    "y": 1529.8
+   },
+   "dom_ref": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(236, 240, 241)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(236, 240, 241)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Contact Us"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 63.1,
+    "x": 40.0,
+    "y": 1545.8
+   },
+   "dom_ref": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(236, 240, 241)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(236, 240, 241)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Disclaimer"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 39.0,
+    "x": 40.0,
+    "y": 1561.8
+   },
+   "dom_ref": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(236, 240, 241)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(236, 240, 241)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "DMCA"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 84.6,
+    "x": 40.0,
+    "y": 1577.8
+   },
+   "dom_ref": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(236, 240, 241)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(236, 240, 241)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Privacy Policy"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 131.0,
+    "x": 40.0,
+    "y": 1593.8
+   },
+   "dom_ref": "div.footer-text > span.footer-right > div.menu > ul > li.page_item > a",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(236, 240, 241)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(236, 240, 241)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Terms and Conditions"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 132.3,
+    "x": 20.0,
+    "y": 871.0
+   },
+   "dom_ref": "div#catapult-cookie-bar",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgb(70, 70, 70)",
+    "border_top_color": "rgb(221, 221, 221)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(221, 221, 221)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "fixed"
+   },
+   "text": "This site uses cookies"
+  },
+  {
+   "bbox_css": {
+    "h": 15.0,
+    "w": 72.2,
+    "x": 184.3,
+    "y": 872.0
+   },
+   "dom_ref": "button#catapultCookie",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgb(200, 35, 44)",
+    "border_top_color": "rgb(221, 221, 221)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(221, 221, 221)",
+    "font_size_px": 13,
+    "font_weight": 700,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "No problem"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 102.6,
+    "x": 288.5,
+    "y": 871.0
+   },
+   "dom_ref": "div#catapult-cookie-bar > a",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(221, 221, 221)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(221, 221, 221)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "More information"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 79.7,
+    "x": 40.0,
+    "y": 1622.8
+   },
+   "dom_ref": "ul#sidr-id-primary-menu > li > a",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Auto & Motor"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 41.7,
+    "x": 40.0,
+    "y": 1638.8
+   },
+   "dom_ref": "ul#sidr-id-primary-menu > li > a",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Design"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 40.5,
+    "x": 40.0,
+    "y": 1654.8
+   },
+   "dom_ref": "ul#sidr-id-primary-menu > li > a > span",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "More \u00bb"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 60.0,
+    "x": 0.0,
+    "y": 1683.8
+   },
+   "dom_ref": "div#secondmenus > div.sidr-inner",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(85, 85, 85)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(85, 85, 85)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "undefined"
+  },
+  {
+   "bbox_css": {
+    "h": 800.0,
+    "w": 1000.0,
+    "x": 0.0,
+    "y": 134.0
+   },
+   "dom_ref": "article#post-642 > div.gmr-box-content > div.content-thumbnail > a > div.wrapperimghome > img.attachment-full",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "image_icon",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": null
+  },
+  {
+   "bbox_css": {
+    "h": 150.0,
+    "w": 150.0,
+    "x": 40.0,
+    "y": 1318.8
+   },
+   "dom_ref": "li#listpost > div.idblog-rp-link > a > img.attachment-thumbnail",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "image_icon",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(0, 0, 0)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": null
+  },
+  {
+   "bbox_css": {
+    "h": 40.0,
+    "w": 1480.0,
+    "x": 0.0,
+    "y": 860.0
+   },
+   "dom_ref": "div#catapult-cookie-bar",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "fixed_region",
+   "style": {
+    "alpha": 1,
+    "background_color": "rgb(70, 70, 70)",
+    "border_top_color": "rgb(221, 221, 221)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(221, 221, 221)",
+    "font_size_px": 13,
+    "font_weight": 500,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "fixed"
+   },
+   "text": null
+  }
+ ],
+ "features": {
+  "edge_density": 0.0583,
+  "element_density": 50.93,
+  "focus_stop_count": 15,
+  "has_sticky": true,
+  "is_non_responsive": false
+ }
+}

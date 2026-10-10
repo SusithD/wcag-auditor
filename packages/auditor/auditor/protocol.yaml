@@ -25,6 +25,7 @@ heuristics:
   focus_unsettled_fraction: 0.05
   focus_obscured_sample_points: 25
   contrast_window_px: 24
+  edge_gradient_threshold: 16
 
 severity:
   contrast:
