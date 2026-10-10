@@ -1,0 +1,113 @@
+{
+  "page_id": "synth_2.5.8_001",
+  "viewport": "desktop",
+  "capture_timestamp": "2026-10-04T05:21:20+00:00",
+  "annotator": "generator@v1.1.0",
+  "protocol_version": "1.0",
+  "generator_version": "1.1.0",
+  "generator_notes": "22 \u00d7 22 adjacent, boundary just below threshold",
+  "test_elements": [
+    {
+      "id": "e-1",
+      "role": "button",
+      "bbox": {
+        "x": 120,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      }
+    },
+    {
+      "id": "e-2",
+      "role": "button",
+      "bbox": {
+        "x": 142,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      }
+    },
+    {
+      "id": "e-3",
+      "role": "button",
+      "bbox": {
+        "x": 164,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      }
+    },
+    {
+      "id": "e-4",
+      "role": "button",
+      "bbox": {
+        "x": 186,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      }
+    }
+  ],
+  "annotations": [
+    {
+      "annotation_id": "a-0001",
+      "sc": "2.5.8",
+      "severity": "minor",
+      "confidence": "high",
+      "bbox": {
+        "x": 120,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      },
+      "boundary": true,
+      "note": "Toolbar button 1 of 4: rendered 22 \u00d7 22 CSS px (threshold 24 \u00d7 24).",
+      "element_id": "e-1"
+    },
+    {
+      "annotation_id": "a-0002",
+      "sc": "2.5.8",
+      "severity": "minor",
+      "confidence": "high",
+      "bbox": {
+        "x": 142,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      },
+      "boundary": true,
+      "note": "Toolbar button 2 of 4: rendered 22 \u00d7 22 CSS px (threshold 24 \u00d7 24).",
+      "element_id": "e-2"
+    },
+    {
+      "annotation_id": "a-0003",
+      "sc": "2.5.8",
+      "severity": "minor",
+      "confidence": "high",
+      "bbox": {
+        "x": 164,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      },
+      "boundary": true,
+      "note": "Toolbar button 3 of 4: rendered 22 \u00d7 22 CSS px (threshold 24 \u00d7 24).",
+      "element_id": "e-3"
+    },
+    {
+      "annotation_id": "a-0004",
+      "sc": "2.5.8",
+      "severity": "minor",
+      "confidence": "high",
+      "bbox": {
+        "x": 186,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      },
+      "boundary": true,
+      "note": "Toolbar button 4 of 4: rendered 22 \u00d7 22 CSS px (threshold 24 \u00d7 24).",
+      "element_id": "e-4"
+    }
+  ]
+}

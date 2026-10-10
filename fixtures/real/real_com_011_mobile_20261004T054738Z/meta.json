@@ -1,0 +1,364 @@
+{
+  "origin": "real",
+  "sector": "com",
+  "page_id": 11,
+  "viewport": "mobile",
+  "viewport_spec": {
+    "width": 390,
+    "height": 844,
+    "is_mobile": true,
+    "has_touch": true,
+    "device_scale_factor": 1
+  },
+  "capture_timestamp": "20261004T054738Z",
+  "url": "http://bigbucketgames.com",
+  "final_url": "http://www.bigbucketgames.com/",
+  "http_status": 200,
+  "title": "Big Bucket",
+  "screenshot_mode": "full_page",
+  "screenshot_sha256": "401a8f799caf44d804962bf4403fd71556d6199d3b61ec3decd6f13fe5adcda0",
+  "focus_step_count": 15,
+  "focus_steps": [
+    {
+      "index": 0,
+      "file_on": "focus-000.png",
+      "file_off": "focus-000-off.png",
+      "uid": 1,
+      "tag": "a",
+      "role": null,
+      "name": "",
+      "selector": "div#navigation-bar > a",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "png_scale": 0.398
+    },
+    {
+      "index": 1,
+      "file_on": "focus-001.png",
+      "file_off": "focus-001-off.png",
+      "uid": 2,
+      "tag": "a",
+      "role": null,
+      "name": "Games",
+      "selector": "ul#navigation > li > a",
+      "rect": {
+        "x": 372,
+        "y": 74,
+        "w": 96,
+        "h": 40
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "png_scale": 0.398
+    },
+    {
+      "index": 2,
+      "file_on": "focus-002.png",
+      "file_off": "focus-002-off.png",
+      "uid": 3,
+      "tag": "a",
+      "role": null,
+      "name": "The Company",
+      "selector": "ul#navigation > li > a",
+      "rect": {
+        "x": 534,
+        "y": 74,
+        "w": 192,
+        "h": 40
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "png_scale": 0.398
+    },
+    {
+      "index": 3,
+      "file_on": "focus-003.png",
+      "file_off": "focus-003-off.png",
+      "uid": 4,
+      "tag": "a",
+      "role": null,
+      "name": "Contact",
+      "selector": "ul#navigation > li > a",
+      "rect": {
+        "x": 793,
+        "y": 74,
+        "w": 111,
+        "h": 40
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "png_scale": 0.398
+    },
+    {
+      "index": 4,
+      "file_on": "focus-004.png",
+      "file_off": "focus-004-off.png",
+      "uid": 5,
+      "tag": "a",
+      "role": null,
+      "name": "Stagehand",
+      "selector": "section#stagehand > div.game-wrapper > div.game-info > h3 > a",
+      "rect": {
+        "x": 70,
+        "y": 1127,
+        "w": 279,
+        "h": 70
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "png_scale": 0.398
+    },
+    {
+      "index": 5,
+      "file_on": "focus-005.png",
+      "file_off": "focus-005-off.png",
+      "uid": 6,
+      "tag": "a",
+      "role": null,
+      "name": "iOS",
+      "selector": "section#stagehand > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "rect": {
+        "x": 70,
+        "y": 1592,
+        "w": 48,
+        "h": 47
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "png_scale": 0.398
+    },
+    {
+      "index": 6,
+      "file_on": "focus-006.png",
+      "file_off": "focus-006-off.png",
+      "uid": 7,
+      "tag": "a",
+      "role": null,
+      "name": "Space Age",
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > h3 > a",
+      "rect": {
+        "x": 490,
+        "y": 1850,
+        "w": 273,
+        "h": 70
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "png_scale": 0.398
+    },
+    {
+      "index": 7,
+      "file_on": "focus-007.png",
+      "file_off": "focus-007-off.png",
+      "uid": 8,
+      "tag": "a",
+      "role": null,
+      "name": "iOS",
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "rect": {
+        "x": 490,
+        "y": 1037,
+        "w": 48,
+        "h": 47
+      },
+      "scroll": {
+        "x": 0,
+        "y": 1278
+      },
+      "png_scale": 0.398
+    },
+    {
+      "index": 8,
+      "file_on": "focus-008.png",
+      "file_off": "focus-008-off.png",
+      "uid": 9,
+      "tag": "a",
+      "role": null,
+      "name": "macOS",
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "rect": {
+        "x": 544,
+        "y": 1037,
+        "w": 79,
+        "h": 47
+      },
+      "scroll": {
+        "x": 0,
+        "y": 1278
+      },
+      "png_scale": 0.398
+    },
+    {
+      "index": 9,
+      "file_on": "focus-009.png",
+      "file_off": "focus-009-off.png",
+      "uid": 10,
+      "tag": "a",
+      "role": null,
+      "name": "tvOS",
+      "selector": "section#spaceage > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "rect": {
+        "x": 630,
+        "y": 1037,
+        "w": 60,
+        "h": 47
+      },
+      "scroll": {
+        "x": 0,
+        "y": 1278
+      },
+      "png_scale": 0.398
+    },
+    {
+      "index": 10,
+      "file_on": "focus-010.png",
+      "file_off": "focus-010-off.png",
+      "uid": 11,
+      "tag": "a",
+      "role": null,
+      "name": "The Incident",
+      "selector": "section#theincident > div.game-wrapper > div.game-info > h3 > a",
+      "rect": {
+        "x": 70,
+        "y": 1295,
+        "w": 320,
+        "h": 70
+      },
+      "scroll": {
+        "x": 0,
+        "y": 1278
+      },
+      "png_scale": 0.398
+    },
+    {
+      "index": 11,
+      "file_on": "focus-011.png",
+      "file_off": "focus-011-off.png",
+      "uid": 12,
+      "tag": "a",
+      "role": null,
+      "name": "iOS",
+      "selector": "section#theincident > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "rect": {
+        "x": 70,
+        "y": 1628,
+        "w": 48,
+        "h": 47
+      },
+      "scroll": {
+        "x": 0,
+        "y": 1278
+      },
+      "png_scale": 0.398
+    },
+    {
+      "index": 12,
+      "file_on": "focus-012.png",
+      "file_off": "focus-012-off.png",
+      "uid": 13,
+      "tag": "a",
+      "role": null,
+      "name": "macOS",
+      "selector": "section#theincident > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "rect": {
+        "x": 124,
+        "y": 1628,
+        "w": 79,
+        "h": 47
+      },
+      "scroll": {
+        "x": 0,
+        "y": 1278
+      },
+      "png_scale": 0.398
+    },
+    {
+      "index": 13,
+      "file_on": "focus-013.png",
+      "file_off": "focus-013-off.png",
+      "uid": 14,
+      "tag": "a",
+      "role": null,
+      "name": "tvOS",
+      "selector": "section#theincident > div.game-wrapper > div.game-info > ul.platforms > li > a",
+      "rect": {
+        "x": 210,
+        "y": 1628,
+        "w": 60,
+        "h": 47
+      },
+      "scroll": {
+        "x": 0,
+        "y": 1278
+      },
+      "png_scale": 0.398
+    },
+    {
+      "index": 14,
+      "file_on": "focus-014.png",
+      "file_off": "focus-014-off.png",
+      "uid": 15,
+      "tag": "a",
+      "role": null,
+      "name": "",
+      "selector": "div#profiles > div.profile > div.profile-details-wrapper > div.profile-more-details > div.profile-twitter > a",
+      "rect": {
+        "x": 181,
+        "y": 1626,
+        "w": 29,
+        "h": 24
+      },
+      "scroll": {
+        "x": 0,
+        "y": 2356
+      },
+      "png_scale": 0.398
+    }
+  ],
+  "focus_run": {
+    "presses": 15,
+    "stop_reason": "max-steps"
+  },
+  "layout": {
+    "has_meta_viewport": false,
+    "layout_width": 980,
+    "scroll_width": 980,
+    "inner_width": 980,
+    "visual_viewport_scale": 0.398
+  },
+  "test_elements_rendered": [],
+  "coordinates": "screenshot.png: 1 px = 1 CSS px. focus-NNN.png: viewport image; a focus step's rect is in CSS px, so its position in the PNG = rect x png_scale (png_scale < 1 when a non-responsive page is shown zoomed out under mobile emulation).",
+  "generator_version": "2.2.0",
+  "protocol_version": "1.0",
+  "tools": {
+    "browser": "chromium 153.0.8010.12",
+    "playwright": "1.63.0"
+  },
+  "webui_page_id": "1656070343426",
+  "domain": "bigbucketgames.com",
+  "selected_for_proxy_signals": [
+    "1.4.11",
+    "2.4.13"
+  ],
+  "sampling_frame": "WebUI (Wu et al., 2023) biglab/webui-7kbal; page re-rendered live at capture time"
+}

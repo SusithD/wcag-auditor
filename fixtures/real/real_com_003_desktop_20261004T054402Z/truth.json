@@ -1,0 +1,184 @@
+{
+  "source": "annotation/benchmark_ground_truth.json (extracted item)",
+  "protocol_version": "1.1",
+  "page_id": "real_com_003_desktop_20261004T054402Z",
+  "viewport": "desktop",
+  "annotations": [
+    {
+      "sc": "1.4.3",
+      "bbox": {
+        "x": 402,
+        "y": 185,
+        "w": 31,
+        "h": 10
+      },
+      "severity": "serious",
+      "source": "agreed",
+      "note": "date badge 'AUG' white on #FF5722 3.16:1"
+    },
+    {
+      "sc": "1.4.3",
+      "bbox": {
+        "x": 404,
+        "y": 199,
+        "w": 28,
+        "h": 10
+      },
+      "severity": "serious",
+      "source": "agreed",
+      "note": "date badge '27TH' white on #FF5722 3.16:1"
+    },
+    {
+      "sc": "1.4.3",
+      "bbox": {
+        "x": 183,
+        "y": 443,
+        "w": 29,
+        "h": 12
+      },
+      "severity": "serious",
+      "source": "agreed",
+      "note": "date badge 'DEC' 3.16:1"
+    },
+    {
+      "sc": "1.4.3",
+      "bbox": {
+        "x": 186,
+        "y": 458,
+        "w": 26,
+        "h": 9
+      },
+      "severity": "serious",
+      "source": "agreed",
+      "note": "date badge '19TH' 3.16:1"
+    },
+    {
+      "sc": "1.4.3",
+      "bbox": {
+        "x": 183,
+        "y": 878,
+        "w": 74,
+        "h": 12
+      },
+      "severity": "minor",
+      "source": "agreed",
+      "note": "cookie 'No problem' #DDDDDD on #C8232C 4.14:1"
+    },
+    {
+      "sc": "1.4.11",
+      "bbox": {
+        "x": 900,
+        "y": 163,
+        "w": 305,
+        "h": 43
+      },
+      "severity": "serious",
+      "source": "agreed",
+      "note": "search input border #ECF0F1 on white ~1.1:1"
+    },
+    {
+      "sc": "1.4.3",
+      "bbox": {
+        "x": 915,
+        "y": 177,
+        "w": 54,
+        "h": 15
+      },
+      "severity": "minor",
+      "source": "A2-only+AR3",
+      "note": "Search placeholder 'Search \u2026' darkest stroke #797979 on white = 4.35:1 (thin anti-aliased glyphs)"
+    }
+  ],
+  "focus_judgments": [
+    {
+      "index": 0,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "meets"
+    },
+    {
+      "index": 1,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "fails"
+    },
+    {
+      "index": 2,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "meets"
+    },
+    {
+      "index": 3,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "meets"
+    },
+    {
+      "index": 4,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "meets"
+    },
+    {
+      "index": 5,
+      "v247": "no",
+      "obs": "none",
+      "v2413": "na"
+    },
+    {
+      "index": 6,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "meets"
+    },
+    {
+      "index": 7,
+      "v247": "no",
+      "obs": "none",
+      "v2413": "na"
+    },
+    {
+      "index": 8,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "meets"
+    },
+    {
+      "index": 9,
+      "v247": "no",
+      "obs": "none",
+      "v2413": "na"
+    },
+    {
+      "index": 10,
+      "v247": "no",
+      "obs": "none",
+      "v2413": "na"
+    },
+    {
+      "index": 11,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "meets"
+    },
+    {
+      "index": 12,
+      "v247": "no",
+      "obs": "none",
+      "v2413": "na"
+    },
+    {
+      "index": 13,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "meets"
+    },
+    {
+      "index": 14,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "fails"
+    }
+  ]
+}

@@ -28,3 +28,9 @@ Fewer system dependencies; OCR only for screenshot-only mode.
 
 ## ADR-009 Detector training on the researcher's local Mac (2026-10-10)
 Context: no Colab or university GPU. Options: local Apple silicon via PyTorch MPS; cloud GPU; skip the detector. Decision: local MPS training with a mandatory 10-minute smoke run first. Hardware: Apple M5 Pro, 48 GB, so the full recipe applies (Nano at 560 px, 15k images, 20 epochs; then Small if Nano meets target); torchvision Faster R-CNN as the fallback if RF-DETR does not train on MPS. Consequences: shipped inference remains ONNX on CPU; the Mac must stay awake and free during training; results are reported with the hardware and wall time.
+
+## ADR-010 Light-theme muted text is zinc-600, not zinc-500 (2026-10-10)
+Context: DESIGN_SPEC §1 gives text-muted `zinc-500` (#71717a). On `muted`/`secondary`/`accent` surfaces (#f4f4f5) that is 4.40:1, below the 4.5:1 the app's own axe gate requires for 12-13 px text. Options: keep zinc-500 and restrict it to background/card; darken the token. Decision: `--muted-foreground` is #52525b (7.4:1 on #f4f4f5). Dark theme unchanged (#a1a1aa, 5.8:1 on #27272a). Evidence: M0 a11y review, computed ratios. Consequence: DESIGN_SPEC §1 should be updated by the researcher; the spec's severity ratio column is also slightly off (computed on zinc-50: serious 4.81, minor 6.42, critical 6.2; all still pass AA).
+
+## ADR-011 Protocol heuristics live in a separate `heuristics` block (2026-10-10)
+Context: 24 (changed-pixel delta, sliding window), 0.05 (unsettled fraction) and 25 (obscured sample points) come from PLAN §4.3, not Protocol v1.1. Decision: `protocol.yaml` keeps them under `heuristics`, apart from `thresholds`, so Chapter 3/4 can state which values are protocol and which are implementation choices.

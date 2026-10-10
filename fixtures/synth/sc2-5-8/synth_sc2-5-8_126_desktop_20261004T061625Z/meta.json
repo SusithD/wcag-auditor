@@ -1,0 +1,173 @@
+{
+  "origin": "synth",
+  "sector": "sc2-5-8",
+  "page_id": 126,
+  "viewport": "desktop",
+  "viewport_spec": {
+    "width": 1440,
+    "height": 900,
+    "is_mobile": false,
+    "has_touch": false,
+    "device_scale_factor": 1
+  },
+  "capture_timestamp": "20261004T061625Z",
+  "url": "file:///Users/susithalwis/Desktop/Final%20Year%20Reserach/04_Data_Collection/synthetic_corpus_v1.1/synth_2.5.8_001/index.html",
+  "final_url": "file:///Users/susithalwis/Desktop/Final%20Year%20Reserach/04_Data_Collection/synthetic_corpus_v1.1/synth_2.5.8_001/index.html",
+  "http_status": 200,
+  "title": "Target size",
+  "screenshot_mode": "full_page",
+  "screenshot_sha256": "6f40e7f1e9012911a69f7df9337f0c3065fd63cb21bfa55ce4d0be1186047e92",
+  "focus_step_count": 4,
+  "focus_steps": [
+    {
+      "index": 0,
+      "file_on": "focus-000.png",
+      "file_off": "focus-000-off.png",
+      "uid": 1,
+      "tag": "button",
+      "role": null,
+      "name": "B",
+      "selector": "html > body > main.content > div > button",
+      "rect": {
+        "x": 120,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "png_scale": 1
+    },
+    {
+      "index": 1,
+      "file_on": "focus-001.png",
+      "file_off": "focus-001-off.png",
+      "uid": 2,
+      "tag": "button",
+      "role": null,
+      "name": "I",
+      "selector": "html > body > main.content > div > button",
+      "rect": {
+        "x": 142,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "png_scale": 1
+    },
+    {
+      "index": 2,
+      "file_on": "focus-002.png",
+      "file_off": "focus-002-off.png",
+      "uid": 3,
+      "tag": "button",
+      "role": null,
+      "name": "U",
+      "selector": "html > body > main.content > div > button",
+      "rect": {
+        "x": 164,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "png_scale": 1
+    },
+    {
+      "index": 3,
+      "file_on": "focus-003.png",
+      "file_off": "focus-003-off.png",
+      "uid": 4,
+      "tag": "button",
+      "role": null,
+      "name": "\ud83d\udd17",
+      "selector": "html > body > main.content > div > button",
+      "rect": {
+        "x": 186,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "png_scale": 1
+    }
+  ],
+  "focus_run": {
+    "presses": 5,
+    "stop_reason": "left-page"
+  },
+  "layout": {
+    "has_meta_viewport": true,
+    "layout_width": 1440,
+    "scroll_width": 1440,
+    "inner_width": 1440,
+    "visual_viewport_scale": 1
+  },
+  "test_elements_rendered": [
+    {
+      "id": "e-1",
+      "rect": {
+        "x": 120,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      },
+      "occluded_samples": 0,
+      "samples": 25
+    },
+    {
+      "id": "e-2",
+      "rect": {
+        "x": 142,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      },
+      "occluded_samples": 0,
+      "samples": 25
+    },
+    {
+      "id": "e-3",
+      "rect": {
+        "x": 164,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      },
+      "occluded_samples": 0,
+      "samples": 25
+    },
+    {
+      "id": "e-4",
+      "rect": {
+        "x": 186,
+        "y": 240,
+        "w": 22,
+        "h": 22
+      },
+      "occluded_samples": 0,
+      "samples": 25
+    }
+  ],
+  "coordinates": "screenshot.png: 1 px = 1 CSS px. focus-NNN.png: viewport image; a focus step's rect is in CSS px, so its position in the PNG = rect x png_scale (png_scale < 1 when a non-responsive page is shown zoomed out under mobile emulation).",
+  "generator_version": "2.2.0",
+  "protocol_version": "1.0",
+  "tools": {
+    "browser": "chromium 153.0.8010.12",
+    "playwright": "1.63.0"
+  },
+  "synthetic_page_id": "synth_2.5.8_001",
+  "seeded_sc": "2.5.8"
+}

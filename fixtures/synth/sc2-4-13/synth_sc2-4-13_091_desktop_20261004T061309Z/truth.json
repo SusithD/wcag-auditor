@@ -1,0 +1,38 @@
+{
+  "page_id": "synth_2.4.13_001",
+  "viewport": "desktop",
+  "capture_timestamp": "2026-10-04T05:21:20+00:00",
+  "annotator": "generator@v1.1.0",
+  "protocol_version": "1.0",
+  "generator_version": "1.1.0",
+  "generator_notes": "outline_px=2, target_ratio=2.9, actual=2.885:1, is_violation=True. outline area OK but contrast 2.9:1 fails 3:1 threshold Indicator drawn only in the :focus state over a #FFFFFF background, so change-of-contrast = 2.885:1.",
+  "test_elements": [
+    {
+      "id": "e-1",
+      "role": "button",
+      "bbox": {
+        "x": 160,
+        "y": 260,
+        "w": 220,
+        "h": 48
+      }
+    }
+  ],
+  "annotations": [
+    {
+      "annotation_id": "a-0001",
+      "sc": "2.4.13",
+      "severity": "minor",
+      "confidence": "high",
+      "bbox": {
+        "x": 156,
+        "y": 256,
+        "w": 228,
+        "h": 56
+      },
+      "boundary": true,
+      "note": "outline area OK but contrast 2.9:1 fails 3:1 threshold",
+      "element_id": "e-1"
+    }
+  ]
+}

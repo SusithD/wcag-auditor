@@ -1,0 +1,148 @@
+{
+  "source": "annotation/benchmark_ground_truth.json (extracted item)",
+  "protocol_version": "1.1",
+  "page_id": "real_com_011_mobile_20261004T054738Z",
+  "viewport": "mobile",
+  "annotations": [
+    {
+      "sc": "1.4.3",
+      "bbox": {
+        "x": 140,
+        "y": 665,
+        "w": 700,
+        "h": 45
+      },
+      "severity": "serious",
+      "source": "agreed",
+      "note": "tagline #ADD6F1 on #3498DB 2.05:1 (large)"
+    },
+    {
+      "sc": "1.4.3",
+      "bbox": {
+        "x": 70,
+        "y": 1210,
+        "w": 335,
+        "h": 45
+      },
+      "severity": "serious",
+      "source": "agreed",
+      "note": "subtitle 'A Reverse Platformer' 2.05:1 (large)"
+    },
+    {
+      "sc": "1.4.3",
+      "bbox": {
+        "x": 490,
+        "y": 1930,
+        "w": 315,
+        "h": 45
+      },
+      "severity": "serious",
+      "source": "agreed",
+      "note": "subtitle 'A Cosmic Adventure' 1.68:1 (large)"
+    },
+    {
+      "sc": "1.4.3",
+      "bbox": {
+        "x": 240,
+        "y": 4228,
+        "w": 185,
+        "h": 32
+      },
+      "severity": "serious",
+      "source": "agreed",
+      "note": "newsletter placeholder 'Email Address' #58595C on #7E8084 1.77:1"
+    }
+  ],
+  "focus_judgments": [
+    {
+      "index": 0,
+      "v247": "no",
+      "obs": "none",
+      "v2413": "na"
+    },
+    {
+      "index": 1,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "meets"
+    },
+    {
+      "index": 2,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "meets"
+    },
+    {
+      "index": 3,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "meets"
+    },
+    {
+      "index": 4,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "fails"
+    },
+    {
+      "index": 5,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "fails"
+    },
+    {
+      "index": 6,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "fails"
+    },
+    {
+      "index": 7,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "fails"
+    },
+    {
+      "index": 8,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "fails"
+    },
+    {
+      "index": 9,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "fails"
+    },
+    {
+      "index": 10,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "fails"
+    },
+    {
+      "index": 11,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "fails"
+    },
+    {
+      "index": 12,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "fails"
+    },
+    {
+      "index": 13,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "fails"
+    },
+    {
+      "index": 14,
+      "v247": "yes",
+      "obs": "none",
+      "v2413": "meets"
+    }
+  ]
+}
