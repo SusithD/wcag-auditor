@@ -16,6 +16,7 @@ log = logging.getLogger(__name__)
 class Job:
     run_id: str
     argv: list[str]
+    timeout_s: float | None = None
 
 
 @dataclass(frozen=True)
@@ -114,7 +115,7 @@ class JobRunner:
         if job.run_id in self._cancelled:
             self._kill(proc)
         try:
-            out, _ = await asyncio.wait_for(proc.communicate(), self._timeout_s)
+            out, _ = await asyncio.wait_for(proc.communicate(), job.timeout_s or self._timeout_s)
         except TimeoutError:
             self._kill(proc)
             out, _ = await proc.communicate()

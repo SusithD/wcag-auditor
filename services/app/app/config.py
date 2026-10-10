@@ -15,6 +15,7 @@ class Settings:
     db_url: str
     folder_roots: tuple[Path, ...] = ()
     job_timeout_s: float = 900
+    eval_timeout_s: float = 6 * 3600
     pdf: bool = True
     benchmark_dir: Path | None = None
     truth_path: Path | None = None
@@ -49,6 +50,7 @@ class Settings:
             if roots
             else (default_root.resolve(),),
             job_timeout_s=float(os.environ.get("JOB_TIMEOUT_S", "900")),
+            eval_timeout_s=float(os.environ.get("EVAL_TIMEOUT_S", str(6 * 3600))),
             pdf=os.environ.get("AUDIT_PDF", "1") != "0",
             benchmark_dir=_path(os.environ.get("BENCHMARK_DIR")),
             truth_path=_path(os.environ.get("TRUTH_PATH")),

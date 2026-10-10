@@ -140,16 +140,24 @@ test("compare keeps the two canvases and selection in step", async ({
     left.getByRole("img", { name: /Full-page screenshot/ }),
   ).toBeVisible();
 
+  const styleOf = (pane: typeof left) =>
+    pane.locator(".react-transform-component").getAttribute("style");
+  const initial = await styleOf(left);
   await left.getByRole("button", { name: "Zoom in" }).click();
   await expect
     .poll(async () => {
-      const a = await left
-        .locator(".react-transform-component")
-        .getAttribute("style");
-      const b = await right
-        .locator(".react-transform-component")
-        .getAttribute("style");
-      return a !== null && a === b;
+      const a = await styleOf(left);
+      const b = await styleOf(right);
+      return a !== initial && a === b;
+    })
+    .toBe(true);
+  const afterLeft = await styleOf(left);
+  await right.getByRole("button", { name: "Zoom out" }).click();
+  await expect
+    .poll(async () => {
+      const a = await styleOf(left);
+      const b = await styleOf(right);
+      return a !== afterLeft && a === b;
     })
     .toBe(true);
 
@@ -157,7 +165,9 @@ test("compare keeps the two canvases and selection in step", async ({
   const ruleBoxes = await right.locator("svg [role=button][data-key]").count();
   expect(hybridBoxes).toBeGreaterThan(ruleBoxes);
 
-  const only = page.getByRole("button", { name: /Only in hybrid/ }).first();
+  const onlyButtons = page.getByRole("button", { name: /Only in hybrid/ });
+  expect(await onlyButtons.count()).toBeGreaterThanOrEqual(1);
+  const only = onlyButtons.first();
   await only.click();
   await expect(only).toHaveAttribute("aria-pressed", "true");
   await expect(
@@ -262,4 +272,87 @@ test("an evaluation can be started and its progress followed to the end", async 
   await expect(
     page.getByRole("img", { name: /^Bar chart of precision/ }),
   ).toBeVisible();
+});
+
+const failedEval = {
+  id: 99,
+  created_at: "2026-10-10T12:00:00Z",
+  status: "failed",
+  source: "run",
+  conditions: ["hybrid"],
+  error: "The evaluation failed: exit code 1",
+  done: null,
+  total: null,
+};
+
+for (const scheme of ["light", "dark"] as const) {
+  test(`evaluation empty, running and failed states have zero axe violations (${scheme})`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: scheme });
+    const states: [string, object[]][] = [
+      ["empty", []],
+      [
+        "running",
+        [{ ...failedEval, status: "running", error: null, done: 4, total: 12 }],
+      ],
+      ["failed", [failedEval]],
+    ];
+    for (const [name, list] of states) {
+      await page.route("**/api/eval", (r) => r.fulfill({ json: list }), {
+        times: 5,
+      });
+      await page.route("**/api/eval/99", (r) =>
+        r.fulfill({ json: { summary: list[0], view: null } }),
+      );
+      await page.route("**/api/eval/99/events", (r) =>
+        r.fulfill({ contentType: "text/event-stream", body: "" }),
+      );
+      await page.goto("/eval");
+      await expect(
+        page.getByRole("heading", { level: 1, name: "Evaluation" }),
+      ).toBeVisible();
+      if (name === "running")
+        await expect(page.getByRole("progressbar")).toBeVisible();
+      if (name === "failed")
+        await expect(page.getByText(/This evaluation failed/)).toBeVisible();
+      if (name === "empty")
+        await expect(
+          page.getByText(/No evaluation has been run/),
+        ).toBeVisible();
+      await scan(page);
+      await page.unrouteAll({ behavior: "ignoreErrors" });
+    }
+  });
+}
+
+test("compare explains itself for a rule-only run and coverage scans before expansion", async ({
+  page,
+  request,
+}) => {
+  test.setTimeout(150_000);
+  const created = await request.post("/api/runs", {
+    data: { folder: FOLDER, condition: "rule_only" },
+  });
+  const { run_id } = await created.json();
+  await expect
+    .poll(
+      async () =>
+        (await (await request.get(`/api/runs/${run_id}`)).json()).status,
+      {
+        timeout: 120_000,
+      },
+    )
+    .toBe("done");
+  await page.goto(`/runs/${run_id}/compare`);
+  await expect(
+    page.getByRole("heading", {
+      name: "Compare is not available for this run",
+    }),
+  ).toBeVisible();
+  await scan(page);
+  const id = await ensureRun(request);
+  await page.goto(`/runs/${id}/coverage`);
+  await expect(page.getByRole("table")).toBeVisible();
+  await scan(page);
 });

@@ -287,6 +287,8 @@ def run_eval(cfg: EvalConfig, progress: Callable[[int, int], None] | None = None
         predictor.close()
         if pixel is not None:
             pixel.close()
+    if progress is not None:
+        progress(len(folders), len(folders))
     present = {r.sc for r in results}
     all_scs = [s for s in ALL_SCS if s in present]
     run_versions = versions.collect({"tools": tools})

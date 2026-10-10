@@ -70,6 +70,10 @@ export function useEvalProgress(id: number | undefined, active: boolean) {
         client.invalidateQueries({ queryKey: ["evals"] });
       }
     });
+    source.onerror = () => {
+      if (source.readyState === EventSource.CLOSED) return;
+      client.invalidateQueries({ queryKey: ["evals"] });
+    };
     return () => source.close();
   }, [id, active, client]);
 }

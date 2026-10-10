@@ -20,3 +20,6 @@ Every approach that was tried and rejected, with the fixture or measurement that
 ## M7a: Next rewrites for the API proxy (2026-10-10)
 `rewrites()` are evaluated at build time, so the API address could not be chosen when starting the e2e servers. Replaced by a runtime route handler (ADR-023).
 
+## M2/M6: McNemar paired by list position (2026-10-10)
+`run_mcnemar(results, conditions[0], conditions[1], ...)` compared whichever two conditions were listed first. With `rule_only,pixel,hybrid` it compared rule-only with the pixel condition, so the recorded McNemar results were not the hybrid-versus-rule-only test the plan specifies. It went unnoticed because the M2 test listed `hybrid,rule_only` and the bootstrap picks its pair by name. Replaced by `mcnemar_pair()` (by name) and a test over the possible orders; the evaluation was rerun.
+

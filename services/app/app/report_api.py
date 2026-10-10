@@ -354,7 +354,9 @@ def build_report_router(settings: Settings) -> APIRouter:
         report = _load_report(run_dir(run_id), viewport)
         path = base / "rule_only.json"
         if not path.is_file():
-            raise HTTPException(404, "Compare needs a hybrid run")
+            raise HTTPException(
+                404, "Compare needs a hybrid run made with this version; run the audit again"
+            )
         try:
             rule = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError) as exc:

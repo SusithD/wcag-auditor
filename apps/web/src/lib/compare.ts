@@ -16,6 +16,7 @@ export type SyncView = { x: number; y: number; scale: number };
 
 export class SyncBus {
   private listeners = new Map<string, (view: SyncView) => void>();
+  enabled = true;
 
   subscribe(id: string, listener: (view: SyncView) => void): () => void {
     this.listeners.set(id, listener);
@@ -23,6 +24,7 @@ export class SyncBus {
   }
 
   publish(source: string, view: SyncView) {
+    if (!this.enabled) return;
     for (const [id, listener] of this.listeners)
       if (id !== source) listener(view);
   }

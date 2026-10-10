@@ -87,10 +87,11 @@ describe("eval helpers", () => {
       "real",
     );
     expect(text).toContain("Hybrid condition on the real stratum");
-    expect(text).toContain(
-      "1.4.3 Contrast (Minimum): precision 0.80, recall 0.50, F1 0.60",
+    expect(text).toContain("Highest F1 is 1.4.3 Contrast (Minimum) at 0.60");
+    expect(text).toContain("View as table");
+    expect(describeChart([cell({ f1: null })], "hybrid", "real")).not.toContain(
+      "Highest F1",
     );
-    expect(text).toContain("2.4.7 Focus Visible: precision n/a");
   });
 });
 

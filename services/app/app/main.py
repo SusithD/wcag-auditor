@@ -13,7 +13,7 @@ from sqlalchemy import select
 from app.api import build_router, status_from_result
 from app.config import Settings
 from app.db import make_engine, make_session_factory
-from app.eval_api import build_eval_router, finish_eval, import_dirs, mark_running
+from app.eval_api import build_eval_router, fail_eval, finish_eval, import_dirs, mark_running
 from app.ingest import ingest_run
 from app.jobs import JobResult, JobRunner
 from app.models import EvalRun, Run
@@ -64,8 +64,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
         async def on_finish(result: JobResult) -> None:
             if result.run_id.startswith("eval-"):
-                with sessions() as session:
-                    finish_eval(session, int(result.run_id[5:]), result.returncode, result.output)
+                try:
+                    with sessions() as session:
+                        finish_eval(
+                            session, int(result.run_id[5:]), result.returncode, result.output
+                        )
+                except Exception:
+                    logging.getLogger(__name__).exception("finishing %s failed", result.run_id)
+                    with sessions() as session:
+                        fail_eval(session, int(result.run_id[5:]))
                 return
             status, error = status_from_result(result, cfg.runs_dir / result.run_id)
             with sessions() as session:

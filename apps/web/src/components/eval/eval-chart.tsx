@@ -14,8 +14,8 @@ import { chartPoints, describeChart, type EvalCell } from "@/lib/eval";
 
 const CONFIG = {
   precision: { label: "Precision", color: "var(--chart-1)" },
-  recall: { label: "Recall", color: "var(--chart-3)" },
-  f1: { label: "F1", color: "var(--chart-4)" },
+  recall: { label: "Recall", color: "var(--chart-2)" },
+  f1: { label: "F1", color: "var(--chart-3)" },
 } satisfies ChartConfig;
 
 export function EvalChart({
@@ -41,6 +41,27 @@ export function EvalChart({
             accessibilityLayer={false}
             margin={{ top: 12, right: 12, left: 0, bottom: 0 }}
           >
+            <defs>
+              <pattern
+                id="pat-recall"
+                width="6"
+                height="6"
+                patternUnits="userSpaceOnUse"
+                patternTransform="rotate(45)"
+              >
+                <rect width="6" height="6" fill="var(--card)" />
+                <rect width="3" height="6" fill="var(--color-recall)" />
+              </pattern>
+              <pattern
+                id="pat-f1"
+                width="6"
+                height="6"
+                patternUnits="userSpaceOnUse"
+              >
+                <rect width="6" height="6" fill="var(--card)" />
+                <circle cx="3" cy="3" r="2" fill="var(--color-f1)" />
+              </pattern>
+            </defs>
             <CartesianGrid vertical={false} />
             <XAxis dataKey="sc" tickLine={false} />
             <YAxis domain={[0, 1]} tickCount={6} width={36} />
@@ -50,7 +71,13 @@ export function EvalChart({
                 key={key}
                 dataKey={key}
                 name={CONFIG[key].label}
-                fill={`var(--color-${key})`}
+                fill={
+                  key === "precision"
+                    ? "var(--color-precision)"
+                    : `url(#pat-${key})`
+                }
+                stroke={`var(--color-${key})`}
+                strokeWidth={1}
                 isAnimationActive={false}
               >
                 <ErrorBar

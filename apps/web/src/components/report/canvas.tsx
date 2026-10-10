@@ -482,7 +482,7 @@ export function Canvas({
 
         <div
           role="toolbar"
-          aria-label="Canvas controls"
+          aria-label={`${label ? `${label} ` : ""}canvas controls`}
           className="absolute inset-x-0 bottom-3 mx-auto flex w-max max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-1 rounded-lg border bg-popover p-1 shadow-md"
         >
           {pairMode === "page" ? (
@@ -549,7 +549,7 @@ export function Canvas({
             size="sm"
             value={[pairMode === "page" ? "page" : pairMode]}
             onValueChange={(v) => v[0] && onPairMode(v[0] as PairMode)}
-            aria-label="Focus pair view"
+            aria-label={`${label ? `${label} ` : ""}focus pair view`}
           >
             <ToggleGroupItem value="page" aria-label="Page view">
               Page

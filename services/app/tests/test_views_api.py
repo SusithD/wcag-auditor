@@ -160,3 +160,125 @@ def test_evaluations_left_unfinished_by_a_previous_process_are_failed(
     with eval_client(tmp_path) as c:
         statuses = {e["status"] for e in c.get("/eval").json()}
         assert statuses == {"done", "failed"}
+
+
+def test_a_second_evaluation_is_refused_while_one_is_queued_and_bad_imports_are_skipped(
+    tmp_path: Path,
+) -> None:
+    bad = tmp_path / "bad_eval"
+    bad.mkdir()
+    (bad / "metrics.json").write_text('{"meta": {}}')
+    settings = Settings(
+        data_dir=tmp_path / "d",
+        db_url=f"sqlite:///{tmp_path / 'a.db'}",
+        folder_roots=(FIXTURES.resolve(),),
+        pdf=False,
+        benchmark_dir=FIXTURES.resolve(),
+        eval_import_dirs=(bad, EVAL_FIXTURE),
+    )
+    with TestClient(create_app(settings)) as c:
+        assert [e["source"] for e in c.get("/eval").json()] == ["import"]
+        first = c.post("/eval", json={"conditions": ["rule_only", "rule_only"], "bootstrap": 100})
+        assert first.status_code == 201
+        assert c.post("/eval", json={}).status_code == 409
+        eval_id = first.json()["eval_id"]
+        deadline = time.time() + 240
+        while time.time() < deadline:
+            current = next(e for e in c.get("/eval").json() if e["id"] == eval_id)
+            if current["status"] in {"done", "failed"}:
+                break
+            time.sleep(1)
+        assert current["status"] == "done" and current["conditions"] == ["rule_only"]
+
+
+def test_two_simultaneous_evaluation_requests_yield_exactly_one_run(tmp_path: Path) -> None:
+    from concurrent.futures import ThreadPoolExecutor
+
+    with eval_client(tmp_path, benchmark_dir=FIXTURES.resolve()) as c:
+        with ThreadPoolExecutor(2) as pool:
+            codes = sorted(
+                f.result().status_code
+                for f in [
+                    pool.submit(
+                        c.post, "/eval", json={"conditions": ["rule_only"], "bootstrap": 100}
+                    )
+                    for _ in range(2)
+                ]
+            )
+        assert codes == [201, 409]
+        eval_id = next(e["id"] for e in c.get("/eval").json() if e["source"] == "run")
+        deadline = time.time() + 240
+        while time.time() < deadline:
+            current = next(e for e in c.get("/eval").json() if e["id"] == eval_id)
+            if current["status"] in {"done", "failed"}:
+                break
+            time.sleep(1)
+        assert current["status"] == "done"
+
+
+def test_export_edge_cases_return_clean_errors(tmp_path: Path) -> None:
+    from app.models import EvalRun
+
+    with eval_client(tmp_path) as c:
+        with cast(Any, c.app).state.sessions() as session:
+            session.add(
+                EvalRun(
+                    config={"status": "running", "out": str(tmp_path / "none"), "conditions": []},
+                    metrics={},
+                )
+            )
+            session.commit()
+            running_id = max(e["id"] for e in c.get("/eval").json())
+        done_id = next(e["id"] for e in c.get("/eval").json() if e["source"] == "import")
+        assert (
+            c.get(
+                f"/eval/{running_id}/export.csv", params={"condition": "hybrid", "stratum": "real"}
+            ).status_code
+            == 404
+        )
+        assert c.get(f"/eval/{running_id}/export.tex").status_code == 404
+        assert (
+            c.get(
+                f"/eval/{done_id}/export.csv", params={"condition": "nonsense", "stratum": "real"}
+            ).status_code
+            == 422
+        )
+        assert c.get("/eval/9999/events").status_code == 404
+        assert c.get(f"/eval/{running_id}").json()["view"] is None
+
+
+def test_pdf_is_exported_with_its_page_count_when_enabled(tmp_path: Path) -> None:
+    settings = Settings(
+        data_dir=tmp_path,
+        db_url=f"sqlite:///{tmp_path / 'app.db'}",
+        folder_roots=(FIXTURES.resolve(),),
+        pdf=True,
+    )
+    with TestClient(create_app(settings)) as c:
+        run_id = c.post("/runs", json={"folder": str(REAL)}).json()["run_id"]
+        assert wait_for_terminal(c, run_id)["status"] == "done"
+        pdf = c.get(f"/runs/{run_id}/report.pdf", params={"viewport": "mobile"})
+        assert pdf.status_code == 200 and pdf.content.startswith(b"%PDF-")
+        listing = {
+            e["format"]: e
+            for e in c.get(f"/runs/{run_id}/exports", params={"viewport": "mobile"}).json()
+        }
+        assert listing["pdf"]["pages"] >= 1 and listing["pdf"]["size_bytes"] > 1000
+
+
+def test_restart_reconciliation_leaves_finished_evaluations_alone_and_explains_the_rest(
+    tmp_path: Path,
+) -> None:
+    from app.models import EvalRun
+
+    with eval_client(tmp_path) as c, cast(Any, c.app).state.sessions() as session:
+        session.add(
+            EvalRun(
+                config={"status": "running", "out": str(tmp_path), "conditions": []}, metrics={}
+            )
+        )
+        session.commit()
+    with eval_client(tmp_path) as c:
+        rows = {e["source"] + e["status"]: e for e in c.get("/eval").json()}
+        assert rows["importdone"]["error"] is None
+        assert "restart" in rows["runfailed"]["error"]

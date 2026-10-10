@@ -78,11 +78,13 @@ export function describeChart(
   condition: string,
   stratum: string,
 ): string {
-  const parts = cells.map(
-    (c) =>
-      `${c.sc} ${SC_TITLES[c.sc] ?? ""}: precision ${fmt(c.precision, 2)}, recall ${fmt(c.recall, 2)}, F1 ${fmt(c.f1, 2)}`,
-  );
-  return `Bar chart of precision, recall and F1 with 95% confidence whiskers for the ${CONDITION_LABEL[condition] ?? condition} condition on the ${stratum} stratum. ${parts.join("; ")}.`;
+  const best = cells
+    .filter((c) => c.f1 !== null)
+    .sort((a, b) => (b.f1 ?? 0) - (a.f1 ?? 0))[0];
+  const lead = best
+    ? ` Highest F1 is ${best.sc} ${SC_TITLES[best.sc] ?? ""} at ${fmt(best.f1, 2)}.`
+    : "";
+  return `Bar chart of precision, recall and F1 with 95% confidence whiskers for ${cells.length} criteria, ${CONDITION_LABEL[condition] ?? condition} condition on the ${stratum} stratum.${lead} Switch to View as table for every value.`;
 }
 
 export function progressFraction(

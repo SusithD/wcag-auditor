@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   useEvalDetail,
@@ -46,6 +46,16 @@ export function EvalScreen() {
   )?.id;
   useEvalProgress(runningId, running);
 
+  const bucket = summary?.total
+    ? Math.floor(progressFraction(summary.done, summary.total) / 25) * 25
+    : 0;
+  const announcement = running
+    ? bucket > 0
+      ? `Evaluation ${bucket}% complete`
+      : "Evaluation started"
+    : summary?.status === "failed"
+      ? "Evaluation failed"
+      : "";
   const view = detail.data?.view ?? null;
   const conditions = view?.meta.conditions ?? [];
   const activeCondition =
@@ -71,9 +81,12 @@ export function EvalScreen() {
           </p>
         </div>
         <Button
-          onClick={() => start.mutate(["rule_only", "pixel", "hybrid"])}
-          disabled={running || start.isPending}
+          onClick={() => {
+            if (!running && !start.isPending)
+              start.mutate(["rule_only", "pixel", "hybrid"]);
+          }}
           aria-disabled={running || start.isPending}
+          className="aria-disabled:opacity-60"
         >
           {running ? "Evaluation running" : "Run evaluation"}
         </Button>
@@ -85,13 +98,16 @@ export function EvalScreen() {
         </p>
       ) : null}
 
+      <output aria-live="polite" className="sr-only">
+        {announcement}
+      </output>
       {running && summary ? (
         <div className="mt-4 rounded-lg border bg-card p-3">
-          <output aria-live="polite" className="block text-body">
+          <p className="text-body">
             {summary.total
               ? `Scoring capture ${summary.done ?? 0} of ${summary.total}`
               : "Starting the evaluation"}
-          </output>
+          </p>
           <Progress
             value={progressFraction(summary.done, summary.total)}
             aria-label="Evaluation progress"
@@ -189,7 +205,11 @@ function Results({
   const m = view.meta;
 
   return (
-    <div className="mt-4">
+    <Tabs
+      className="mt-4"
+      value={stratum}
+      onValueChange={(v) => onStratum(v as Stratum)}
+    >
       <p className="text-caption text-muted-foreground">
         {m.items_scored} captures scored ({m.items_unlabelled} without ground
         truth), seed {m.seed}, {m.resamples.toLocaleString()} bootstrap
@@ -205,15 +225,13 @@ function Results({
       </p>
 
       <div className="mt-3 flex flex-wrap items-center gap-3">
-        <Tabs value={stratum} onValueChange={(v) => onStratum(v as Stratum)}>
-          <TabsList aria-label="Stratum">
-            {STRATA.map((s) => (
-              <TabsTrigger key={s} value={s}>
-                {STRATUM_LABEL[s]}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+        <TabsList aria-label="Stratum">
+          {STRATA.map((s) => (
+            <TabsTrigger key={s} value={s}>
+              {STRATUM_LABEL[s]}
+            </TabsTrigger>
+          ))}
+        </TabsList>
         <ToggleGroup
           variant="outline"
           size="sm"
@@ -253,127 +271,35 @@ function Results({
         </span>
       </div>
 
-      <section aria-labelledby="per-sc-h" className="mt-4">
-        <h2 id="per-sc-h" className="text-h3 font-semibold">
-          {CONDITION_LABEL[condition] ?? condition},{" "}
-          {STRATUM_LABEL[stratum].toLowerCase()} stratum
-        </h2>
-        {asTable ? (
-          <div
-            role="region"
-            aria-label="Per-criterion results"
-            tabIndex={0}
-            className="mt-2 overflow-x-auto"
-          >
-            <table className="w-full border-collapse text-row">
-              <caption className="sr-only">
-                Per-criterion results for {CONDITION_LABEL[condition]} on the{" "}
-                {stratum} stratum
-              </caption>
-              <thead>
-                <tr>
-                  {[
-                    "Criterion",
-                    "TP",
-                    "FP",
-                    "FN",
-                    "Dup",
-                    "Precision",
-                    "Recall",
-                    "F1",
-                  ].map((h) => (
-                    <th
-                      key={h}
-                      scope="col"
-                      className="border-b px-3 py-2 text-left font-medium"
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {cells.map((c) => (
-                  <tr key={c.sc}>
-                    <th
-                      scope="row"
-                      className="border-b px-3 py-2 text-left font-normal"
-                    >
-                      <span className="font-mono text-label">{c.sc}</span>{" "}
-                      {SC_TITLES[c.sc]}
-                    </th>
-                    <td className="border-b px-3 py-2 font-mono text-label">
-                      {c.tp}
-                    </td>
-                    <td className="border-b px-3 py-2 font-mono text-label">
-                      {c.fp}
-                    </td>
-                    <td className="border-b px-3 py-2 font-mono text-label">
-                      {c.fn}
-                    </td>
-                    <td className="border-b px-3 py-2 font-mono text-label">
-                      {c.duplicates}
-                    </td>
-                    <td className="border-b px-3 py-2 font-mono text-label">
-                      {fmt(c.precision)} {fmtCi(c.precision_ci)}
-                    </td>
-                    <td className="border-b px-3 py-2 font-mono text-label">
-                      {fmt(c.recall)} {fmtCi(c.recall_ci)}
-                    </td>
-                    <td className="border-b px-3 py-2 font-mono text-label">
-                      {fmt(c.f1)} {fmtCi(c.f1_ci)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="mt-2">
-            <EvalChart cells={cells} condition={condition} stratum={stratum} />
-          </div>
-        )}
-      </section>
-
-      <section aria-labelledby="tests-h" className="mt-8">
-        <h2 id="tests-h" className="text-h3 font-semibold">
-          Hybrid against rule-only
-        </h2>
-        {mcnemar.length === 0 ? (
-          <p className="mt-2 text-body text-muted-foreground">
-            This evaluation compared a single condition, so there is no paired
-            test.
-          </p>
-        ) : (
-          <>
-            <p className="mt-1 text-caption text-muted-foreground">
-              Exact McNemar test on paired per-unit outcomes ({view.mcnemar_a}{" "}
-              against {view.mcnemar_b}), Benjamini–Hochberg adjusted within the
-              stratum. ΔPrecision is hybrid minus rule-only with a 95% bootstrap
-              interval; the margin is {deltas[0]?.margin ?? -0.05}. “n/a” means
-              the test has no discordant pairs or precision is undefined for a
-              condition.
-            </p>
+      <TabsContent value={stratum}>
+        <section aria-labelledby="per-sc-h" className="mt-4">
+          <h2 id="per-sc-h" className="text-h3 font-semibold">
+            {CONDITION_LABEL[condition] ?? condition},{" "}
+            {STRATUM_LABEL[stratum].toLowerCase()} stratum
+          </h2>
+          {asTable ? (
             <div
               role="region"
-              aria-label="Paired tests"
+              aria-label="Per-criterion results"
               tabIndex={0}
               className="mt-2 overflow-x-auto"
             >
               <table className="w-full border-collapse text-row">
                 <caption className="sr-only">
-                  McNemar and ΔPrecision per criterion, {stratum} stratum
+                  Per-criterion results for {CONDITION_LABEL[condition]} on the{" "}
+                  {stratum} stratum
                 </caption>
                 <thead>
                   <tr>
                     {[
                       "Criterion",
-                      "Only hybrid correct",
-                      "Only rule-only correct",
-                      "p",
-                      "p (BH)",
-                      "ΔPrecision 95% interval",
-                      "Non-inferior",
+                      "TP",
+                      "FP",
+                      "FN",
+                      "Dup",
+                      "Precision",
+                      "Recall",
+                      "F1",
                     ].map((h) => (
                       <th
                         key={h}
@@ -386,8 +312,106 @@ function Results({
                   </tr>
                 </thead>
                 <tbody>
-                  {SC_LIST.filter((sc) => mcnemar.some((r) => r.sc === sc)).map(
-                    (sc) => {
+                  {cells.map((c) => (
+                    <tr key={c.sc}>
+                      <th
+                        scope="row"
+                        className="border-b px-3 py-2 text-left font-normal"
+                      >
+                        <span className="font-mono text-label">{c.sc}</span>{" "}
+                        {SC_TITLES[c.sc]}
+                      </th>
+                      <td className="border-b px-3 py-2 font-mono text-label">
+                        {c.tp}
+                      </td>
+                      <td className="border-b px-3 py-2 font-mono text-label">
+                        {c.fp}
+                      </td>
+                      <td className="border-b px-3 py-2 font-mono text-label">
+                        {c.fn}
+                      </td>
+                      <td className="border-b px-3 py-2 font-mono text-label">
+                        {c.duplicates}
+                      </td>
+                      <td className="border-b px-3 py-2 font-mono text-label">
+                        {fmt(c.precision)} {fmtCi(c.precision_ci)}
+                      </td>
+                      <td className="border-b px-3 py-2 font-mono text-label">
+                        {fmt(c.recall)} {fmtCi(c.recall_ci)}
+                      </td>
+                      <td className="border-b px-3 py-2 font-mono text-label">
+                        {fmt(c.f1)} {fmtCi(c.f1_ci)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="mt-2">
+              <EvalChart
+                cells={cells}
+                condition={condition}
+                stratum={stratum}
+              />
+            </div>
+          )}
+        </section>
+
+        <section aria-labelledby="tests-h" className="mt-8">
+          <h2 id="tests-h" className="text-h3 font-semibold">
+            Hybrid against rule-only
+          </h2>
+          {mcnemar.length === 0 ? (
+            <p className="mt-2 text-body text-muted-foreground">
+              This evaluation compared a single condition, so there is no paired
+              test.
+            </p>
+          ) : (
+            <>
+              <p className="mt-1 text-caption text-muted-foreground">
+                Exact McNemar test on paired per-unit outcomes ({view.mcnemar_a}{" "}
+                against {view.mcnemar_b}), Benjamini–Hochberg adjusted within
+                the stratum. ΔPrecision is hybrid minus rule-only with a 95%
+                bootstrap interval; the margin is {deltas[0]?.margin ?? -0.05}.
+                “n/a” means the test has no discordant pairs or precision is
+                undefined for a condition.
+              </p>
+              <div
+                role="region"
+                aria-label="Paired tests"
+                tabIndex={0}
+                className="mt-2 overflow-x-auto"
+              >
+                <table className="w-full border-collapse text-row">
+                  <caption className="sr-only">
+                    McNemar and ΔPrecision per criterion, {stratum} stratum
+                  </caption>
+                  <thead>
+                    <tr>
+                      {[
+                        "Criterion",
+                        "Only hybrid correct",
+                        "Only rule-only correct",
+                        "p",
+                        "p (BH)",
+                        "ΔPrecision 95% interval",
+                        "Non-inferior",
+                      ].map((h) => (
+                        <th
+                          key={h}
+                          scope="col"
+                          className="border-b px-3 py-2 text-left font-medium"
+                        >
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {SC_LIST.filter((sc) =>
+                      mcnemar.some((r) => r.sc === sc),
+                    ).map((sc) => {
                       const t = mcnemar.find((r) => r.sc === sc);
                       const d = deltas.find((r) => r.sc === sc);
                       if (!t) return null;
@@ -426,14 +450,14 @@ function Results({
                           </td>
                         </tr>
                       );
-                    },
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
-      </section>
-    </div>
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </section>
+      </TabsContent>
+    </Tabs>
   );
 }

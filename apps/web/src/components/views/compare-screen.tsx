@@ -41,6 +41,7 @@ export function CompareScreen({ runId }: { runId: string }) {
   const [ruleKey, setRuleKey] = useState<string | null>(null);
   const [pairA, setPairA] = useState<PairMode>("page");
   const [pairB, setPairB] = useState<PairMode>("page");
+  const [linked, setLinked] = useState(true);
   const syncA = useMemo(() => ({ bus: bus.current, id: "hybrid" }), []);
   const syncB = useMemo(() => ({ bus: bus.current, id: "rule_only" }), []);
 
@@ -103,6 +104,18 @@ export function CompareScreen({ runId }: { runId: string }) {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <RunNav runId={runId} current="compare" query={`?vp=${viewport}`} />
+          <label className="inline-flex min-h-7 items-center gap-2 text-body">
+            <input
+              type="checkbox"
+              className="size-4"
+              checked={linked}
+              onChange={(e) => {
+                bus.current.enabled = e.target.checked;
+                setLinked(e.target.checked);
+              }}
+            />
+            Sync views
+          </label>
           {available.length > 1 ? (
             <ToggleGroup
               variant="outline"

@@ -4,6 +4,8 @@ import asyncio
 import csv
 import io
 import json
+import logging
+import threading
 from collections.abc import AsyncIterator
 from datetime import datetime
 from pathlib import Path
@@ -11,7 +13,7 @@ from typing import Any, Literal
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import PlainTextResponse, StreamingResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -24,6 +26,8 @@ from app.models import EvalRun
 EvalCondition = Literal["rule_only", "pixel", "hybrid"]
 EvalStatus = Literal["queued", "running", "done", "failed"]
 STRATA = ("real", "synthetic", "combined")
+log = logging.getLogger(__name__)
+_start_lock = threading.Lock()
 
 
 def _all_conditions() -> list[EvalCondition]:
@@ -32,6 +36,12 @@ def _all_conditions() -> list[EvalCondition]:
 
 class EvalRequest(BaseModel):
     conditions: list[EvalCondition] = Field(default_factory=_all_conditions, min_length=1)
+
+    @field_validator("conditions")
+    @classmethod
+    def _unique(cls, value: list[EvalCondition]) -> list[EvalCondition]:
+        return list(dict.fromkeys(value))
+
     include_needs_review: bool = False
     bootstrap: int = Field(default=10000, ge=100, le=100000)
 
@@ -254,8 +264,13 @@ def import_dirs(session: Session, dirs: tuple[Path, ...]) -> None:
         file = d / "metrics.json"
         if str(d) in known or not file.is_file():
             continue
-        metrics = json.loads(file.read_text(encoding="utf-8"))
-        meta = metrics["meta"]
+        try:
+            metrics = json.loads(file.read_text(encoding="utf-8"))
+            meta = metrics["meta"]
+            to_view(metrics)
+        except (OSError, ValueError, KeyError, TypeError):
+            log.warning("skipping unreadable evaluation in %s", d)
+            continue
         session.add(
             EvalRun(
                 benchmark_sha=meta.get("benchmark_sha"),
@@ -280,9 +295,19 @@ def finish_eval(session: Session, eval_id: int, returncode: int, output: str) ->
         return
     cfg = dict(row.config)
     metrics_file = Path(cfg["out"]) / "metrics.json"
+    loaded: dict[str, Any] | None = None
     if returncode == 0 and metrics_file.is_file():
-        row.metrics = json.loads(metrics_file.read_text(encoding="utf-8"))
-        meta = row.metrics["meta"]
+        try:
+            loaded = json.loads(metrics_file.read_text(encoding="utf-8"))
+            assert loaded is not None
+            to_view(loaded)
+        except (OSError, ValueError, KeyError, TypeError):
+            log.exception("evaluation %s wrote unreadable metrics", eval_id)
+            loaded = None
+            output = "The evaluation wrote unreadable metrics"
+    if loaded is not None:
+        row.metrics = loaded
+        meta = loaded["meta"]
         row.benchmark_sha, row.truth_sha = meta.get("benchmark_sha"), meta.get("truth_sha")
         row.protocol_sha = meta.get("protocol_sha")
         cfg["status"] = "done"
@@ -290,6 +315,17 @@ def finish_eval(session: Session, eval_id: int, returncode: int, output: str) ->
         cfg["status"], cfg["error"] = "failed", (output[-500:] or "The evaluation failed")
     row.config = cfg
     session.commit()
+
+
+def fail_eval(session: Session, eval_id: int) -> None:
+    row = session.get(EvalRun, eval_id)
+    if row is not None:
+        row.config = {
+            **row.config,
+            "status": "failed",
+            "error": "The evaluation could not be finished",
+        }
+        session.commit()
 
 
 def mark_running(session: Session, eval_id: int) -> None:
@@ -314,8 +350,11 @@ def build_eval_router(settings: Settings) -> APIRouter:
             raise HTTPException(422, "BENCHMARK_DIR is not configured on the service")
         if settings.truth_path is not None and not settings.truth_path.is_file():
             raise HTTPException(422, "TRUTH_PATH does not point to a file")
-        with request.app.state.sessions() as session:
-            if any(r.config.get("status") == "running" for r in session.scalars(select(EvalRun))):
+        with _start_lock, request.app.state.sessions() as session:
+            if any(
+                r.config.get("status") in {"queued", "running"}
+                for r in session.scalars(select(EvalRun))
+            ):
                 raise HTTPException(409, "An evaluation is already running")
             row = EvalRun(config={}, metrics={})
             session.add(row)
@@ -344,7 +383,7 @@ def build_eval_router(settings: Settings) -> APIRouter:
             argv += ["--truth", str(settings.truth_path)]
         if body.include_needs_review:
             argv.append("--include-needs-review")
-        request.app.state.jobs.submit(Job(f"eval-{eval_id}", argv))
+        request.app.state.jobs.submit(Job(f"eval-{eval_id}", argv, settings.eval_timeout_s))
         return EvalCreated(eval_id=eval_id)
 
     @router.get("/eval", response_model=list[EvalSummary])
@@ -371,10 +410,13 @@ def build_eval_router(settings: Settings) -> APIRouter:
         with request.app.state.sessions() as session:
             get_row(session, eval_id)
 
+        def snapshot() -> EvalSummary:
+            with request.app.state.sessions() as session:
+                return summarise(get_row(session, eval_id))
+
         async def stream() -> AsyncIterator[str]:
             while True:
-                with request.app.state.sessions() as session:
-                    summary = summarise(get_row(session, eval_id))
+                summary = await asyncio.to_thread(snapshot)
                 yield f"event: progress\ndata: {summary.model_dump_json()}\n\n"
                 if summary.status in {"done", "failed"}:
                     return
