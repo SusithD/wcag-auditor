@@ -42,7 +42,7 @@ class EvalConfig:
     seed: int = DEFAULT_SEED
     bootstrap: int = 10000
     rule_findings: Path | None = None
-    include_needs_review: bool = False
+    include_needs_review: bool = True
     calibration: bool = False
 
 

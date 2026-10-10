@@ -58,6 +58,7 @@ Supersedes the defaults in ADR-014 (tier policy), ADR-017 (default ring) and ADR
 Consequences: rerun `make eval` with the new defaults; regenerate tables, figures and calibration; update the eval screen fixture; record old-vs-new headline numbers in NOTES.md.
 
 ## ADR-014 Evaluation harness scoring policy (2026-10-10, M2)
+> Update 2026-10-10: the headline tier policy and the default-ring default are superseded by ADR-028 (both tiers counted; default rings evaluated). The automated-only policy below is now the secondary table (`--automated-only`).
 Context: PLAN §8 fixes the units but leaves several scoring choices open.
 Decisions:
 - **Rule-only counts axe `violations` only.** `incomplete` (needs-review) findings are excluded by default (`--include-needs-review` adds them), matching the benchmark baseline (`run_baseline.py` reports violations as the headline). 862 needs-review nodes are excluded on the full benchmark and reported in `metrics.json` (`rule_findings_dropped`). When the hybrid condition exists, both conditions must use the same tier policy (automated only by default, needs-review-included as a reported variant), otherwise ΔPrecision compares different policies.
@@ -81,6 +82,7 @@ Decisions:
 Consequences: Chapter 4 must list these; the M6 hybrid condition inherits the tier policy of ADR-014 (automated only by default).
 
 ## ADR-017 Focus-criterion modules: rulings beyond the Protocol text (2026-10-10, M5)
+> Update 2026-10-10: ADR-028 sets `ua_default_ring_exempt: false` as the headline; the exempt reading is the sensitivity row (`eval/<date>/secondary/ring_exempt`). The OPEN QUESTION below is answered.
 Context: M5 measures 2.4.7, 2.4.11, 2.4.12, 2.4.13 from the focused/unfocused PNG pair of each stop (all strata) and 2.5.7 from DOM structure.
 Decisions:
 - **Visibility (R1, 2.4.7)** uses the strongest state contrast among the *added* pixels (PLAN §4.3 "max state contrast"); a first version used the median and was replaced because a large faint fill change masked a crisp border. Added pixels are changed pixels (sum of channel differences above the delta) whose focused colour is farther from the page background (sampled from the pad frame around the element) than the unfocused colour, so removed pixels never count (R4). The median is kept as evidence.

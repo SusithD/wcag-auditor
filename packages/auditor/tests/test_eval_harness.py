@@ -122,7 +122,9 @@ def test_item_without_truth_is_counted_as_unlabelled(tmp_path: Path) -> None:
     assert metrics["meta"]["items_scored"] == 0 and metrics["meta"]["items_unlabelled"] == 1
 
 
-def test_needs_review_findings_are_excluded_unless_requested(tmp_path: Path) -> None:
+def test_needs_review_findings_count_by_default_and_automated_only_excludes_them(
+    tmp_path: Path,
+) -> None:
     bench = tmp_path / "bench"
     src = next(FIXTURES.glob("synth/sc2-5-8/*"))
     shutil.copytree(src, bench / src.name)
@@ -140,15 +142,16 @@ def test_needs_review_findings_are_excluded_unless_requested(tmp_path: Path) -> 
     }
     raw["findings"].append(extra)
     (findings / f"{src.name}.json").write_text(json.dumps(raw))
-    base = EvalConfig(benchmark=bench, out=tmp_path / "a", rule_findings=findings, bootstrap=10)
-    without = run_eval(base)
     with_nr = run_eval(
+        EvalConfig(benchmark=bench, out=tmp_path / "a", rule_findings=findings, bootstrap=10)
+    )
+    without = run_eval(
         EvalConfig(
             benchmark=bench,
             out=tmp_path / "b",
             rule_findings=findings,
             bootstrap=10,
-            include_needs_review=True,
+            include_needs_review=False,
         )
     )
     assert without["metrics"]["rule_only"]["synthetic"]["2.5.8"]["fp"] == 0
