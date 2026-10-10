@@ -137,6 +137,9 @@ def eval(
     ] = None,
     include_needs_review: Annotated[bool, typer.Option()] = False,
     synthetic_truth: Annotated[str, typer.Option(help="from-folders")] = "from-folders",
+    calibration: Annotated[
+        bool, typer.Option("--calibration/--no-calibration", help="Also write calibration.*")
+    ] = False,
     progress_file: Annotated[
         Path | None, typer.Option(help="Write {done,total} JSON lines here")
     ] = None,
@@ -158,6 +161,7 @@ def eval(
         bootstrap=bootstrap,
         rule_findings=rule_findings,
         include_needs_review=include_needs_review,
+        calibration=calibration,
     )
     try:
         metrics = run_eval(cfg, _progress_writer(progress_file))
