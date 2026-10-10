@@ -49,11 +49,11 @@ def test_protocol_path_can_be_overridden_for_sweeps(tmp_path, monkeypatch):  # t
     alt = tmp_path / "alt.yaml"
     alt.write_text(
         protocol.PROTOCOL_PATH.read_text().replace(
-            "ua_default_ring_exempt: true", "ua_default_ring_exempt: false"
+            "ua_default_ring_exempt: false", "ua_default_ring_exempt: true"
         )
     )
     monkeypatch.setenv("AUDITOR_PROTOCOL", str(alt))
-    assert protocol.load().heuristics.ua_default_ring_exempt is False
+    assert protocol.load().heuristics.ua_default_ring_exempt is True
     assert protocol.sha256() != protocol.sha256(protocol.PROTOCOL_PATH)
     monkeypatch.delenv("AUDITOR_PROTOCOL")
-    assert protocol.load().heuristics.ua_default_ring_exempt is True
+    assert protocol.load().heuristics.ua_default_ring_exempt is False

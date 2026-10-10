@@ -42,7 +42,7 @@ class EvalRequest(BaseModel):
     def _unique(cls, value: list[EvalCondition]) -> list[EvalCondition]:
         return list(dict.fromkeys(value))
 
-    include_needs_review: bool = False
+    include_needs_review: bool = True
     bootstrap: int = Field(default=10000, ge=100, le=100000)
 
 
@@ -381,8 +381,7 @@ def build_eval_router(settings: Settings) -> APIRouter:
         )  # fmt: skip
         if settings.truth_path is not None:
             argv += ["--truth", str(settings.truth_path)]
-        if body.include_needs_review:
-            argv.append("--include-needs-review")
+        argv.append("--include-needs-review" if body.include_needs_review else "--automated-only")
         request.app.state.jobs.submit(Job(f"eval-{eval_id}", argv, settings.eval_timeout_s))
         return EvalCreated(eval_id=eval_id)
 

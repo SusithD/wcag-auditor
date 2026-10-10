@@ -135,7 +135,13 @@ def eval(
     rule_findings: Annotated[
         Path | None, typer.Option(help="Precomputed baseline_runs/<id> directory")
     ] = None,
-    include_needs_review: Annotated[bool, typer.Option()] = False,
+    include_needs_review: Annotated[
+        bool,
+        typer.Option(
+            "--include-needs-review/--automated-only",
+            help="Headline counts both tiers (ADR-028); --automated-only is the stricter table",
+        ),
+    ] = True,
     synthetic_truth: Annotated[str, typer.Option(help="from-folders")] = "from-folders",
     calibration: Annotated[
         bool, typer.Option("--calibration/--no-calibration", help="Also write calibration.*")

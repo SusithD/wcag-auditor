@@ -36,7 +36,7 @@ export function useStartEval() {
   return useMutation({
     mutationFn: async (conditions: ("rule_only" | "pixel" | "hybrid")[]) => {
       const { data, error } = await api.POST("/eval", {
-        body: { conditions, include_needs_review: false, bootstrap: 10000 },
+        body: { conditions, include_needs_review: true, bootstrap: 10000 },
       });
       if (error || !data) {
         const detail = (error as { detail?: unknown } | undefined)?.detail;

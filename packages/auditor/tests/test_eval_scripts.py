@@ -101,3 +101,21 @@ def test_failure_taxonomy_counts_and_feature_rows(tmp_path: Path) -> None:
     assert "| 2.4.7 | 0 | 0 | 0 | 1 |" in text
     assert "| non-responsive | False | 1 | 1 |" in text and "| sector | com | 1 | 1 |" in text
     assert "### hybrid: real-stratum failures by page feature" in text
+
+
+def test_reeval_compare_shows_both_values_and_the_change() -> None:
+    import reeval_compare  # type: ignore[import-not-found]
+
+    def m(p: float | None, r: float) -> dict[str, object]:
+        cell = {"precision": p, "recall": r, "f1": 0.5}
+        return {
+            "metrics": {"hybrid": {s: {"2.4.13": cell} for s in ("real", "synthetic", "combined")}}
+        }
+
+    text = reeval_compare.compare(m(0.7, 0.4), m(0.72, 0.88), "old", "new")
+    assert "## hybrid, real" in text
+    assert (
+        "| 2.4.13 | 0.700 / 0.400 / 0.500 | 0.720 (+0.020) / 0.880 (+0.480) / 0.500 (+0.000) |"
+        in text
+    )
+    assert "n/a" in reeval_compare.compare(m(None, 0.4), m(0.5, 0.4), "o", "n")
