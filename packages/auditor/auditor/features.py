@@ -30,16 +30,20 @@ def is_non_responsive(capture: Capture) -> bool:
     )
 
 
-def compute(capture: Capture, elements: list[Element]) -> PageFeatures:
+def compute(capture: Capture, elements: list[Element] | None) -> PageFeatures:
     threshold = protocol.load().heuristics.edge_gradient_threshold
     with Image.open(capture.path / "screenshot.png") as shot:
         width, height = shot.size
         edges = edge_density(shot, threshold)
-    measurable = [e for e in elements if e.kind not in _LAYOUT_KINDS]
+    measurable = [e for e in elements or [] if e.kind not in _LAYOUT_KINDS]
     return PageFeatures(
         edge_density=round(edges, 4),
-        element_density=round(len(measurable) / (width * height / _PIXELS_PER_MEGAPIXEL), 2),
+        element_density=(
+            None
+            if elements is None
+            else round(len(measurable) / (width * height / _PIXELS_PER_MEGAPIXEL), 2)
+        ),
         focus_stop_count=len(capture.focus_steps),
-        has_sticky=any(e.kind in _LAYOUT_KINDS for e in elements),
+        has_sticky=None if elements is None else any(e.kind in _LAYOUT_KINDS for e in elements),
         is_non_responsive=is_non_responsive(capture),
     )

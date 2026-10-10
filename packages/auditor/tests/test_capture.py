@@ -9,13 +9,15 @@ import sys
 import threading
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 import pytest
 from auditor.capture import snapshot_html, step_focus
 from auditor.capture.driver import GENERATOR_VERSION
 
 REPO = Path(__file__).resolve().parents[3]
-SITES = REPO / "fixtures" / "sites"
+FIXTURES = REPO / "fixtures"
+SITES = FIXTURES / "sites"
 VALIDATOR = REPO.parent / "04_Data_Collection" / "validate_captures.py"
 
 
@@ -184,6 +186,185 @@ def test_meta_keys_superset_of_benchmark(captured: list[Path]) -> None:
     union = _benchmark_meta_keys(bench)
     for folder in captured:
         assert union <= set(json.loads((folder / "meta.json").read_text()))
+
+
+def _iou(a: dict[str, float], b: dict[str, float]) -> float:
+    x0, y0 = max(a["x"], b["x"]), max(a["y"], b["y"])
+    x1 = min(a["x"] + a["w"], b["x"] + b["w"])
+    y1 = min(a["y"] + a["h"], b["y"] + b["h"])
+    inter = max(0.0, x1 - x0) * max(0.0, y1 - y0)
+    union = a["w"] * a["h"] + b["w"] * b["h"] - inter
+    return inter / union if union else 0.0
+
+
+def _focus_matches(capture: Any, elements: list[Any]) -> int:
+    hits = 0
+    for step in capture.focus_steps:
+        rect = {
+            "x": step.rect.x + step.scroll["x"],
+            "y": step.rect.y + step.scroll["y"],
+            "w": step.rect.w,
+            "h": step.rect.h,
+        }
+        hits += any(
+            e.dom_ref == step.selector and _iou(rect, e.bbox_css.model_dump()) >= 0.9
+            for e in elements
+            if e.kind not in {"text", "fixed_region"}
+        )
+    return hits
+
+
+@pytest.mark.browser
+def test_capture_time_geometry_matches_focus_rects_and_survives_offline_replay(
+    captured: list[Path], tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import shutil
+
+    from auditor.elements.dom import DomElementSource
+    from auditor.schema import Capture
+
+    white = "rgb(255, 255, 255)"
+    for folder in captured:
+        stored = json.loads((folder / "elements.json").read_text())
+        assert stored["geometry_source"] == "capture" and stored["captured_at"]
+        assert stored["viewport"]["width"] and stored["doc_size"]["height"] > 1200
+        capture = Capture.from_folder(folder)
+        source = DomElementSource()
+        assert source.geometry_source(capture) == "capture"
+        elements = source.elements(capture)
+        title = next(e for e in elements if e.text == "Static fixture")
+        assert title.style["color"] == white, "static.css was not applied"
+        assert len(capture.focus_steps) == 5
+        assert _focus_matches(capture, elements) == 5
+
+        moved = tmp_path / "replay" / folder.name
+        shutil.copytree(folder, moved)
+        before = (moved / "elements.json").read_bytes()
+
+        def no_browser(*_a: Any, **_k: Any) -> Any:
+            raise AssertionError("replay must not launch a browser")
+
+        monkeypatch.setattr(DomElementSource, "_rerender", no_browser)
+        replay = DomElementSource().elements(Capture.from_folder(moved))
+        monkeypatch.undo()
+        assert [e.model_dump() for e in replay] == [e.model_dump() for e in elements]
+        assert (moved / "elements.json").read_bytes() == before
+
+        rerendered = DomElementSource(force_rerender=True).elements(capture)
+        assert _focus_matches(capture, rerendered) <= 1
+        assert next(e for e in rerendered if e.text == "Static fixture").style["color"] != white
+
+
+@pytest.mark.browser
+def test_page_without_focusable_elements_still_gets_geometry(
+    static_server: str, tmp_path: Path
+) -> None:
+    from auditor.cli import app
+    from auditor.elements.dom import DomElementSource
+    from auditor.schema import Capture
+    from typer.testing import CliRunner
+
+    url = static_server.replace("static.html", "inert.html")
+    result = CliRunner().invoke(
+        app, ["capture", url, "--out", str(tmp_path), "--viewports", "desktop"]
+    )
+    assert result.exit_code == 0, result.output
+    (folder,) = [d for d in tmp_path.iterdir() if d.is_dir()]
+    capture = Capture.from_folder(folder)
+    assert capture.focus_steps == []
+    assert DomElementSource().geometry_source(capture) == "capture"
+    assert any(e.kind == "text" for e in DomElementSource().elements(capture))
+
+
+class _StubBrowser:
+    versions = {"browser": "chromium 153.0.0.0", "playwright": "1.63.0"}
+
+    def __init__(self, geometry: list[dict[str, Any]] | None) -> None:
+        self.geometry = geometry
+
+    def capture(self, url: str, folder: Path, vp: str, max_steps: int) -> dict[str, Any]:
+        from PIL import Image
+
+        Image.new("RGB", (4, 4), "white").save(folder / "screenshot.png")
+        (folder / "dom.html").write_text("<html></html>")
+        (folder / "proxy_findings.json").write_text("{}")
+        return {
+            "http_status": 200,
+            "final_url": url,
+            "title": "t",
+            "screenshot_mode": "full_page",
+            "focus_steps": [],
+            "focus_run": {"presses": 0, "stop_reason": "left-page"},
+            "layout": {},
+            "test_elements_rendered": [],
+            "geometry": self.geometry,
+            "geometry_error": None if self.geometry is not None else "Error: boom",
+            "doc_size": {"width": 4, "height": 4},
+        }
+
+
+def test_failed_extraction_keeps_capture_without_elements_json(tmp_path: Path) -> None:
+    from auditor.capture import capture_url
+    from auditor.elements.dom import DomElementSource, GeometryUnavailable
+    from auditor.schema import Capture, ViewportSpec
+
+    (folder,) = capture_url(_StubBrowser(None), "http://x.test/", tmp_path, ["desktop"])  # type: ignore[arg-type]
+    assert not (folder / "elements.json").exists()
+    meta = json.loads((folder / "meta.json").read_text())
+    assert meta["geometry_error"] == "Error: boom"
+    capture = Capture.model_construct(
+        path=folder,
+        meta=meta,
+        viewport="desktop",
+        viewport_spec=ViewportSpec.model_validate(meta["viewport_spec"]),
+    )
+    assert DomElementSource().geometry_source(capture) == "unavailable"
+    with pytest.raises(GeometryUnavailable):
+        DomElementSource().elements(capture)
+
+
+def _synth_with_elements(tmp_path: Path, payload: str | None, origin: str) -> Any:
+    import shutil
+
+    from auditor.schema import Capture
+
+    src = next(FIXTURES.glob("synth/sc2-5-8/*"))
+    folder = tmp_path / "f"
+    shutil.copytree(src, folder)
+    meta = json.loads((folder / "meta.json").read_text())
+    meta["origin"] = origin
+    (folder / "meta.json").write_text(json.dumps(meta))
+    if payload is not None:
+        (folder / "elements.json").write_text(payload)
+    return Capture.from_folder(folder)
+
+
+def test_elements_json_takes_precedence_whatever_the_origin(tmp_path: Path) -> None:
+    from auditor.elements.dom import DomElementSource
+
+    good = json.dumps({"geometry_source": "capture", "elements": []})
+    capture = _synth_with_elements(tmp_path, good, origin="real")
+    assert DomElementSource().geometry_source(capture) == "capture"
+    assert DomElementSource().elements(capture) == []
+
+
+@pytest.mark.parametrize(
+    "payload",
+    ["{not json", json.dumps({"geometry_source": "capture"}), json.dumps({"elements": []})],
+)
+def test_corrupt_elements_json_is_geometry_unavailable(tmp_path: Path, payload: str) -> None:
+    from auditor.elements.dom import DomElementSource, GeometryUnavailable
+
+    capture = _synth_with_elements(tmp_path, payload, origin="synth")
+    with pytest.raises(GeometryUnavailable):
+        DomElementSource().elements(capture)
+
+
+def test_unknown_origin_without_geometry_is_unavailable(tmp_path: Path) -> None:
+    from auditor.elements.dom import DomElementSource
+
+    capture = _synth_with_elements(tmp_path, None, origin="mystery")
+    assert DomElementSource().geometry_source(capture) == "unavailable"
 
 
 def test_playwright_pin() -> None:

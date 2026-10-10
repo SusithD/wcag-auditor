@@ -14,6 +14,7 @@ from urllib.parse import urlparse
 from auditor import __version__ as auditor_version
 from auditor import versions
 from auditor.capture.focus import FOCUS_INFO_JS, FOCUS_START_JS, step_focus
+from auditor.elements.extract_js import EXTRACT_JS, write_elements
 
 GENERATOR_VERSION = f"auditor-{auditor_version}"
 PROTOCOL_VERSION = "1.0"
@@ -117,6 +118,16 @@ class PlaywrightBrowser:
         ctx = self._context(viewport)
         try:
             page, status = self._open(ctx, url)
+            geometry: list[dict[str, Any]] | None
+            geometry_error: str | None = None
+            try:
+                geometry = page.evaluate(EXTRACT_JS)
+            except Exception as exc:
+                geometry, geometry_error = None, f"{type(exc).__name__}: {exc}"
+            doc_size = page.evaluate(
+                "() => ({ width: document.documentElement.scrollWidth,"
+                " height: document.documentElement.scrollHeight })"
+            )
             shot: dict[str, Any] = {"animations": "disabled", "caret": "hide"}
             mode = "full_page"
             try:
@@ -169,6 +180,9 @@ class PlaywrightBrowser:
                 "focus_run": focus_run,
                 "layout": layout,
                 "test_elements_rendered": test_elements,
+                "geometry": geometry,
+                "geometry_error": geometry_error,
+                "doc_size": doc_size,
             }
         finally:
             ctx.close()
@@ -211,6 +225,7 @@ def capture_url(
             continue
         meta: dict[str, Any] = {
             **dict.fromkeys(BENCHMARK_ONLY_KEYS),
+            "geometry_error": res["geometry_error"],
             "origin": "real",
             "sector": _slug(url),
             "page_id": page_id,
@@ -233,6 +248,14 @@ def capture_url(
             "protocol_version": PROTOCOL_VERSION,
             "tools": browser.versions,
         }
+        if res["geometry"] is not None:
+            write_elements(
+                tmp,
+                res["geometry"],
+                ts,
+                {**VIEWPORTS[vp], "device_scale_factor": 1},
+                res["doc_size"],
+            )
         (tmp / "meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
         (tmp / "VERSIONS.json").write_text(
             json.dumps(versions.collect(meta), indent=2), encoding="utf-8"

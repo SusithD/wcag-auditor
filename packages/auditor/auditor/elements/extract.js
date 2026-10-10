@@ -60,6 +60,7 @@
 
   const out = [];
   const seen = new Set();
+  try {
   const INTERACTIVE = 'a[href], button, input, select, textarea, summary, [tabindex], ' +
     '[onclick], [role=button], [role=link], [role=checkbox], [role=radio], [role=tab], ' +
     '[role=menuitem], [role=switch], [role=slider], [role=combobox], [role=textbox]';
@@ -152,6 +153,8 @@
     });
   }
 
-  probe.remove();
+  } finally {
+    probe.remove();
+  }
   return out;
 }

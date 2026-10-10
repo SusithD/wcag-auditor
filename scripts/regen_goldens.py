@@ -14,11 +14,9 @@ GOLDEN = FIXTURES / "golden" / "elements"
 
 def dump(folder: Path) -> dict[str, object]:
     capture = Capture.from_folder(folder)
-    elements = DomElementSource().elements(capture)
-    return {
-        "features": compute(capture, elements).model_dump(),
-        "elements": [e.model_dump(mode="json") for e in elements],
-    }
+    source = DomElementSource()
+    dumped, elements = source.dump(capture)
+    return {"features": compute(capture, elements).model_dump(), **dumped}
 
 
 def main() -> None:

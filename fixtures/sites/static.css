@@ -1,0 +1,6 @@
+body { font: 16px/1.5 system-ui, sans-serif; margin: 0; color: #1a1a1a; }
+header, main, footer { padding: 16px 24px; }
+header { background: #0b3d91; color: #fff; }
+a, button { font-size: 16px; padding: 8px 12px; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid #ffbf47; outline-offset: 2px; }
+.low { color: #aaa; }
