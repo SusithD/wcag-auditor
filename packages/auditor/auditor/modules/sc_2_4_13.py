@@ -77,7 +77,8 @@ def _sides(
 
 
 def _is_ua_default_ring(diff: StopDiff, rgb: list[int], tolerance: int, min_share: float) -> bool:
-    """The browser's own focus ring (colour pinned to the capture tool's Chromium) is exempt."""
+    """The browser's own focus ring (colour pinned to the capture tool's Chromium); exempt only
+    when `ua_default_ring_exempt` is set (off by default, ADR-028)."""
     if not diff.added.any():
         return False
     pixels = diff.on_pixels[diff.added].astype(np.int16)
@@ -90,9 +91,9 @@ def run(ctx: ModuleContext) -> list[Finding]:
     rounded corners never decide R5.
 
     R1 first (no visible indicator: 2.4.13 is not applicable), then the unstyled default ring
-    (exempt), then R5 (a complete solid ring of at least the minimum thickness at the minimum
-    contrast on every visible side meets), then O4 (changed pixels at the minimum contrast must
-    reach area_factor x (w + h))."""
+    (exempt only when `ua_default_ring_exempt` is set), then R5 (a complete solid ring of at
+    least the minimum thickness at the minimum contrast on every visible side meets), then O4
+    (changed pixels at the minimum contrast must reach area_factor x (w + h))."""
     th = ctx.protocol.thresholds
     h = ctx.protocol.heuristics
     findings: list[Finding] = []

@@ -12,6 +12,8 @@ dev = [
   "pytest-cov",
   "httpx",
   "types-PyYAML",
+  "pypdf>=6.20.0",
+  "matplotlib>=3.11.2",
 ]
 
 [tool.uv.workspace]
@@ -28,6 +30,9 @@ extend-exclude = ["apps", "fixtures", "services/app/alembic"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+"packages/auditor/auditor/report/render.py" = ["E501"]
 
 [tool.mypy]
 python_version = "3.12"

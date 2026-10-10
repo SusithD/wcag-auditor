@@ -73,15 +73,15 @@ def test_o4_fixture_violation_is_reported_with_its_evidence() -> None:
     assert f.evidence["rule"] == "R5 then O4"
 
 
-def test_unstyled_default_ring_is_exempt_and_evaluated_when_the_switch_is_off() -> None:
+def test_unstyled_default_ring_is_evaluated_by_default_and_exempt_when_the_switch_is_on() -> None:
     folder = next(FIXTURES.glob("synth/sc2-4-7/*_047_*"))
     capture = Capture.from_folder(folder)
     proto = load()
-    off = proto.model_copy(
-        update={"heuristics": proto.heuristics.model_copy(update={"ua_default_ring_exempt": False})}
+    on = proto.model_copy(
+        update={"heuristics": proto.heuristics.model_copy(update={"ua_default_ring_exempt": True})}
     )
-    exempt = ModuleContext.load(capture, [], has_geometry=False)
-    strict = ModuleContext.load(capture, [], protocol=off, has_geometry=False)
-    assert MODULES["2.4.13"](exempt) == []
+    strict = ModuleContext.load(capture, [], has_geometry=False)
+    exempt = ModuleContext.load(capture, [], protocol=on, has_geometry=False)
     assert len(MODULES["2.4.13"](strict)) == 1
+    assert MODULES["2.4.13"](exempt) == []
     assert MODULES["2.4.7"](exempt) == []

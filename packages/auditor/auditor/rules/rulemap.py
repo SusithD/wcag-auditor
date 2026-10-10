@@ -18,7 +18,7 @@ def to_findings(raw_findings: list[dict[str, Any]]) -> tuple[list[Finding], int]
     skipped = 0
     for raw in raw_findings:
         box = raw.get("bbox")
-        if not box:
+        if not box or box["w"] <= 0 or box["h"] <= 0:
             skipped += 1
             continue
         out.append(

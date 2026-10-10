@@ -2,14 +2,17 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 from auditor import protocol, versions
+from auditor.eval import calibration, tables
 from auditor.eval import failures as failures_mod
-from auditor.eval import tables
 from auditor.eval.bootstrap import STRATA, bootstrap
+from auditor.eval.calibration import Point as CalPoint
+from auditor.eval.calibration import points_for_item
 from auditor.eval.mcnemar import run_mcnemar
 from auditor.eval.metrics import MatchConfig, UnitResult, aggregate, score_item
 from auditor.eval.units import (
@@ -19,11 +22,15 @@ from auditor.eval.units import (
     real_truth,
     synthetic_truth,
 )
-from auditor.rules.rulemap import COVERED_SCS
-from auditor.schema import BBox, Capture
+from auditor.fusion import apply_policy, fuse
+from auditor.rules.rulemap import COVERED_SCS, to_findings
+from auditor.schema import BBox, Capture, Finding
 
 SKIP_PARTS = {"golden", "sites", "vectors", "baseline_golden"}
 SWEEP_IOU = [i / 10 for i in range(1, 8)]
+
+
+DEFAULT_SEED = 20261004
 
 
 @dataclass
@@ -32,11 +39,12 @@ class EvalConfig:
     out: Path
     truth: Path | None = None
     conditions: list[str] = field(default_factory=lambda: ["rule_only"])
-    seed: int = 20261004
+    seed: int = DEFAULT_SEED
     bootstrap: int = 10000
     rule_findings: Path | None = None
-    include_needs_review: bool = False
+    include_needs_review: bool = True
     elements: str = "auto"
+    calibration: bool = False
 
 
 def discover(benchmark: Path) -> list[Path]:
@@ -83,6 +91,15 @@ class RulePredictor:
         digest = str(capture.meta.get("screenshot_sha256"))[:12]
         return self.cache / f"{capture.path.name}.{digest}.json"
 
+    def findings(self, capture: Capture) -> list[Finding]:
+        """Schema findings for fusion: boxed, non-empty rule nodes (all tiers)."""
+        raw = [
+            f
+            for f in self.raw(capture)["findings"]
+            if f["bbox"] and f["bbox"]["w"] > 0 and f["bbox"]["h"] > 0
+        ]
+        return to_findings(raw)[0]
+
     def predict(self, capture: Capture) -> Prediction:
         pred = Prediction()
         for f in self.raw(capture)["findings"]:
@@ -103,6 +120,16 @@ class RulePredictor:
             self._runner.close()
 
 
+def to_prediction(findings: list[Finding]) -> Prediction:
+    pred = Prediction()
+    for f in findings:
+        if f.focus_index is not None:
+            pred.stops.setdefault(f.sc, set()).add(f.focus_index)
+        elif f.bbox is not None:
+            pred.page_boxes.setdefault(f.sc, []).append(f.bbox)
+    return pred
+
+
 class PixelPredictor:
     """Pixel-channel modules over the element source each capture allows (ADR-012): stored or
     re-rendered DOM geometry when it exists, OCR text lines otherwise.
@@ -119,7 +146,7 @@ class PixelPredictor:
         self.source_counts = {"dom": 0, "pixel": 0}
         self.needs_review_excluded = 0
 
-    def predict(self, capture: Capture) -> Prediction:
+    def findings(self, capture: Capture) -> list[Finding]:
         from auditor.elements.dom import GeometryUnavailable
         from auditor.modules import MODULES, ModuleContext
 
@@ -131,19 +158,15 @@ class PixelPredictor:
             elements = source.elements(capture)
         self.source_counts[name] += 1
         ctx = ModuleContext.load(capture, elements, has_geometry=name == "dom")
-        pred = Prediction()
-        for sc, run in MODULES.items():
-            for finding in run(ctx):
-                if finding.tier == "not-assessable":
-                    continue
-                if finding.tier == "needs-review" and not self.cfg.include_needs_review:
-                    self.needs_review_excluded += 1
-                    continue
-                if finding.focus_index is not None:
-                    pred.stops.setdefault(sc, set()).add(finding.focus_index)
-                elif finding.bbox is not None:
-                    pred.page_boxes.setdefault(sc, []).append(finding.bbox)
-        return pred
+        return [f for run in MODULES.values() for f in run(ctx) if f.tier != "not-assessable"]
+
+    def predict(self, capture: Capture, found: list[Finding] | None = None) -> Prediction:
+        found = self.findings(capture) if found is None else found
+        kept = apply_policy(found, self.cfg.include_needs_review)
+        self.needs_review_excluded += sum(1 for f in found if f.tier == "needs-review") - sum(
+            1 for f in kept if f.tier == "needs-review"
+        )
+        return to_prediction(kept)
 
     def close(self) -> None:
         self.sources.close()
@@ -188,7 +211,15 @@ def _page_features(capture: Capture) -> dict[str, Any]:
     }
 
 
-SUPPORTED_CONDITIONS = {"rule_only", "pixel"}
+def mcnemar_pair(conditions: list[str]) -> tuple[str, str] | None:
+    """The H1 comparison is hybrid against rule_only whatever the listed order; with other
+    condition sets the first two are compared."""
+    if "hybrid" in conditions and "rule_only" in conditions:
+        return ("hybrid", "rule_only")
+    return (conditions[0], conditions[1]) if len(conditions) >= 2 else None
+
+
+SUPPORTED_CONDITIONS = {"rule_only", "pixel", "hybrid"}
 ALL_SCS = ["1.4.3", "1.4.11", "2.4.7", "2.4.11", "2.4.12", "2.4.13", "2.5.7", "2.5.8"]
 
 
@@ -203,7 +234,7 @@ def _folder_sha(capture: Capture) -> str:
     return hashlib.sha256(b"\x00".join(parts)).hexdigest()
 
 
-def run_eval(cfg: EvalConfig) -> dict[str, Any]:
+def run_eval(cfg: EvalConfig, progress: Callable[[int, int], None] | None = None) -> dict[str, Any]:
     unsupported = [c for c in cfg.conditions if c not in SUPPORTED_CONDITIONS]
     if unsupported:
         raise NotImplementedError(f"condition(s) {unsupported} are not available yet")
@@ -222,11 +253,16 @@ def run_eval(cfg: EvalConfig) -> dict[str, Any]:
     failed: list[dict[str, str]] = []
     tools: dict[str, Any] = {}
     unlabelled = 0
+    cal_points: list[CalPoint] = []
     base = MatchConfig(match.iou, match.containment, True)
     pixel: PixelPredictor | None = None
+    needs_pixel = bool({"pixel", "hybrid"} & set(cfg.conditions))
     try:
-        pixel = PixelPredictor(cfg) if "pixel" in cfg.conditions else None
-        for folder in discover(cfg.benchmark):
+        pixel = PixelPredictor(cfg) if needs_pixel else None
+        folders = list(discover(cfg.benchmark))
+        for position, folder in enumerate(folders, start=1):
+            if progress is not None:
+                progress(position - 1, len(folders))
             capture = Capture.from_folder(folder)
             truth, raw_truth = _truth_for(capture, gt, excluded)
             if truth is None:
@@ -234,9 +270,21 @@ def run_eval(cfg: EvalConfig) -> dict[str, Any]:
                 continue
             preds: dict[str, Prediction] = {}
             try:
+                pixel_found = pixel.findings(capture) if pixel is not None else []
                 for cond in cfg.conditions:
                     if cond == "pixel" and pixel is not None:
-                        preds[cond] = pixel.predict(capture)
+                        preds[cond] = pixel.predict(capture, pixel_found)
+                        if cfg.calibration:
+                            cal_points += points_for_item(
+                                truth, pixel_found, cond, match.iou, match.containment
+                            )
+                    elif cond == "hybrid" and pixel is not None:
+                        fused = fuse(predictor.findings(capture) + pixel_found, proto)
+                        preds[cond] = to_prediction(apply_policy(fused, cfg.include_needs_review))
+                        if cfg.calibration:
+                            cal_points += points_for_item(
+                                truth, fused, cond, match.iou, match.containment
+                            )
                     else:
                         preds[cond] = predictor.predict(capture)
             except Exception as exc:
@@ -255,6 +303,8 @@ def run_eval(cfg: EvalConfig) -> dict[str, Any]:
         predictor.close()
         if pixel is not None:
             pixel.close()
+    if progress is not None:
+        progress(len(folders), len(folders))
     present = {r.sc for r in results}
     all_scs = [s for s in ALL_SCS if s in present]
     run_versions = versions.collect({"tools": tools})
@@ -292,10 +342,9 @@ def run_eval(cfg: EvalConfig) -> dict[str, Any]:
         },
     }
     metrics["bootstrap"] = bootstrap(results, cfg.conditions, all_scs, cfg.bootstrap, cfg.seed)
-    if len(cfg.conditions) >= 2:
-        metrics["mcnemar"] = run_mcnemar(
-            results, cfg.conditions[0], cfg.conditions[1], all_scs, STRATA
-        )
+    pair = mcnemar_pair(cfg.conditions)
+    if pair is not None:
+        metrics["mcnemar"] = run_mcnemar(results, pair[0], pair[1], all_scs, STRATA)
     else:
         metrics["mcnemar"] = {"note": "single condition: no paired comparison"}
     sensitivity = _sweep(sweep_inputs)
@@ -310,6 +359,8 @@ def run_eval(cfg: EvalConfig) -> dict[str, Any]:
         cfg.out / "failures.csv", results, features
     )
     (cfg.out / "sensitivity.csv").write_text(sensitivity)
+    if cfg.calibration:
+        calibration.write(cfg.out, cal_points)
     return metrics
 
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
 from typing import Annotated
 
@@ -7,6 +8,7 @@ import typer
 from rich.console import Console
 
 from auditor import pipeline
+from auditor.eval.harness import DEFAULT_SEED
 from auditor.schema import Condition
 
 app = typer.Typer(no_args_is_help=True, help="ML-assisted WCAG 2.2 auditor")
@@ -41,6 +43,35 @@ def run(
 
 
 @app.command()
+def audit(
+    out: Annotated[Path, typer.Option(help="Run directory")],
+    url: Annotated[str | None, typer.Option()] = None,
+    folder: Annotated[list[Path] | None, typer.Option(help="Capture folder (repeatable)")] = None,
+    viewports: Annotated[str, typer.Option()] = "desktop,mobile",
+    condition: Annotated[Condition, typer.Option()] = "hybrid",
+    max_focus_steps: Annotated[int, typer.Option()] = 15,
+    pdf: Annotated[bool, typer.Option("--pdf/--no-pdf")] = True,
+) -> None:
+    """Capture a URL or replay folders, run each viewport; writes events.jsonl, summary.json."""
+    from auditor.audit import audit as run_audit
+
+    if (url is None) == (not folder):
+        console.print("error: pass either --url or one or more --folder")
+        raise typer.Exit(code=1)
+    names = [v.strip() for v in viewports.split(",") if v.strip()]
+    code = run_audit(
+        out,
+        url=url,
+        folders=folder or [],
+        viewports=names,
+        condition=condition,
+        max_focus_steps=max_focus_steps,
+        pdf=pdf,
+    )
+    raise typer.Exit(code=code)
+
+
+@app.command()
 def capture(
     url: str,
     out: Annotated[Path, typer.Option()] = Path("data/captures"),
@@ -70,6 +101,37 @@ def capture(
         raise typer.Exit(code=1)
 
 
+@app.command()
+def stability(
+    benchmark: Annotated[Path, typer.Option(help="Folder tree of benchmark capture folders")],
+    out: Annotated[Path, typer.Option()],
+    sample: Annotated[int, typer.Option()] = 10,
+    seed: Annotated[int, typer.Option()] = DEFAULT_SEED,
+) -> None:
+    """Re-capture a sample of real pages live and compare findings with the benchmark capture."""
+    from auditor.eval.stability import run_stability
+
+    summary = run_stability(benchmark, out, sample, seed)
+    console.print(
+        f"compared {summary['pages_compared']} pages, overall Dice {summary['overall_dice']}, "
+        f"{len(summary['pages_failed'])} failed -> {out / 'stability.md'}"
+    )
+
+
+def _progress_writer(path: Path | None) -> Callable[[int, int], None] | None:
+    if path is None:
+        return None
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    def write(done: int, total: int) -> None:
+        import json
+
+        with path.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps({"done": done, "total": total}) + "\n")
+
+    return write
+
+
 def _fmt(v: float | None) -> str:
     return "n/a" if v is None else f"{v:.3f}"
 
@@ -80,14 +142,26 @@ def eval(
     truth: Annotated[Path | None, typer.Option(help="benchmark_ground_truth.json")] = None,
     out: Annotated[Path, typer.Option()] = Path("eval"),
     conditions: Annotated[str, typer.Option()] = "rule_only",
-    seed: Annotated[int, typer.Option()] = 20261004,
+    seed: Annotated[int, typer.Option()] = DEFAULT_SEED,
     bootstrap: Annotated[int, typer.Option()] = 10000,
     rule_findings: Annotated[
         Path | None, typer.Option(help="Precomputed baseline_runs/<id> directory")
     ] = None,
-    include_needs_review: Annotated[bool, typer.Option()] = False,
+    include_needs_review: Annotated[
+        bool,
+        typer.Option(
+            "--include-needs-review/--automated-only",
+            help="Headline counts both tiers (ADR-028); --automated-only is the stricter table",
+        ),
+    ] = True,
     elements: Annotated[str, typer.Option(help="auto | dom | detector")] = "auto",
     synthetic_truth: Annotated[str, typer.Option(help="from-folders")] = "from-folders",
+    calibration: Annotated[
+        bool, typer.Option("--calibration/--no-calibration", help="Also write calibration.*")
+    ] = False,
+    progress_file: Annotated[
+        Path | None, typer.Option(help="Write {done,total} JSON lines here")
+    ] = None,
 ) -> None:
     """Score captures against ground truth (real: --truth file or per-folder truth.json;
     synthetic: each folder's truth.json)."""
@@ -107,9 +181,10 @@ def eval(
         rule_findings=rule_findings,
         include_needs_review=include_needs_review,
         elements=elements,
+        calibration=calibration,
     )
     try:
-        metrics = run_eval(cfg)
+        metrics = run_eval(cfg, _progress_writer(progress_file))
     except (NotImplementedError, FileNotFoundError, ValueError) as exc:
         console.print(f"error: {exc}")
         raise typer.Exit(code=2) from exc

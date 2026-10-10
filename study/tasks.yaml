@@ -1,0 +1,103 @@
+# Task pages are placeholders taken from the synthetic corpus (one page per criterion).
+# ADR-028 / PLAN section 11: replace `folder` with the four-to-eight pages chosen with the
+# supervisor (captures made with `auditor capture`) before any real session.
+sets:
+  S1: [T1, T2, T3, T4]
+  S2: [T5, T6, T7, T8]
+tasks:
+  - id: T1
+    set: S1
+    sc: "1.4.3"
+    title: Low-contrast text block
+    folder: fixtures/synth/sc1-4-3/synth_sc1-4-3_001_desktop_20261004T060449Z
+    brief: The report lists one accessibility issue on this page. Propose a fix.
+    rubric:
+      issue: Body text is just below the minimum text contrast against its background.
+      expected_fix: Darken the text colour (or lighten the background) until the contrast ratio reaches the 4.5:1 minimum for normal text.
+      success_criteria: The proposed colours give at least 4.5:1, or the fix names a specific passing colour pair; vague advice ("make it darker") scores partial.
+      partial_credit: Correct direction without a value that reaches the threshold.
+      reported_by: [rule_only, hybrid]
+  - id: T2
+    set: S1
+    sc: "2.4.7"
+    title: Button with no visible focus indicator
+    folder: fixtures/synth/sc2-4-7/synth_sc2-4-7_049_desktop_20261004T060914Z
+    brief: The report lists one accessibility issue on this page. Propose a fix.
+    rubric:
+      issue: The button's focus outline was suppressed (outline none) so keyboard focus is not visible.
+      expected_fix: Remove outline none, or add a visible :focus-visible style (outline or ring) with enough contrast.
+      success_criteria: The fix restores a visible focus indicator on the button using CSS that applies on keyboard focus.
+      partial_credit: Mentions focus styling but removes it for another state or gives no selector.
+      reported_by: [hybrid]
+  - id: T3
+    set: S1
+    sc: "2.4.11"
+    title: Focused field hidden under a sticky header
+    folder: fixtures/synth/sc2-4-11/synth_sc2-4-11_061_desktop_20261004T061021Z
+    brief: The report lists one accessibility issue on this page. Propose a fix.
+    rubric:
+      issue: A fixed header covers the input completely when it receives keyboard focus.
+      expected_fix: Add scroll-padding-top (or scroll-margin) at least the header height, or make the header non-fixed.
+      success_criteria: The fix keeps a focused control out from under the fixed header (scroll padding or margin, or repositioning).
+      partial_credit: Identifies the header overlap without a workable change.
+      reported_by: [hybrid]
+  - id: T4
+    set: S1
+    sc: "2.5.7"
+    title: Slider that can only be dragged
+    folder: fixtures/synth/sc2-5-7/synth_sc2-5-7_113_desktop_20261004T061513Z
+    brief: The report lists one accessibility issue on this page. Propose a fix.
+    rubric:
+      issue: The value can only be changed by dragging the handle; there is no single-pointer or keyboard alternative.
+      expected_fix: Use a native range input, add increment and decrement buttons, or add a number field bound to the value.
+      success_criteria: The fix provides a way to set the value without dragging.
+      partial_credit: Adds keyboard arrow handling only, with no single-pointer alternative.
+      reported_by: [hybrid]
+  - id: T5
+    set: S2
+    sc: "2.5.8"
+    title: Adjacent small buttons
+    folder: fixtures/synth/sc2-5-8/synth_sc2-5-8_126_desktop_20261004T061625Z
+    brief: The report lists one accessibility issue on this page. Propose a fix.
+    rubric:
+      issue: The buttons are slightly smaller than the minimum target size and sit directly next to each other.
+      expected_fix: Make each target at least 24 by 24 CSS pixels (min-width and min-height) or space them so a 24 px circle on each does not meet another target.
+      success_criteria: The fix reaches 24 by 24 px or adds spacing that satisfies the circle rule.
+      partial_credit: Enlarges the buttons but still below 24 px.
+      reported_by: [rule_only, hybrid]
+  - id: T6
+    set: S2
+    sc: "1.4.11"
+    title: Faint input borders
+    folder: fixtures/synth/sc1-4-11/synth_sc1-4-11_026_desktop_20261004T060646Z
+    brief: The report lists one accessibility issue on this page. Propose a fix.
+    rubric:
+      issue: The input borders are too faint against the page background to identify the fields.
+      expected_fix: Darken the input border so it reaches at least 3:1 against the surrounding background.
+      success_criteria: The proposed border colour reaches 3:1, or a passing colour is named.
+      partial_credit: Darkens the border without reaching the threshold.
+      reported_by: [hybrid]
+  - id: T7
+    set: S2
+    sc: "2.4.13"
+    title: Thin focus indicator
+    folder: fixtures/synth/sc2-4-13/synth_sc2-4-13_092_desktop_20261004T061315Z
+    brief: The report lists one accessibility issue on this page. Propose a fix.
+    rubric:
+      issue: The focus indicator is present but too thin or weak to meet the focus appearance requirement.
+      expected_fix: Use a solid outline of at least 2 CSS pixels with at least 3:1 change of contrast on all sides (for example outline 2px solid with offset).
+      success_criteria: The fix gives a solid outline at least 2 px thick with sufficient contrast around the whole control.
+      partial_credit: Thickens or recolours the outline but not both, or only on some sides.
+      reported_by: [hybrid]
+  - id: T8
+    set: S2
+    sc: "2.4.12"
+    title: Focused field partly hidden
+    folder: fixtures/synth/sc2-4-12/synth_sc2-4-12_076_desktop_20261004T061145Z
+    brief: The report lists one accessibility issue on this page. Propose a fix.
+    rubric:
+      issue: A fixed header partly covers the input when it receives keyboard focus.
+      expected_fix: Add scroll-padding-top (or scroll-margin) at least the header height so no part of the focused control is covered.
+      success_criteria: The fix keeps the whole focused control clear of the fixed header.
+      partial_credit: Identifies the overlap without a workable change.
+      reported_by: [hybrid]

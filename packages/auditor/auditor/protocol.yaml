@@ -34,7 +34,7 @@ heuristics:
   slider_widget_depth: 3
   ua_focus_ring_rgb: [0, 95, 204]
   ua_ring_min_share: 0.5
-  ua_default_ring_exempt: true
+  ua_default_ring_exempt: false
   ocr_tile_height_px: 2000
   ocr_tile_overlap_px: 64
   ocr_large_ink_height_px: 32

@@ -1,0 +1,139 @@
+1.4.3/contrast:
+  sc_title: Contrast (Minimum)
+  level: AA
+  understanding: https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html
+  what_failed: >-
+    The text colour {fg} on {bg} has a contrast ratio of {ratio}:1; this text needs at least
+    {threshold}:1.
+  nearest_passing: >-
+    Changing the text colour to {nearest} on {bg} reaches {threshold}:1 with the smallest change.
+  fix_css: |-
+    .element {
+      color: {nearest};
+      background-color: {bg};
+    }
+  fix_html: |-
+    <p style="color: {nearest}; background-color: {bg}">Text with enough contrast</p>
+  techniques:
+    - {id: G18, title: Ensuring that a contrast ratio of at least 4.5:1 exists between text (and images of text) and background behind the text, url: https://www.w3.org/WAI/WCAG22/Techniques/general/G18}
+    - {id: G145, title: Ensuring that a contrast ratio of at least 3:1 exists between text (and images of text) and background behind the text, url: https://www.w3.org/WAI/WCAG22/Techniques/general/G145}
+1.4.11/non-text-contrast:
+  sc_title: Non-text Contrast
+  level: AA
+  understanding: https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html
+  what_failed: >-
+    The visible boundary of this control has a contrast ratio of {ratio}:1 against its
+    surroundings; where the boundary is what identifies a user-interface component it needs at
+    least {threshold}:1.
+  nearest_passing: >-
+    A border colour of {nearest} against {outside} reaches {threshold}:1.
+  fix_css: |-
+    input, select, textarea {
+      border: 1px solid {nearest};
+    }
+  fix_html: |-
+    <input type="text" style="border: 1px solid {nearest}">
+  techniques:
+    - {id: G207, title: Ensuring that a contrast ratio of 3:1 is provided for icons, url: https://www.w3.org/WAI/WCAG22/Techniques/general/G207}
+    - {id: G209, title: Provide sufficient contrast at the boundaries between adjoining colors, url: https://www.w3.org/WAI/WCAG22/Techniques/general/G209}
+2.4.7/focus-visible:
+  sc_title: Focus Visible
+  level: AA
+  understanding: https://www.w3.org/WAI/WCAG22/Understanding/focus-visible.html
+  what_failed: >-
+    Moving keyboard focus to this control changes the page by at most {state_contrast_max}:1
+    (the protocol needs a visible change of at least {threshold}:1), so the focus is not visible.
+  nearest_passing: Restore a visible outline or add a distinct focus style.
+  fix_css: |-
+    :focus-visible {
+      outline: 2px solid #1d4ed8;
+      outline-offset: 2px;
+    }
+  fix_html: ''
+  techniques:
+    - {id: C15, title: Using CSS to change the presentation of a user interface component when it receives focus, url: https://www.w3.org/WAI/WCAG22/Techniques/css/C15}
+    - {id: G149, title: Using user interface components that are highlighted by the user agent when they receive focus, url: https://www.w3.org/WAI/WCAG22/Techniques/general/G149}
+2.4.11/focus-not-obscured-min:
+  sc_title: Focus Not Obscured (Minimum)
+  level: AA
+  understanding: https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html
+  what_failed: >-
+    The focused control is entirely hidden behind author-created content such as a fixed header
+    or banner.
+  nearest_passing: Keep focused controls clear of sticky and fixed regions.
+  fix_css: |-
+    html {
+      scroll-padding-top: var(--sticky-header-height);
+    }
+  fix_html: ''
+  techniques:
+    - {id: C43, title: Using CSS scroll-padding to un-obscure content, url: https://www.w3.org/WAI/WCAG22/Techniques/css/C43}
+2.4.12/focus-not-obscured-enh:
+  sc_title: Focus Not Obscured (Enhanced)
+  level: AAA
+  understanding: https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-enhanced.html
+  what_failed: >-
+    Part of the focused control is hidden behind author-created content such as a fixed header
+    ({covered_fraction} of the sampled points are covered).
+  nearest_passing: Keep the whole focused control visible.
+  fix_css: |-
+    html {
+      scroll-padding-top: var(--sticky-header-height);
+    }
+  fix_html: ''
+  techniques:
+    - {id: C43, title: Using CSS scroll-padding to un-obscure content, url: https://www.w3.org/WAI/WCAG22/Techniques/css/C43}
+2.4.13/focus-appearance:
+  sc_title: Focus Appearance
+  level: AAA
+  understanding: https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html
+  what_failed: >-
+    The focus indicator covers {strong_area_css} CSS px of changed area at {ring_min_contrast}:1
+    or more; at least {required_area_css} is required, or a complete solid ring {ring_min_px} px
+    thick.
+  nearest_passing: A solid {ring_min_px} px outline at {ring_min_contrast}:1 or more around the control meets the criterion.
+  fix_css: |-
+    :focus-visible {
+      outline: {ring_min_px}px solid #1d4ed8;
+      outline-offset: 2px;
+    }
+  fix_html: ''
+  techniques:
+    - {id: C40, title: Creating a two-color focus indicator to ensure sufficient contrast with all components, url: https://www.w3.org/WAI/WCAG22/Techniques/css/C40}
+    - {id: G195, title: "Using an author-supplied, visible focus indicator", url: https://www.w3.org/WAI/WCAG22/Techniques/general/G195}
+2.5.7/dragging:
+  sc_title: Dragging Movements
+  level: AA
+  understanding: https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html
+  what_failed: >-
+    This slider can only be operated by dragging; no button, input or link in its widget offers a
+    single-pointer alternative.
+  nearest_passing: Add a number input or increment and decrement buttons next to the slider.
+  fix_css: |-
+    .slider-controls button {
+      min-width: {threshold}px;
+      min-height: {threshold}px;
+    }
+  fix_html: |-
+    <input type="range" min="0" max="100">
+    <input type="number" min="0" max="100" aria-label="Value">
+  techniques:
+    - {id: G219, title: Ensuring that an alternative is available for dragging movements that operate on content, url: https://www.w3.org/WAI/WCAG22/Techniques/general/G219}
+2.5.8/target-size:
+  sc_title: Target Size (Minimum)
+  level: AA
+  understanding: https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html
+  what_failed: >-
+    This target is {w} x {h} CSS px and no exception applies; targets need to be at least
+    {threshold} x {threshold} CSS px, or be spaced so that a {threshold} px circle centred on the
+    target does not reach another target or its circle.
+  nearest_passing: Make the target at least {threshold} x {threshold} CSS px.
+  fix_css: |-
+    .icon-button {
+      min-width: {threshold}px;
+      min-height: {threshold}px;
+    }
+  fix_html: |-
+    <button class="icon-button" aria-label="Bold">B</button>
+  techniques:
+    - {id: C42, title: Using min-height and min-width on target container to ensure sufficient target spacing, url: https://www.w3.org/WAI/WCAG22/Techniques/css/C42}

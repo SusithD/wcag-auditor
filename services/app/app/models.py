@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -49,6 +49,7 @@ class FindingRow(Base):
     capture_id: Mapped[int] = mapped_column(
         ForeignKey("captures.id", ondelete="CASCADE"), index=True
     )
+    key: Mapped[str | None] = mapped_column(String, index=True)
     sc: Mapped[str] = mapped_column(String)
     bbox: Mapped[dict[str, Any] | None]
     focus_index: Mapped[int | None]
@@ -92,6 +93,13 @@ class StudySession(Base):
     participant_code: Mapped[str] = mapped_column(String, unique=True)
     order: Mapped[str] = mapped_column(String)
     consent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    synthetic: Mapped[bool] = mapped_column(Boolean, default=True)
+    step: Mapped[int] = mapped_column(Integer, default=0)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    consent: Mapped[dict[str, Any]] = mapped_column(default=dict)
+    demographics: Mapped[dict[str, Any]] = mapped_column(default=dict)
+    debrief: Mapped[dict[str, Any]] = mapped_column(default=dict)
 
 
 class StudyTask(Base):
@@ -103,8 +111,11 @@ class StudyTask(Base):
     )
     task_id: Mapped[str] = mapped_column(String)
     condition: Mapped[str] = mapped_column(String)
+    task_index: Mapped[int] = mapped_column(Integer, default=0)
+    block: Mapped[int] = mapped_column(Integer, default=1)
     opened_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    fix_text: Mapped[str | None] = mapped_column(Text)
     success: Mapped[bool | None]
     notes: Mapped[str | None] = mapped_column(Text)
 
@@ -115,5 +126,15 @@ class SusResponse(Base):
     session_id: Mapped[int] = mapped_column(
         ForeignKey("study_sessions.id", ondelete="CASCADE"), primary_key=True
     )
+    block: Mapped[int] = mapped_column(Integer, primary_key=True)
     item: Mapped[int] = mapped_column(Integer, primary_key=True)
+    condition: Mapped[str] = mapped_column(String)
     score: Mapped[int] = mapped_column(Integer)
+
+
+class StudyRun(Base):
+    __tablename__ = "study_runs"
+
+    task_id: Mapped[str] = mapped_column(String, primary_key=True)
+    condition: Mapped[str] = mapped_column(String, primary_key=True)
+    run_id: Mapped[str] = mapped_column(String)

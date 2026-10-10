@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from auditor import browser
 from auditor.capture.snapshot import snapshot_html
 from auditor.rules.rulemap import COVERED_SCS, RULE_TO_SC
 from auditor.schema import Capture
@@ -65,14 +66,11 @@ class AxeRunner:
     """
 
     def __init__(self, headless: bool = True) -> None:
-        from playwright.sync_api import sync_playwright
-
-        self._cm = sync_playwright()
-        self._pw = self._cm.__enter__()
+        self._pw = browser.acquire()
         try:
             self._browser = self._pw.chromium.launch(headless=headless)
         except Exception:
-            self._cm.__exit__(None, None, None)
+            browser.release()
             raise
         self._axe_src = AXE_PATH.read_text(encoding="utf-8")
 
@@ -86,7 +84,7 @@ class AxeRunner:
         try:
             self._browser.close()
         finally:
-            self._cm.__exit__(None, None, None)
+            browser.release()
 
     def run(self, capture: Capture) -> dict[str, Any]:
         spec = capture.viewport_spec
