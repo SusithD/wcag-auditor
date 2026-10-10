@@ -48,16 +48,15 @@ class PlaywrightBrowser:
     def __init__(
         self, headless: bool = True, timeout_ms: int = 20000, settle_ms: int = 1500
     ) -> None:
-        from playwright.sync_api import sync_playwright
+        from auditor import browser as shared
 
         self.timeout_ms = timeout_ms
         self.settle_ms = settle_ms
-        self._pw_cm = sync_playwright()
-        self._pw = self._pw_cm.__enter__()
+        self._pw = shared.acquire()
         try:
             self._browser = self._pw.chromium.launch(headless=headless)
         except Exception:
-            self._pw_cm.__exit__(None, None, None)
+            shared.release()
             raise
         js = PROXY_JS.read_text(encoding="utf-8")
         self._checks_fn = "() => {\n" + js + "\nreturn runAllProxyChecks();\n}"
@@ -76,7 +75,9 @@ class PlaywrightBrowser:
         try:
             self._browser.close()
         finally:
-            self._pw_cm.__exit__(None, None, None)
+            from auditor import browser as shared
+
+            shared.release()
 
     def _context(self, viewport: str) -> Any:
         vp = VIEWPORTS[viewport]

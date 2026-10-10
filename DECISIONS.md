@@ -124,3 +124,10 @@ Decisions:
 - **Compare.** A hybrid run also writes `rule_only.json`: the same axe findings fused without the pixel channel, so no second capture or axe pass is needed. Pairing of hybrid and rule-only findings uses the Protocol match thresholds on the server (IoU or containment for page findings, the focus stop for focus findings); the client never holds thresholds.
 - **Chart.** Recharts bars (precision, recall, F1) with 95% bootstrap whiskers, wrapped in a `role="img"` element whose label states every value; a table alternative is one toggle away and carries the intervals as text.
 
+## ADR-026 Final evaluation outputs, figures and the stability check (2026-10-10, M8)
+- **No threshold or tie-break changed.** M8 re-runs the frozen pipeline; every number comes from the same `protocol.yaml` (sha e8c35965...) and seed.
+- **Figures are vector and deterministic.** SVG and PDF (matplotlib `svg.hashsalt`, no creation date), because PNG figures over 200 KB are not committed and the thesis needs vector output. `make eval` regenerates them after the evaluation.
+- **IoU sweep reading.** The sweep reports both matching rules; the containment rule (ADR-013) is what makes results stable above IoU 0.5, so the headline figures keep the Protocol thresholds (IoU 0.3 or containment 0.5) and the sweep is evidence, not a retune.
+- **Stability check design.** A seeded sample of 10 real desktop pages is re-captured live and run through the same hybrid pipeline as the benchmark capture; findings are matched one-to-one per criterion with the Protocol thresholds (focus criteria by stop index) and agreement is the Dice coefficient. It is a sanity check on capture drift plus element-source differences, not a re-labelling.
+- **Shared Playwright driver in the capture path.** `PlaywrightBrowser` now acquires the process-wide driver (`auditor/browser.py`, ADR-023/M6) instead of starting its own: capturing and then running axe in one process raised "Playwright Sync API inside the asyncio loop" and failed all ten pages in the first stability attempt.
+

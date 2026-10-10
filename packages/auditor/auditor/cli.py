@@ -88,6 +88,23 @@ def capture(
         raise typer.Exit(code=1)
 
 
+@app.command()
+def stability(
+    benchmark: Annotated[Path, typer.Option(help="Folder tree of benchmark capture folders")],
+    out: Annotated[Path, typer.Option()],
+    sample: Annotated[int, typer.Option()] = 10,
+    seed: Annotated[int, typer.Option()] = 20261004,
+) -> None:
+    """Re-capture a sample of real pages live and compare findings with the benchmark capture."""
+    from auditor.eval.stability import run_stability
+
+    summary = run_stability(benchmark, out, sample, seed)
+    console.print(
+        f"compared {summary['pages_compared']} pages, overall Dice {summary['overall_dice']}, "
+        f"{len(summary['pages_failed'])} failed -> {out / 'stability.md'}"
+    )
+
+
 def _progress_writer(path: Path | None) -> Callable[[int, int], None] | None:
     if path is None:
         return None

@@ -128,3 +128,48 @@ def test_the_mcnemar_pair_is_hybrid_against_rule_only_whatever_the_order() -> No
     assert mcnemar_pair(["hybrid", "rule_only"]) == ("hybrid", "rule_only")
     assert mcnemar_pair(["pixel", "rule_only"]) == ("pixel", "rule_only")
     assert mcnemar_pair(["rule_only"]) is None
+
+
+def test_stability_dice_matches_findings_one_to_one_per_criterion() -> None:
+    from auditor.eval.stability import compare_findings, summarise
+    from auditor.schema import BBox, Finding
+
+    def f(
+        sc: str, box: tuple[float, float, float, float] | None, focus: int | None = None
+    ) -> Finding:
+        bbox = BBox(x=box[0], y=box[1], w=box[2], h=box[3]) if box else None
+        return Finding(
+            sc=sc,
+            bbox=bbox,
+            focus_index=focus,
+            severity="minor",
+            tier="automated",
+            score=1.0,
+            provenance="rule",
+            evidence={},
+            guidance_key="k",
+        )
+
+    base = [f("1.4.3", (10, 10, 100, 20)), f("1.4.3", (10, 200, 100, 20)), f("2.4.7", None, 3)]
+    again = [
+        f("1.4.3", (12, 11, 98, 19)),
+        f("1.4.3", (500, 500, 10, 10)),
+        f("2.4.7", None, 4),
+        f("2.5.8", (0, 0, 5, 5)),
+    ]
+    by_sc = {a.sc: a for a in compare_findings(base, again, 0.3, 0.5)}
+    assert (by_sc["1.4.3"].matched, by_sc["1.4.3"].dice) == (1, 0.5)
+    assert by_sc["2.4.7"].matched == 0 and by_sc["2.4.7"].dice == 0.0
+    assert by_sc["2.5.8"].benchmark == 0 and by_sc["2.5.8"].dice == 0.0
+    rows = [
+        {
+            "page_id": "p",
+            "sc": a.sc,
+            "benchmark": a.benchmark,
+            "recapture": a.recapture,
+            "matched": a.matched,
+        }
+        for a in by_sc.values()
+    ]
+    assert summarise(rows, [], 1, 1)["per_sc"]["1.4.3"]["dice"] == 0.5
+    assert compare_findings([], [], 0.3, 0.5) == []

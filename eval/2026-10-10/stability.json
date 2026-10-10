@@ -1,0 +1,45 @@
+{
+  "overall_dice": 0.775,
+  "pages_compared": 10,
+  "pages_failed": [],
+  "per_sc": {
+    "1.4.11": {
+      "benchmark": 0,
+      "dice": 0.0,
+      "matched": 0,
+      "recapture": 3
+    },
+    "1.4.3": {
+      "benchmark": 102,
+      "dice": 0.756,
+      "matched": 73,
+      "recapture": 91
+    },
+    "2.4.11": {
+      "benchmark": 14,
+      "dice": 0.0,
+      "matched": 0,
+      "recapture": 0
+    },
+    "2.4.13": {
+      "benchmark": 18,
+      "dice": 1.0,
+      "matched": 18,
+      "recapture": 18
+    },
+    "2.4.7": {
+      "benchmark": 15,
+      "dice": 1.0,
+      "matched": 15,
+      "recapture": 15
+    },
+    "2.5.8": {
+      "benchmark": 6,
+      "dice": 0.923,
+      "matched": 6,
+      "recapture": 7
+    }
+  },
+  "sample_size": 10,
+  "seed": 20261004
+}
