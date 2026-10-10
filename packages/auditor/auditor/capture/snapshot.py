@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from html import escape
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +15,7 @@ def snapshot_html(folder: Path, meta: dict[str, Any]) -> str:
     html = _SCRIPT.sub("", html)
     base = meta.get("final_url") or meta.get("url") or ""
     if base.startswith("http") and not _BASE.search(html):
-        tag = f'<base href="{base}">'
+        tag = f'<base href="{escape(base, quote=True)}">'
         if _HEAD.search(html):
             html = _HEAD.sub(lambda m: m.group(1) + tag, html, count=1)
         else:

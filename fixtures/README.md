@@ -60,6 +60,6 @@ Parsed by `auditor.schema.Truth`.
 
 Union of `meta.json` keys across the 410 benchmark folders (generator 2.2.0 and 2.3.0): `capture_timestamp`, `coordinates`, `domain`, `final_url`, `focus_run`, `focus_step_count`, `focus_steps`, `generator_version`, `http_status`, `layout`, `origin`, `page_id`, `protocol_version`, `sampling_frame`, `screenshot_mode`, `screenshot_sha256`, `sector`, `seeded_sc`, `selected_for_proxy_signals`, `synthetic_page_id`, `test_elements_rendered`, `title`, `tools`, `truth_note`, `url`, `viewport`, `viewport_spec`, `webui_page_id`.
 
-`auditor capture` emits every key except the origin-specific ones (`domain`, `sampling_frame`, `seeded_sc`, `selected_for_proxy_signals`, `synthetic_page_id`, `truth_note`, `webui_page_id`), which only exist for benchmark sampling and synthetic seeding. `test_meta_keys_superset_of_benchmark` enforces this. New captures set `generator_version` to the auditor's own version (`auditor-<version>`) and write `VERSIONS.json` beside `meta.json`.
+`auditor capture` emits every key; the benchmark-only ones (`domain`, `sampling_frame`, `seeded_sc`, `selected_for_proxy_signals`, `synthetic_page_id`, `truth_note`, `webui_page_id`) are written as `null`. `test_meta_keys_superset_of_benchmark` enforces this. New captures set `generator_version` to the auditor's own version (`auditor-<version>`) and write `VERSIONS.json` beside `meta.json`.
 
 `fixtures/sites/static.html` is the page served by the browser tests.

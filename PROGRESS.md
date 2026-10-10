@@ -5,7 +5,7 @@ Claude Code updates this file at the end of every milestone. Status: `todo` · `
 | Milestone | Branch | Status | Merged | Notes |
 |---|---|---|---|---|
 | M0 scaffold | m0-scaffold | done | 2026-10-10 | acceptance + reviews passed; merged to main |
-| M1 capture | m1-capture | todo | | |
+| M1 capture | m1-capture | done | | acceptance + reviews passed 2026-10-10; not yet merged |
 | M2 rules + eval harness | m2-rules-eval | todo | | GATE: needs sealed ground truth + baseline golden |
 | M3 frames + DOM elements | m3-elements | todo | | |
 | M4 static modules | m4-static-modules | todo | | |

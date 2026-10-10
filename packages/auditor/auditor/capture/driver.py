@@ -11,11 +11,21 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
+from auditor import __version__ as auditor_version
 from auditor import versions
 from auditor.capture.focus import FOCUS_INFO_JS, FOCUS_START_JS, step_focus
 
-GENERATOR_VERSION = f"auditor-{pkg_version('auditor')}"
+GENERATOR_VERSION = f"auditor-{auditor_version}"
 PROTOCOL_VERSION = "1.0"
+BENCHMARK_ONLY_KEYS = (
+    "domain",
+    "sampling_frame",
+    "seeded_sc",
+    "selected_for_proxy_signals",
+    "synthetic_page_id",
+    "truth_note",
+    "webui_page_id",
+)
 PROXY_JS = Path(__file__).with_name("proxy_signals.js")
 LAYOUT_JS = Path(__file__).with_name("layout.js").read_text(encoding="utf-8")
 TEST_ELEMENTS_JS = Path(__file__).with_name("test_elements.js").read_text(encoding="utf-8")
@@ -178,8 +188,9 @@ def capture_url(
     url: str,
     out: Path,
     viewports: list[str],
-    max_focus_steps: int = 60,
+    max_focus_steps: int = 15,
     page_id: int = 1,
+    errors: list[str] | None = None,
 ) -> list[Path]:
     out.mkdir(parents=True, exist_ok=True)
     folders: list[Path] = []
@@ -192,10 +203,14 @@ def capture_url(
         tmp.mkdir(parents=True)
         try:
             res = browser.capture(url, tmp, vp, max_focus_steps)
-        except Exception:
+        except Exception as exc:
             shutil.rmtree(tmp, ignore_errors=True)
-            raise
+            if errors is None:
+                raise
+            errors.append(f"{vp}: {type(exc).__name__}: {exc}")
+            continue
         meta: dict[str, Any] = {
+            **dict.fromkeys(BENCHMARK_ONLY_KEYS),
             "origin": "real",
             "sector": _slug(url),
             "page_id": page_id,
@@ -222,6 +237,9 @@ def capture_url(
         (tmp / "VERSIONS.json").write_text(
             json.dumps(versions.collect(meta), indent=2), encoding="utf-8"
         )
+        if folder.exists():
+            shutil.rmtree(tmp, ignore_errors=True)
+            raise FileExistsError(f"{folder} already exists (same-second capture)")
         tmp.rename(folder)
         folders.append(folder)
     return folders
