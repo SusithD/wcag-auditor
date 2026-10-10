@@ -3,11 +3,6 @@
 import { type KeyboardEvent, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
   type Counts,
   type CoverageCell,
   PROV_GLYPH,
@@ -52,8 +47,11 @@ export function CriteriaRail({
     if (event.key === "ArrowDown")
       items[Math.min(items.length - 1, index + 1)]?.focus();
     else if (event.key === "ArrowUp") items[Math.max(0, index - 1)]?.focus();
-    else if (event.key === "Enter" && event.shiftKey) onEnterCanvas();
-    else return;
+    else if (event.key === "Enter" && index >= 0) {
+      const sc = items[index].dataset.sc || null;
+      onSelect(sc === active ? null : sc);
+      setTimeout(onEnterCanvas, 0);
+    } else return;
     event.preventDefault();
   }
 
@@ -147,21 +145,9 @@ export function CriteriaRail({
           );
         })}
       </ul>
-      <Tooltip>
-        <TooltipTrigger
-          render={
-            <button
-              type="button"
-              className="min-h-6 self-start text-caption text-muted-foreground underline underline-offset-4"
-            >
-              Verdict legend
-            </button>
-          }
-        />
-        <TooltipContent>
-          ◐ rule · ◑ pixel · ● both · ○ no verdict
-        </TooltipContent>
-      </Tooltip>
+      <p className="text-caption text-muted-foreground">
+        Verdict: ◐ rule · ◑ pixel · ● both · ○ none
+      </p>
     </nav>
   );
 }

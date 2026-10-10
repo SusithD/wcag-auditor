@@ -13,7 +13,11 @@ export function useReportState() {
     [params],
   );
   const latest = useRef(state);
-  latest.current = state;
+  const seen = useRef(params.toString());
+  if (seen.current !== params.toString()) {
+    seen.current = params.toString();
+    latest.current = state;
+  }
 
   const update = useCallback(
     (patch: Partial<ReportState>, mode: "replace" | "push" = "replace") => {

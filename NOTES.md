@@ -140,3 +140,26 @@ Scope item -> delivery:
 - **Deviation.** PLAN lists `PATCH /findings/{id}` and `/catalogue` among the endpoints; they belong to M7b/M7c and are not built.
 - Needs planning: none new. ADR-017 and ADR-018 still wait for the researcher.
 
+## M7b Report screen (2026-10-10, branch m7b-report-screen)
+
+State before M7b: M0-M6, M1b, M10a, M7a merged and pushed; M10 blocked at the training gate.
+Scope item -> delivery:
+| Item | Delivered by | State |
+|---|---|---|
+| Three-pane layout, ResizablePanel, collapse to Sheet (<1280) and Tabs (<1024) | `report/report-screen.tsx`, `ui/resizable.tsx` | done (breakpoint 1280, not 1440: ADR-024) |
+| Criteria rail: search, summary, 8 SC rows with severity triplets, provenance glyph, legend | `report/criteria-rail.tsx` | done; legend is static text |
+| Canvas: img + SVG overlay in react-zoom-pan-pinch, buttons and keys (+ - 0, Shift+arrows), roving tabindex boxes, dual stroke, selection auto-fit, labels toggle, minimap, focus-pair toggle (Focused/Unfocused/Diff), context menu | `report/canvas.tsx`, `focus-pair.tsx` | done |
+| Tab cycling through stacked boxes | none (arrows only) | NOT DONE |
+| Right pane: evidence card with swatches and crop, fix tabs with copy, status buttons, J/K | `report/detail-pane.tsx` | done; crop is the pipeline's side-by-side image, not a 2x live crop |
+| Table: TanStack, virtualised, facets, grouping, aria-rowcount/rowindex/sort, URL state | `report/findings-table.tsx`, `lib/report.ts` | done |
+| Empty, partial (with Retry) and error states | `report-screen.tsx` | done; the error log is the run's error text |
+| PATCH /findings/{id}, findings/overview/exports/CSV endpoints, ingestion | `services/app/app/report_api.py`, `ingest.py`, migration 0002 | done |
+| Sheet returns focus to the box or row that opened it | none | NOT DONE |
+| Toolbar arrow-key navigation | none (Tab order) | NOT DONE |
+| Per-module staggered boxes during progress (M7a carry-over) | none | NOT DONE |
+| Manual VoiceOver + Safari and NVDA + Chrome pass of the report screen | none | NOT DONE: needs the researcher on a Mac and a Windows machine; DESIGN_SPEC section 5 requires it before M7b is closed |
+
+- **Tests.** services/app 28 passed; vitest 46 passed; Playwright e2e 25 passed twice in a row: axe (WCAG 2.x A/AA/AAA tags, `color-contrast-enhanced` off) on the report for both real fixtures in light and dark, on canvas, selected finding and table; axe in the 1100 px sheet, the 800 px tabs, diff mode and the empty-filter state; keyboard test (Tab to canvas, arrow to the third box in reading order, Enter, detail shows it, K goes to the previous finding in table order, J returns); URL state (criterion, view, selection, severity, provenance, search) restored on reload; status change persists across reload; focus-pair views; layout collapse; visual snapshot at 1440x900 (`e2e/report.spec.ts-snapshots/report-1440x900-darwin.png`, recorded on macOS, skipped on other platforms).
+- **Real bugs the gate found.** Technique titles in guidance.yaml truncated at a comma (a YAML flow-scalar bug) now covered by a pinned-title test; dimmed overlay text failed 4.5:1; the focus-pair scroll area had no keyboard access; the auto-fit raced the panel layout (a ResizeObserver now refits until the user pans or zooms); the API proxy did not forward PATCH.
+- **Reviews.** correctness, tests and ui-a11y ran; applied: lazy ingest and status preservation, CSV formula escaping, deep-link and status-change refits, rAF cleanup, Esc dismisses a box label, focused boxes pan into view, halo under the box focus ring, 24 px resize handles with the global 3 px focus ring, sticky group headers, J/K ignored inside menus and dialogs, debounced search box, once-only empty-state pulse, skip links first, HTML-then-CSS fix tabs, Enter on a rail row focuses the canvas.
+

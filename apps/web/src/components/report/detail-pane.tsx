@@ -197,17 +197,18 @@ export function DetailPane({
               How to fix
             </h3>
             <p className="mt-1 text-body">{g.nearest_passing}</p>
-            <Tabs defaultValue="css" className="mt-2">
+            <Tabs defaultValue={g.fix_html ? "html" : "css"} className="mt-2">
               <TabsList>
-                <TabsTrigger value="css">CSS</TabsTrigger>
                 {g.fix_html ? (
                   <TabsTrigger value="html">HTML</TabsTrigger>
                 ) : null}
+                <TabsTrigger value="css">CSS</TabsTrigger>
               </TabsList>
               <TabsContent value="css">
                 <div className="flex items-start gap-2">
                   <pre
                     tabIndex={0}
+                    role="region"
                     aria-label="CSS fix"
                     className="min-w-0 flex-1 overflow-auto rounded-md border bg-muted p-2 font-mono text-label"
                   >
@@ -221,6 +222,7 @@ export function DetailPane({
                   <div className="flex items-start gap-2">
                     <pre
                       tabIndex={0}
+                      role="region"
                       aria-label="HTML fix"
                       className="min-w-0 flex-1 overflow-auto rounded-md border bg-muted p-2 font-mono text-label"
                     >

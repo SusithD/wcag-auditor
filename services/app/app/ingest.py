@@ -11,6 +11,13 @@ from app.models import CaptureRow, CoverageRow, FindingRow
 
 def ingest_run(session: Session, run_id: str, run_dir: Path) -> None:
     """Copy each finished viewport's report.json into captures/findings/coverage (idempotent)."""
+    kept: dict[tuple[str, str], str] = {}
+    for capture, finding in session.execute(
+        select(CaptureRow, FindingRow)
+        .join(FindingRow, FindingRow.capture_id == CaptureRow.id)
+        .where(CaptureRow.run_id == run_id)
+    ):
+        kept[(capture.viewport, finding.key or "")] = finding.status
     session.execute(delete(CaptureRow).where(CaptureRow.run_id == run_id))
     for report_path in sorted(run_dir.glob("*/report.json")):
         try:
@@ -41,6 +48,7 @@ def ingest_run(session: Session, run_id: str, run_dir: Path) -> None:
                     provenance=f["provenance"],
                     evidence=f.get("evidence", {}),
                     guidance_key=f["guidance_key"],
+                    status=kept.get((viewport, f["id"]), "open"),
                 )
             )
         for c in report.get("coverage", {}).get("cells", []):

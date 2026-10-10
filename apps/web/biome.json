@@ -69,8 +69,6 @@
             "useSemanticElements": "off",
             "noNoninteractiveTabindex": "off",
             "noStaticElementInteractions": "off",
-            "useAriaPropsSupportedByRole": "off",
-            "noAriaHiddenOnFocusable": "off",
             "useAnchorContent": "off"
           }
         }

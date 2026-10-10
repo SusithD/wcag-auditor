@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -53,7 +54,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     row.status, row.error = status, error
                     session.commit()
                 if status in {"done", "partial"}:
-                    ingest_run(session, result.run_id, cfg.runs_dir / result.run_id)
+                    try:
+                        ingest_run(session, result.run_id, cfg.runs_dir / result.run_id)
+                    except Exception:
+                        session.rollback()
+                        logging.getLogger(__name__).exception("ingest of %s failed", result.run_id)
 
         runner = JobRunner(on_finish, on_start, cfg.job_timeout_s)
         runner.start()

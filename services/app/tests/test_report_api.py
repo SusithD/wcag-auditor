@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any, cast
 
 from test_runs_api import REAL, client, wait_for_terminal
 
@@ -67,3 +68,66 @@ def test_report_endpoints_404_before_the_run_has_a_report(tmp_path: Path) -> Non
         assert c.get(f"/runs/{'0' * 32}/overview", params={"viewport": "mobile"}).status_code == 404
         assert c.get("/runs/zz/findings", params={"viewport": "mobile"}).status_code == 404
         wait_for_terminal(c, run_id)
+
+
+def test_statuses_survive_a_second_ingest_and_foreign_ids_are_isolated(tmp_path: Path) -> None:
+    from app.ingest import ingest_run
+
+    with client(tmp_path) as c:
+        run_a = finished_run(c)
+        run_b = finished_run(c)
+        fa = c.get(f"/runs/{run_a}/findings", params={"viewport": "mobile"}).json()
+        fb = c.get(f"/runs/{run_b}/findings", params={"viewport": "mobile"}).json()
+        assert fa[0]["key"] == fb[0]["key"] and fa[0]["id"] != fb[0]["id"]
+        for status in ("fixed", "ignored", "open", "fixed"):
+            assert (
+                c.patch(f"/findings/{fa[0]['id']}", json={"status": status}).json()["status"]
+                == status
+            )
+        with cast(Any, c.app).state.sessions() as session:
+            ingest_run(session, run_a, tmp_path / "runs" / run_a)
+        again = c.get(f"/runs/{run_a}/findings", params={"viewport": "mobile"}).json()
+        assert again[0]["status"] == "fixed" and again[0]["key"] == fa[0]["key"]
+        other = c.get(f"/runs/{run_b}/findings", params={"viewport": "mobile"}).json()
+        assert all(f["status"] == "open" for f in other)
+
+
+def test_csv_neutralises_spreadsheet_formulas_and_quotes_special_characters() -> None:
+    from app.report_api import _csv_cell
+
+    assert _csv_cell("=SUM(A1)") == "'=SUM(A1)"
+    assert _csv_cell("@cmd") == "'@cmd" and _csv_cell("-2+3") == "'-2+3"
+    assert _csv_cell("plain") == "plain" and _csv_cell(3.5) == 3.5
+
+
+def test_csv_content_matches_the_findings_and_downloads_work(tmp_path: Path) -> None:
+    import csv
+    import io
+
+    with client(tmp_path) as c:
+        run_id = finished_run(c)
+        rows = list(
+            csv.DictReader(
+                io.StringIO(c.get(f"/runs/{run_id}/report.csv", params={"viewport": "mobile"}).text)
+            )
+        )
+        findings = c.get(f"/runs/{run_id}/findings", params={"viewport": "mobile"}).json()
+        assert [r["id"] for r in rows] == [f["key"] for f in findings]
+        assert {r["sc"] for r in rows} == {f["sc"] for f in findings}
+        for ext, kind in (("json", "application/json"), ("html", "text/html")):
+            r = c.get(f"/runs/{run_id}/report.{ext}", params={"viewport": "mobile"})
+            assert r.status_code == 200 and r.headers["content-type"].startswith(kind)
+        assert c.get(f"/runs/{run_id}/exports", params={"viewport": "tablet"}).status_code == 422
+
+
+def test_findings_are_ingested_lazily_when_the_finish_hook_missed_them(tmp_path: Path) -> None:
+    from app.models import CaptureRow
+    from sqlalchemy import delete
+
+    with client(tmp_path) as c:
+        run_id = finished_run(c)
+        with cast(Any, c.app).state.sessions() as session:
+            session.execute(delete(CaptureRow).where(CaptureRow.run_id == run_id))
+            session.commit()
+        rows = c.get(f"/runs/{run_id}/findings", params={"viewport": "mobile"})
+        assert rows.status_code == 200 and len(rows.json()) == 18

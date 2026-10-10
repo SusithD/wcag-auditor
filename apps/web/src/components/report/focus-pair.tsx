@@ -31,6 +31,9 @@ export function FocusPairView({
   const [failed, setFailed] = useState(false);
   const base = `/api/runs/${runId}/assets/${viewport}/focus/${index}`;
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new image pair clears an earlier failure
+  useEffect(() => setFailed(false), [mode, base]);
+
   useEffect(() => {
     if (mode !== "diff") return;
     let cancelled = false;
@@ -63,7 +66,12 @@ export function FocusPairView({
   }, [mode, base]);
 
   return (
-    <div className="flex h-full w-full items-start justify-center overflow-auto p-3 pb-16">
+    <div
+      tabIndex={0}
+      role="region"
+      aria-label={`Focus pair view for ${label}`}
+      className="flex h-full w-full items-start justify-center overflow-auto p-3 pb-16"
+    >
       {failed ? (
         <p role="alert" className="text-body text-muted-foreground">
           The focus images for this stop could not be loaded.

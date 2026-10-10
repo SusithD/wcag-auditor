@@ -75,6 +75,14 @@ export function ReportScreen({
   const medium = useMediaQuery("(min-width: 1024px)", true);
   const [pairMode, setPairMode] = useState<PairMode>("page");
   const [tab, setTab] = useState("canvas");
+  const [query, setQuery] = useState(state.q);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: write the debounced search box to the URL only when it differs
+  useEffect(() => {
+    if (query === state.q) return;
+    const timer = setTimeout(() => update({ q: query }), 250);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   const available = run.available_viewports as Viewport[];
   const vp = (
@@ -125,9 +133,13 @@ export function ReportScreen({
     function onKey(event: KeyboardEvent) {
       if (
         isTyping(event.target) ||
+        event.defaultPrevented ||
         event.metaKey ||
         event.ctrlKey ||
-        event.altKey
+        event.altKey ||
+        (event.target as HTMLElement | null)?.closest?.(
+          "[role=menu], [role=dialog], [role=alertdialog], [role=listbox]",
+        )
       )
         return;
       if (event.key === "j" || event.key === "J") step(1);
@@ -202,9 +214,9 @@ export function ReportScreen({
       counts={counts}
       coverage={overview.data?.coverage ?? []}
       active={state.sc.length === 1 ? state.sc[0] : null}
-      query={state.q}
+      query={query}
       total={visible.length}
-      onQuery={(q) => update({ q })}
+      onQuery={setQuery}
       onSelect={(sc) => {
         update({ sc: sc ? [sc] : [], f: null });
         if (!medium) setTab("canvas");
@@ -262,7 +274,7 @@ export function ReportScreen({
         focusStops={overview.data?.focus_stops ?? 0}
       />
       {all.length === 0 ? (
-        <div className="pointer-events-none absolute inset-3 rounded-lg border-2 border-emerald-600 motion-safe:animate-pulse dark:border-emerald-400">
+        <div className="pointer-events-none absolute inset-3 rounded-lg border-2 border-emerald-600 motion-safe:animate-[pulse_1.2s_ease-in-out_1] dark:border-emerald-400">
           <p className="pointer-events-auto m-4 inline-block rounded-md bg-background p-3 text-body">
             No violations found in the 8 in-scope criteria. The coverage view
             shows what was checked.
@@ -275,7 +287,11 @@ export function ReportScreen({
   const banner =
     run.status === "partial" ? (
       <Alert className="m-3">
-        <AlertTitle>Part of this audit failed</AlertTitle>
+        <AlertTitle>
+          {available.length === 1
+            ? `${available[0] === "desktop" ? "Mobile" : "Desktop"} capture failed`
+            : "Part of this audit failed"}
+        </AlertTitle>
         <AlertDescription>{run.error}</AlertDescription>
         {run.source_kind !== "upload" ? (
           <AlertAction>
@@ -407,6 +423,7 @@ export function ReportScreen({
 
   return (
     <div className="flex h-[calc(100dvh-3rem)] flex-col">
+      {skip}
       <TopBar
         runId={run.id}
         subject={subject}
@@ -418,7 +435,6 @@ export function ReportScreen({
         onViewport={(next) => update({ vp: next, f: null })}
         onView={(view) => update({ view })}
       />
-      {skip}
       {banner}
       {body}
     </div>

@@ -78,6 +78,8 @@ export function Canvas({
   const [focusedKey, setFocusedKey] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const raf = useRef(0);
+  const autoFit = useRef(true);
+  const [dismissedKey, setDismissedKey] = useState<string | null>(null);
 
   const boxes = useMemo(
     () => readingOrder(findings.filter((f) => f.bbox)),
@@ -103,20 +105,88 @@ export function Canvas({
     (time = 0) => {
       const c = containerSize();
       const scale = fitWidth(size.w, c);
+      autoFit.current = true;
       wrapper.current?.setTransform(0, 0, scale, time);
     },
     [containerSize, size.w],
   );
 
-  useEffect(() => {
-    if (loaded) fit(0);
-  }, [loaded, fit]);
+  const selectedRef = useRef(selected);
+  selectedRef.current = selected;
+  const selectedKeyNow = selected?.key;
 
   useEffect(() => {
-    if (!selected?.bbox || pairMode !== "page") return;
-    const t = fitTransform(selected.bbox, containerSize());
+    if (!loaded) return;
+    const current = selectedRef.current;
+    if (current?.bbox) {
+      const t = fitTransform(current.bbox, containerSize());
+      autoFit.current = false;
+      wrapper.current?.setTransform(t.x, t.y, t.scale, 0);
+    } else fit(0);
+  }, [loaded, fit, containerSize]);
+
+  useEffect(() => {
+    const el = frame.current;
+    if (!el || !loaded) return;
+    const observer = new ResizeObserver(() => {
+      if (autoFit.current && !selectedRef.current?.bbox) fit(0);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loaded, fit]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refit only when the selected finding changes, not when its status does
+  useEffect(() => {
+    const current = selectedRef.current;
+    if (!loaded || !current?.bbox || pairMode !== "page") return;
+    const t = fitTransform(current.bbox, containerSize());
+    autoFit.current = false;
     wrapper.current?.setTransform(t.x, t.y, t.scale, animation);
-  }, [selected, pairMode, containerSize, animation]);
+  }, [selectedKeyNow, pairMode, loaded, containerSize, animation]);
+
+  useEffect(() => () => cancelAnimationFrame(raf.current), []);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new focus target re-shows its label
+  useEffect(() => setDismissedKey(null), [focusedKey]);
+
+  function ensureVisible(f: Finding) {
+    const w = wrapper.current;
+    const b = f.bbox;
+    if (!w || !b) return;
+    const { scale, positionX, positionY } = w.state;
+    const c = containerSize();
+    const left = positionX + b.x * scale;
+    const top = positionY + b.y * scale;
+    if (
+      left >= 48 &&
+      top >= 48 &&
+      left + b.w * scale <= c.w - 48 &&
+      top + b.h * scale <= c.h - 96
+    )
+      return;
+    w.setTransform(
+      c.w / 2 - (b.x + b.w / 2) * scale,
+      c.h / 2 - (b.y + b.h / 2) * scale,
+      scale,
+      animation,
+    );
+  }
+
+  function zoomToActual() {
+    const w = wrapper.current;
+    if (!w) return;
+    autoFit.current = false;
+    const { scale, positionX, positionY } = w.state;
+    const c = containerSize();
+    const cx = (c.w / 2 - positionX) / scale;
+    const cy = (c.h / 2 - positionY) / scale;
+    w.setTransform(c.w / 2 - cx, c.h / 2 - cy, 1, animation);
+  }
+
+  function onWheel(event: React.WheelEvent<HTMLDivElement>) {
+    autoFit.current = false;
+    if (event.ctrlKey || event.metaKey) return;
+    wrapper.current?.panBy(-event.deltaX, -event.deltaY);
+  }
 
   const onTransform = useCallback(
     (
@@ -152,6 +222,7 @@ export function Canvas({
       onSelect(f.key);
     } else if (event.key === "Escape") {
       event.preventDefault();
+      setDismissedKey(f.key);
       onSelect(null);
     }
   }
@@ -161,6 +232,8 @@ export function Canvas({
     if (!w || (event.target as HTMLElement).closest("button, [role=radio]"))
       return;
     const step = 80;
+    if (["+", "=", "-", "_"].includes(event.key) || event.shiftKey)
+      autoFit.current = false;
     if (event.key === "+" || event.key === "=") w.zoomIn(0.4, animation);
     else if (event.key === "-" || event.key === "_") w.zoomOut(0.4, animation);
     else if (event.key === "0") fit(animation);
@@ -193,6 +266,7 @@ export function Canvas({
           <div
             ref={frame}
             onKeyDown={onFrameKey}
+            onWheel={onWheel}
             data-testid="canvas"
             className="relative h-full min-h-96 overflow-hidden bg-muted"
           />
@@ -215,6 +289,12 @@ export function Canvas({
             wheel={{ activationKeys: ["Control", "Meta"] }}
             doubleClick={{ disabled: true }}
             onTransform={onTransform}
+            onPanningStart={() => {
+              autoFit.current = false;
+            }}
+            onZoomStart={() => {
+              autoFit.current = false;
+            }}
           >
             <TransformComponent
               wrapperStyle={{ width: "100%", height: "100%" }}
@@ -264,26 +344,40 @@ export function Canvas({
                         data-key={f.key}
                         data-selected={isSel}
                         className="group cursor-pointer outline-none"
-                        style={{ opacity: dim ? 0.4 : 1 }}
                         onClick={() => onSelect(f.key)}
                         onContextMenu={() => onSelect(f.key)}
                         onKeyDown={(e) => onBoxKey(e, f)}
-                        onFocus={() => setFocusedKey(f.key)}
+                        onFocus={() => {
+                          setFocusedKey(f.key);
+                          ensureVisible(f);
+                        }}
                         onBlur={() =>
                           setFocusedKey((k) => (k === f.key ? null : k))
                         }
                       >
                         {focusedKey === f.key ? (
-                          <rect
-                            x={b.x}
-                            y={b.y}
-                            width={Math.max(b.w, 1)}
-                            height={Math.max(b.h, 1)}
-                            fill="none"
-                            stroke="var(--accent-focus)"
-                            strokeWidth={10}
-                            vectorEffect="non-scaling-stroke"
-                          />
+                          <>
+                            <rect
+                              x={b.x}
+                              y={b.y}
+                              width={Math.max(b.w, 1)}
+                              height={Math.max(b.h, 1)}
+                              fill="none"
+                              stroke="var(--halo)"
+                              strokeWidth={16}
+                              vectorEffect="non-scaling-stroke"
+                            />
+                            <rect
+                              x={b.x}
+                              y={b.y}
+                              width={Math.max(b.w, 1)}
+                              height={Math.max(b.h, 1)}
+                              fill="none"
+                              stroke="var(--accent-focus)"
+                              strokeWidth={10}
+                              vectorEffect="non-scaling-stroke"
+                            />
+                          </>
                         ) : null}
                         <rect
                           x={b.x}
@@ -291,6 +385,7 @@ export function Canvas({
                           width={Math.max(b.w, 1)}
                           height={Math.max(b.h, 1)}
                           data-hit="true"
+                          opacity={dim ? 0.4 : 1}
                           fill={`color-mix(in srgb, var(--sev-${key === "needs-review" ? "review" : key}) ${isSel || focusedKey === f.key ? 16 : 8}%, transparent)`}
                           stroke="var(--halo)"
                           strokeWidth={4}
@@ -305,6 +400,7 @@ export function Canvas({
                           stroke={`var(--sev-${key === "needs-review" ? "review" : key})`}
                           strokeWidth={key === "needs-review" ? 1.5 : 2}
                           strokeDasharray={SEV_DASH[key]}
+                          opacity={dim ? 0.4 : 1}
                           vectorEffect="non-scaling-stroke"
                         />
                         <text
@@ -322,7 +418,8 @@ export function Canvas({
                           }}
                         >
                           {SEV_GLYPH[key]}
-                          {labels || isSel || focusedKey === f.key
+                          {(labels || isSel || focusedKey === f.key) &&
+                          dismissedKey !== f.key
                             ? ` ${f.sc} ${SC_TITLES[f.sc] ?? ""}`
                             : ""}
                         </text>
@@ -398,10 +495,8 @@ export function Canvas({
               <Button
                 variant="ghost"
                 size="sm"
-                aria-label="Zoom to 100 percent"
-                onClick={() =>
-                  wrapper.current?.setTransform(view.x, view.y, 1, animation)
-                }
+                aria-label="100% zoom"
+                onClick={zoomToActual}
               >
                 100%
               </Button>

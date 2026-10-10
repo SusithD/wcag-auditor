@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ArrowDown, ArrowUp, ListFilter } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -162,6 +162,14 @@ export function FindingsTable({
     overscan: 10,
     initialRect: { width: 800, height: 600 },
   });
+  const selectedIndex = items.findIndex(
+    (i) => i.type === "row" && i.finding.key === selectedKey,
+  );
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll only when the selection moves
+  useEffect(() => {
+    if (selectedIndex >= 0)
+      virtual.scrollToIndex(selectedIndex, { align: "auto" });
+  }, [selectedIndex]);
   const rows = virtual.getVirtualItems();
   const padTop = rows.length ? rows[0].start : 0;
   const padBottom = rows.length
@@ -265,7 +273,8 @@ export function FindingsTable({
           </thead>
           <tbody>
             {padTop > 0 ? (
-              <tr aria-hidden="true" style={{ height: padTop }}>
+              // biome-ignore lint/a11y/noInteractiveElementToNoninteractiveRole: spacer row of the virtual window
+              <tr role="presentation" style={{ height: padTop }}>
                 <td colSpan={COLUMNS.length} />
               </tr>
             ) : null}
@@ -277,12 +286,12 @@ export function FindingsTable({
                     key={`g-${item.sc}`}
                     aria-rowindex={vr.index + 2}
                     style={{ height: ROW }}
-                    className="sticky z-[5] bg-muted"
+                    className="bg-muted"
                   >
                     <th
                       scope="rowgroup"
                       colSpan={COLUMNS.length}
-                      className="px-3 text-left text-caption font-semibold"
+                      className="sticky z-[5] bg-muted px-3 text-left text-caption font-semibold"
                       style={{ top: HEAD }}
                     >
                       <span className="font-mono">{item.sc}</span>{" "}
@@ -350,17 +359,18 @@ export function FindingsTable({
               );
             })}
             {padBottom > 0 ? (
-              <tr aria-hidden="true" style={{ height: padBottom }}>
+              // biome-ignore lint/a11y/noInteractiveElementToNoninteractiveRole: spacer row of the virtual window
+              <tr role="presentation" style={{ height: padBottom }}>
                 <td colSpan={COLUMNS.length} />
               </tr>
             ) : null}
           </tbody>
         </table>
-        {items.length === 0 ? (
-          <p className="p-4 text-body text-muted-foreground">
-            No findings match the current filters.
-          </p>
-        ) : null}
+        items.length === 0 ? (
+        <p className="p-4 text-body text-muted-foreground">
+          No findings match the current filters.
+        </p>
+        ) : null;
       </div>
     </div>
   );

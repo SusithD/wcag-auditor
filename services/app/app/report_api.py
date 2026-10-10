@@ -10,10 +10,11 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from app.api import HEX, Viewport, _capture_folders
 from app.config import Settings
-from app.ingest import capture_for
+from app.ingest import capture_for, ingest_run
 from app.models import CaptureRow, FindingRow
 
 Status = Literal["open", "fixed", "ignored"]
@@ -97,6 +98,11 @@ class FindingPatch(BaseModel):
     status: Status
 
 
+def _csv_cell(value: object) -> object:
+    text = str(value)
+    return "'" + text if text[:1] in {"=", "+", "-", "@", "\t", "\r"} else value
+
+
 def _element(evidence: dict[str, Any]) -> str:
     rule = evidence.get("rule")
     if isinstance(rule, dict) and rule.get("target"):
@@ -113,7 +119,10 @@ def _load_report(run_dir: Path, viewport: str) -> dict[str, Any]:
     path = run_dir / viewport / "report.json"
     if not path.is_file():
         raise HTTPException(404, "Report not available")
-    data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise HTTPException(500, "The report file is unreadable") from exc
     return data
 
 
@@ -124,6 +133,17 @@ def build_report_router(settings: Settings) -> APIRouter:
         if not HEX.match(run_id):
             raise HTTPException(404, "Unknown run")
         return settings.runs_dir / run_id
+
+    def ensure_ingested(session: Session, run_id: str, viewport: str) -> CaptureRow | None:
+        capture = capture_for(session, run_id, viewport)
+        if capture is None and (run_dir(run_id) / viewport / "report.json").is_file():
+            try:
+                ingest_run(session, run_id, run_dir(run_id))
+            except Exception as exc:
+                session.rollback()
+                raise HTTPException(500, "The report could not be loaded") from exc
+            capture = capture_for(session, run_id, viewport)
+        return capture
 
     def to_out(row: FindingRow, viewport: str, report: dict[str, Any]) -> FindingOut:
         key = row.key or ""
@@ -171,7 +191,7 @@ def build_report_router(settings: Settings) -> APIRouter:
     def _csv(run_id: str, viewport: str, request: Request) -> str:
         report = _load_report(run_dir(run_id), viewport)
         with request.app.state.sessions() as session:
-            capture = capture_for(session, run_id, viewport)
+            capture = ensure_ingested(session, run_id, viewport)
             rows = (
                 session.scalars(
                     select(FindingRow)
@@ -206,7 +226,8 @@ def build_report_router(settings: Settings) -> APIRouter:
                 ev = f.evidence_rows
                 box = f.bbox
                 writer.writerow(
-                    [
+                    _csv_cell(c)
+                    for c in [
                         f.key,
                         f.sc,
                         f.severity,
@@ -278,7 +299,7 @@ def build_report_router(settings: Settings) -> APIRouter:
     ) -> list[FindingOut]:
         report = _load_report(run_dir(run_id), viewport)
         with request.app.state.sessions() as session:
-            capture = capture_for(session, run_id, viewport)
+            capture = ensure_ingested(session, run_id, viewport)
             if capture is None:
                 raise HTTPException(404, "Run not ingested yet")
             query = select(FindingRow).where(FindingRow.capture_id == capture.id)
@@ -301,9 +322,9 @@ def build_report_router(settings: Settings) -> APIRouter:
                 raise HTTPException(404, "Unknown finding")
             capture = session.get(CaptureRow, row.capture_id)
             assert capture is not None
+            report = _load_report(Path(capture.path).parent, capture.viewport)
             row.status = body.status
             session.commit()
-            report = _load_report(Path(capture.path).parent, capture.viewport)
             return to_out(row, capture.viewport, report)
 
     @router.get("/runs/{run_id}/assets/{viewport}/crop/{key}")

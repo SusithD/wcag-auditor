@@ -107,3 +107,14 @@ Decisions:
 - **Input border token.** `--input` is `#71717a` (light) and `#8b8b94` (dark), not zinc-200/zinc-800: a field boundary at 1.2:1 fails 1.4.11. This departs from the DESIGN_SPEC section 1 border token for form controls only.
 - Type scale and radii remapped so shadcn's `text-sm` is 13/20 and radii are 4/6/8/10 px as specified.
 
+## ADR-024 Report screen: data flow, ordering and overlay semantics (2026-10-10, M7b)
+Context: the report needs per-finding status that survives reloads, a canvas that is fully keyboard-operable, and zero axe violations in every layout.
+Decisions:
+- **Findings live in SQLite as well as report.json.** When a run finishes, `ingest_run` copies each viewport's report into captures/findings/coverage (migration 0002 adds `findings.key`, the report's `f001`-style id). Statuses are keyed by (viewport, key) and survive a re-ingest; if the finish hook missed a run, the first read ingests lazily. Guidance, evidence rows and crops stay in report.json and are merged into `FindingOut`, so the UI types are generated from OpenAPI (nothing hand-written).
+- **Two orders.** Arrow keys on the canvas follow reading order (top to bottom, left to right) because that is what a sighted keyboard user expects; J/K and the table follow criterion, then severity, then position, because that is the order the rail and table show. The e2e test pins both and asserts they differ on the fixture.
+- **Overlay painting.** Boxes are painted largest first so the smallest is on top and clickable; the DOM order is therefore by area, while the roving tab stop and arrow navigation use reading order. Dimming of unselected boxes applies to the shapes only: dimming the text label dropped its contrast below 4.5:1.
+- **Focus pair.** Diff is computed in the browser from the two viewport PNGs (changed pixels red on grey, threshold 8/255); it is a viewing aid, not a measurement. The pair view replaces the page canvas because focus PNGs are viewport images scaled by `png_scale`, not page coordinates.
+- **Exports.** JSON, HTML, PDF (page count from pypdf) and CSV; CSV cells that start with `=`, `+`, `-`, `@`, tab or CR are prefixed with a quote against spreadsheet formula injection.
+- **Layout.** Three resizable panes from 1280 px (DESIGN_SPEC says 1440; 1280 keeps the panes usable on common laptops), a Sheet for the detail pane from 1024 to 1279 px, tabs below 1024 px. Separators are keyboard operable and have a 24 px hit area.
+- **Lint.** `src/components/report` switches off biome's `useSemanticElements`, `noNoninteractiveTabindex`, `noStaticElementInteractions` and `useAnchorContent`: the overlay uses `<g role="button">`, scroll regions must be focusable (axe `scrollable-region-focusable`), and menu items render their own anchor content.
+
