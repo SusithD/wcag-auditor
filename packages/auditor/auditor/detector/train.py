@@ -213,6 +213,17 @@ def resolve_resume(out: Path, epochs: int, stop_after_epoch: int | None) -> Path
     return path
 
 
+def check_resume_config(out: Path, current: dict[str, Any]) -> None:
+    """A resumed phase must use the settings that wrote the checkpoint."""
+    recorded_path = out / "config.json"
+    if not recorded_path.is_file():
+        return
+    recorded = json.loads(recorded_path.read_text())
+    changed = {k: (recorded.get(k), v) for k, v in current.items() if recorded.get(k) != v}
+    if changed:
+        raise SystemExit(f"resume settings differ from {recorded_path}: {changed}")
+
+
 def checkpoint_epoch(path: Path | None) -> int:
     if path is None:
         return 0
@@ -254,6 +265,7 @@ def train(
     resume: Path | None = None,
     num_workers: int = 4,
     stop_after_epoch: int | None = None,
+    grad_accum: int = 1,
 ) -> Path:
     """Fine-tune RF-DETR on a prepared WebUI dataset (Roboflow layout, see prepare_webui).
 
@@ -267,6 +279,8 @@ def train(
         "model": model,
         "epochs": epochs,
         "batch_size": batch_size,
+        "grad_accum": grad_accum,
+        "num_workers": num_workers,
         "resolution": resolution,
         "seed": seed,
         "device": device,
@@ -286,7 +300,16 @@ def train(
     detector = build_model(model, resolution, device)
     with extra_callbacks(make_callbacks(seed, stop_after_epoch, checkpoint_epoch(resume))):
         _fit(
-            detector, dataset_dir, output_dir, epochs, batch_size, seed, resume, num_workers, device
+            detector,
+            dataset_dir,
+            output_dir,
+            epochs,
+            batch_size,
+            seed,
+            resume,
+            num_workers,
+            device,
+            grad_accum,
         )
     return output_dir
 
@@ -301,13 +324,14 @@ def _fit(
     resume: Path | None,
     num_workers: int,
     device: str,
+    grad_accum: int,
 ) -> None:
     detector.train(
         device=device,
         dataset_dir=str(dataset_dir),
         epochs=epochs,
         batch_size=batch_size,
-        grad_accum_steps=1,
+        grad_accum_steps=grad_accum,
         use_ema=True,
         seed=seed,
         output_dir=str(output_dir),
@@ -330,6 +354,8 @@ def main() -> None:
     ap.add_argument("--resolution", type=int, default=576)
     ap.add_argument("--seed", type=int, default=20261004)
     ap.add_argument("--device", default="mps")
+    ap.add_argument("--num-workers", type=int, default=4)
+    ap.add_argument("--grad-accum", type=int, default=1)
     ap.add_argument("--resume", type=Path, default=None)
     ap.add_argument(
         "--resume-latest",
@@ -343,10 +369,24 @@ def main() -> None:
         help="stop cleanly after this epoch; the schedule still covers --epochs (ADR-028)",
     )
     args = ap.parse_args()
+    if args.batch_size < 1 or args.grad_accum < 1 or args.num_workers < 0:
+        ap.error("--batch-size and --grad-accum must be at least 1, --num-workers at least 0")
     if args.resume_latest:
         if args.resume is not None:
             ap.error("--resume and --resume-latest are exclusive")
         args.resume = resolve_resume(args.out, args.epochs, args.stop_after_epoch)
+    if args.resume is not None:
+        check_resume_config(
+            args.out,
+            {
+                "model": args.model,
+                "epochs": args.epochs,
+                "batch_size": args.batch_size,
+                "grad_accum": args.grad_accum,
+                "resolution": args.resolution,
+                "seed": args.seed,
+            },
+        )
     train(
         args.dataset,
         args.out,
@@ -357,6 +397,8 @@ def main() -> None:
         args.seed,
         args.device,
         args.resume,
+        num_workers=args.num_workers,
+        grad_accum=args.grad_accum,
         stop_after_epoch=args.stop_after_epoch,
     )
 

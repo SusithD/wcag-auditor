@@ -74,15 +74,17 @@ def assert_tree_equal(x: Any, y: Any) -> None:
         assert x == y
 
 
-@pytest.mark.parametrize("workers", [0, 2])
-def test_three_epochs_equal_two_epochs_plus_a_resumed_epoch(tmp_path: Path, workers: int) -> None:
+@pytest.mark.parametrize(("workers", "accum"), [(0, 1), (2, 1), (2, 2)])
+def test_three_epochs_equal_two_epochs_plus_a_resumed_epoch(
+    tmp_path: Path, workers: int, accum: int
+) -> None:
     import torch
     from auditor.detector.train import train
 
     data = make_dataset(tmp_path / "data")
     common: dict[str, Any] = {
         "model": "nano", "epochs": 3, "batch_size": 2, "resolution": SIZE,
-        "seed": 11, "device": "cpu", "num_workers": workers,
+        "seed": 11, "device": "cpu", "num_workers": workers, "grad_accum": accum,
     }  # fmt: skip
     straight = train(data, tmp_path / "straight", **common)
     phase = train(data, tmp_path / "phased", stop_after_epoch=2, **common)

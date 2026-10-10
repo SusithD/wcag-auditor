@@ -5,7 +5,7 @@ phase=${1:?usage: train_detector.sh phase1|phase2|export-phase1}
 dataset=${DATASET:-data/webui/prepared_full}
 out=${OUT:-data/models/rfdetr-nano-full}
 export PYTORCH_ENABLE_MPS_FALLBACK=1
-train=(uv run python -m auditor.detector.train --dataset "$dataset" --out "$out" --model nano --epochs 20 --batch-size 8 --resolution 576 --device mps)
+train=(uv run python -m auditor.detector.train --dataset "$dataset" --out "$out" --model nano --epochs 20 --batch-size 4 --grad-accum 2 --num-workers 2 --resolution 576 --device mps)
 case $phase in
   phase1)
     exec caffeinate -i "${train[@]}" --stop-after-epoch 10 --resume-latest

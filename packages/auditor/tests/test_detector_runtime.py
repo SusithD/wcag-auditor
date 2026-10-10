@@ -246,3 +246,23 @@ def test_label_noise_sample_is_deterministic_for_a_seed(tmp_path: Path) -> None:
     other = label_noise.build(dataset, tmp_path / "c", n=10, seed=6)
     rows = [list(csv.reader(p.open())) for p in (first, again, other)]
     assert rows[0] == rows[1] and rows[0] != rows[2]
+
+
+def test_resume_refuses_changed_settings(tmp_path: Path) -> None:
+    (tmp_path / "config.json").write_text(json.dumps({"batch_size": 4, "grad_accum": 2}))
+    train_mod.check_resume_config(tmp_path, {"batch_size": 4, "grad_accum": 2})
+    with pytest.raises(SystemExit):
+        train_mod.check_resume_config(tmp_path, {"batch_size": 8, "grad_accum": 1})
+
+
+def test_resolve_resume_picks_the_newest_checkpoint_and_refuses_a_finished_phase(
+    tmp_path: Path,
+) -> None:
+    assert train_mod.resolve_resume(tmp_path, 20, 10) is None
+    for n in (0, 1, 2):
+        (tmp_path / f"checkpoint_{n}.ckpt").write_bytes(b"x")
+    assert train_mod.resolve_resume(tmp_path, 20, 10) == tmp_path / "checkpoint_2.ckpt"
+    (tmp_path / "checkpoint_9.ckpt").write_bytes(b"x")
+    with pytest.raises(SystemExit):
+        train_mod.resolve_resume(tmp_path, 20, 10)
+    assert train_mod.resolve_resume(tmp_path, 20, None) == tmp_path / "checkpoint_9.ckpt"
