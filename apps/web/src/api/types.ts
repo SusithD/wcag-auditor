@@ -21,6 +21,125 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/runs/{run_id}/overview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Overview */
+    get: operations["overview_runs__run_id__overview_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/runs/{run_id}/report.csv": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Report Csv */
+    get: operations["report_csv_runs__run_id__report_csv_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/runs/{run_id}/exports": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Exports */
+    get: operations["exports_runs__run_id__exports_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/runs/{run_id}/findings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Findings */
+    get: operations["list_findings_runs__run_id__findings_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/findings/{finding_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Patch Finding */
+    patch: operations["patch_finding_findings__finding_id__patch"];
+    trace?: never;
+  };
+  "/runs/{run_id}/assets/{viewport}/crop/{key}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Crop */
+    get: operations["crop_runs__run_id__assets__viewport__crop__key__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/runs/{run_id}/assets/{viewport}/focus/{index}/{state}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Focus Image */
+    get: operations["focus_image_runs__run_id__assets__viewport__focus__index___state__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/uploads": {
     parameters: {
       query?: never;
@@ -145,15 +264,164 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** BBoxOut */
+    BBoxOut: {
+      /** X */
+      x: number;
+      /** Y */
+      y: number;
+      /** W */
+      w: number;
+      /** H */
+      h: number;
+    };
     /** Body_create_upload_uploads_post */
     Body_create_upload_uploads_post: {
       /** Files */
       files: string[];
     };
+    /** CoverageCellOut */
+    CoverageCellOut: {
+      /** Sc */
+      sc: string;
+      /**
+       * Rule Verdict
+       * @enum {string}
+       */
+      rule_verdict: "automated" | "needs-review" | "not-assessable" | "none";
+      /**
+       * Pixel Verdict
+       * @enum {string}
+       */
+      pixel_verdict: "automated" | "needs-review" | "not-assessable" | "none";
+      /**
+       * Hybrid Verdict
+       * @enum {string}
+       */
+      hybrid_verdict: "automated" | "needs-review" | "not-assessable" | "none";
+    };
+    /** EvidenceRow */
+    EvidenceRow: {
+      /** Label */
+      label: string;
+      /** Value */
+      value: string;
+    };
+    /** ExportInfo */
+    ExportInfo: {
+      /**
+       * Format
+       * @enum {string}
+       */
+      format: "json" | "html" | "pdf" | "csv";
+      /** Url */
+      url: string;
+      /** Size Bytes */
+      size_bytes: number;
+      /** Pages */
+      pages: number | null;
+    };
+    /** FindingOut */
+    FindingOut: {
+      /** Id */
+      id: number;
+      /** Key */
+      key: string;
+      /**
+       * Viewport
+       * @enum {string}
+       */
+      viewport: "desktop" | "mobile";
+      /** Sc */
+      sc: string;
+      bbox: components["schemas"]["BBoxOut"] | null;
+      /** Focus Index */
+      focus_index: number | null;
+      /**
+       * Severity
+       * @enum {string}
+       */
+      severity: "critical" | "serious" | "minor";
+      /**
+       * Tier
+       * @enum {string}
+       */
+      tier: "automated" | "needs-review" | "not-assessable";
+      /** Score */
+      score: number;
+      /**
+       * Provenance
+       * @enum {string}
+       */
+      provenance: "rule" | "pixel" | "both";
+      /** Element */
+      element: string;
+      guidance: components["schemas"]["GuidanceOut"] | null;
+      /** Evidence Rows */
+      evidence_rows: components["schemas"]["EvidenceRow"][];
+      /** Has Crop */
+      has_crop: boolean;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "open" | "fixed" | "ignored";
+    };
+    /** FindingPatch */
+    FindingPatch: {
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "open" | "fixed" | "ignored";
+    };
+    /** GuidanceOut */
+    GuidanceOut: {
+      /** Sc Title */
+      sc_title: string;
+      /** Level */
+      level: string;
+      /** Understanding */
+      understanding: string;
+      /** What Failed */
+      what_failed: string;
+      /** Nearest Passing */
+      nearest_passing: string;
+      /** Fix Css */
+      fix_css: string;
+      /** Fix Html */
+      fix_html: string;
+      /** Techniques */
+      techniques: components["schemas"]["Technique"][];
+    };
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
       detail?: components["schemas"]["ValidationError"][];
+    };
+    /** Overview */
+    Overview: {
+      /**
+       * Viewport
+       * @enum {string}
+       */
+      viewport: "desktop" | "mobile";
+      /** Url */
+      url: string;
+      /** Title */
+      title: string | null;
+      /** Screenshot Width */
+      screenshot_width: number;
+      /** Screenshot Height */
+      screenshot_height: number;
+      /** Focus Stops */
+      focus_stops: number;
+      /** Condition */
+      condition: string;
+      /** Coverage */
+      coverage: components["schemas"]["CoverageCellOut"][];
+      /** Available Viewports */
+      available_viewports: ("desktop" | "mobile")[];
     };
     /** RunCreate */
     RunCreate: {
@@ -240,6 +508,15 @@ export interface components {
        */
       needs_review: number;
     };
+    /** Technique */
+    Technique: {
+      /** Id */
+      id: string;
+      /** Title */
+      title: string;
+      /** Url */
+      url: string;
+    };
     /** UploadResult */
     UploadResult: {
       /** Upload Id */
@@ -287,6 +564,244 @@ export interface operations {
           "application/json": {
             [key: string]: string;
           };
+        };
+      };
+    };
+  };
+  overview_runs__run_id__overview_get: {
+    parameters: {
+      query: {
+        viewport: "desktop" | "mobile";
+      };
+      header?: never;
+      path: {
+        run_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Overview"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  report_csv_runs__run_id__report_csv_get: {
+    parameters: {
+      query: {
+        viewport: "desktop" | "mobile";
+      };
+      header?: never;
+      path: {
+        run_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  exports_runs__run_id__exports_get: {
+    parameters: {
+      query: {
+        viewport: "desktop" | "mobile";
+      };
+      header?: never;
+      path: {
+        run_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ExportInfo"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_findings_runs__run_id__findings_get: {
+    parameters: {
+      query: {
+        viewport: "desktop" | "mobile";
+        sc?: string | null;
+        severity?: string | null;
+        provenance?: string | null;
+        tier?: string | null;
+      };
+      header?: never;
+      path: {
+        run_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FindingOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  patch_finding_findings__finding_id__patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        finding_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FindingPatch"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FindingOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  crop_runs__run_id__assets__viewport__crop__key__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        run_id: string;
+        viewport: "desktop" | "mobile";
+        key: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  focus_image_runs__run_id__assets__viewport__focus__index___state__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        run_id: string;
+        viewport: "desktop" | "mobile";
+        index: number;
+        state: "on" | "off";
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
         };
       };
     };

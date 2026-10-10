@@ -97,6 +97,7 @@
   --input: #71717a;
   --ring: #2563eb;
   --accent-focus: #2563eb;
+  --halo: #ffffff;
   --sev-critical: #b91c1c;
   --sev-serious: #b45309;
   --sev-minor: #1d4ed8;
@@ -138,6 +139,7 @@
   --input: #8b8b94;
   --ring: #60a5fa;
   --accent-focus: #60a5fa;
+  --halo: #000000;
   --sev-critical: #fca5a5;
   --sev-serious: #fcd34d;
   --sev-minor: #93c5fd;
@@ -187,5 +189,11 @@
 @media (forced-colors: active) {
   :focus-visible {
     outline-color: Highlight;
+  }
+  svg [data-key] rect {
+    stroke: CanvasText;
+  }
+  svg [data-key][data-selected="true"] rect {
+    stroke: Highlight;
   }
 }

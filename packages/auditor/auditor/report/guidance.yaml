@@ -100,7 +100,7 @@
   fix_html: ''
   techniques:
     - {id: C40, title: Creating a two-color focus indicator to ensure sufficient contrast with all components, url: https://www.w3.org/WAI/WCAG22/Techniques/css/C40}
-    - {id: G195, title: Using an author-supplied, visible focus indicator, url: https://www.w3.org/WAI/WCAG22/Techniques/general/G195}
+    - {id: G195, title: "Using an author-supplied, visible focus indicator", url: https://www.w3.org/WAI/WCAG22/Techniques/general/G195}
 2.5.7/dragging:
   sc_title: Dragging Movements
   level: AA

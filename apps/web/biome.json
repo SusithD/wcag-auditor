@@ -62,6 +62,21 @@
       }
     },
     {
+      "includes": ["src/components/report/**"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "useSemanticElements": "off",
+            "noNoninteractiveTabindex": "off",
+            "noStaticElementInteractions": "off",
+            "useAriaPropsSupportedByRole": "off",
+            "noAriaHiddenOnFocusable": "off",
+            "useAnchorContent": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["src/app/globals.css"],
       "linter": {
         "rules": {

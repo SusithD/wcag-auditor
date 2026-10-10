@@ -294,3 +294,28 @@ def test_hostile_evidence_text_cannot_inject_template_placeholders(tmp_path: Pat
     report = build.build(make_run([]), cap.model_copy(update={"meta": meta}), tmp_path)
     html = render(report, tmp_path, cap.path / "screenshot.png")
     assert "http://x.test/$summary$findings" in html
+
+
+VERIFIED_TECHNIQUE_TITLES = {
+    "G18": "Ensuring that a contrast ratio of at least 4.5:1 exists between text (and images of text) and background behind the text",  # noqa: E501
+    "G145": "Ensuring that a contrast ratio of at least 3:1 exists between text (and images of text) and background behind the text",  # noqa: E501
+    "G207": "Ensuring that a contrast ratio of 3:1 is provided for icons",
+    "G209": "Provide sufficient contrast at the boundaries between adjoining colors",
+    "C15": "Using CSS to change the presentation of a user interface component when it receives focus",  # noqa: E501
+    "G149": "Using user interface components that are highlighted by the user agent when they receive focus",  # noqa: E501
+    "G195": "Using an author-supplied, visible focus indicator",
+    "C40": "Creating a two-color focus indicator to ensure sufficient contrast with all components",
+    "C43": "Using CSS scroll-padding to un-obscure content",
+    "G219": "Ensuring that an alternative is available for dragging movements that operate on content",  # noqa: E501
+    "C42": "Using min-height and min-width on target container to ensure sufficient target spacing",
+}
+
+
+def test_every_guidance_technique_title_is_the_verified_w3c_title() -> None:
+    entries = guidance.load()
+    seen: dict[str, str] = {}
+    for entry in entries.values():
+        for t in entry["techniques"]:
+            seen[t["id"]] = t["title"]
+            assert t["url"].startswith("https://www.w3.org/WAI/WCAG22/Techniques/")
+    assert seen == {k: VERIFIED_TECHNIQUE_TITLES[k] for k in seen}
