@@ -38,6 +38,9 @@ heuristics:
   ocr_tile_height_px: 2000
   ocr_tile_overlap_px: 64
   ocr_large_ink_height_px: 32
+  detector_score_threshold: 0.3
+  detector_nms_iou: 0.5
+  detector_tile_overlap_px: 64
 
 severity:
   contrast:

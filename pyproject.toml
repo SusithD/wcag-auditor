@@ -36,7 +36,7 @@ plugins = ["pydantic.mypy"]
 exclude = ["apps/", "fixtures/", "services/app/alembic/"]
 
 [[tool.mypy.overrides]]
-module = ["statsmodels.*", "scipy.*", "rapidocr_onnxruntime.*"]
+module = ["statsmodels.*", "scipy.*", "rapidocr_onnxruntime.*", "pyarrow.*", "rfdetr.*", "torch.*", "onnx.*", "onnxruntime.*", "psutil.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

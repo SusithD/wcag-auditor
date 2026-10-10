@@ -99,7 +99,7 @@ def run(ctx: ModuleContext) -> list[Finding]:
                 sc=SC,
                 bbox=BBox(x=b.x, y=b.y, w=b.w, h=b.h),
                 severity="serious",
-                tier="automated",
+                tier="needs-review" if el.style.get("source") == "detector" else "automated",
                 score=score_from_margin(min(b.w, b.h), size),
                 provenance="pixel",
                 evidence={

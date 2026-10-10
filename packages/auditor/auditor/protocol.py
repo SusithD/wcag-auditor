@@ -66,6 +66,9 @@ class Heuristics(_Frozen):
     ocr_tile_height_px: int
     ocr_tile_overlap_px: int
     ocr_large_ink_height_px: int
+    detector_score_threshold: float
+    detector_nms_iou: float
+    detector_tile_overlap_px: int
 
 
 class ContrastSeverity(_Frozen):
