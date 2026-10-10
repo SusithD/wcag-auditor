@@ -28,3 +28,10 @@ Running log for Chapter 4. Claude Code appends to this file; the researcher adds
 - Real fixtures have no `truth.json` in the benchmark (truth lives in `benchmark_ground_truth.json`); M0 extracted each item into the fixture's `truth.json`.
 - The 976 KB mobile screenshot is committed uncompressed, against CLAUDE.md's "no PNG > 200 KB", because the M0 prompt says to keep that fixture's originals.
 - `.gitignore` carries `autopilot.sh` and `.autopilot-logs/` lines added outside this session; left uncommitted.
+
+## M1 capture (2026-10-10, branch m1-capture)
+
+- `auditor/capture/`: `driver.py` (PlaywrightBrowser, `capture_url`), `focus.py` (`step_focus` + sentinel/info JS), `snapshot.py`, `proxy_signals.js` (verbatim copy of `../04_Data_Collection/webui_proxy_signals.js`, needed because `validate_captures.py` requires `proxy_findings.json`).
+- `auditor capture <url> --out <dir> --viewports desktop,mobile` writes the benchmark folder layout plus `VERSIONS.json`; `auditor run --folder` replay already worked and is covered by a browser test.
+- Deviation: the meta-key superset test excludes the 7 origin-specific keys (synthetic seeding / WebUI sampling), see `fixtures/README.md`.
+- `fixtures/sites/static.html` created (the milestone referenced it but it did not exist).

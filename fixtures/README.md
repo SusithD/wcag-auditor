@@ -55,3 +55,11 @@ Parsed by `auditor.schema.Truth`.
 - **Real** (extracted from `annotation/benchmark_ground_truth.json`, protocol 1.1, by `page_id`): `page_id`, `viewport`, `annotations[]` (`sc`, `bbox`, `severity`, `source`, `note`) and `focus_judgments[]` per stop: `index`, `v247` (`yes|no|not-assessable`), `obs` (`none|partial|entire`), `v2413` (`meets|fails|na|not-assessable`).
 
 `bbox` is `{x, y, w, h}` in document CSS px. Page SCs (1.4.3, 1.4.11, 2.5.7, 2.5.8) are matched by IoU; focus SCs (2.4.x) by `index` into `focus_judgments` (ADR-006).
+
+## meta.json key union (benchmark, M1)
+
+Union of `meta.json` keys across the 410 benchmark folders (generator 2.2.0 and 2.3.0): `capture_timestamp`, `coordinates`, `domain`, `final_url`, `focus_run`, `focus_step_count`, `focus_steps`, `generator_version`, `http_status`, `layout`, `origin`, `page_id`, `protocol_version`, `sampling_frame`, `screenshot_mode`, `screenshot_sha256`, `sector`, `seeded_sc`, `selected_for_proxy_signals`, `synthetic_page_id`, `test_elements_rendered`, `title`, `tools`, `truth_note`, `url`, `viewport`, `viewport_spec`, `webui_page_id`.
+
+`auditor capture` emits every key except the origin-specific ones (`domain`, `sampling_frame`, `seeded_sc`, `selected_for_proxy_signals`, `synthetic_page_id`, `truth_note`, `webui_page_id`), which only exist for benchmark sampling and synthetic seeding. `test_meta_keys_superset_of_benchmark` enforces this. New captures set `generator_version` to the auditor's own version (`auditor-<version>`) and write `VERSIONS.json` beside `meta.json`.
+
+`fixtures/sites/static.html` is the page served by the browser tests.

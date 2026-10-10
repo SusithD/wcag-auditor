@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Static capture fixture</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 0; color: #1a1a1a; }
+  header, main, footer { padding: 16px 24px; }
+  header { background: #0b3d91; color: #fff; }
+  a, button { font-size: 16px; padding: 8px 12px; }
+  a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid #ffbf47; outline-offset: 2px; }
+  .low { color: #aaa; }
+</style>
+</head>
+<body>
+<header><h1>Static fixture</h1><nav><a href="#a">Alpha</a> <a href="#b">Beta</a></nav></header>
+<main>
+  <p>Body text for the capture test.</p>
+  <p class="low">Low contrast paragraph.</p>
+  <form><label>Name <input type="text" name="n"></label> <button type="button">Send</button></form>
+  <div style="height:1200px" id="a"></div>
+  <p id="b">Bottom of page.</p>
+</main>
+<footer><a href="#a">Back up</a></footer>
+</body>
+</html>
