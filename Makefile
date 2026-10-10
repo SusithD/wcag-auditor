@@ -18,8 +18,12 @@ check:
 smoke:
 	bash scripts/smoke.sh
 
+EVAL_OUT ?= eval/$(shell date +%F)
+
 eval:
-	uv run auditor eval --benchmark $(BENCHMARK_DIR) --truth $(TRUTH_PATH) --out eval/$$(date +%F)
+	uv run auditor eval --benchmark $(BENCHMARK_DIR) --truth $(TRUTH_PATH) --synthetic-truth from-folders \
+		--conditions rule_only --seed 20261004 --bootstrap 10000 \
+		$(if $(RULE_FINDINGS),--rule-findings $(RULE_FINDINGS)) --out $(EVAL_OUT)
 
 goldens:
 	uv run python scripts/regen_goldens.py

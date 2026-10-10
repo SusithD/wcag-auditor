@@ -1,0 +1,37 @@
+{
+ "page_id": "synth_sc1-4-3_001_desktop_20261004T060449Z",
+ "origin": "synth",
+ "viewport": "desktop",
+ "mode": "snapshot",
+ "axe_version": "4.13.0",
+ "covered_scs": [
+  "1.4.3",
+  "2.5.8"
+ ],
+ "not_covered_scs": [
+  "1.4.11",
+  "2.4.7",
+  "2.4.11",
+  "2.4.12",
+  "2.4.13",
+  "2.5.7"
+ ],
+ "findings": [
+  {
+   "sc": "1.4.3",
+   "rule": "color-contrast",
+   "kind": "violation",
+   "impact": "serious",
+   "bbox": {
+    "x": 96,
+    "y": 217,
+    "w": 437,
+    "h": 16
+   },
+   "target": [
+    "span"
+   ],
+   "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.41 (foreground color: #787878, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+  }
+ ]
+}

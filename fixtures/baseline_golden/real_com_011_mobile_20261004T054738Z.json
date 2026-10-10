@@ -1,0 +1,69 @@
+{
+ "page_id": "real_com_011_mobile_20261004T054738Z",
+ "origin": "real",
+ "viewport": "mobile",
+ "mode": "snapshot",
+ "axe_version": "4.13.0",
+ "covered_scs": [
+  "1.4.3",
+  "2.5.8"
+ ],
+ "not_covered_scs": [
+  "1.4.11",
+  "2.4.7",
+  "2.4.11",
+  "2.4.12",
+  "2.4.13",
+  "2.5.7"
+ ],
+ "findings": [
+  {
+   "sc": "1.4.3",
+   "rule": "color-contrast",
+   "kind": "violation",
+   "impact": "serious",
+   "bbox": {
+    "x": 70,
+    "y": 641,
+    "w": 840,
+    "h": 46
+   },
+   "target": [
+    "h2"
+   ],
+   "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.05 (foreground color: #aed6f1, background color: #3498db, font size: 30.0pt (40px), font weight: normal). Expected contrast ratio of 3:1"
+  },
+  {
+   "sc": "1.4.3",
+   "rule": "color-contrast",
+   "kind": "violation",
+   "impact": "serious",
+   "bbox": {
+    "x": 70,
+    "y": 1169,
+    "w": 420,
+    "h": 49
+   },
+   "target": [
+    "#stagehand > .game-wrapper > .game-info > .game-tagline"
+   ],
+   "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.06 (foreground color: #c59fd5, background color: #9b59b6, font size: 31.5pt (42px), font weight: normal). Expected contrast ratio of 3:1"
+  },
+  {
+   "sc": "1.4.3",
+   "rule": "color-contrast",
+   "kind": "violation",
+   "impact": "serious",
+   "bbox": {
+    "x": 490,
+    "y": 1849,
+    "w": 420,
+    "h": 49
+   },
+   "target": [
+    "#spaceage > .game-wrapper > .game-info > .game-tagline"
+   ],
+   "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.67 (foreground color: #78c8b8, background color: #16a085, font size: 31.5pt (42px), font weight: normal). Expected contrast ratio of 3:1"
+  }
+ ]
+}
