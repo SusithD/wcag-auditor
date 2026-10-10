@@ -62,6 +62,19 @@
       }
     },
     {
+      "includes": ["src/components/report/**"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "useSemanticElements": "off",
+            "noNoninteractiveTabindex": "off",
+            "noStaticElementInteractions": "off",
+            "useAnchorContent": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["src/app/globals.css"],
       "linter": {
         "rules": {

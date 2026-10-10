@@ -10,6 +10,7 @@ dependencies = [
   "sqlalchemy>=2.0",
   "alembic",
   "python-multipart",
+  "pypdf>=6.20.0",
 ]
 
 [build-system]

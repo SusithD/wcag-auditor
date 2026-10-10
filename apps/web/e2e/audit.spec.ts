@@ -27,9 +27,7 @@ test("a fixture-folder run shows progress and lands on the report with the scree
   await expect
     .poll(() => shot.evaluate((el: HTMLImageElement) => el.naturalWidth))
     .toBeGreaterThan(0);
-  await expect(
-    page.getByRole("link", { name: "Open HTML report" }),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Export" })).toBeVisible();
 });
 
 test("a queued run can be cancelled from the progress screen after confirming", async ({

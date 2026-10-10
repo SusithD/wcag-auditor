@@ -16,7 +16,7 @@ Claude Code updates this file at the end of every milestone. Status: `todo` · `
 | M10 detector | m10-detector | blocked (gate: full training needs researcher OK; training size per ADR-018) | | Code, 15k/1.5k data prep, smoke gate (RF-DETR OK, 2.23 img/s, 27 GB MPS), ONNX path, screenshot-only run are done and tested on branch m10-detector (committed, NOT merged: acceptance needs the trained model). Pending: training run, mAP report, ablation, label-noise check. |
 | M6 fusion + report | m6-fusion-report | done | 2026-10-10 | hybrid non-inferior on 1.4.3 (ΔP CI [-0.029,-0.002]); real fixtures 4 automated / 5 any (ADR-021, ADR-022) |
 | M7a web shell + New Audit + progress | m7a-web-shell | done | 2026-10-10 | 13 e2e incl. axe zero violations on `/` and run progress, keyboard-only run; focus-pair upload, favicon, per-module boxes NOT DONE (ADR-023) |
-| M7b report screen | m7b-report | todo | | |
+| M7b report screen | m7b-report-screen | done (manual screen-reader pass pending) | 2026-10-10 | 25 e2e incl. axe on both fixtures, keyboard and URL-state tests, 1440x900 snapshot; manual VoiceOver/NVDA pass NOT DONE (ADR-024) |
 | M7c secondary screens | m7c-secondary-screens | todo | | |
 | M8 full evaluation | m8-eval-run | todo | | report real and synthetic strata separately; IoU sweep with and without containment (ADR-013) |
 | M9 study build | m9-study | todo | | GATE: ethics approval |

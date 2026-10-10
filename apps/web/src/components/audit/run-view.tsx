@@ -3,13 +3,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Circle, CircleAlert, CircleDot } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import {
-  api,
-  reportUrl,
-  screenshotUrl,
-  TERMINAL,
-  type Viewport,
-} from "@/api/client";
+import { api, screenshotUrl, TERMINAL, type Viewport } from "@/api/client";
+import { ReportScreen } from "@/components/report/report-screen";
 import { SeverityTriplet } from "@/components/severity-triplet";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
@@ -25,7 +20,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useRunEvents } from "@/hooks/use-run-events";
 import {
   buildSteps,
@@ -177,7 +171,6 @@ export function RunView({ runId }: { runId: string }) {
   const { events } = useRunEvents(runId, !terminalNow);
   const heading = useRef<HTMLHeadingElement>(null);
   const wasRunning = useRef(false);
-  const [viewport, setViewport] = useState<Viewport | undefined>();
   const [cancelError, setCancelError] = useState<string | null>(null);
 
   const terminal = run ? TERMINAL.has(run.status) : false;
@@ -213,8 +206,7 @@ export function RunView({ runId }: { runId: string }) {
   const available = (
     run.available_viewports.length ? run.available_viewports : captured
   ) as Viewport[];
-  const shownViewport =
-    viewport && available.includes(viewport) ? viewport : available[0];
+  const shownViewport = available[0];
   const current = currentStage(events);
   const steps = buildSteps(
     run.viewports,
@@ -234,9 +226,10 @@ export function RunView({ runId }: { runId: string }) {
 
   if (terminal) {
     const failedAll = run.status === "failed" || run.status === "cancelled";
+    if (!failedAll) return <ReportScreen run={run} headingRef={heading} />;
     return (
       <div className="mx-auto w-full max-w-5xl px-6 py-8">
-        <title>{`${failedAll ? "Audit failed" : "Audit report"} - ${subject}`}</title>
+        <title>{`${run.status === "cancelled" ? "Audit cancelled" : "Audit failed"} - ${subject}`}</title>
         <p
           className="font-mono text-label text-muted-foreground"
           title={subject}
@@ -248,65 +241,14 @@ export function RunView({ runId }: { runId: string }) {
           tabIndex={-1}
           className="mt-1 text-h1 font-semibold tracking-tight outline-none"
         >
-          {failedAll
-            ? run.status === "cancelled"
-              ? "Audit cancelled"
-              : "Audit failed"
-            : "Audit report"}
+          {run.status === "cancelled" ? "Audit cancelled" : "Audit failed"}
         </h1>
         {run.error ? (
           <Alert className="mt-4" variant="destructive">
-            <AlertTitle>
-              {run.status === "partial"
-                ? "Part of the audit failed"
-                : "What went wrong"}
-            </AlertTitle>
+            <AlertTitle>What went wrong</AlertTitle>
             <AlertDescription>{run.error}</AlertDescription>
           </Alert>
         ) : null}
-        {!failedAll ? (
-          <div className="mt-4 flex flex-wrap items-center gap-4">
-            <SeverityTriplet counts={run.counts} />
-            {available.length > 1 ? (
-              <ToggleGroup
-                variant="outline"
-                value={shownViewport ? [shownViewport] : []}
-                onValueChange={(v) => v[0] && setViewport(v[0] as Viewport)}
-                aria-label="Viewport"
-              >
-                {available.map((vp) => (
-                  <ToggleGroupItem key={vp} value={vp}>
-                    {vp === "desktop" ? "Desktop" : "Mobile"}
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-            ) : null}
-            {shownViewport ? (
-              <>
-                <a
-                  className="inline-flex min-h-6 items-center underline underline-offset-4"
-                  href={reportUrl(runId, "html", shownViewport)}
-                >
-                  Open HTML report
-                </a>
-                <a
-                  className="inline-flex min-h-6 items-center underline underline-offset-4"
-                  href={reportUrl(runId, "json", shownViewport)}
-                >
-                  Download JSON
-                </a>
-              </>
-            ) : null}
-          </div>
-        ) : null}
-        <div className="mt-6">
-          <Canvas
-            runId={runId}
-            viewport={shownViewport}
-            alt={alt}
-            ready={captured.length > 0 || available.length > 0}
-          />
-        </div>
       </div>
     );
   }
