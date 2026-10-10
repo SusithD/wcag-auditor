@@ -1,0 +1,77 @@
+{
+  "origin": "synth",
+  "sector": "sc2-4-13",
+  "page_id": 92,
+  "viewport": "desktop",
+  "viewport_spec": {
+    "width": 1440,
+    "height": 900,
+    "is_mobile": false,
+    "has_touch": false,
+    "device_scale_factor": 1
+  },
+  "capture_timestamp": "20261004T061315Z",
+  "url": "file:///Users/susithalwis/Desktop/Final%20Year%20Reserach/04_Data_Collection/synthetic_corpus_v1.1/synth_2.4.13_002/index.html",
+  "final_url": "file:///Users/susithalwis/Desktop/Final%20Year%20Reserach/04_Data_Collection/synthetic_corpus_v1.1/synth_2.4.13_002/index.html",
+  "http_status": 200,
+  "title": "Focus appearance",
+  "screenshot_mode": "full_page",
+  "screenshot_sha256": "c12c4ab5dc49b64ce30316d85d87aa21e8c93712e50dc72b0827dd131b53c662",
+  "focus_step_count": 1,
+  "focus_steps": [
+    {
+      "index": 0,
+      "file_on": "focus-000.png",
+      "file_off": "focus-000-off.png",
+      "uid": 1,
+      "tag": "button",
+      "role": null,
+      "name": "Confirm",
+      "selector": "button#confirm",
+      "rect": {
+        "x": 160,
+        "y": 260,
+        "w": 220,
+        "h": 48
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0
+      },
+      "png_scale": 1
+    }
+  ],
+  "focus_run": {
+    "presses": 2,
+    "stop_reason": "left-page"
+  },
+  "layout": {
+    "has_meta_viewport": true,
+    "layout_width": 1440,
+    "scroll_width": 1440,
+    "inner_width": 1440,
+    "visual_viewport_scale": 1
+  },
+  "test_elements_rendered": [
+    {
+      "id": "e-1",
+      "rect": {
+        "x": 160,
+        "y": 260,
+        "w": 220,
+        "h": 48
+      },
+      "occluded_samples": 0,
+      "samples": 25
+    }
+  ],
+  "coordinates": "screenshot.png: 1 px = 1 CSS px. focus-NNN.png: viewport image; a focus step's rect is in CSS px, so its position in the PNG = rect x png_scale (png_scale < 1 when a non-responsive page is shown zoomed out under mobile emulation).",
+  "generator_version": "2.2.0",
+  "protocol_version": "1.0",
+  "tools": {
+    "browser": "chromium 153.0.8010.12",
+    "playwright": "1.63.0"
+  },
+  "synthetic_page_id": "synth_2.4.13_002",
+  "seeded_sc": "2.4.13"
+}

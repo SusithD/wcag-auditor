@@ -43,3 +43,17 @@ def test_scs_match_schema_and_protocol_sha_matches_file() -> None:
 def test_serious_boundary_is_strict() -> None:
     sev = protocol.load().severity.contrast
     assert (sev.serious_below, sev.serious_below_large) == (4.0, 2.7)
+
+
+def test_protocol_path_can_be_overridden_for_sweeps(tmp_path, monkeypatch):  # type: ignore[no-untyped-def]
+    alt = tmp_path / "alt.yaml"
+    alt.write_text(
+        protocol.PROTOCOL_PATH.read_text().replace(
+            "ua_default_ring_exempt: true", "ua_default_ring_exempt: false"
+        )
+    )
+    monkeypatch.setenv("AUDITOR_PROTOCOL", str(alt))
+    assert protocol.load().heuristics.ua_default_ring_exempt is False
+    assert protocol.sha256() != protocol.sha256(protocol.PROTOCOL_PATH)
+    monkeypatch.delenv("AUDITOR_PROTOCOL")
+    assert protocol.load().heuristics.ua_default_ring_exempt is True

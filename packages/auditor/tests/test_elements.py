@@ -15,7 +15,7 @@ FOLDERS = sorted(p.parent for p in FIXTURES.glob("**/meta.json") if "golden" not
 
 
 def test_golden_exists_for_every_fixture() -> None:
-    assert len(FOLDERS) == 6
+    assert len(FOLDERS) == 12
     assert {f"{f.name}.json" for f in FOLDERS} == {p.name for p in GOLDEN.glob("*.json")}
 
 
@@ -34,6 +34,12 @@ def _close(a: Any, b: Any, tol: float = 1.0) -> bool:
 EXPECTED_KINDS = {
     "synth_sc1-4-3_001": {"text": 2},
     "synth_sc1-4-11_026": {"input": 2, "text": 5},
+    "synth_sc2-4-11_061": {"input": 1, "text": 3, "fixed_region": 1},
+    "synth_sc2-4-12_076": {"input": 1, "text": 3, "fixed_region": 1},
+    "synth_sc2-4-13_092": {"button": 1, "text": 4},
+    "synth_sc2-4-7_049": {"button": 1, "text": 4},
+    "synth_sc2-4-7_047": {"button": 1, "text": 4},
+    "synth_sc2-5-7_113": {"slider": 1, "text": 3},
     "synth_sc2-4-13_091": {"button": 1, "text": 4},
     "synth_sc2-5-8_126": {"button": 4, "text": 7},
 }
@@ -141,3 +147,35 @@ def test_inline_page_flags_and_regions(tmp_path: Path) -> None:
     assert sticky.style["alpha"] == pytest.approx(0.5)
     assert fixed.style["alpha"] == pytest.approx(1.0)
     assert (fixed.bbox_css.x, fixed.bbox_css.w, fixed.bbox_css.h) == (0, 200, 30)
+
+
+SLIDERS = """<!doctype html><html><body style="margin:0">
+<section><div id="a1"><div><div class="track"><span id="handleA" role="slider" tabindex="0"
+ style="display:block;width:22px;height:22px;background:#06c"></span></div>
+ <input id="numA" type="number"></div></div></section>
+<section><div id="b1"><div><div><div class="deep"><span id="handleB" role="slider" tabindex="0"
+ style="display:block;width:22px;height:22px;background:#06c"></span></div></div>
+ <div></div></div><button id="farB">far</button></div></div></section>
+<section><div id="c1"><span id="handleC" role="slider" tabindex="0"
+ style="display:block;width:22px;height:22px;background:#06c"></span>
+ <span role="button" tabindex="0" id="roleC"
+  style="display:block;width:20px;height:20px">+</span></div></section>
+<div id="bar" style="position:fixed;top:0;left:0;width:300px;height:50px;background:#fff">
+ <a href="#x" id="inBar">link</a></div>
+</body></html>"""
+
+
+@pytest.mark.browser
+def test_slider_alternatives_use_the_nearest_ancestors_and_fixed_regions_list_their_controls(
+    tmp_path: Path,
+) -> None:
+    src = next(FIXTURES.glob("synth/sc2-5-8/*"))
+    (tmp_path / "dom.html").write_text(SLIDERS)
+    (tmp_path / "meta.json").write_text((src / "meta.json").read_text())
+    elements = DomElementSource().elements(Capture.from_folder(tmp_path))
+    by_ref = {e.dom_ref: e for e in elements if e.kind != "text"}
+    assert [a["tag"] for a in by_ref["span#handleA"].style["alternatives"]] == ["input"]
+    assert by_ref["span#handleB"].style["alternatives"] == []
+    assert [a["role"] for a in by_ref["span#handleC"].style["alternatives"]] == ["button"]
+    bar = next(e for e in elements if e.kind == "fixed_region")
+    assert "a#inBar" in bar.style["contains_refs"]

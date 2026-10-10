@@ -5,7 +5,7 @@ from typing import Any, Literal
 
 from auditor.capture.snapshot import snapshot_html
 from auditor.elements.base import Element
-from auditor.elements.extract_js import ELEMENTS_FILE, EXTRACT_JS
+from auditor.elements.extract_js import ELEMENTS_FILE, EXTRACT_JS, extract_args
 from auditor.schema import Capture
 
 GeometrySource = Literal["capture", "rerender", "unavailable"]
@@ -123,7 +123,7 @@ class DomElementSource:
             ctx.route("**/*", lambda route: route.abort())
             page = ctx.new_page()
             page.set_content(html, wait_until="load", timeout=self.timeout_ms)
-            raw: list[dict[str, Any]] = page.evaluate(EXTRACT_JS)
+            raw: list[dict[str, Any]] = page.evaluate(EXTRACT_JS, extract_args())
         finally:
             ctx.close()
         return raw

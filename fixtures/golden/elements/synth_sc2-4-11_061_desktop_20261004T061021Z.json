@@ -1,0 +1,148 @@
+{
+ "elements": [
+  {
+   "bbox_css": {
+    "h": 40.0,
+    "w": 480.0,
+    "x": 120.0,
+    "y": 12.0
+   },
+   "dom_ref": "input#email",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "input",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(11, 87, 208)",
+    "border_top_style": "solid",
+    "border_top_width": 2,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 14,
+    "font_weight": 400,
+    "input_type": "email",
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute",
+    "unstyled_native": false
+   },
+   "text": null
+  },
+  {
+   "bbox_css": {
+    "h": 18.0,
+    "w": 366.1,
+    "x": 32.0,
+    "y": 20.0
+   },
+   "dom_ref": "html > body > header.site",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(31, 41, 55)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(31, 41, 55)",
+    "font_size_px": 16,
+    "font_weight": 600,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "fixed"
+   },
+   "text": "Synthetic Test Corpus \u2014 page synth_2.4.11_001"
+  },
+  {
+   "bbox_css": {
+    "h": 28.0,
+    "w": 206.7,
+    "x": 73.0,
+    "y": 121.0
+   },
+   "dom_ref": "html > body > main.content > div.card > h1",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(17, 24, 39)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(17, 24, 39)",
+    "font_size_px": 24,
+    "font_weight": 700,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Newsletter signup"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 270.8,
+    "x": 73.0,
+    "y": 163.0
+   },
+   "dom_ref": "html > body > main.content > div.card > p",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(31, 41, 55)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(31, 41, 55)",
+    "font_size_px": 14,
+    "font_weight": 400,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Enter your email to receive weekly updates."
+  },
+  {
+   "bbox_css": {
+    "h": 64.0,
+    "w": 1440.0,
+    "x": 0.0,
+    "y": 0.0
+   },
+   "dom_ref": "html > body > header.site",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "fixed_region",
+   "style": {
+    "alpha": 1,
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(31, 41, 55)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(31, 41, 55)",
+    "contains_refs": [
+     "html > body > header.site"
+    ],
+    "font_size_px": 16,
+    "font_weight": 600,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "fixed"
+   },
+   "text": null
+  }
+ ],
+ "features": {
+  "edge_density": 0.012,
+  "element_density": 3.09,
+  "focus_stop_count": 1,
+  "has_sticky": true,
+  "is_non_responsive": false
+ },
+ "geometry_source": "rerender"
+}

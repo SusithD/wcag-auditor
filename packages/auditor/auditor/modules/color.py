@@ -73,3 +73,15 @@ def score_from_margin(measured: float, threshold: float) -> float:
     """0.5 at the threshold, rising to 1.0 as the miss or pass margin reaches the threshold."""
     margin = min(1.0, abs(measured - threshold) / threshold)
     return round(0.5 + 0.5 * margin, 3)
+
+
+def luminance_array(pixels: np.ndarray) -> np.ndarray:
+    v = pixels.astype(np.float64) / 255
+    lin = np.where(v <= 0.04045, v / 12.92, ((v + 0.055) / 1.055) ** 2.4)
+    return np.asarray(0.2126 * lin[..., 0] + 0.7152 * lin[..., 1] + 0.0722 * lin[..., 2])
+
+
+def contrast_array(a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Per-pixel contrast ratio between two same-shape RGB images."""
+    la, lb = luminance_array(a), luminance_array(b)
+    return np.asarray((np.maximum(la, lb) + 0.05) / (np.minimum(la, lb) + 0.05))

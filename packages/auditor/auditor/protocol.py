@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -56,6 +57,12 @@ class Heuristics(_Frozen):
     ring_outside_gap_px: int
     ring_corner_skip_px: int
     ring_inset_px: int
+    focus_pad_px: int
+    ring_side_margin_fraction: float
+    slider_widget_depth: int
+    ua_focus_ring_rgb: list[int]
+    ua_ring_min_share: float
+    ua_default_ring_exempt: bool
 
 
 class ContrastSeverity(_Frozen):
@@ -106,9 +113,15 @@ def _load(path: Path) -> Protocol:
     return Protocol.model_validate(data)
 
 
+def default_path() -> Path:
+    """The packaged protocol.yaml, or the file named by AUDITOR_PROTOCOL (parameter sweeps)."""
+    override = os.environ.get("AUDITOR_PROTOCOL")
+    return Path(override) if override else PROTOCOL_PATH
+
+
 def load(path: Path | None = None) -> Protocol:
-    return _load(path or PROTOCOL_PATH)
+    return _load(path or default_path())
 
 
 def sha256(path: Path | None = None) -> str:
-    return hashlib.sha256(_read(path or PROTOCOL_PATH)).hexdigest()
+    return hashlib.sha256(_read(path or default_path())).hexdigest()

@@ -1,0 +1,22 @@
+{
+  "page_id": "synth_2.4.13_002",
+  "viewport": "desktop",
+  "capture_timestamp": "2026-10-04T05:21:20+00:00",
+  "annotator": "generator@v1.1.0",
+  "protocol_version": "1.0",
+  "generator_version": "1.1.0",
+  "generator_notes": "outline_px=2, target_ratio=3.0, actual=3.033:1, is_violation=False. outline 2px at 3.0:1 \u2014 exactly at threshold Indicator drawn only in the :focus state over a #FFFFFF background, so change-of-contrast = 3.033:1.",
+  "test_elements": [
+    {
+      "id": "e-1",
+      "role": "button",
+      "bbox": {
+        "x": 160,
+        "y": 260,
+        "w": 220,
+        "h": 48
+      }
+    }
+  ],
+  "annotations": []
+}

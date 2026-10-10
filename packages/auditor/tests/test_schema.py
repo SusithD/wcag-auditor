@@ -47,7 +47,7 @@ def test_fixture_captures_and_truth_parse(meta: Path) -> None:
     capture = Capture.from_folder(folder)
     assert len(capture.focus_steps) == capture.meta["focus_step_count"]
     truth = Truth.model_validate(json.loads((folder / "truth.json").read_text()))
-    assert truth.annotations or truth.focus_judgments
+    assert truth.page_id and (truth.annotations or truth.focus_judgments or "synth" in folder.name)
 
 
 def test_non_responsive_mobile_fixture_keeps_png_scale() -> None:
@@ -58,5 +58,5 @@ def test_non_responsive_mobile_fixture_keeps_png_scale() -> None:
     assert capture.layout is not None and capture.layout.has_meta_viewport is False
 
 
-def test_fixture_glob_finds_six() -> None:
-    assert len(list(FIXTURES.glob("**/meta.json"))) == 6
+def test_fixture_glob_finds_twelve() -> None:
+    assert len(list(FIXTURES.glob("**/meta.json"))) == 12

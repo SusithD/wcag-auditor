@@ -1,0 +1,38 @@
+{
+  "page_id": "synth_2.5.7_003",
+  "viewport": "desktop",
+  "capture_timestamp": "2026-10-04T05:21:20+00:00",
+  "annotator": "generator@v1.1.0",
+  "protocol_version": "1.0",
+  "generator_version": "1.1.0",
+  "generator_notes": "range slider with drag handle only, no keyboard/number alternative",
+  "test_elements": [
+    {
+      "id": "e-1",
+      "role": "slider-widget",
+      "bbox": {
+        "x": 120,
+        "y": 260,
+        "w": 480,
+        "h": 48
+      }
+    }
+  ],
+  "annotations": [
+    {
+      "annotation_id": "a-0001",
+      "sc": "2.5.7",
+      "severity": "serious",
+      "confidence": "high",
+      "bbox": {
+        "x": 120,
+        "y": 260,
+        "w": 480,
+        "h": 48
+      },
+      "boundary": false,
+      "note": "Range slider offers only a drag handle; no keyboard or single-pointer alternative provided.",
+      "element_id": "e-1"
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "pageUrl": "file:///Users/susithalwis/Desktop/Final%20Year%20Reserach/04_Data_Collection/synthetic_corpus_v1.1/synth_2.4.11_001/index.html",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "contrast": [
+    {
+      "selector": "html > body > header.site",
+      "textSample": "Synthetic Test Corpus \u2014 page synth_2.4.1",
+      "fgColor": [
+        31,
+        41,
+        55
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 14.68,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "html > body > main.content > div.card > h1",
+      "textSample": "Newsletter signup",
+      "fgColor": [
+        17,
+        24,
+        39
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 17.74,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "html > body > main.content > div.card > p",
+      "textSample": "Enter your email to receive weekly updat",
+      "fgColor": [
+        31,
+        41,
+        55
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 14.68,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    }
+  ],
+  "nonTextContrast": [
+    {
+      "selector": "input#email",
+      "borderColor": [
+        11,
+        87,
+        208
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 6.39,
+      "threshold": 3,
+      "isViolation": false,
+      "boundary": false
+    }
+  ],
+  "targetSize": [
+    {
+      "selector": "input#email",
+      "width": 480,
+      "height": 40,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    }
+  ],
+  "focus": [
+    {
+      "selector": "input#email",
+      "focusVisible": true,
+      "appearanceOk": true,
+      "obscured": {
+        "obscuredSamplePoints": 5,
+        "totalSamplePoints": 5,
+        "entirelyObscured": true,
+        "partiallyObscured": false,
+        "coveredBySticky": true
+      }
+    }
+  ],
+  "dragging": [],
+  "hasFinding": {
+    "1.4.3": false,
+    "1.4.11": false,
+    "2.4.7": false,
+    "2.4.11": true,
+    "2.4.12": true,
+    "2.4.13": false,
+    "2.5.7": false,
+    "2.5.8": false
+  },
+  "counts": {
+    "contrastChecked": 3,
+    "contrastViolations": 0,
+    "nonTextContrastChecked": 1,
+    "nonTextContrastViolations": 0,
+    "targetSizeChecked": 1,
+    "targetSizeViolations": 0,
+    "focusChecked": 1,
+    "focusNotVisible": 0,
+    "focusObscured": 1,
+    "draggingCandidates": 0
+  }
+}
