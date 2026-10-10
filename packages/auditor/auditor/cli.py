@@ -29,6 +29,35 @@ def run(
 
 
 @app.command()
+def audit(
+    out: Annotated[Path, typer.Option(help="Run directory")],
+    url: Annotated[str | None, typer.Option()] = None,
+    folder: Annotated[list[Path] | None, typer.Option(help="Capture folder (repeatable)")] = None,
+    viewports: Annotated[str, typer.Option()] = "desktop,mobile",
+    condition: Annotated[Condition, typer.Option()] = "hybrid",
+    max_focus_steps: Annotated[int, typer.Option()] = 15,
+    pdf: Annotated[bool, typer.Option("--pdf/--no-pdf")] = True,
+) -> None:
+    """Capture a URL or replay folders, run each viewport; writes events.jsonl, summary.json."""
+    from auditor.audit import audit as run_audit
+
+    if (url is None) == (not folder):
+        console.print("error: pass either --url or one or more --folder")
+        raise typer.Exit(code=1)
+    names = [v.strip() for v in viewports.split(",") if v.strip()]
+    code = run_audit(
+        out,
+        url=url,
+        folders=folder or [],
+        viewports=names,
+        condition=condition,
+        max_focus_steps=max_focus_steps,
+        pdf=pdf,
+    )
+    raise typer.Exit(code=code)
+
+
+@app.command()
 def capture(
     url: str,
     out: Annotated[Path, typer.Option()] = Path("data/captures"),

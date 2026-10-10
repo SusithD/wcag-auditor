@@ -198,5 +198,7 @@ def build(run: Run, capture: Capture, out: Path) -> dict[str, Any]:
         evidence_rows=evid,
         crops=crops,
     )
-    (out / "report.json").write_text(json.dumps(report, indent=2))
+    tmp = out / ".report.json.tmp"
+    tmp.write_text(json.dumps(report, indent=2))
+    tmp.replace(out / "report.json")
     return report

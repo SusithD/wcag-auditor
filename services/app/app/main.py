@@ -8,9 +8,11 @@ from alembic import command
 from alembic.config import Config
 from fastapi import FastAPI
 
+from app.api import build_router, status_from_result
 from app.config import Settings
 from app.db import make_engine, make_session_factory
-from app.jobs import JobRunner
+from app.jobs import JobResult, JobRunner
+from app.models import Run
 
 ALEMBIC_INI = Path(__file__).resolve().parents[1] / "alembic.ini"
 
@@ -27,7 +29,24 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         engine = make_engine(cfg.db_url)
         app.state.engine = engine
         app.state.sessions = make_session_factory(engine)
-        runner = JobRunner()
+        sessions = app.state.sessions
+
+        async def on_start(run_id: str) -> None:
+            with sessions() as session:
+                row = session.get(Run, run_id)
+                if row is not None:
+                    row.status = "running"
+                    session.commit()
+
+        async def on_finish(result: JobResult) -> None:
+            status, error = status_from_result(result, cfg.runs_dir / result.run_id)
+            with sessions() as session:
+                row = session.get(Run, result.run_id)
+                if row is not None:
+                    row.status, row.error = status, error
+                    session.commit()
+
+        runner = JobRunner(on_finish, on_start, cfg.job_timeout_s)
         runner.start()
         app.state.jobs = runner
         try:
@@ -42,6 +61,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def health() -> dict[str, str]:
         return {"status": "ok"}
 
+    app.include_router(build_router(cfg))
     return app
 
 
