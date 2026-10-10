@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any, Literal
 
+from auditor import browser
 from auditor.capture.snapshot import snapshot_html
 from auditor.elements.base import Element
 from auditor.elements.extract_js import ELEMENTS_FILE, EXTRACT_JS, extract_args
@@ -50,15 +51,13 @@ class DomElementSource:
 
     def _ensure_browser(self) -> Any:
         if self._browser is None:
-            from playwright.sync_api import sync_playwright
-
-            self._cm = sync_playwright()
-            pw = self._cm.__enter__()
+            pw = browser.acquire()
+            self._cm = True
             try:
                 self._browser = pw.chromium.launch(headless=True)
             except Exception:
-                self._cm.__exit__(None, None, None)
                 self._cm = None
+                browser.release()
                 raise
         return self._browser
 
@@ -69,7 +68,7 @@ class DomElementSource:
                 self._browser.close()
         finally:
             if self._cm is not None:
-                self._cm.__exit__(None, None, None)
+                browser.release()
             self._browser, self._cm = None, None
 
     def geometry_source(self, capture: Capture) -> GeometrySource:

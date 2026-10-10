@@ -18,11 +18,12 @@ check:
 smoke:
 	bash scripts/smoke.sh
 
+CONDITIONS ?= rule_only,pixel,hybrid
 EVAL_OUT ?= eval/$(shell date +%F)
 
 eval:
 	uv run auditor eval --benchmark $(BENCHMARK_DIR) --truth $(TRUTH_PATH) --synthetic-truth from-folders \
-		--conditions rule_only --seed 20261004 --bootstrap 10000 \
+		--conditions $(CONDITIONS) --seed 20261004 --bootstrap 10000 \
 		$(if $(RULE_FINDINGS),--rule-findings $(RULE_FINDINGS)) --out $(EVAL_OUT)
 
 goldens:

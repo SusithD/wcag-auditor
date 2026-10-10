@@ -61,7 +61,7 @@ def test_unknown_condition_exits_with_code_2(tmp_path: Path) -> None:
             "--out",
             str(tmp_path),
             "--conditions",
-            "hybrid",
+            "bogus",
             "--rule-findings",
             str(GOLDEN),
             "--bootstrap",
@@ -220,3 +220,23 @@ def test_pixel_condition_scores_every_focus_and_drag_fixture(tmp_path: Path) -> 
         cell = synthetic[sc]
         assert (cell["tp"], cell["fp"], cell["fn"]) == (positives, 0, 0), sc
     assert synthetic["2.4.13"]["tn"] == 1
+
+
+@pytest.mark.browser
+def test_hybrid_condition_scores_better_than_rule_only_on_the_synthetic_fixtures(
+    tmp_path: Path,
+) -> None:
+    metrics = run_eval(
+        EvalConfig(
+            benchmark=FIXTURES,
+            out=tmp_path,
+            rule_findings=GOLDEN,
+            conditions=["hybrid", "rule_only"],
+            bootstrap=50,
+        )
+    )
+    hybrid = metrics["metrics"]["hybrid"]["synthetic"]
+    rule = metrics["metrics"]["rule_only"]["synthetic"]
+    for sc in ("1.4.11", "2.4.7", "2.4.11", "2.4.12", "2.4.13", "2.5.7"):
+        assert hybrid[sc]["recall"] == 1.0 and rule[sc]["recall"] == 0.0
+    assert hybrid["2.5.8"]["fp"] == 0 and metrics["mcnemar"]["a"] == "hybrid"

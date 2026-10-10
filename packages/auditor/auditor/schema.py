@@ -29,6 +29,7 @@ class BBox(BaseModel):
 
 
 class Finding(BaseModel):
+    id: str | None = None
     sc: SC
     bbox: BBox | None = None
     focus_index: int | None = None
