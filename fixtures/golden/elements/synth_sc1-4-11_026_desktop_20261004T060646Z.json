@@ -1,0 +1,198 @@
+{
+ "elements": [
+  {
+   "bbox_css": {
+    "h": 40.0,
+    "w": 320.0,
+    "x": 80.0,
+    "y": 220.0
+   },
+   "dom_ref": "input#name",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "input",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(152, 152, 152)",
+    "border_top_style": "solid",
+    "border_top_width": 1,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 14,
+    "font_weight": 400,
+    "input_type": "text",
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute",
+    "unstyled_native": false
+   },
+   "text": null
+  },
+  {
+   "bbox_css": {
+    "h": 40.0,
+    "w": 320.0,
+    "x": 80.0,
+    "y": 296.0
+   },
+   "dom_ref": "input#email",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "input",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(152, 152, 152)",
+    "border_top_style": "solid",
+    "border_top_width": 1,
+    "color": "rgb(0, 0, 0)",
+    "font_size_px": 14,
+    "font_weight": 400,
+    "input_type": "email",
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute",
+    "unstyled_native": false
+   },
+   "text": null
+  },
+  {
+   "bbox_css": {
+    "h": 18.0,
+    "w": 366.1,
+    "x": 32.0,
+    "y": 20.0
+   },
+   "dom_ref": "html > body > header.site",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(31, 41, 55)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(31, 41, 55)",
+    "font_size_px": 16,
+    "font_weight": 600,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "Synthetic Test Corpus \u2014 page synth_1.4.11_001"
+  },
+  {
+   "bbox_css": {
+    "h": 28.0,
+    "w": 124.0,
+    "x": 73.0,
+    "y": 121.0
+   },
+   "dom_ref": "html > body > main.content > div.card > h1",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(17, 24, 39)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(17, 24, 39)",
+    "font_size_px": 24,
+    "font_weight": 700,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Contact us"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 250.8,
+    "x": 73.0,
+    "y": 163.0
+   },
+   "dom_ref": "html > body > main.content > div.card > p",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(31, 41, 55)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(31, 41, 55)",
+    "font_size_px": 14,
+    "font_weight": 400,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "We usually reply within one working day."
+  },
+  {
+   "bbox_css": {
+    "h": 14.0,
+    "w": 32.0,
+    "x": 80.0,
+    "y": 200.0
+   },
+   "dom_ref": "html > body > main.content > label",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(55, 65, 81)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(55, 65, 81)",
+    "font_size_px": 12,
+    "font_weight": 400,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "Name"
+  },
+  {
+   "bbox_css": {
+    "h": 14.0,
+    "w": 30.0,
+    "x": 80.0,
+    "y": 276.0
+   },
+   "dom_ref": "html > body > main.content > label",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(55, 65, 81)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(55, 65, 81)",
+    "font_size_px": 12,
+    "font_weight": 400,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "Email"
+  }
+ ],
+ "features": {
+  "edge_density": 0.0138,
+  "element_density": 5.4,
+  "focus_stop_count": 2,
+  "has_sticky": false,
+  "is_non_responsive": false
+ },
+ "geometry_source": "rerender"
+}

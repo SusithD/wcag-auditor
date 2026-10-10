@@ -26,13 +26,15 @@ def _distance(pixels: np.ndarray, color: RGB) -> np.ndarray:
     return np.linalg.norm(pixels.astype(np.float64) - np.array(color, dtype=np.float64), axis=-1)
 
 
-def _background(window: np.ndarray, fg: RGB) -> RGB:
+def _background(window: np.ndarray, fg: RGB) -> RGB | None:
     """Colour behind the glyphs: median of the pixels that are nearer the dominant colour
-    than the foreground, which drops glyph and anti-aliasing pixels."""
+    than the foreground, which drops glyph and anti-aliasing pixels. When glyph pixels dominate
+    the window, the most common colour that is not the foreground is used; None if there is none."""
     dominant = mode_color(window)
     reach = float(np.linalg.norm(np.array(dominant, dtype=np.float64) - np.array(fg)))
     if reach == 0:
-        return dominant
+        rest = window[np.any(window != np.array(fg, dtype=window.dtype), axis=-1)]
+        return mode_color(rest) if rest.size else None
     bg_like = window[_distance(window, fg) >= reach / 2]
     if bg_like.size == 0:
         return dominant
@@ -72,15 +74,14 @@ def _severity(ratio: float, large: bool | None, ctx: ModuleContext) -> str:
     return "serious" if ratio < cutoff else "minor"
 
 
-def _measure(
-    ctx: ModuleContext, el: Element
-) -> tuple[float, RGB, RGB, int, str] | None:
+def _measure(ctx: ModuleContext, el: Element) -> tuple[float, RGB, RGB, int, str] | None:
     box = el.bbox_css
     crop = ctx.crop(box.x, box.y, box.x + box.w, box.y + box.h)
     if crop.size == 0 or crop.shape[0] < 1 or crop.shape[1] < 1:
         return None
     parsed = parse_css_color(el.style.get("color"))
-    opacity = float(el.style.get("opacity", 1.0))
+    raw_opacity = el.style.get("opacity")
+    opacity = 1.0 if raw_opacity is None or math.isnan(float(raw_opacity)) else float(raw_opacity)
     source = "dom"
     if parsed is None:
         fg_flat, alpha, source = _pixel_foreground(crop), 1.0, "pixel"
@@ -90,11 +91,14 @@ def _measure(
     for start, end in _windows(crop.shape[1], ctx.protocol.heuristics.contrast_window_px):
         window = crop[:, start:end]
         bg = _background(window, fg_flat)
+        if bg is None:
+            continue
         fg = blend(fg_flat, bg, alpha) if alpha < 1 else fg_flat
         ratio = contrast_ratio(fg, bg)
         if worst is None or ratio < worst[0]:
             worst = (ratio, fg, bg, start)
-    assert worst is not None
+    if worst is None:
+        return None
     return (*worst, source)
 
 
@@ -102,7 +106,7 @@ def run(ctx: ModuleContext) -> list[Finding]:
     th = ctx.protocol.thresholds.contrast
     findings: list[Finding] = []
     for el in ctx.elements:
-        if el.kind != "text" or el.is_disabled:
+        if el.kind != "text" or el.is_disabled or el.style.get("in_svg"):
             continue
         measured = _measure(ctx, el)
         if measured is None:
@@ -115,9 +119,9 @@ def run(ctx: ModuleContext) -> list[Finding]:
         box = el.bbox_css
         findings.append(
             Finding(
-                sc=SC,  # type: ignore[arg-type]
+                sc=SC,
                 bbox=BBox(x=box.x, y=box.y, w=box.w, h=box.h),
-                severity=_severity(ratio, large, ctx),  # type: ignore[arg-type]
+                severity=_severity(ratio, large, ctx),
                 tier="automated" if large is not None else "needs-review",
                 score=score_from_margin(ratio, threshold),
                 provenance="pixel",
@@ -133,7 +137,7 @@ def run(ctx: ModuleContext) -> list[Finding]:
                     "method": source,
                     "text": el.text,
                     "dom_ref": el.dom_ref,
-                    "exception_tested": [],
+                    "exception_tested": ["disabled", "svg-text"],
                 },
                 guidance_key=GUIDANCE_KEY,
             )

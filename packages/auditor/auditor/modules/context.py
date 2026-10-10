@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -31,6 +32,8 @@ class ModuleContext:
         return cls(capture, elements, image, protocol or protocol_mod.load())
 
     def crop(self, x0: float, y0: float, x1: float, y1: float) -> np.ndarray:
+        if not all(math.isfinite(v) for v in (x0, y0, x1, y1)):
+            return self.image[0:0, 0:0]
         h, w = self.image.shape[:2]
         left, top = max(0, int(np.floor(x0))), max(0, int(np.floor(y0)))
         right, bottom = min(w, int(np.ceil(x1))), min(h, int(np.ceil(y1)))

@@ -102,6 +102,46 @@ class RulePredictor:
             self._runner.close()
 
 
+class PixelPredictor:
+    """Pixel-channel modules over the element source the capture allows (ADR-012).
+
+    Same tier policy as the rule channel (ADR-014): automated findings only unless
+    include_needs_review is set. Captures with no element geometry yield no predictions.
+    """
+
+    def __init__(self, cfg: EvalConfig) -> None:
+        from auditor.elements.dom import DomElementSource
+
+        self.cfg = cfg
+        self.source = DomElementSource().__enter__()
+        self.no_geometry = 0
+        self.needs_review_excluded = 0
+
+    def predict(self, capture: Capture) -> Prediction:
+        from auditor.elements.dom import GeometryUnavailable
+        from auditor.modules import MODULES, ModuleContext
+
+        pred = Prediction()
+        try:
+            elements = self.source.elements(capture)
+        except GeometryUnavailable:
+            self.no_geometry += 1
+            return pred
+        ctx = ModuleContext.load(capture, elements)
+        for sc, run in MODULES.items():
+            for finding in run(ctx):
+                if finding.tier == "not-assessable" or finding.bbox is None:
+                    continue
+                if finding.tier == "needs-review" and not self.cfg.include_needs_review:
+                    self.needs_review_excluded += 1
+                    continue
+                pred.page_boxes.setdefault(sc, []).append(finding.bbox)
+        return pred
+
+    def close(self) -> None:
+        self.source.close()
+
+
 def _sha(parts: list[str]) -> str:
     return hashlib.sha256("\n".join(parts).encode("utf-8")).hexdigest()
 
@@ -141,7 +181,7 @@ def _page_features(capture: Capture) -> dict[str, Any]:
     }
 
 
-SUPPORTED_CONDITIONS = {"rule_only"}
+SUPPORTED_CONDITIONS = {"rule_only", "pixel"}
 ALL_SCS = ["1.4.3", "1.4.11", "2.4.7", "2.4.11", "2.4.12", "2.4.13", "2.5.7", "2.5.8"]
 
 
@@ -176,7 +216,9 @@ def run_eval(cfg: EvalConfig) -> dict[str, Any]:
     tools: dict[str, Any] = {}
     unlabelled = 0
     base = MatchConfig(match.iou, match.containment, True)
+    pixel: PixelPredictor | None = None
     try:
+        pixel = PixelPredictor(cfg) if "pixel" in cfg.conditions else None
         for folder in discover(cfg.benchmark):
             capture = Capture.from_folder(folder)
             truth, raw_truth = _truth_for(capture, gt, excluded)
@@ -186,7 +228,10 @@ def run_eval(cfg: EvalConfig) -> dict[str, Any]:
             preds: dict[str, Prediction] = {}
             try:
                 for cond in cfg.conditions:
-                    preds[cond] = predictor.predict(capture)
+                    if cond == "pixel" and pixel is not None:
+                        preds[cond] = pixel.predict(capture)
+                    else:
+                        preds[cond] = predictor.predict(capture)
             except Exception as exc:
                 failed.append(
                     {"page_id": folder.name, "error": f"{type(exc).__name__}: {exc}"[:300]}
@@ -201,6 +246,8 @@ def run_eval(cfg: EvalConfig) -> dict[str, Any]:
                 sweep_inputs.append((truth, cond, pred))
     finally:
         predictor.close()
+        if pixel is not None:
+            pixel.close()
     present = {r.sc for r in results}
     all_scs = [s for s in ALL_SCS if s in present]
     run_versions = versions.collect({"tools": tools})
@@ -226,6 +273,8 @@ def run_eval(cfg: EvalConfig) -> dict[str, Any]:
             "items_unlabelled": unlabelled,
             "items_failed": failed,
             "rule_findings_dropped": predictor.dropped,
+            "pixel_captures_without_geometry": pixel.no_geometry if pixel else None,
+            "pixel_needs_review_excluded": pixel.needs_review_excluded if pixel else None,
             "strata": STRATA,
         },
         "metrics": aggregate(results),

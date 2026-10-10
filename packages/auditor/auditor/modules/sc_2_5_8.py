@@ -46,6 +46,16 @@ def _inline(el: Element, texts: list[Element], size: float) -> bool:
     return False
 
 
+def _contains(a: Element, b: Element) -> bool:
+    x, y = a.bbox_css, b.bbox_css
+    return x.x <= y.x and x.y <= y.y and x.x + x.w >= y.x + y.w and x.y + x.h >= y.y + y.h
+
+
+def _valid(el: Element) -> bool:
+    b = el.bbox_css
+    return all(math.isfinite(v) for v in (b.x, b.y, b.w, b.h)) and b.w > 0 and b.h > 0
+
+
 def _spacing_exempt(el: Element, others: list[Element], size: float) -> bool:
     radius = size / 2
     c = _center(el)
@@ -60,22 +70,25 @@ def _spacing_exempt(el: Element, others: list[Element], size: float) -> bool:
 
 def run(ctx: ModuleContext) -> list[Finding]:
     size = ctx.protocol.thresholds.target_size_px
-    targets = [e for e in ctx.elements if e.kind in TARGET_KINDS and not e.is_disabled]
+    targets = [e for e in ctx.elements if e.kind in TARGET_KINDS and _valid(e)]
     texts = [e for e in ctx.elements if e.kind == "text"]
     findings: list[Finding] = []
     for el in targets:
         b = el.bbox_css
-        if b.w >= size and b.h >= size:
+        if el.is_disabled or (b.w >= size and b.h >= size):
             continue
         tested: list[dict[str, object]] = []
-        if el.is_native and el.style.get("unstyled_native") is True:
+        user_agent = el.is_native and el.style.get("unstyled_native") is True
+        tested.append({"exception": "user-agent", "applies": user_agent})
+        if user_agent:
             continue
-        tested.append({"exception": "user-agent", "applies": False})
         inline = _inline(el, texts, size)
         tested.append({"exception": "inline", "applies": inline})
         if inline:
             continue
-        others = [o for o in targets if o is not el]
+        others = [
+            o for o in targets if o is not el and not _contains(el, o) and not _contains(o, el)
+        ]
         spacing = _spacing_exempt(el, others, size)
         tested.append({"exception": "spacing", "applies": spacing})
         if spacing:
@@ -83,7 +96,7 @@ def run(ctx: ModuleContext) -> list[Finding]:
         tested.append({"exception": "equivalent", "applies": None, "note": "not modelled"})
         findings.append(
             Finding(
-                sc=SC,  # type: ignore[arg-type]
+                sc=SC,
                 bbox=BBox(x=b.x, y=b.y, w=b.w, h=b.h),
                 severity="serious",
                 tier="automated",

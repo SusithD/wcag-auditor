@@ -58,5 +58,5 @@ def test_non_responsive_mobile_fixture_keeps_png_scale() -> None:
     assert capture.layout is not None and capture.layout.has_meta_viewport is False
 
 
-def test_fixture_glob_finds_five() -> None:
-    assert len(list(FIXTURES.glob("**/meta.json"))) == 5
+def test_fixture_glob_finds_six() -> None:
+    assert len(list(FIXTURES.glob("**/meta.json"))) == 6

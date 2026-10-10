@@ -18,7 +18,7 @@ def cfg(out: Path, **kw: object) -> EvalConfig:
 
 def test_discover_skips_support_directories() -> None:
     names = {p.name for p in discover(FIXTURES)}
-    assert len(names) == 5 and not any(n in {"golden", "sites", "vectors"} for n in names)
+    assert len(names) == 6 and not any(n in {"golden", "sites", "vectors"} for n in names)
 
 
 def test_eval_on_fixtures_writes_metrics_with_shas_and_seed(tmp_path: Path) -> None:
@@ -28,7 +28,7 @@ def test_eval_on_fixtures_writes_metrics_with_shas_and_seed(tmp_path: Path) -> N
     assert meta["seed"] == 20261004 and meta["bootstrap_resamples"] == 200
     for key in ("benchmark_sha", "truth_sha", "protocol_sha"):
         assert len(meta[key]) == 64
-    assert meta["items_scored"] == 5 and meta["items_unlabelled"] == 0
+    assert meta["items_scored"] == 6 and meta["items_unlabelled"] == 0
     synthetic = metrics["metrics"]["rule_only"]["synthetic"]
     assert synthetic["2.5.8"]["tp"] == 4 and synthetic["2.5.8"]["fn"] == 0
     assert synthetic["1.4.3"]["tp"] == 1
@@ -170,3 +170,40 @@ def test_live_axe_scores_the_same_as_the_golden_findings(tmp_path: Path) -> None
     assert (tmp_path / "live" / "sensitivity.csv").read_text() == (
         tmp_path / "golden" / "sensitivity.csv"
     ).read_text()
+
+
+@pytest.mark.browser
+def test_pixel_condition_scores_the_synthetic_fixtures(tmp_path: Path) -> None:
+    metrics = run_eval(
+        EvalConfig(benchmark=FIXTURES, out=tmp_path, conditions=["pixel"], bootstrap=50)
+    )
+    synthetic = metrics["metrics"]["pixel"]["synthetic"]
+    assert (synthetic["1.4.3"]["tp"], synthetic["1.4.3"]["fp"], synthetic["1.4.3"]["fn"]) == (
+        1,
+        0,
+        0,
+    )
+    assert (synthetic["2.5.8"]["tp"], synthetic["2.5.8"]["fp"], synthetic["2.5.8"]["fn"]) == (
+        4,
+        0,
+        0,
+    )
+    cell = synthetic["1.4.11"]
+    assert (cell["tp"], cell["fp"], cell["fn"]) == (2, 0, 0)
+    assert metrics["meta"]["pixel_captures_without_geometry"] == 2
+
+
+def test_pixel_and_rule_conditions_are_both_supported_names(tmp_path: Path) -> None:
+    result = CliRunner().invoke(
+        app,
+        [
+            "eval",
+            "--benchmark",
+            str(tmp_path),
+            "--out",
+            str(tmp_path / "o"),
+            "--conditions",
+            "bogus",
+        ],
+    )
+    assert result.exit_code == 2

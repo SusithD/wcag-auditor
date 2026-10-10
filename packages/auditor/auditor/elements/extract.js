@@ -21,6 +21,14 @@
   };
   const visible = (el, cs, r) =>
     cs.display !== 'none' && cs.visibility !== 'hidden' && r.width > 0 && r.height > 0;
+  const effOpacity = (el) => {
+    let o = 1;
+    for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+      const v = parseFloat(getComputedStyle(n).opacity);
+      if (!Number.isNaN(v)) o *= v;
+    }
+    return Math.round(o * 1000) / 1000;
+  };
   const style = (cs) => ({
     color: cs.color,
     background_color: cs.backgroundColor,
@@ -121,7 +129,8 @@
         kind: 'text',
         bbox_css: box({ left: l.left, top: l.top, width: l.right - l.left, height: l.bottom - l.top }),
         text: node.nodeValue.trim().replace(/\s+/g, ' ').slice(0, 120),
-        style: style(cs), dom_ref: path(parent), is_native: false,
+        style: { ...style(cs), opacity: effOpacity(parent), ...(parent.closest('svg') ? { in_svg: true } : {}) },
+        dom_ref: path(parent), is_native: false,
         is_disabled: !!parent.closest('[disabled], [aria-disabled=true]'),
       });
     }

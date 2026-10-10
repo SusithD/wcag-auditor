@@ -12,7 +12,7 @@ FOLDERS = sorted(p.parent for p in FIXTURES.glob("**/meta.json"))
 
 
 def test_fixture_set_is_complete() -> None:
-    assert len(FOLDERS) == 5
+    assert len(FOLDERS) == 6
 
 
 @pytest.mark.parametrize("folder", FOLDERS, ids=lambda p: p.name)
