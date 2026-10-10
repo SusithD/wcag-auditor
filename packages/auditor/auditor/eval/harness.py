@@ -8,9 +8,11 @@ from pathlib import Path
 from typing import Any
 
 from auditor import protocol, versions
+from auditor.eval import calibration, tables
 from auditor.eval import failures as failures_mod
-from auditor.eval import tables
 from auditor.eval.bootstrap import STRATA, bootstrap
+from auditor.eval.calibration import Point as CalPoint
+from auditor.eval.calibration import points_for_item
 from auditor.eval.mcnemar import run_mcnemar
 from auditor.eval.metrics import MatchConfig, UnitResult, aggregate, score_item
 from auditor.eval.units import (
@@ -41,6 +43,7 @@ class EvalConfig:
     bootstrap: int = 10000
     rule_findings: Path | None = None
     include_needs_review: bool = False
+    calibration: bool = False
 
 
 def discover(benchmark: Path) -> list[Path]:
@@ -249,6 +252,7 @@ def run_eval(cfg: EvalConfig, progress: Callable[[int, int], None] | None = None
     failed: list[dict[str, str]] = []
     tools: dict[str, Any] = {}
     unlabelled = 0
+    cal_points: list[CalPoint] = []
     base = MatchConfig(match.iou, match.containment, True)
     pixel: PixelPredictor | None = None
     needs_pixel = bool({"pixel", "hybrid"} & set(cfg.conditions))
@@ -269,9 +273,17 @@ def run_eval(cfg: EvalConfig, progress: Callable[[int, int], None] | None = None
                 for cond in cfg.conditions:
                     if cond == "pixel" and pixel is not None:
                         preds[cond] = pixel.predict(capture, pixel_found)
+                        if cfg.calibration:
+                            cal_points += points_for_item(
+                                truth, pixel_found, cond, match.iou, match.containment
+                            )
                     elif cond == "hybrid" and pixel is not None:
                         fused = fuse(predictor.findings(capture) + pixel_found, proto)
                         preds[cond] = to_prediction(apply_policy(fused, cfg.include_needs_review))
+                        if cfg.calibration:
+                            cal_points += points_for_item(
+                                truth, fused, cond, match.iou, match.containment
+                            )
                     else:
                         preds[cond] = predictor.predict(capture)
             except Exception as exc:
@@ -344,6 +356,8 @@ def run_eval(cfg: EvalConfig, progress: Callable[[int, int], None] | None = None
         cfg.out / "failures.csv", results, features
     )
     (cfg.out / "sensitivity.csv").write_text(sensitivity)
+    if cfg.calibration:
+        calibration.write(cfg.out, cal_points)
     return metrics
 
 

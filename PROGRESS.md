@@ -20,4 +20,4 @@ Claude Code updates this file at the end of every milestone. Status: `todo` · `
 | M7c coverage, compare, evaluation | m7c-secondary-screens | done | 2026-10-10 | 40 e2e incl. axe on coverage, compare, eval and /eval from eval/fixtures; H1 McNemar pair corrected and evaluation rerun (ADR-025) |
 | M8 full evaluation | m8-eval-run | done | 2026-10-10 | make eval twice byte-identical (sha cfa9c78a); figures, taxonomy and 10-page re-capture check (Dice 0.775, confounded by element source) (ADR-026) |
 | M9 study build | m9-study | todo | | GATE: ethics approval |
-| M11 calibration (stretch) | m11-stretch | todo | | OCR moved to M10a |
+| M11 calibration (stretch) | m11-calibration | done | 2026-10-10 | ECE/Brier/reliability for pixel and hybrid; hybrid real ECE 0.253, pixel real 0.144; no recalibration (ADR-027); OCR half done in M10a |
