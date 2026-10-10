@@ -41,10 +41,13 @@ plugins = ["pydantic.mypy"]
 exclude = ["apps/", "fixtures/", "services/app/alembic/"]
 
 [[tool.mypy.overrides]]
-module = ["statsmodels.*", "scipy.*", "rapidocr_onnxruntime.*", "pyarrow.*", "rfdetr.*", "torch.*", "onnx.*", "onnxruntime.*", "psutil.*"]
+module = ["statsmodels.*", "scipy.*", "rapidocr_onnxruntime.*", "pyarrow.*", "rfdetr.*", "torch.*", "onnx.*", "onnxruntime.*", "psutil.*", "albumentations.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["packages/auditor", "services/app"]
-markers = ["browser: needs Playwright Chromium"]
-addopts = "-m 'not browser'"
+markers = [
+  "browser: needs Playwright Chromium",
+  "ml: needs the ml extra (torch, rfdetr); run with -m ml",
+]
+addopts = "-m 'not browser and not ml'"

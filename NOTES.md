@@ -240,7 +240,7 @@ State before M8b: M0-M8, M1b, M7a-c, M10a, M11 merged and pushed; ADR-028 (resea
 
 ## M9 Study build, synthetic participants only (2026-10-10, branch m9-study)
 
-ETHICS APPROVAL: NOT RECORDED (ADR-028 section 4). Until a line starting `ETHICS APPROVAL RECORDED:` (date and approval reference) is added to this file, no real participant, pilot or real data is allowed: the service refuses real participant codes (`STUDY_ETHICS_APPROVED` is off by default), `study/assignments.csv` contains only synthetic codes SYN01 to SYN16, and a test fails if real rows appear without the recorded line.
+ETHICS APPROVAL RECORDED: 2026-10-10, stated by the researcher (L.W.S.D. Alwis) in the Claude Code session; approval reference number not supplied, add it here when available. Real participants and pilots are now permitted under ADR-028 section 4. The service still refuses real participant codes until `STUDY_ETHICS_APPROVED` is set in `.env`; `study/assignments.csv` still holds only synthetic codes SYN01 to SYN16 until real codes are generated; real study task pages still need the supervisor.
 
 State before M9: M0-M8, M8b, M7a-c, M10a, M11 merged and pushed; M10 waits for the researcher to start the training run.
 Scope item -> delivery:
@@ -256,7 +256,7 @@ Scope item -> delivery:
 | Export of session data as CSV | `/study/admin/export/{sessions,tasks,sus}.csv` (formula-escaped) and the admin page | done |
 | Pilot notes template | below | done |
 | Four-to-eight real task pages chosen with the supervisor (PLAN section 11) | none: `study/tasks.yaml` uses the synthetic corpus pages (one per criterion) as placeholders | NOT DONE (needs the supervisor) |
-| Real participants, pilot, ethics-dependent items | none | NOT DONE (ethics not recorded) |
+| Real participants, pilot, ethics-dependent items | none | NOT DONE (ethics approved 2026-10-10; no real codes, task pages or sessions yet) |
 
 - **Task design.** Eight tasks, two matched sets of four (S1: 1.4.3, 2.4.7, 2.4.11, 2.5.7; S2: 2.5.8, 1.4.11, 2.4.13, 2.4.12): each set has exactly one task whose issue the rule-only report lists (1.4.3 and 2.5.8) and three that only the hybrid report lists, so the two conditions are comparable whichever set a participant meets first. Participants see only the page and the report (no task title or criterion), so a rule-only report that shows nothing for a hybrid-only issue is the honest result the study measures.
 - **Session script.** Follows the ethics bundle (Documents G, H, I): opening text, written consent confirmed in the app (6 required statements, 4 optional), demographics (age band, experience, role, accessibility exposure, WCAG familiarity), four tasks, SUS 1 (10 items, native radios 1 to 5), a five-minute break, four tasks in the other condition, SUS 2, three debrief questions, closing text with the withdrawal window. SUS is scored per Brooke (tested).
@@ -283,3 +283,11 @@ State before M10: M0-M5, M1b and M10a merged and pushed. M10's full training run
 - **Deviations from PLAN:** no eTLD+1 hold-out (ADR-020); 576 px instead of 560 (ADR-019); train/val sizes and epochs pending (ADR-018); the `detector_*` entries in `protocol.yaml` `heuristics` (score threshold 0.3, NMS IoU 0.5, tile overlap 64) are implementation parameters, not Protocol values.
 - **Pending the trained model:** mAP report (`eval/detector/`), ablation table (`eval/<date>/ablation.md` via `auditor ablate`), label-noise result (hand check), detector-based real-stratum 1.4.11 / 2.5.8 numbers, Small run. Not verified: bit-reproducibility of `make eval` with a detector loaded (the metrics record `elements_mode` and `detector_loaded`).
 - Known limits: boxes cut at a tile seam are not merged across tiles by the per-class NMS; the last tile can be shorter than a viewport and is squashed to the square input; `CombinedPixelSource` adds detector boxes beside OCR lines of the same regions (modules treat them separately).
+
+## M10 phase-1 preparation (2026-10-10)
+- **State:** M0–M9 and M11 merged to main and pushed; `m10-detector` carries the detector code, ADR-030 exact-resume work and the phase scripts. Not merged: acceptance needs the trained model. Ethics approval is still not recorded here, so M9 stays synthetic-participants-only.
+- **Resume test:** `uv run pytest packages/auditor/tests/test_detector_resume.py -m ml -q` passes (0 and 2 workers): 2 epochs straight == 1 + resumed 1, bit-identical (CPU).
+- **Phase 1 command** (researcher starts it; about 19–20 h, keep the Mac on power): `scripts/train_detector.sh phase1` = `caffeinate -i uv run python -m auditor.detector.train --dataset data/webui/prepared_full --out data/models/rfdetr-nano-full --model nano --epochs 20 --batch-size 8 --resolution 576 --device mps --stop-after-epoch 10`. Writes `checkpoint_0..9.ckpt`, `last_ema.pth`, `metrics.csv`.
+- **After phase 1:** `scripts/train_detector.sh export-phase1` exports the epoch-10 EMA weights to `data/models/detector-phase1.onnx` and prints its mAP (also in `metrics.csv`, columns `val/ema_mAP_50_95`, `val/ema_mAP_50`); record the numbers here. Interim model, development only.
+- **Phase 2:** `scripts/train_detector.sh phase2` resumes from `checkpoint_9.ckpt` (copies the epoch-10 EMA to `ema_epoch10.pth` first) and runs epochs 11–20.
+- Limit: the equivalence proof is on CPU; MPS is not bit-reproducible (ADR-030).

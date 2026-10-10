@@ -218,6 +218,7 @@ def test_train_records_the_manifest_hash_and_passes_resume_through(
 
     monkeypatch.setattr(train_mod, "build_model", lambda m, r, d: FakeModel())
     monkeypatch.setattr(train_mod, "environment", lambda: {"torch": "x"})
+    monkeypatch.setattr(train_mod, "checkpoint_epoch", lambda path: 3)
     data = tmp_path / "ds"
     data.mkdir()
     (data / "manifest.json").write_text("{}")
