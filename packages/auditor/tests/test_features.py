@@ -62,3 +62,10 @@ def test_golden_features_agree_with_capture_meta() -> None:
         assert feats["focus_stop_count"] == len(capture.focus_steps)
         assert feats["is_non_responsive"] == is_non_responsive(capture)
         assert 0.0 <= feats["edge_density"] <= 1.0
+
+
+def test_compute_without_geometry_leaves_element_features_unset() -> None:
+    capture = Capture.from_folder(next(FIXTURES.glob("real/real_com_003_desktop_*")))
+    feats = compute(capture, None)
+    assert feats.element_density is None and feats.has_sticky is None
+    assert feats.focus_stop_count == len(capture.focus_steps) > 0

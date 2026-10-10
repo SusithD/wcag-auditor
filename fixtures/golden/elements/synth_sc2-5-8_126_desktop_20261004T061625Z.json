@@ -297,5 +297,6 @@
   "focus_stop_count": 4,
   "has_sticky": false,
   "is_non_responsive": false
- }
+ },
+ "geometry_source": "rerender"
 }

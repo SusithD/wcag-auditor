@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 from auditor.elements.base import Element
-from auditor.elements.dom import DomElementSource
+from auditor.elements.dom import DomElementSource, GeometryUnavailable
 from auditor.features import compute
 from auditor.schema import Capture
 
@@ -32,40 +32,47 @@ def _close(a: Any, b: Any, tol: float = 1.0) -> bool:
 
 
 EXPECTED_KINDS = {
-    "real_com_003_desktop": {
-        "link": 22,
-        "input": 1,
-        "button": 2,
-        "text": 39,
-        "image_icon": 2,
-        "fixed_region": 1,
-    },
-    "real_com_011_mobile": {"link": 18, "input": 1, "button": 1, "text": 38, "image_icon": 10},
     "synth_sc1-4-3_001": {"text": 2},
     "synth_sc2-4-13_091": {"button": 1, "text": 4},
     "synth_sc2-5-8_126": {"button": 4, "text": 7},
 }
 
 
+def _is_real(folder: Path) -> bool:
+    return folder.name.startswith("real_")
+
+
 @pytest.mark.parametrize("folder", FOLDERS, ids=lambda p: p.name)
 def test_golden_content_is_valid_and_counts_are_pinned(folder: Path) -> None:
     golden = json.loads((GOLDEN / f"{folder.name}.json").read_text())
+    if _is_real(folder):
+        assert golden["geometry_source"] == "unavailable"
+        assert golden["elements"] is None
+        assert golden["features"]["element_density"] is None
+        assert golden["features"]["has_sticky"] is None
+        return
+    assert golden["geometry_source"] == "rerender"
     elements = [Element.model_validate(e) for e in golden["elements"]]
-    counts = Counter(e.kind for e in elements)
     key = next(k for k in EXPECTED_KINDS if folder.name.startswith(k))
-    assert dict(counts) == EXPECTED_KINDS[key]
+    assert dict(Counter(e.kind for e in elements)) == EXPECTED_KINDS[key]
     assert all(e.bbox_css.w > 0 and e.bbox_css.h > 0 for e in elements)
+
+
+@pytest.mark.parametrize("folder", [f for f in FOLDERS if _is_real(f)], ids=lambda p: p.name)
+def test_real_benchmark_folders_have_no_geometry(folder: Path) -> None:
+    capture = Capture.from_folder(folder)
+    assert DomElementSource().geometry_source(capture) == "unavailable"
+    with pytest.raises(GeometryUnavailable):
+        DomElementSource().elements(capture)
 
 
 @pytest.mark.browser
 @pytest.mark.parametrize("folder", FOLDERS, ids=lambda p: p.name)
 def test_element_dump_matches_golden(folder: Path) -> None:
     capture = Capture.from_folder(folder)
-    elements = DomElementSource().elements(capture)
-    got = {
-        "features": compute(capture, elements).model_dump(),
-        "elements": [e.model_dump(mode="json") for e in elements],
-    }
+    source = DomElementSource()
+    dumped, elements = source.dump(capture)
+    got = {"features": compute(capture, elements).model_dump(), **dumped}
     want = json.loads((GOLDEN / f"{folder.name}.json").read_text())
     assert _close(json.loads(json.dumps(got, sort_keys=True)), want)
 
@@ -84,16 +91,7 @@ def test_synthetic_boxes_match_capture_and_truth() -> None:
     assert boxes == pytest.approx(focus)
     for ann in truth["test_elements"]:
         b = ann["bbox"]
-        assert (b["x"], b["y"], b["w"], b["h"]) in [tuple(x) for x in boxes] or any(
-            (b["x"], b["y"], b["w"], b["h"]) == pytest.approx(x) for x in boxes
-        )
-
-
-@pytest.mark.browser
-def test_element_kinds_on_real_desktop_fixture() -> None:
-    capture = Capture.from_folder(next(FIXTURES.glob("real/real_com_003_desktop_*")))
-    kinds = {e.kind for e in DomElementSource().elements(capture)}
-    assert {"link", "input", "button", "text", "image_icon", "fixed_region"} <= kinds
+        assert any((b["x"], b["y"], b["w"], b["h"]) == pytest.approx(x) for x in boxes)
 
 
 INLINE = """<!doctype html><html><head><style>
