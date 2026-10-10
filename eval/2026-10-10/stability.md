@@ -1,5 +1,7 @@
 # Re-capture stability
 
+Run 2026-10-10T12:02:19+00:00 against live pages: this artefact is not reproducible byte for byte.
+
 Sample of 10 real desktop pages (seed 20261004); 10 re-captured and compared, 0 failed.
 Agreement is the Dice coefficient of one-to-one matched findings (page criteria by IoU or containment, focus criteria by stop index).
 

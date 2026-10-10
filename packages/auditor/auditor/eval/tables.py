@@ -39,6 +39,64 @@ def _rows(metrics: dict[str, Any], cond: str, stratum: str) -> list[list[str]]:
 
 
 HEADER = ["SC", "TP", "FP", "FN", "Dup", "Precision", "Recall", "F1"]
+PAIRED_HEADER = [
+    "SC",
+    "only A correct",
+    "only B correct",
+    "both correct",
+    "both wrong",
+    "McNemar p",
+    "p (BH)",
+    "dPrecision 95% CI",
+    "non-inferior",
+]
+
+
+def _p(v: float | None) -> str:
+    if v is None:
+        return "n/a"
+    return "<0.001" if v < 0.001 else f"{v:.3f}"
+
+
+def paired_title(metrics: dict[str, Any], stratum: str) -> str:
+    mc = metrics.get("mcnemar", {})
+    return f"McNemar, A = {mc.get('a')} against B = {mc.get('b')}, {stratum}"
+
+
+def _paired_rows(metrics: dict[str, Any], stratum: str) -> list[list[str]]:
+    mc = metrics.get("mcnemar", {})
+    tests = mc.get("tests", {}).get(stratum, {})
+    deltas = metrics.get("bootstrap", {}).get("delta_precision", {}).get(stratum, {})
+    rows = []
+    for sc in SCS:
+        if sc not in tests:
+            continue
+        t = tests[sc]
+        d = deltas.get(sc, {})
+        if t.get("p_value") is None:
+            p_cell, adj = "degenerate: no discordant pairs", "n/a"
+        else:
+            p_cell = _p(t["p_value"])
+            adj = _p(mc.get("bh_adjusted", {}).get(stratum, {}).get(sc))
+        if d.get("low") is None:
+            ci, ok = "not estimable", "n/a"
+        else:
+            ci = f"[{d['low']:.3f}, {d['high']:.3f}]"
+            ok = "yes" if d.get("non_inferior") else "no"
+        rows.append(
+            [
+                sc,
+                str(t["only_a_correct"]),
+                str(t["only_b_correct"]),
+                str(t["both_correct"]),
+                str(t["both_wrong"]),
+                p_cell,
+                adj,
+                ci,
+                ok,
+            ]
+        )
+    return rows
 
 
 def markdown(metrics: dict[str, Any]) -> str:
@@ -50,6 +108,13 @@ def markdown(metrics: dict[str, Any]) -> str:
             for row in _rows(metrics, cond, stratum):
                 lines.append("| " + " | ".join(row) + " |")
             lines.append("")
+    for stratum in metrics.get("mcnemar", {}).get("tests", {}):
+        lines += [f"## {paired_title(metrics, stratum)}", ""]
+        lines.append("| " + " | ".join(PAIRED_HEADER) + " |")
+        lines.append("|" + "---|" * len(PAIRED_HEADER))
+        for row in _paired_rows(metrics, stratum):
+            lines.append("| " + " | ".join(row) + " |")
+        lines.append("")
     for cond, cov in metrics.get("coverage", {}).items():
         lines.append(
             f"Coverage ({cond}): {cov['scs_with_verdict']} / {len(SCS)} SCs return a verdict."
@@ -71,4 +136,15 @@ def latex(metrics: dict[str, Any]) -> str:
             out.append("\\hline")
             out.append("\\end{tabular}")
             out.append("")
+    for stratum in metrics.get("mcnemar", {}).get("tests", {}):
+        out.append(f"% {paired_title(metrics, stratum)}")
+        out.append("\\begin{tabular}{lrrrrlllc}")
+        out.append("\\hline")
+        out.append(" & ".join(PAIRED_HEADER) + " \\\\")
+        out.append("\\hline")
+        for row in _paired_rows(metrics, stratum):
+            out.append(" & ".join(c.replace("%", "\\%").replace("<", "$<$") for c in row) + " \\\\")
+        out.append("\\hline")
+        out.append("\\end{tabular}")
+        out.append("")
     return "\n".join(out) + "\n"

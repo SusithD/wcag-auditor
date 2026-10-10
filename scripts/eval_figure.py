@@ -13,6 +13,7 @@ matplotlib.rcParams["svg.hashsalt"] = "wcag-auditor"
 import matplotlib.pyplot as plt  # noqa: E402
 
 META = {".svg": {"Date": None}, ".pdf": {"CreationDate": None, "Producer": None}}
+CENTRE = 1 / 2
 FOCUS_SCS = {"2.4.7", "2.4.11", "2.4.12", "2.4.13"}
 SCS = ["1.4.3", "1.4.11", "2.4.7", "2.4.11", "2.4.12", "2.4.13", "2.5.7", "2.5.8"]
 STYLE = {
@@ -54,8 +55,8 @@ def sensitivity(eval_dir: Path) -> list[Path]:
             ax.grid(alpha=0.25)
             if sc in FOCUS_SCS:
                 ax.text(
-                    0.5,
-                    0.5,
+                    CENTRE,
+                    CENTRE,
                     "keyed by focus stop,\nnot IoU-based",
                     ha="center",
                     va="center",

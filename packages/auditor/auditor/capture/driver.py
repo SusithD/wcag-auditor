@@ -52,18 +52,23 @@ class PlaywrightBrowser:
 
         self.timeout_ms = timeout_ms
         self.settle_ms = settle_ms
+        self._closed = False
         self._pw = shared.acquire()
         try:
             self._browser = self._pw.chromium.launch(headless=headless)
+            try:
+                js = PROXY_JS.read_text(encoding="utf-8")
+                self._checks_fn = "() => {\n" + js + "\nreturn runAllProxyChecks();\n}"
+                self.versions = {
+                    "browser": f"chromium {self._browser.version}",
+                    "playwright": pkg_version("playwright"),
+                }
+            except Exception:
+                self._browser.close()
+                raise
         except Exception:
             shared.release()
             raise
-        js = PROXY_JS.read_text(encoding="utf-8")
-        self._checks_fn = "() => {\n" + js + "\nreturn runAllProxyChecks();\n}"
-        self.versions = {
-            "browser": f"chromium {self._browser.version}",
-            "playwright": pkg_version("playwright"),
-        }
 
     def __enter__(self) -> PlaywrightBrowser:
         return self
@@ -72,6 +77,9 @@ class PlaywrightBrowser:
         self.close()
 
     def close(self) -> None:
+        if self._closed:
+            return
+        self._closed = True
         try:
             self._browser.close()
         finally:

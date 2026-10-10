@@ -40,6 +40,17 @@
       "recapture": 7
     }
   },
+  "protocol_sha": "e8c35965328ca3bbc71795dd93d812f20077aaba4c5a021f2c2f0df1c396be77",
+  "reproducible": false,
+  "run_at": "2026-10-10T12:02:19+00:00",
   "sample_size": 10,
-  "seed": 20261004
+  "seed": 20261004,
+  "versions": {
+    "axe": "c24f097bd2f451d4f933e8bc7d8d539f8672a2ebcb5cc9f9f3eec8ca9470a0c1",
+    "chromium": "chromium 153.0.8010.12",
+    "git_sha": "43ecebdeb6a7c5771368df8d76e7a8f0263d9885",
+    "model_sha": null,
+    "playwright": "1.63.0",
+    "protocol_sha": "e8c35965328ca3bbc71795dd93d812f20077aaba4c5a021f2c2f0df1c396be77"
+  }
 }

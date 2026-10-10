@@ -6,13 +6,30 @@ import random
 import shutil
 import tempfile
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from auditor import protocol
+from auditor import protocol, versions
+from auditor.eval.harness import DEFAULT_SEED
 from auditor.geometry import containment, iou
 from auditor.schema import Capture, Finding
 
+BAD_STATUS = 400
+FIELDS = [
+    "page_id",
+    "url",
+    "sc",
+    "benchmark",
+    "recapture",
+    "matched",
+    "dice",
+    "focus_steps_benchmark",
+    "focus_steps_recapture",
+    "status_benchmark",
+    "status_recapture",
+    "final_url_recapture",
+]
 FOCUS_SCS = {"2.4.7", "2.4.11", "2.4.12", "2.4.13"}
 
 
@@ -31,7 +48,7 @@ class Agreement:
 
 def _same_place(a: Finding, b: Finding, iou_min: float, containment_min: float) -> bool:
     if a.sc in FOCUS_SCS:
-        return a.focus_index == b.focus_index
+        return a.focus_index is not None and a.focus_index == b.focus_index
     if a.bbox is None or b.bbox is None:
         return False
     return (
@@ -62,7 +79,7 @@ def compare_findings(
 
 
 def sample_pages(benchmark: Path, n: int, seed: int) -> list[Path]:
-    pages = sorted(benchmark.glob("real_*_desktop_*"))
+    pages = sorted(p for p in benchmark.glob("real_*_desktop_*") if p.is_dir())
     rng = random.Random(seed)
     return sorted(rng.sample(pages, min(n, len(pages))))
 
@@ -73,7 +90,7 @@ def _findings(report: Path) -> list[Finding]:
 
 
 def run_stability(
-    benchmark: Path, out: Path, n: int = 10, seed: int = 20261004, max_focus_steps: int = 15
+    benchmark: Path, out: Path, n: int = 10, seed: int = DEFAULT_SEED, max_focus_steps: int = 15
 ) -> dict[str, Any]:
     from auditor.capture import PlaywrightBrowser, capture_url
     from auditor.pipeline import run_folder
@@ -82,17 +99,27 @@ def run_stability(
     out.mkdir(parents=True, exist_ok=True)
     rows: list[dict[str, Any]] = []
     failures: list[dict[str, str]] = []
+    compared: list[str] = []
     work = Path(tempfile.mkdtemp(prefix="stability_"))
+    browser_version = ""
     try:
         with PlaywrightBrowser() as browser:
-            for folder in sample_pages(benchmark, n, seed):
-                capture = Capture.from_folder(folder)
-                url = str(capture.meta.get("final_url") or capture.meta.get("url") or "")
+            browser_version = browser.versions["browser"]
+            for index, folder in enumerate(sample_pages(benchmark, n, seed), start=1):
                 page_id = folder.name
+                url = ""
                 try:
+                    capture = Capture.from_folder(folder)
+                    url = str(capture.meta.get("final_url") or capture.meta.get("url") or "")
                     errors: list[str] = []
                     made = capture_url(
-                        browser, url, work / "captures", ["desktop"], max_focus_steps, errors=errors
+                        browser,
+                        url,
+                        work / "captures",
+                        ["desktop"],
+                        max_focus_steps,
+                        page_id=index,
+                        errors=errors,
                     )
                     if not made:
                         raise RuntimeError(errors[0] if errors else "capture failed")
@@ -101,6 +128,9 @@ def run_stability(
                     base = _findings(work / page_id / "benchmark" / "report.json")
                     again = _findings(work / page_id / "recapture" / "report.json")
                     new_meta = Capture.from_folder(made[0]).meta
+                    status = new_meta.get("http_status")
+                    if isinstance(status, int) and status >= BAD_STATUS:
+                        raise RuntimeError(f"re-capture returned HTTP {status}")
                 except Exception as exc:
                     failures.append(
                         {
@@ -110,6 +140,7 @@ def run_stability(
                         }
                     )
                     continue
+                compared.append(page_id)
                 for ag in compare_findings(base, again, match.iou, match.containment):
                     rows.append(
                         {
@@ -122,23 +153,32 @@ def run_stability(
                             "dice": "" if ag.dice is None else f"{ag.dice:.3f}",
                             "focus_steps_benchmark": capture.meta.get("focus_step_count"),
                             "focus_steps_recapture": new_meta.get("focus_step_count"),
+                            "status_benchmark": capture.meta.get("http_status"),
+                            "status_recapture": new_meta.get("http_status"),
+                            "final_url_recapture": new_meta.get("final_url"),
                         }
                     )
     finally:
         shutil.rmtree(work, ignore_errors=True)
-    fields = list(rows[0]) if rows else ["page_id"]
     with (out / "stability.csv").open("w", newline="") as fh:
-        writer = csv.DictWriter(fh, fieldnames=fields)
+        writer = csv.DictWriter(fh, fieldnames=FIELDS)
         writer.writeheader()
         writer.writerows(rows)
-    summary = summarise(rows, failures, n, seed)
+    summary = summarise(rows, failures, n, seed, len(compared))
+    summary["run_at"] = datetime.now(UTC).isoformat(timespec="seconds")
+    summary["versions"] = versions.collect({"tools": {"browser": browser_version}})
+    summary["reproducible"] = False
     (out / "stability.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
     (out / "stability.md").write_text(markdown(summary))
     return summary
 
 
 def summarise(
-    rows: list[dict[str, Any]], failures: list[dict[str, str]], n: int, seed: int
+    rows: list[dict[str, Any]],
+    failures: list[dict[str, str]],
+    n: int,
+    seed: int,
+    pages_compared: int | None = None,
 ) -> dict[str, Any]:
     per_sc: dict[str, dict[str, int]] = {}
     for r in rows:
@@ -164,7 +204,10 @@ def summarise(
     return {
         "sample_size": n,
         "seed": seed,
-        "pages_compared": len({r["page_id"] for r in rows}),
+        "pages_compared": (
+            len({r["page_id"] for r in rows}) if pages_compared is None else pages_compared
+        ),
+        "protocol_sha": protocol.sha256(),
         "pages_failed": failures,
         "per_sc": table,
         "overall_dice": overall,
@@ -174,6 +217,9 @@ def summarise(
 def markdown(summary: dict[str, Any]) -> str:
     lines = [
         "# Re-capture stability",
+        "",
+        f"Run {summary.get('run_at', 'n/a')} against live pages: this artefact is not "
+        "reproducible byte for byte.",
         "",
         f"Sample of {summary['sample_size']} real desktop pages (seed {summary['seed']}); "
         f"{summary['pages_compared']} re-captured and compared, "
@@ -188,7 +234,9 @@ def markdown(summary: dict[str, Any]) -> str:
         d = "n/a" if c["dice"] is None else f"{c['dice']:.3f}"
         lines.append(f"| {sc} | {c['benchmark']} | {c['recapture']} | {c['matched']} | {d} |")
     lines.append("")
-    lines.append(f"Overall Dice: {summary['overall_dice']}")
+    lines.append(
+        f"Overall Dice: {'n/a' if summary['overall_dice'] is None else summary['overall_dice']}"
+    )
     for f in summary["pages_failed"]:
         lines.append(f"- failed {f['page_id']}: {f['error']}")
     return "\n".join(lines) + "\n"

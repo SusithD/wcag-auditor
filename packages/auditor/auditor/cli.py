@@ -8,6 +8,7 @@ import typer
 from rich.console import Console
 
 from auditor import pipeline
+from auditor.eval.harness import DEFAULT_SEED
 from auditor.schema import Condition
 
 app = typer.Typer(no_args_is_help=True, help="ML-assisted WCAG 2.2 auditor")
@@ -93,7 +94,7 @@ def stability(
     benchmark: Annotated[Path, typer.Option(help="Folder tree of benchmark capture folders")],
     out: Annotated[Path, typer.Option()],
     sample: Annotated[int, typer.Option()] = 10,
-    seed: Annotated[int, typer.Option()] = 20261004,
+    seed: Annotated[int, typer.Option()] = DEFAULT_SEED,
 ) -> None:
     """Re-capture a sample of real pages live and compare findings with the benchmark capture."""
     from auditor.eval.stability import run_stability
@@ -129,7 +130,7 @@ def eval(
     truth: Annotated[Path | None, typer.Option(help="benchmark_ground_truth.json")] = None,
     out: Annotated[Path, typer.Option()] = Path("eval"),
     conditions: Annotated[str, typer.Option()] = "rule_only",
-    seed: Annotated[int, typer.Option()] = 20261004,
+    seed: Annotated[int, typer.Option()] = DEFAULT_SEED,
     bootstrap: Annotated[int, typer.Option()] = 10000,
     rule_findings: Annotated[
         Path | None, typer.Option(help="Precomputed baseline_runs/<id> directory")

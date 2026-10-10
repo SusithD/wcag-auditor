@@ -28,13 +28,16 @@ SKIP_PARTS = {"golden", "sites", "vectors", "baseline_golden"}
 SWEEP_IOU = [i / 10 for i in range(1, 8)]
 
 
+DEFAULT_SEED = 20261004
+
+
 @dataclass
 class EvalConfig:
     benchmark: Path
     out: Path
     truth: Path | None = None
     conditions: list[str] = field(default_factory=lambda: ["rule_only"])
-    seed: int = 20261004
+    seed: int = DEFAULT_SEED
     bootstrap: int = 10000
     rule_findings: Path | None = None
     include_needs_review: bool = False
