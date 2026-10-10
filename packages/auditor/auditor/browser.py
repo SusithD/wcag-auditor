@@ -25,7 +25,7 @@ def acquire() -> Any:
 def release() -> None:
     global _cm, _pw, _refs
     with _lock:
-        _refs -= 1
+        _refs = max(0, _refs - 1)
         if _refs == 0 and _cm is not None:
             try:
                 _cm.__exit__(None, None, None)

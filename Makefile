@@ -5,7 +5,7 @@ export
 BENCHMARK_DIR ?= ../04_Data_Collection/benchmark_captures
 TRUTH_PATH ?= ../04_Data_Collection/annotation/benchmark_ground_truth.json
 
-.PHONY: check smoke eval goldens gen-types test-browser
+.PHONY: check smoke eval stability goldens gen-types test-browser
 
 check:
 	uv run ruff check .
@@ -25,6 +25,11 @@ eval:
 	uv run auditor eval --benchmark $(BENCHMARK_DIR) --truth $(TRUTH_PATH) --synthetic-truth from-folders \
 		--conditions $(CONDITIONS) --seed 20261004 --bootstrap 10000 \
 		$(if $(RULE_FINDINGS),--rule-findings $(RULE_FINDINGS)) --out $(EVAL_OUT)
+	uv run python scripts/eval_figure.py $(EVAL_OUT)
+	uv run python scripts/failure_taxonomy.py $(EVAL_OUT)
+
+stability:
+	uv run auditor stability --benchmark $(BENCHMARK_DIR) --out $(EVAL_OUT)
 
 goldens:
 	uv run python scripts/regen_goldens.py

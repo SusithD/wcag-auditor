@@ -5,7 +5,12 @@ from pathlib import Path
 import auditor
 
 PACKAGE = Path(auditor.__file__).parent
-SCANNED = [PACKAGE / "modules", PACKAGE / "fusion", PACKAGE / "eval"]
+SCANNED = [
+    PACKAGE / "modules",
+    PACKAGE / "fusion",
+    PACKAGE / "eval",
+    Path(__file__).resolve().parents[3] / "scripts",
+]
 FORBIDDEN = {4.5, 3.0, 24.0, 1.5, 0.3, 18.66}
 
 

@@ -23,3 +23,6 @@ Every approach that was tried and rejected, with the fixture or measurement that
 ## M2/M6: McNemar paired by list position (2026-10-10)
 `run_mcnemar(results, conditions[0], conditions[1], ...)` compared whichever two conditions were listed first. With `rule_only,pixel,hybrid` it compared rule-only with the pixel condition, so the recorded McNemar results were not the hybrid-versus-rule-only test the plan specifies. It went unnoticed because the M2 test listed `hybrid,rule_only` and the bootstrap picks its pair by name. Replaced by `mcnemar_pair()` (by name) and a test over the possible orders; the evaluation was rerun.
 
+## M8: stability check with a second sync Playwright (2026-10-10)
+The first `auditor stability` run failed all ten pages because the capture driver started its own `sync_playwright()` and the axe runner started another in the same thread. The capture driver now uses the shared reference-counted driver (the fix already applied to the rule runner and DOM source in M6).
+

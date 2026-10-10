@@ -18,6 +18,6 @@ Claude Code updates this file at the end of every milestone. Status: `todo` · `
 | M7a web shell + New Audit + progress | m7a-web-shell | done | 2026-10-10 | 13 e2e incl. axe zero violations on `/` and run progress, keyboard-only run; focus-pair upload, favicon, per-module boxes NOT DONE (ADR-023) |
 | M7b report screen | m7b-report-screen | done (manual screen-reader pass pending) | 2026-10-10 | 25 e2e incl. axe on both fixtures, keyboard and URL-state tests, 1440x900 snapshot; manual VoiceOver/NVDA pass NOT DONE (ADR-024) |
 | M7c coverage, compare, evaluation | m7c-secondary-screens | done | 2026-10-10 | 40 e2e incl. axe on coverage, compare, eval and /eval from eval/fixtures; H1 McNemar pair corrected and evaluation rerun (ADR-025) |
-| M8 full evaluation | m8-eval-run | todo | | report real and synthetic strata separately; IoU sweep with and without containment (ADR-013) |
+| M8 full evaluation | m8-eval-run | done | 2026-10-10 | make eval twice byte-identical (sha cfa9c78a); figures, taxonomy and 10-page re-capture check (Dice 0.775, confounded by element source) (ADR-026) |
 | M9 study build | m9-study | todo | | GATE: ethics approval |
 | M11 calibration (stretch) | m11-stretch | todo | | OCR moved to M10a |
