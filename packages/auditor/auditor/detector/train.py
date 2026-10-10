@@ -165,7 +165,35 @@ def make_callbacks(seed: int, stop_after_epoch: int | None, start_epoch: int = 0
             if stop_after_epoch is not None and trainer.current_epoch + 1 >= stop_after_epoch:
                 trainer.should_stop = True
 
-    return [EpochSeed(), StopAfterEpoch()]
+    callbacks: list[Any] = [EpochSeed(), StopAfterEpoch()]
+    if os.environ.get("AUDITOR_MEM_LOG"):
+        callbacks.append(memory_log_callback(Path(os.environ["AUDITOR_MEM_LOG"])))
+    return callbacks
+
+
+def memory_log_callback(path: Path) -> Any:
+    from pytorch_lightning import Callback
+
+    class MemoryLog(Callback):
+        def on_train_batch_end(
+            self, trainer: Any, pl_module: Any, outputs: Any, batch: Any, batch_idx: int
+        ) -> None:
+            if batch_idx % 25:
+                return
+            import resource
+            import time
+
+            import torch
+
+            with path.open("a") as f:
+                f.write(
+                    f"{time.time():.0f},{trainer.global_step},{batch_idx},"
+                    f"{torch.mps.current_allocated_memory() / 2**30:.2f},"
+                    f"{torch.mps.driver_allocated_memory() / 2**30:.2f},"
+                    f"{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 2**30:.2f}\n"
+                )
+
+    return MemoryLog()
 
 
 @contextmanager
