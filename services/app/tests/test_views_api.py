@@ -154,9 +154,7 @@ def test_evaluations_left_unfinished_by_a_previous_process_are_failed(
 
     with eval_client(tmp_path) as c, cast(Any, c.app).state.sessions() as session:
         session.add(
-            EvalRun(
-                config={"status": state, "out": str(tmp_path), "conditions": []}, metrics={}
-            )
+            EvalRun(config={"status": state, "out": str(tmp_path), "conditions": []}, metrics={})
         )
         session.commit()
     with eval_client(tmp_path) as c:
