@@ -1,4 +1,12 @@
 .env
+
+# Claude Code working files: kept locally, never committed
+.claude/
+claude-config/
+CLAUDE.md
+CLAUDE.local.md
+MILESTONES.md
+setup.sh
 data/
 eval/**/*.png
 node_modules/
