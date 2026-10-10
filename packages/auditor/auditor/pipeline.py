@@ -4,6 +4,7 @@ import json
 import logging
 import shutil
 import uuid
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -24,12 +25,26 @@ OUTPUTS = ("report.json", "report.html", "report.pdf", "rule_findings.json", "VE
 PDF_TIMEOUT_S = 120
 
 
-def pixel_channel(capture: Capture) -> tuple[list[Finding], Inputs]:
+Progress = Callable[[str], None]
+
+
+def _quiet(_stage: str) -> None:
+    return None
+
+
+def atomic_write(path: Path, text: str) -> None:
+    tmp = path.with_name(f".{path.name}.tmp")
+    tmp.write_text(text, encoding="utf-8")
+    tmp.replace(path)
+
+
+def pixel_channel(capture: Capture, progress: Progress = _quiet) -> tuple[list[Finding], Inputs]:
     """Run every module over the element source the capture allows (ADR-012)."""
     from auditor.modules import MODULES, ModuleContext
 
     selector = SourceSelector()
     try:
+        progress("elements")
         name, source = selector.for_capture(capture)
         try:
             elements = source.elements(capture)
@@ -37,7 +52,10 @@ def pixel_channel(capture: Capture) -> tuple[list[Finding], Inputs]:
             name, source = "pixel", selector.pixel
             elements = source.elements(capture)
         ctx = ModuleContext.load(capture, elements, has_geometry=name == "dom" and bool(elements))
-        findings = [f for run in MODULES.values() for f in run(ctx)]
+        findings: list[Finding] = []
+        for sc, module in MODULES.items():
+            progress(f"module:{sc}")
+            findings += module(ctx)
         inputs = Inputs(
             element_source=name,
             has_geometry=name == "dom" and bool(elements),
@@ -50,7 +68,13 @@ def pixel_channel(capture: Capture) -> tuple[list[Finding], Inputs]:
     return findings, inputs
 
 
-def run_folder(folder: Path, out: Path, condition: Condition = "hybrid", pdf: bool = True) -> Run:
+def run_folder(
+    folder: Path,
+    out: Path,
+    condition: Condition = "hybrid",
+    pdf: bool = True,
+    progress: Progress = _quiet,
+) -> Run:
     """Replay a capture folder: rule channel, pixel channel (hybrid only), fusion, coverage and
     the report (report.json, report.html, report.pdf, crops/)."""
     capture = Capture.from_folder(folder)
@@ -59,16 +83,22 @@ def run_folder(folder: Path, out: Path, condition: Condition = "hybrid", pdf: bo
     for name in OUTPUTS:
         (out / name).unlink(missing_ok=True)
     shutil.rmtree(out / "crops", ignore_errors=True)
-    with AxeRunner() as runner:
-        raw = runner.run(capture)
-    (out / "rule_findings.json").write_text(dumps(raw))
-    rule_findings, boxless = to_findings(raw["findings"])
-    stage = {"rules": "done", "rules_boxless_nodes": str(boxless)}
+    has_dom = (capture.path / "dom.html").is_file()
+    rule_findings: list[Finding] = []
+    stage: dict[str, str] = {"rules": "skipped"}
+    if has_dom:
+        progress("rules")
+        with AxeRunner() as runner:
+            raw = runner.run(capture)
+        (out / "rule_findings.json").write_text(dumps(raw))
+        rule_findings, boxless = to_findings(raw["findings"])
+        stage = {"rules": "done", "rules_boxless_nodes": str(boxless)}
     pixel: list[Finding] = []
     inputs: Inputs | None = None
     if condition == "hybrid":
-        pixel, inputs = pixel_channel(capture)
+        pixel, inputs = pixel_channel(capture, progress)
         stage.update(pixel="done", element_source=inputs.element_source)
+    progress("fusion")
     fused = fuse(rule_findings + [f for f in pixel if f.tier != "not-assessable"], proto)
     stage["fusion"] = "done"
     run_versions = versions.collect(capture.meta)
@@ -84,11 +114,12 @@ def run_folder(folder: Path, out: Path, condition: Condition = "hybrid", pdf: bo
         versions=run_versions,
         protocol_sha=protocol.sha256(),
         findings=fused,
-        coverage=build_coverage(capture, condition, inputs, rule_ran=True),
+        coverage=build_coverage(capture, condition, inputs, rule_ran=has_dom),
     )
+    progress("report")
     report = report_build.build(run, capture, out)
     html = render(report, out, capture.path / "screenshot.png")
-    (out / "report.html").write_text(html, encoding="utf-8")
+    atomic_write(out / "report.html", html)
     (out / "VERSIONS.json").write_text(json.dumps(run_versions, indent=2))
     if pdf:
         try:
@@ -98,5 +129,5 @@ def run_folder(folder: Path, out: Path, condition: Condition = "hybrid", pdf: bo
             log.warning("PDF export failed: %s", exc)
             run.stage_status["pdf"] = f"failed: {type(exc).__name__}"
         report["stage_status"] = run.stage_status
-        (out / "report.json").write_text(json.dumps(report, indent=2))
+        atomic_write(out / "report.json", json.dumps(report, indent=2))
     return run
