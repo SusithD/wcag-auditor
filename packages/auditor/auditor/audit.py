@@ -71,7 +71,9 @@ def audit(
                         captured[vp] = made[0]
                         log.emit(f"captured:{vp}", vp, str(made[0]))
                     else:
-                        errors[vp] = failures[0] if failures else "capture failed"
+                        errors[vp] = (
+                            failures[0].removeprefix(f"{vp}: ") if failures else "capture failed"
+                        )
                         log.emit(f"failed:capture:{vp}", vp, errors[vp])
         else:
             from auditor.schema import Capture
@@ -90,7 +92,9 @@ def audit(
                     pdf=pdf,
                     progress=_progress(log, vp),
                 )
-                viewport_summary[vp] = {"counts": _counts(out / "report.json")}
+                counts = _counts(out / "report.json")
+                viewport_summary[vp] = {"counts": counts}
+                log.emit(f"counts:{vp}", vp, json.dumps(counts))
             except Exception as exc:
                 errors[vp] = f"{type(exc).__name__}: {exc}"
                 log.emit(f"failed:{vp}", vp, errors[vp])
