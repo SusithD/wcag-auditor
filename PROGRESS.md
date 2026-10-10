@@ -6,7 +6,7 @@ Claude Code updates this file at the end of every milestone. Status: `todo` · `
 |---|---|---|---|---|
 | M0 scaffold | m0-scaffold | done | 2026-10-10 | acceptance + reviews passed; merged to main |
 | M1 capture | m1-capture | done | 2026-10-10 | acceptance + reviews passed; merged to main |
-| M2 rules + eval harness | m2-rules-eval | todo | | GATE: needs sealed ground truth + baseline golden |
+| M2 rules + eval harness | m2-rules-eval | blocked (gate: GT not sealed) | | `SEAL_LOG.md` has no `benchmark \| GT` entry for benchmark_ground_truth.json (case 186 still provisional); baseline snapshot run exists |
 | M3 frames + DOM elements | m3-elements | todo | | |
 | M4 static modules | m4-static-modules | todo | | |
 | M5 focus + drag modules | m5-focus-modules | todo | | |
