@@ -1,4 +1,5 @@
-() => {
+(opts) => {
+  const sliderDepth = (opts && opts.sliderDepth) || 3;
   const sx = window.scrollX, sy = window.scrollY;
   const r1 = (n) => Math.round(n * 10) / 10;
   const box = (r) => ({ x: r1(r.left + sx), y: r1(r.top + sy), w: r1(r.width), h: r1(r.height) });
@@ -66,6 +67,21 @@
       k.radius === cs.borderTopLeftRadius;
   };
 
+  const ALT = 'button, input:not([type=hidden]), select, textarea, [role=button], [role=spinbutton], a[href]';
+  const alternatives = (el) => {
+    let node = el.parentElement;
+    for (let d = 0; d < sliderDepth && node && node !== document.body; d++, node = node.parentElement) {
+      const found = [...node.querySelectorAll(ALT)].filter((x) => {
+        if (x === el || el.contains(x) || x.contains(el) || x.getAttribute('role') === 'slider') return false;
+        const r = x.getBoundingClientRect();
+        return r.width > 0 && r.height > 0 && getComputedStyle(x).visibility !== 'hidden';
+      });
+      if (found.length) {
+        return found.slice(0, 5).map((x) => ({ tag: x.tagName.toLowerCase(), type: x.getAttribute('type'), role: x.getAttribute('role') }));
+      }
+    }
+    return [];
+  };
   const out = [];
   const seen = new Set();
   try {
@@ -94,6 +110,7 @@
     const st = style(cs);
     if (native && tag !== 'a') st.unstyled_native = isPristine(el, cs);
     if (tag === 'input') st.input_type = type || 'text';
+    if (kind === 'slider') st.alternatives = alternatives(el);
     out.push({
       kind, bbox_css: box(r),
       text: (el.getAttribute('aria-label') || el.innerText || (type === 'password' ? '' : el.value) || '').toString().trim().slice(0, 120) || null,
@@ -155,7 +172,8 @@
     const r = el.getBoundingClientRect();
     if (!visible(el, cs, r)) continue;
     const st = style(cs);
-    st.alpha = r1(alpha(cs.backgroundColor) * parseFloat(cs.opacity) * 100) / 100;
+    st.alpha = r1(alpha(cs.backgroundColor) * effOpacity(el) * 100) / 100;
+    st.contains_refs = [el, ...el.querySelectorAll(INTERACTIVE)].slice(0, 200).map(path);
     out.push({
       kind: cs.position === 'fixed' ? 'fixed_region' : 'sticky_region', bbox_css: box(r),
       text: null, style: st, dom_ref: path(el), is_native: false, is_disabled: false,

@@ -1,0 +1,20 @@
+{
+ "page_id": "synth_sc2-4-11_061_desktop_20261004T061021Z",
+ "origin": "synth",
+ "viewport": "desktop",
+ "mode": "snapshot",
+ "axe_version": "4.13.0",
+ "covered_scs": [
+  "1.4.3",
+  "2.5.8"
+ ],
+ "not_covered_scs": [
+  "1.4.11",
+  "2.4.7",
+  "2.4.11",
+  "2.4.12",
+  "2.4.13",
+  "2.5.7"
+ ],
+ "findings": []
+}

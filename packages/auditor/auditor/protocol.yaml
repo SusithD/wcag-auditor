@@ -29,6 +29,12 @@ heuristics:
   ring_outside_gap_px: 2
   ring_corner_skip_px: 4
   ring_inset_px: 4
+  focus_pad_px: 6
+  ring_side_margin_fraction: 0.25
+  slider_widget_depth: 3
+  ua_focus_ring_rgb: [0, 95, 204]
+  ua_ring_min_share: 0.5
+  ua_default_ring_exempt: true
 
 severity:
   contrast:

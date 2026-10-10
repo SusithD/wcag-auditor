@@ -1,0 +1,143 @@
+{
+ "elements": [
+  {
+   "bbox_css": {
+    "h": 44.0,
+    "w": 200.0,
+    "x": 120.0,
+    "y": 240.0
+   },
+   "dom_ref": "html > body > main.content > div.card > button",
+   "is_disabled": false,
+   "is_native": true,
+   "kind": "button",
+   "style": {
+    "background_color": "rgb(11, 87, 208)",
+    "border_top_color": "rgb(255, 255, 255)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(255, 255, 255)",
+    "font_size_px": 15,
+    "font_weight": 600,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute",
+    "unstyled_native": false
+   },
+   "text": "Continue"
+  },
+  {
+   "bbox_css": {
+    "h": 18.0,
+    "w": 358.1,
+    "x": 32.0,
+    "y": 20.0
+   },
+   "dom_ref": "html > body > header.site",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(31, 41, 55)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(31, 41, 55)",
+    "font_size_px": 16,
+    "font_weight": 600,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "Synthetic Test Corpus \u2014 page synth_2.4.7_002"
+  },
+  {
+   "bbox_css": {
+    "h": 28.0,
+    "w": 80.0,
+    "x": 73.0,
+    "y": 121.0
+   },
+   "dom_ref": "html > body > main.content > div.card > h1",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(17, 24, 39)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(17, 24, 39)",
+    "font_size_px": 24,
+    "font_weight": 700,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Sign in"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 257.6,
+    "x": 73.0,
+    "y": 163.0
+   },
+   "dom_ref": "html > body > main.content > div.card > p",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(31, 41, 55)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(31, 41, 55)",
+    "font_size_px": 14,
+    "font_weight": 400,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Please enter your credentials to continue."
+  },
+  {
+   "bbox_css": {
+    "h": 17.0,
+    "w": 65.0,
+    "x": 187.5,
+    "y": 253.5
+   },
+   "dom_ref": "html > body > main.content > div.card > button",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgb(11, 87, 208)",
+    "border_top_color": "rgb(255, 255, 255)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(255, 255, 255)",
+    "font_size_px": 15,
+    "font_weight": 600,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "Continue"
+  }
+ ],
+ "features": {
+  "edge_density": 0.0118,
+  "element_density": 3.86,
+  "focus_stop_count": 1,
+  "has_sticky": false,
+  "is_non_responsive": false
+ },
+ "geometry_source": "rerender"
+}

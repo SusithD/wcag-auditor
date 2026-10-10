@@ -1,0 +1,135 @@
+{
+  "pageUrl": "file:///Users/susithalwis/Desktop/Final%20Year%20Reserach/04_Data_Collection/synthetic_corpus_v1.1/synth_2.4.7_004/index.html",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "contrast": [
+    {
+      "selector": "html > body > header.site",
+      "textSample": "Synthetic Test Corpus \u2014 page synth_2.4.7",
+      "fgColor": [
+        31,
+        41,
+        55
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 14.68,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "html > body > main.content > div.card > h1",
+      "textSample": "Sign in",
+      "fgColor": [
+        17,
+        24,
+        39
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 17.74,
+      "threshold": 3,
+      "largeText": true,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "html > body > main.content > div.card > p",
+      "textSample": "Please enter your credentials to continu",
+      "fgColor": [
+        31,
+        41,
+        55
+      ],
+      "bgColor": [
+        255,
+        255,
+        255
+      ],
+      "ratio": 14.68,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    },
+    {
+      "selector": "html > body > main.content > div.card > button",
+      "textSample": "Continue",
+      "fgColor": [
+        255,
+        255,
+        255
+      ],
+      "bgColor": [
+        11,
+        87,
+        208
+      ],
+      "ratio": 6.39,
+      "threshold": 4.5,
+      "largeText": false,
+      "isViolation": false,
+      "boundary": false
+    }
+  ],
+  "nonTextContrast": [],
+  "targetSize": [
+    {
+      "selector": "html > body > main.content > div.card > button",
+      "width": 200,
+      "height": 44,
+      "meetsSize": true,
+      "spacingExempt": false,
+      "inlineExempt": false,
+      "isViolation": false,
+      "boundary": false
+    }
+  ],
+  "focus": [
+    {
+      "selector": "html > body > main.content > div.card > button",
+      "focusVisible": false,
+      "appearanceOk": null,
+      "obscured": {
+        "obscuredSamplePoints": 0,
+        "totalSamplePoints": 5,
+        "entirelyObscured": false,
+        "partiallyObscured": false,
+        "coveredBySticky": false
+      }
+    }
+  ],
+  "dragging": [],
+  "hasFinding": {
+    "1.4.3": false,
+    "1.4.11": false,
+    "2.4.7": true,
+    "2.4.11": false,
+    "2.4.12": false,
+    "2.4.13": false,
+    "2.5.7": false,
+    "2.5.8": false
+  },
+  "counts": {
+    "contrastChecked": 4,
+    "contrastViolations": 0,
+    "nonTextContrastChecked": 0,
+    "nonTextContrastViolations": 0,
+    "targetSizeChecked": 1,
+    "targetSizeViolations": 0,
+    "focusChecked": 1,
+    "focusNotVisible": 1,
+    "focusObscured": 0,
+    "draggingCandidates": 0
+  }
+}

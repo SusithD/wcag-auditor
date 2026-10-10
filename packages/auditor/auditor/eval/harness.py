@@ -122,20 +122,24 @@ class PixelPredictor:
         from auditor.modules import MODULES, ModuleContext
 
         pred = Prediction()
+        has_geometry = True
         try:
             elements = self.source.elements(capture)
         except GeometryUnavailable:
             self.no_geometry += 1
-            return pred
-        ctx = ModuleContext.load(capture, elements)
+            elements, has_geometry = [], False
+        ctx = ModuleContext.load(capture, elements, has_geometry=has_geometry)
         for sc, run in MODULES.items():
             for finding in run(ctx):
-                if finding.tier == "not-assessable" or finding.bbox is None:
+                if finding.tier == "not-assessable":
                     continue
                 if finding.tier == "needs-review" and not self.cfg.include_needs_review:
                     self.needs_review_excluded += 1
                     continue
-                pred.page_boxes.setdefault(sc, []).append(finding.bbox)
+                if finding.focus_index is not None:
+                    pred.stops.setdefault(sc, set()).add(finding.focus_index)
+                elif finding.bbox is not None:
+                    pred.page_boxes.setdefault(sc, []).append(finding.bbox)
         return pred
 
     def close(self) -> None:

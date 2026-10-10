@@ -14,7 +14,7 @@ from urllib.parse import urlparse
 from auditor import __version__ as auditor_version
 from auditor import versions
 from auditor.capture.focus import FOCUS_INFO_JS, FOCUS_START_JS, step_focus
-from auditor.elements.extract_js import EXTRACT_JS, write_elements
+from auditor.elements.extract_js import EXTRACT_JS, extract_args, write_elements
 
 GENERATOR_VERSION = f"auditor-{auditor_version}"
 PROTOCOL_VERSION = "1.0"
@@ -121,7 +121,7 @@ class PlaywrightBrowser:
             geometry: list[dict[str, Any]] | None
             geometry_error: str | None = None
             try:
-                geometry = page.evaluate(EXTRACT_JS)
+                geometry = page.evaluate(EXTRACT_JS, extract_args())
             except Exception as exc:
                 geometry, geometry_error = None, f"{type(exc).__name__}: {exc}"
             doc_size = page.evaluate(

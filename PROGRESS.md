@@ -11,7 +11,7 @@ Claude Code updates this file at the end of every milestone. Status: `todo` · `
 | M3 frames + DOM elements | m3-elements | done | 2026-10-10 | merged; real-page limitation → ADR-012 |
 | M1b capture-time geometry | m1b-capture-geometry | done | 2026-10-10 | geometry_source capture/rerender/unavailable; goldens regenerated (see NOTES) |
 | M4 static modules | m4-static-modules | done | 2026-10-10 | synthetic desktop: 1.4.3 15/15, 1.4.11 20/20, 2.5.8 52/52, 0 FP (pinned test); ADR-016; pixel condition in eval |
-| M5 focus + drag modules | m5-focus-modules | todo | | focus SCs use meta.json focus rects (all strata) |
+| M5 focus + drag modules | m5-focus-modules | done | 2026-10-10 | synthetic corpus 8/8 SCs recall=precision=1.0 (pinned); real-stratum 2.4.7 P.68 R.67, 2.4.13 P.75 R.40 (exempt) / P.72 R.88 (evaluate default ring); ADR-017 |
 | M10a OCR text source | m10a-ocr | todo | | ADR-012: RapidOCR (`ocr` extra, now core) → `PixelElementSource` text lines; 1.4.3 recall on real fixtures reported (no threshold) |
 | M10 detector | m10-detector | todo | | GATE: researcher OK before overnight training. Now before M6 (ADR-012). Adds detector boxes to `PixelElementSource`. |
 | M6 fusion + report | m6-fusion-report | todo | | element source chosen per capture (ADR-012) |

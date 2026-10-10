@@ -9,6 +9,12 @@ EXTRACT_JS = Path(__file__).with_name("extract.js").read_text(encoding="utf-8")
 ELEMENTS_FILE = "elements.json"
 
 
+def extract_args() -> dict[str, int]:
+    from auditor import protocol
+
+    return {"sliderDepth": protocol.load().heuristics.slider_widget_depth}
+
+
 EXTRACT_SHA256 = hashlib.sha256(EXTRACT_JS.encode("utf-8")).hexdigest()
 
 

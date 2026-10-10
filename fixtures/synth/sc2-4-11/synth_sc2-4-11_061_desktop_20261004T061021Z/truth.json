@@ -1,0 +1,53 @@
+{
+  "page_id": "synth_2.4.11_001",
+  "viewport": "desktop",
+  "capture_timestamp": "2026-10-04T05:21:20+00:00",
+  "annotator": "generator@v1.1.0",
+  "protocol_version": "1.0",
+  "generator_version": "1.1.0",
+  "generator_notes": "Focused input placed under a fixed 64 px header \u2014 entirely obscured",
+  "test_elements": [
+    {
+      "id": "e-1",
+      "role": "text-input",
+      "bbox": {
+        "x": 120,
+        "y": 12,
+        "w": 480,
+        "h": 40
+      }
+    }
+  ],
+  "annotations": [
+    {
+      "annotation_id": "a-0001",
+      "sc": "2.4.11",
+      "severity": "critical",
+      "confidence": "high",
+      "bbox": {
+        "x": 120,
+        "y": 12,
+        "w": 480,
+        "h": 40
+      },
+      "boundary": false,
+      "note": "Focused input entirely hidden by the fixed header (fails 2.4.11 and 2.4.12).",
+      "element_id": "e-1"
+    },
+    {
+      "annotation_id": "a-0002",
+      "sc": "2.4.12",
+      "severity": "critical",
+      "confidence": "high",
+      "bbox": {
+        "x": 120,
+        "y": 12,
+        "w": 480,
+        "h": 40
+      },
+      "boundary": false,
+      "note": "Entirely obscured \u2014 implies a violation of the enhanced criterion.",
+      "element_id": "e-1"
+    }
+  ]
+}

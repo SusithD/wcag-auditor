@@ -1,0 +1,22 @@
+{
+  "page_id": "synth_2.4.7_002",
+  "viewport": "desktop",
+  "capture_timestamp": "2026-10-04T05:21:20+00:00",
+  "annotator": "generator@v1.1.0",
+  "protocol_version": "1.0",
+  "generator_version": "1.1.0",
+  "generator_notes": "browser default focus outline preserved",
+  "test_elements": [
+    {
+      "id": "e-1",
+      "role": "button",
+      "bbox": {
+        "x": 120,
+        "y": 240,
+        "w": 200,
+        "h": 44
+      }
+    }
+  ],
+  "annotations": []
+}
