@@ -1,0 +1,63 @@
+{
+ "elements": [
+  {
+   "bbox_css": {
+    "h": 18.0,
+    "w": 358.1,
+    "x": 32.0,
+    "y": 20.0
+   },
+   "dom_ref": "html > body > header.site",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgb(255, 255, 255)",
+    "border_top_color": "rgb(31, 41, 55)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(31, 41, 55)",
+    "font_size_px": 16,
+    "font_weight": 600,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "absolute"
+   },
+   "text": "Synthetic Test Corpus \u2014 page synth_1.4.3_001"
+  },
+  {
+   "bbox_css": {
+    "h": 16.0,
+    "w": 437.3,
+    "x": 96.0,
+    "y": 217.0
+   },
+   "dom_ref": "html > body > main.content > div.card > div > span",
+   "is_disabled": false,
+   "is_native": false,
+   "kind": "text",
+   "style": {
+    "background_color": "rgba(0, 0, 0, 0)",
+    "border_top_color": "rgb(120, 120, 120)",
+    "border_top_style": "none",
+    "border_top_width": 0,
+    "color": "rgb(120, 120, 120)",
+    "font_size_px": 14,
+    "font_weight": 400,
+    "opacity": 1,
+    "outline_style": "none",
+    "pointer_events": "auto",
+    "position": "static"
+   },
+   "text": "Reset your password to complete the sign-in process for your account."
+  }
+ ],
+ "features": {
+  "edge_density": 0.009,
+  "element_density": 1.54,
+  "focus_stop_count": 0,
+  "has_sticky": false,
+  "is_non_responsive": false
+ }
+}
