@@ -33,10 +33,29 @@ def capture(
     url: str,
     out: Annotated[Path, typer.Option()] = Path("data/captures"),
     viewports: Annotated[str, typer.Option()] = "desktop,mobile",
+    max_focus_steps: Annotated[int, typer.Option()] = 15,
 ) -> None:
-    """Capture a URL (implemented in M1)."""
-    console.print("capture: not implemented until M1")
-    raise typer.Exit(code=2)
+    """Capture a URL into benchmark-layout folders (one per viewport)."""
+    from auditor.capture import VIEWPORTS, PlaywrightBrowser, capture_url
+
+    if max_focus_steps < 1:
+        console.print("error: --max-focus-steps must be at least 1")
+        raise typer.Exit(code=1)
+
+    names = [v.strip() for v in viewports.split(",") if v.strip()]
+    unknown = [v for v in names if v not in VIEWPORTS]
+    if unknown or not names:
+        console.print(f"error: bad viewports {unknown or viewports!r}; use {sorted(VIEWPORTS)}")
+        raise typer.Exit(code=1)
+    errors: list[str] = []
+    with PlaywrightBrowser() as browser:
+        folders = capture_url(browser, url, out, names, max_focus_steps, errors=errors)
+    for folder in folders:
+        console.print(f"captured {folder}")
+    for err in errors:
+        console.print(f"failed {err}")
+    if errors:
+        raise typer.Exit(code=1)
 
 
 @app.command()

@@ -5,7 +5,7 @@ export
 BENCHMARK_DIR ?= ../04_Data_Collection/benchmark_captures
 TRUTH_PATH ?= ../04_Data_Collection/annotation/benchmark_ground_truth.json
 
-.PHONY: check smoke eval goldens gen-types
+.PHONY: check smoke eval goldens gen-types test-browser
 
 check:
 	uv run ruff check .
@@ -27,3 +27,6 @@ goldens:
 gen-types:
 	uv run python -m app.openapi data/openapi.json
 	pnpm -C apps/web gen:types
+
+test-browser:
+	REQUIRE_BENCHMARK=1 uv run pytest packages/auditor -m browser -q
