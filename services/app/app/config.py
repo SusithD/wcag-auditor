@@ -21,10 +21,17 @@ class Settings:
     truth_path: Path | None = None
     eval_import_dirs: tuple[Path, ...] = ()
     catalogue_path: Path | None = None
+    study_dir: Path | None = None
+    study_ethics_approved: bool = False
+    study_admin_token: str | None = None
 
     @property
     def catalogue_file(self) -> Path:
         return self.catalogue_path or Path(__file__).resolve().parents[3] / "CHECK_CATALOGUE.md"
+
+    @property
+    def study_path(self) -> Path:
+        return self.study_dir or Path(__file__).resolve().parents[3] / "study"
 
     @property
     def eval_dir(self) -> Path:
@@ -60,4 +67,7 @@ class Settings:
                 if p
             ),
             catalogue_path=_path(os.environ.get("CATALOGUE_PATH")),
+            study_dir=_path(os.environ.get("STUDY_DIR")),
+            study_ethics_approved=os.environ.get("STUDY_ETHICS_APPROVED") == "1",
+            study_admin_token=os.environ.get("STUDY_ADMIN_TOKEN") or None,
         )

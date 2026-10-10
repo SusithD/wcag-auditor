@@ -27,6 +27,7 @@ export default defineConfig({
         AUDIT_PDF: "0",
         FOLDER_ROOTS: join(root, "fixtures"),
         EVAL_IMPORT_DIRS: join(root, "eval", "fixtures"),
+        STUDY_ADMIN_TOKEN: "e2e-token",
         BENCHMARK_DIR: join(root, "fixtures"),
       },
     },

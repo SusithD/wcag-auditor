@@ -1,0 +1,17 @@
+participant_code,synthetic,order,block1_condition,block2_condition,block1_set,block2_set,task_order
+SYN01,1,AB,rule_only,hybrid,S1,S2,T3 T1 T4 T2 T7 T6 T8 T5
+SYN02,1,AB,rule_only,hybrid,S2,S1,T7 T8 T5 T6 T4 T2 T1 T3
+SYN03,1,BA,hybrid,rule_only,S1,S2,T3 T2 T1 T4 T7 T6 T8 T5
+SYN04,1,BA,hybrid,rule_only,S2,S1,T5 T7 T8 T6 T3 T2 T4 T1
+SYN05,1,AB,rule_only,hybrid,S1,S2,T1 T2 T3 T4 T8 T7 T5 T6
+SYN06,1,AB,rule_only,hybrid,S2,S1,T6 T7 T5 T8 T3 T2 T4 T1
+SYN07,1,BA,hybrid,rule_only,S1,S2,T4 T2 T1 T3 T5 T6 T7 T8
+SYN08,1,BA,hybrid,rule_only,S2,S1,T6 T5 T7 T8 T2 T3 T4 T1
+SYN09,1,AB,rule_only,hybrid,S1,S2,T3 T4 T1 T2 T8 T7 T6 T5
+SYN10,1,AB,rule_only,hybrid,S2,S1,T6 T5 T8 T7 T3 T1 T4 T2
+SYN11,1,BA,hybrid,rule_only,S1,S2,T2 T3 T4 T1 T5 T8 T7 T6
+SYN12,1,BA,hybrid,rule_only,S2,S1,T5 T7 T8 T6 T4 T1 T3 T2
+SYN13,1,AB,rule_only,hybrid,S1,S2,T1 T4 T3 T2 T8 T7 T5 T6
+SYN14,1,AB,rule_only,hybrid,S2,S1,T6 T5 T8 T7 T2 T3 T4 T1
+SYN15,1,BA,hybrid,rule_only,S1,S2,T4 T3 T1 T2 T8 T6 T7 T5
+SYN16,1,BA,hybrid,rule_only,S2,S1,T6 T7 T5 T8 T4 T3 T1 T2

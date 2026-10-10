@@ -65,7 +65,8 @@
       "includes": [
         "src/components/report/**",
         "src/components/views/**",
-        "src/components/eval/**"
+        "src/components/eval/**",
+        "src/components/study/**"
       ],
       "linter": {
         "rules": {

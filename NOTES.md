@@ -238,3 +238,38 @@ State before M8b: M0-M8, M1b, M7a-c, M10a, M11 merged and pushed; ADR-028 (resea
 - Calibration and figures are regenerated from the headline run (`calibration.md`, `reliability.*`, `sensitivity.*`, `f1_by_sc.*`, `failure_taxonomy.md`). The eval screen fixture (`eval/fixtures`) is the new headline.
 - Not changed: the NOTES M8 numbers above remain as the record of the earlier policy; this section supersedes them for the headline.
 
+## M9 Study build, synthetic participants only (2026-10-10, branch m9-study)
+
+ETHICS APPROVAL: NOT RECORDED (ADR-028 section 4). Until a line starting `ETHICS APPROVAL RECORDED:` (date and approval reference) is added to this file, no real participant, pilot or real data is allowed: the service refuses real participant codes (`STUDY_ETHICS_APPROVED` is off by default), `study/assignments.csv` contains only synthetic codes SYN01 to SYN16, and a test fails if real rows appear without the recorded line.
+
+State before M9: M0-M8, M8b, M7a-c, M10a, M11 merged and pushed; M10 waits for the researcher to start the training run.
+Scope item -> delivery:
+| Item | Delivered by | State |
+|---|---|---|
+| Study tables | migration 0003: `study_sessions` (consent, demographics, debrief, step, synthetic flag), `study_tasks` (block, index, fix text, timing, success, notes), `sus_responses` (per block and condition), `study_runs` | done |
+| Endpoints | `app/study_api.py`: materials, config, prepare, sessions, consent, demographics, task open/submit, SUS, break, debrief; admin: tasks, rating, CSV export (sessions, tasks, SUS) behind `X-Study-Token` | done |
+| `/study` flow: code, consent check, demographics, counterbalanced tasks, report embedded for the task's page in the assigned condition, fix form, SUS, break, debrief, thanks | `components/study/*`, `app/study/*` | done |
+| Counterbalancing from `study/assignments.csv` | `scripts/make_assignments.py` (seed 20261010): AB/BA crossed with which matched task set goes first (2 x 2 Latin square, 4 participants per cell), task order shuffled within blocks; A = rule-only, B = hybrid | done |
+| Server-side timing | `opened_at` (first open only) and `submitted_at` in UTC; seconds derived; the page shows no timer | done |
+| Rubric fields | `study/tasks.yaml`: issue, expected fix, success criteria, partial credit, which conditions' reports list the issue; exported with every task row; researcher rates success in `/study/admin` | done |
+| Rule-only parity | same components and layout in both conditions; the report's no-findings message states how many of the 8 criteria the report checks (rule-only: 2 of 8) and that the rest were not assessed; a test compares the page structure for the same task under both conditions and checks that rule-only reports contain only rule findings and no pixel verdicts | done |
+| Export of session data as CSV | `/study/admin/export/{sessions,tasks,sus}.csv` (formula-escaped) and the admin page | done |
+| Pilot notes template | below | done |
+| Four-to-eight real task pages chosen with the supervisor (PLAN section 11) | none: `study/tasks.yaml` uses the synthetic corpus pages (one per criterion) as placeholders | NOT DONE (needs the supervisor) |
+| Real participants, pilot, ethics-dependent items | none | NOT DONE (ethics not recorded) |
+
+- **Task design.** Eight tasks, two matched sets of four (S1: 1.4.3, 2.4.7, 2.4.11, 2.5.7; S2: 2.5.8, 1.4.11, 2.4.13, 2.4.12): each set has exactly one task whose issue the rule-only report lists (1.4.3 and 2.5.8) and three that only the hybrid report lists, so the two conditions are comparable whichever set a participant meets first. Participants see only the page and the report (no task title or criterion), so a rule-only report that shows nothing for a hybrid-only issue is the honest result the study measures.
+- **Session script.** Follows the ethics bundle (Documents G, H, I): opening text, written consent confirmed in the app (6 required statements, 4 optional), demographics (age band, experience, role, accessibility exposure, WCAG familiarity), four tasks, SUS 1 (10 items, native radios 1 to 5), a five-minute break, four tasks in the other condition, SUS 2, three debrief questions, closing text with the withdrawal window. SUS is scored per Brooke (tested).
+- **Tests.** services/app 24 study tests (SUS scoring, counterbalancing and reproducibility of `assignments.csv`, rubric completeness, step enforcement, validation, timing, admin token, ethics gate, prepare, a synthetic dry run); Playwright `study.spec.ts` 6 tests (full e2e suite 46 passed): study pages prepared, a full AB session through the UI with axe at every step in light mode, parity, rule-only honesty, admin rating and CSV download with axe in dark mode.
+- **Review fixes (correctness, tests, ui-a11y).** Study runs are hidden from `GET /runs` and cannot be cancelled; their stored `source` is neutral; `prepare` validates every folder, commits, then submits jobs (serialised); concurrent session starts and double submits end in a clean 200/409 (never a 500) and the second submit cannot overwrite the first; the ethics gate also applies to existing sessions; `opened_at` is set only after the study run is known to exist; the report embedded in a task hides triage status buttons, Retry and the error text; embedded layout switches to two panes below 1760 px so nothing is clipped next to the fix form; the task heading is focused on load; consent, demographics and SUS errors name the missing items and are linked with `aria-invalid`/`aria-describedby`; the Done button cannot submit twice and announces saving; admin rows keep focus and announce saves; scroll padding is set. Known limitation: a participant can still read their own study run through the public run endpoints (report data includes the capture's original page path), which is acceptable for synthetic sessions but must be revisited (separate study deployment or per-session tokens) before real sessions.
+- **Synthetic dry run.** `scripts/study_dryrun.py` runs the 16 synthetic participants through the API with simulated behaviour and writes the exports and a summary labelled fabricated; it exists to test the pipeline and the analysis arithmetic, not as evidence.
+- **Pilot notes template (fill in only after ethics approval is recorded above).**
+  - Session: pseudonym, date, condition order (AB or BA), task-set order, duration, incidents.
+  - Recording and consent: signed consent filed, optional consents ticked (screen, audio, quotes, contact), recording file renamed to the pseudonym and moved to institutional storage within 24 hours.
+  - Per task (1 to 8): confusions about the page or report, wording that was unclear, report issues (missing, wrong, misleading), time outliers, whether the participant asked for help.
+  - Rubric: any fix the rubric scored badly or could not score, proposed rubric change (do not change scoring after data collection starts without a dated ADR).
+  - Tool defects: UI problems, bugs, accessibility problems found by the participant.
+  - SUS and debrief: anything notable; participant remarks about each report.
+  - Decisions: changes made before the main study (task pages, wording, timing), each with a DECISIONS entry.
+- Needs the researcher: the real task pages (with the supervisor), ethics approval, the ADR-028 tier-policy consequence for 1.4.3 (the hybrid report is not shown non-inferior on 1.4.3 precision when needs-review findings count; see M8b), and the decision to start the M10 training run.
+

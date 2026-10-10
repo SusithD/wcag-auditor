@@ -1,10 +1,10 @@
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Suspense } from "react";
 import "./globals.css";
+import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryProvider } from "@/lib/query";
 
@@ -30,31 +30,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <QueryProvider>
             <TooltipProvider>
-              <header className="flex h-12 items-center justify-between border-b px-6">
-                <Link
-                  href="/"
-                  className="inline-flex min-h-6 items-center font-mono text-label"
-                >
-                  wcag-auditor
-                </Link>
-                <div className="flex items-center gap-1">
-                  <nav aria-label="Main" className="flex gap-1">
-                    <Link
-                      href="/"
-                      className="inline-flex min-h-7 items-center rounded-md px-2.5 text-body hover:bg-muted"
-                    >
-                      New audit
-                    </Link>
-                    <Link
-                      href="/eval"
-                      className="inline-flex min-h-7 items-center rounded-md px-2.5 text-body hover:bg-muted"
-                    >
-                      Evaluation
-                    </Link>
-                  </nav>
-                  <ThemeToggle />
-                </div>
-              </header>
+              <Suspense fallback={<header className="h-12 border-b" />}>
+                <SiteHeader />
+              </Suspense>
               <main id="main" tabIndex={-1} className="flex-1 outline-none">
                 {children}
               </main>
