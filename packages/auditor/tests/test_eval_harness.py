@@ -190,7 +190,7 @@ def test_pixel_condition_scores_the_synthetic_fixtures(tmp_path: Path) -> None:
     )
     cell = synthetic["1.4.11"]
     assert (cell["tp"], cell["fp"], cell["fn"]) == (2, 0, 0)
-    assert metrics["meta"]["pixel_captures_without_geometry"] == 2
+    assert metrics["meta"]["pixel_element_sources"] == {"dom": 10, "pixel": 2}
 
 
 def test_pixel_and_rule_conditions_are_both_supported_names(tmp_path: Path) -> None:

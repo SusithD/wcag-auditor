@@ -5,12 +5,11 @@ from auditor.eval.metrics import MatchConfig, score_item
 from auditor.eval.units import (
     ItemTruth,
     Prediction,
-    containment,
-    iou,
     real_truth,
     stop_truth,
     synthetic_truth,
 )
+from auditor.geometry import containment, iou
 from auditor.schema import BBox, Capture
 
 FIXTURES = Path(__file__).resolve().parents[3] / "fixtures"

@@ -103,32 +103,34 @@ class RulePredictor:
 
 
 class PixelPredictor:
-    """Pixel-channel modules over the element source the capture allows (ADR-012).
+    """Pixel-channel modules over the element source each capture allows (ADR-012): stored or
+    re-rendered DOM geometry when it exists, OCR text lines otherwise.
 
     Same tier policy as the rule channel (ADR-014): automated findings only unless
-    include_needs_review is set. Captures with no element geometry yield no predictions.
+    include_needs_review is set.
     """
 
     def __init__(self, cfg: EvalConfig) -> None:
-        from auditor.elements.dom import DomElementSource
+        from auditor.elements.select import SourceSelector
 
         self.cfg = cfg
-        self.source = DomElementSource().__enter__()
-        self.no_geometry = 0
+        self.sources = SourceSelector()
+        self.source_counts = {"dom": 0, "pixel": 0}
         self.needs_review_excluded = 0
 
     def predict(self, capture: Capture) -> Prediction:
         from auditor.elements.dom import GeometryUnavailable
         from auditor.modules import MODULES, ModuleContext
 
-        pred = Prediction()
-        has_geometry = True
+        name, source = self.sources.for_capture(capture)
         try:
-            elements = self.source.elements(capture)
+            elements = source.elements(capture)
         except GeometryUnavailable:
-            self.no_geometry += 1
-            elements, has_geometry = [], False
-        ctx = ModuleContext.load(capture, elements, has_geometry=has_geometry)
+            name, source = "pixel", self.sources.pixel
+            elements = source.elements(capture)
+        self.source_counts[name] += 1
+        ctx = ModuleContext.load(capture, elements, has_geometry=name == "dom")
+        pred = Prediction()
         for sc, run in MODULES.items():
             for finding in run(ctx):
                 if finding.tier == "not-assessable":
@@ -143,7 +145,7 @@ class PixelPredictor:
         return pred
 
     def close(self) -> None:
-        self.source.close()
+        self.sources.close()
 
 
 def _sha(parts: list[str]) -> str:
@@ -277,7 +279,7 @@ def run_eval(cfg: EvalConfig) -> dict[str, Any]:
             "items_unlabelled": unlabelled,
             "items_failed": failed,
             "rule_findings_dropped": predictor.dropped,
-            "pixel_captures_without_geometry": pixel.no_geometry if pixel else None,
+            "pixel_element_sources": pixel.source_counts if pixel else None,
             "pixel_needs_review_excluded": pixel.needs_review_excluded if pixel else None,
             "strata": STRATA,
         },
