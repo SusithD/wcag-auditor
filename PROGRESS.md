@@ -13,7 +13,7 @@ Claude Code updates this file at the end of every milestone. Status: `todo` · `
 | M4 static modules | m4-static-modules | done | 2026-10-10 | synthetic desktop: 1.4.3 15/15, 1.4.11 20/20, 2.5.8 52/52, 0 FP (pinned test); ADR-016; pixel condition in eval |
 | M5 focus + drag modules | m5-focus-modules | done | 2026-10-10 | synthetic corpus 8/8 SCs recall=precision=1.0 (pinned); real-stratum 2.4.7 P.68 R.67, 2.4.13 P.75 R.40 (exempt) / P.72 R.88 (evaluate default ring); ADR-017 |
 | M10a OCR text source | m10a-ocr | done | 2026-10-10 | RapidOCR line boxes: synthetic 15/15 truth blocks, ~0.7 s/page; real stratum 1.4.3 (needs-review included) P .78 R .82; default policy R .01 (tier policy, not geometry); ADR-012 source selection |
-| M10 detector | m10-detector | todo | | GATE: researcher OK before overnight training. Now before M6 (ADR-012). Adds detector boxes to `PixelElementSource`. |
+| M10 detector | m10-detector | blocked (gate: full training needs researcher OK; training size per ADR-018) | | Code, 15k/1.5k data prep, smoke gate (RF-DETR OK, 2.23 img/s, 27 GB MPS), ONNX path, screenshot-only run are done and tested on branch m10-detector (committed, NOT merged: acceptance needs the trained model). Pending: training run, mAP report, ablation, label-noise check. |
 | M6 fusion + report | m6-fusion-report | todo | | element source chosen per capture (ADR-012) |
 | M7a web shell | m7a-web-shell | todo | | carry-over from M0 review: axe gate AA→AA+AAA set (CLAUDE.md); input-border contrast; radius/type-scale remap; atomic report writes; job timeouts; CI `--all-packages` |
 | M7b report screen | m7b-report | todo | | |
