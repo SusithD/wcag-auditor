@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
 from typing import Annotated
 
@@ -87,6 +88,20 @@ def capture(
         raise typer.Exit(code=1)
 
 
+def _progress_writer(path: Path | None) -> Callable[[int, int], None] | None:
+    if path is None:
+        return None
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    def write(done: int, total: int) -> None:
+        import json
+
+        with path.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps({"done": done, "total": total}) + "\n")
+
+    return write
+
+
 def _fmt(v: float | None) -> str:
     return "n/a" if v is None else f"{v:.3f}"
 
@@ -104,6 +119,9 @@ def eval(
     ] = None,
     include_needs_review: Annotated[bool, typer.Option()] = False,
     synthetic_truth: Annotated[str, typer.Option(help="from-folders")] = "from-folders",
+    progress_file: Annotated[
+        Path | None, typer.Option(help="Write {done,total} JSON lines here")
+    ] = None,
 ) -> None:
     """Score captures against ground truth (real: --truth file or per-folder truth.json;
     synthetic: each folder's truth.json)."""
@@ -124,7 +142,7 @@ def eval(
         include_needs_review=include_needs_review,
     )
     try:
-        metrics = run_eval(cfg)
+        metrics = run_eval(cfg, _progress_writer(progress_file))
     except NotImplementedError as exc:
         console.print(f"error: {exc}")
         raise typer.Exit(code=2) from exc

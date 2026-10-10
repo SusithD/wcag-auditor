@@ -46,7 +46,9 @@
   },
   "overrides": [
     {
-      "includes": ["src/components/ui/**"],
+      "includes": [
+        "src/components/ui/**"
+      ],
       "linter": {
         "rules": {
           "security": {
@@ -62,7 +64,11 @@
       }
     },
     {
-      "includes": ["src/components/report/**"],
+      "includes": [
+        "src/components/report/**",
+        "src/components/views/**",
+        "src/components/eval/**"
+      ],
       "linter": {
         "rules": {
           "a11y": {
@@ -75,7 +81,9 @@
       }
     },
     {
-      "includes": ["src/app/globals.css"],
+      "includes": [
+        "src/app/globals.css"
+      ],
       "linter": {
         "rules": {
           "complexity": {

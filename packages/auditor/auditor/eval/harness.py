@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -203,6 +204,14 @@ def _page_features(capture: Capture) -> dict[str, Any]:
     }
 
 
+def mcnemar_pair(conditions: list[str]) -> tuple[str, str] | None:
+    """The H1 comparison is hybrid against rule_only whatever the listed order; with other
+    condition sets the first two are compared."""
+    if "hybrid" in conditions and "rule_only" in conditions:
+        return ("hybrid", "rule_only")
+    return (conditions[0], conditions[1]) if len(conditions) >= 2 else None
+
+
 SUPPORTED_CONDITIONS = {"rule_only", "pixel", "hybrid"}
 ALL_SCS = ["1.4.3", "1.4.11", "2.4.7", "2.4.11", "2.4.12", "2.4.13", "2.5.7", "2.5.8"]
 
@@ -218,7 +227,7 @@ def _folder_sha(capture: Capture) -> str:
     return hashlib.sha256(b"\x00".join(parts)).hexdigest()
 
 
-def run_eval(cfg: EvalConfig) -> dict[str, Any]:
+def run_eval(cfg: EvalConfig, progress: Callable[[int, int], None] | None = None) -> dict[str, Any]:
     unsupported = [c for c in cfg.conditions if c not in SUPPORTED_CONDITIONS]
     if unsupported:
         raise NotImplementedError(f"condition(s) {unsupported} are not available yet")
@@ -242,7 +251,10 @@ def run_eval(cfg: EvalConfig) -> dict[str, Any]:
     needs_pixel = bool({"pixel", "hybrid"} & set(cfg.conditions))
     try:
         pixel = PixelPredictor(cfg) if needs_pixel else None
-        for folder in discover(cfg.benchmark):
+        folders = list(discover(cfg.benchmark))
+        for position, folder in enumerate(folders, start=1):
+            if progress is not None:
+                progress(position - 1, len(folders))
             capture = Capture.from_folder(folder)
             truth, raw_truth = _truth_for(capture, gt, excluded)
             if truth is None:
@@ -310,10 +322,9 @@ def run_eval(cfg: EvalConfig) -> dict[str, Any]:
         },
     }
     metrics["bootstrap"] = bootstrap(results, cfg.conditions, all_scs, cfg.bootstrap, cfg.seed)
-    if len(cfg.conditions) >= 2:
-        metrics["mcnemar"] = run_mcnemar(
-            results, cfg.conditions[0], cfg.conditions[1], all_scs, STRATA
-        )
+    pair = mcnemar_pair(cfg.conditions)
+    if pair is not None:
+        metrics["mcnemar"] = run_mcnemar(results, pair[0], pair[1], all_scs, STRATA)
     else:
         metrics["mcnemar"] = {"note": "single condition: no paired comparison"}
     sensitivity = _sweep(sweep_inputs)

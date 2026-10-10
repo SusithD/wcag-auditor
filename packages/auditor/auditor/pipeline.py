@@ -21,7 +21,14 @@ from auditor.rules.rulemap import to_findings
 from auditor.schema import Capture, Condition, Finding, Run
 
 log = logging.getLogger(__name__)
-OUTPUTS = ("report.json", "report.html", "report.pdf", "rule_findings.json", "VERSIONS.json")
+OUTPUTS = (
+    "report.json",
+    "report.html",
+    "report.pdf",
+    "rule_findings.json",
+    "rule_only.json",
+    "VERSIONS.json",
+)
 PDF_TIMEOUT_S = 120
 
 
@@ -36,6 +43,20 @@ def atomic_write(path: Path, text: str) -> None:
     tmp = path.with_name(f".{path.name}.tmp")
     tmp.write_text(text, encoding="utf-8")
     tmp.replace(path)
+
+
+def write_rule_only(
+    out: Path, rule_findings: list[Finding], proto: protocol.Protocol, has_dom: bool
+) -> None:
+    """The rule-only view of the same capture, for the compare screen."""
+    fused = fuse(rule_findings, proto)
+    rows = {f.id or "": report_build.evidence_rows(f) for f in fused}
+    payload = {
+        "findings": [json.loads(f.model_dump_json()) for f in fused],
+        "evidence_rows": rows,
+        "has_dom": has_dom,
+    }
+    atomic_write(out / "rule_only.json", json.dumps(payload, indent=2))
 
 
 def pixel_channel(capture: Capture, progress: Progress = _quiet) -> tuple[list[Finding], Inputs]:
@@ -120,6 +141,8 @@ def run_folder(
     report = report_build.build(run, capture, out)
     html = render(report, out, capture.path / "screenshot.png")
     atomic_write(out / "report.html", html)
+    if condition == "hybrid":
+        write_rule_only(out, rule_findings, proto, has_dom)
     (out / "VERSIONS.json").write_text(json.dumps(run_versions, indent=2))
     if pdf:
         try:

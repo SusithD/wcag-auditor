@@ -94,8 +94,40 @@ class ExportInfo(BaseModel):
     pages: int | None
 
 
+class ComparePair(BaseModel):
+    hybrid: str
+    rule_only: str
+
+
+class CompareOut(BaseModel):
+    hybrid: list[FindingOut]
+    rule_only: list[FindingOut]
+    pairs: list[ComparePair]
+    only_hybrid: list[str]
+    only_rule_only: list[str]
+
+
 class FindingPatch(BaseModel):
     status: Status
+
+
+def related(a: FindingOut, b: FindingOut, iou_min: float, containment_min: float) -> bool:
+    """Same criterion and the same place: focus findings by stop, page findings by overlap."""
+    if a.sc != b.sc:
+        return False
+    if a.focus_index is not None or b.focus_index is not None:
+        return a.focus_index == b.focus_index
+    if a.bbox is None or b.bbox is None:
+        return False
+    from auditor.geometry import containment, iou
+    from auditor.schema import BBox
+
+    box_a, box_b = BBox(**a.bbox.model_dump()), BBox(**b.bbox.model_dump())
+    return (
+        iou(box_a, box_b) >= iou_min
+        or containment(box_a, box_b) >= containment_min
+        or containment(box_b, box_a) >= containment_min
+    )
 
 
 def _csv_cell(value: object) -> object:
@@ -313,6 +345,71 @@ def build_report_router(settings: Settings) -> APIRouter:
                     query = query.where(column.in_(value.split(",")))
             rows = session.scalars(query.order_by(FindingRow.key)).all()
             return [to_out(r, viewport, report) for r in rows]
+
+    @router.get("/runs/{run_id}/compare", response_model=CompareOut)
+    def compare(run_id: str, viewport: Viewport, request: Request) -> CompareOut:
+        from auditor import protocol
+
+        base = run_dir(run_id) / viewport
+        report = _load_report(run_dir(run_id), viewport)
+        path = base / "rule_only.json"
+        if not path.is_file():
+            raise HTTPException(404, "Compare needs a hybrid run")
+        try:
+            rule = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            raise HTTPException(500, "The rule-only file is unreadable") from exc
+        with request.app.state.sessions() as session:
+            capture = ensure_ingested(session, run_id, viewport)
+            if capture is None:
+                raise HTTPException(404, "Run not ingested yet")
+            hybrid = [
+                to_out(r, viewport, report)
+                for r in session.scalars(
+                    select(FindingRow)
+                    .where(FindingRow.capture_id == capture.id)
+                    .order_by(FindingRow.key)
+                )
+            ]
+        rule_out: list[FindingOut] = []
+        for f in rule["findings"]:
+            key = f["id"]
+            rows = rule.get("evidence_rows", {}).get(key, [])
+            rule_out.append(
+                FindingOut(
+                    id=0,
+                    key=key,
+                    viewport=viewport,
+                    sc=f["sc"],
+                    bbox=BBoxOut(**f["bbox"]) if f.get("bbox") else None,
+                    focus_index=f.get("focus_index"),
+                    severity=f["severity"],
+                    tier=f["tier"],
+                    score=f["score"],
+                    provenance=f["provenance"],
+                    element=_element(f.get("evidence", {})),
+                    guidance=None,
+                    evidence_rows=[EvidenceRow(label=a, value=b) for a, b in rows],
+                    has_crop=False,
+                    status="open",
+                )
+            )
+        m = protocol.load().thresholds.match
+        pairs = [
+            ComparePair(hybrid=h.key, rule_only=r.key)
+            for h in hybrid
+            for r in rule_out
+            if related(h, r, m.iou, m.containment)
+        ]
+        matched_h = {p.hybrid for p in pairs}
+        matched_r = {p.rule_only for p in pairs}
+        return CompareOut(
+            hybrid=hybrid,
+            rule_only=rule_out,
+            pairs=pairs,
+            only_hybrid=[h.key for h in hybrid if h.key not in matched_h],
+            only_rule_only=[r.key for r in rule_out if r.key not in matched_r],
+        )
 
     @router.patch("/findings/{finding_id}", response_model=FindingOut)
     def patch_finding(finding_id: int, body: FindingPatch, request: Request) -> FindingOut:
