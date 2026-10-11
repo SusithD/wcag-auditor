@@ -59,6 +59,14 @@ async function openReport(page: Page, id: string, query = "") {
     ).toBeVisible();
 }
 
+const status = (page: Page) => page.getByTestId("report-status");
+
+const openTable = (page: Page) =>
+  page
+    .getByRole("navigation", { name: "Report views" })
+    .getByRole("link", { name: "Table", exact: true })
+    .click();
+
 const settle = (page: Page) =>
   page.evaluate(() =>
     Promise.all(document.getAnimations().map((a) => a.finished)),
@@ -96,7 +104,7 @@ for (const scheme of ["light", "dark"] as const) {
         page.getByRole("heading", { level: 2, name: /\d\.\d+/ }),
       ).toBeVisible();
       await scan();
-      await page.getByRole("button", { name: "Table", exact: true }).click();
+      await openTable(page);
       await expect(
         page.getByRole("region", { name: "Findings table" }),
       ).toBeVisible();
@@ -182,7 +190,7 @@ test("filters, selection and view are restored from the URL on reload", async ({
     .getByRole("navigation", { name: "Criteria" })
     .getByRole("button", { name: /2\.4\.13/ })
     .click();
-  await page.getByRole("button", { name: "Table", exact: true }).click();
+  await openTable(page);
   const row = page.locator("tr[data-key]").first();
   await row.getByRole("button").first().click();
   await expect(page).toHaveURL(/f=f\d+/);
@@ -214,24 +222,335 @@ test("filters, selection and view are restored from the URL on reload", async ({
   ).toBeVisible();
 });
 
-test("status changes persist across a reload", async ({ page, request }) => {
+test("marking a finding as fixed shows Fix not verified and persists across a reload", async ({
+  page,
+  request,
+}) => {
   const id = await ensureRun(request, "mobile");
   await page.setViewportSize({ width: 1440, height: 900 });
   await openReport(page, id);
   await hit(page);
-  await page.getByRole("button", { name: "Mark fixed", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Mark as fixed", exact: true })
+    .click();
+  const notice = page.getByTestId("decision-notice");
+  await expect(notice).toContainText("Fix not verified");
+  await expect(status(page)).toHaveText(/^Marked as fixed\. Fix not verified/);
   await expect(
-    page.getByRole("button", { name: "Fixed", exact: true }),
-  ).toHaveAttribute("aria-pressed", "true");
+    page.getByRole("button", { name: "Mark as fixed", exact: true }),
+  ).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Reopen" })).toBeFocused();
   await page.reload();
+  await expect(page.getByTestId("decision-notice")).toContainText(
+    "Fix not verified",
+  );
+  await page.getByRole("button", { name: "Reopen" }).click();
   await expect(
-    page.getByRole("button", { name: "Fixed", exact: true }),
-  ).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: "Fixed", exact: true }).click();
-  await expect(
-    page.getByRole("button", { name: "Mark fixed", exact: true }),
+    page.getByRole("button", { name: "Mark as fixed", exact: true }),
   ).toBeVisible();
+  await expect(page.getByTestId("decision-notice")).toHaveCount(0);
 });
+
+test("dismissing needs a reason from the menu and the reason is stored and shown", async ({
+  page,
+  request,
+}) => {
+  const id = await ensureRun(request, "mobile");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openReport(page, id);
+  await hit(page);
+  await expect(page).toHaveURL(/f=f\d+/);
+  const key = new URL(page.url()).searchParams.get("f") ?? "";
+  await page.getByRole("button", { name: "Dismiss", exact: true }).click();
+  const menu = page.getByRole("menu");
+  await expect(menu).toBeVisible();
+  for (const reason of [
+    "Tool error",
+    "Decorative or not interactive",
+    "Third-party content",
+    "Large text",
+    "Other",
+  ])
+    await expect(menu.getByRole("menuitem", { name: reason })).toBeVisible();
+  await menu.getByRole("menuitem", { name: "Tool error" }).click();
+  await expect(page.getByTestId("decision-notice")).toContainText("Dismissed");
+  await expect(page.getByTestId("decision-notice")).toContainText("Tool error");
+  await expect(status(page)).toHaveText("Dismissed: Tool error.");
+  type Stored = {
+    key: string;
+    status: string;
+    decision: { reason: string | null };
+  };
+  const stored = async () =>
+    (
+      (await (
+        await request.get(`/api/runs/${id}/findings?viewport=mobile`)
+      ).json()) as Stored[]
+    ).find((f) => f.key === key);
+  await expect.poll(async () => (await stored())?.status).toBe("dismissed");
+  expect((await stored())?.decision.reason).toBe("Tool error");
+  await page.reload();
+  await expect(page.getByTestId("decision-notice")).toContainText("Tool error");
+  await page.getByRole("button", { name: "Reopen" }).click();
+  await expect(page.getByTestId("decision-notice")).toHaveCount(0);
+});
+
+test("a failed save rolls the decision back and shows an alert, not a toast", async ({
+  page,
+  request,
+}) => {
+  const id = await ensureRun(request, "mobile");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openReport(page, id);
+  await hit(page);
+  await page.route("**/api/findings/*", (route) =>
+    route.request().method() === "PATCH"
+      ? route.fulfill({ status: 500, body: "{}" })
+      : route.continue(),
+  );
+  await page
+    .getByRole("button", { name: "Mark as fixed", exact: true })
+    .click();
+  await expect(
+    page.getByRole("alert").filter({ hasText: "could not be saved" }),
+  ).toContainText("The decision could not be saved");
+  await expect(
+    page.getByRole("button", { name: "Mark as fixed", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByTestId("decision-notice")).toHaveCount(0);
+});
+
+test("group by Element and Severity lists every finding as a selectable row", async ({
+  page,
+  request,
+}) => {
+  const id = await ensureRun(request, "mobile");
+  const rows: (ApiFinding & { element: string })[] = await (
+    await request.get(`/api/runs/${id}/findings?viewport=mobile`)
+  ).json();
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openReport(page, id);
+  const rail = page.getByRole("navigation", { name: "Criteria" });
+  const group = rail.getByRole("group", { name: "Group by" });
+  await expect(
+    group.getByRole("button", { name: "Criterion" }),
+  ).toHaveAttribute("aria-pressed", "true");
+  for (const heading of [
+    "Failed",
+    "Needs review",
+    "No issue found",
+    "Could not decide",
+  ])
+    await expect(rail.getByRole("heading", { name: heading })).toBeVisible();
+
+  await group.getByRole("button", { name: "Severity" }).click();
+  await expect(group.getByRole("button", { name: "Severity" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(rail.locator("button[data-finding]")).toHaveCount(rows.length);
+  const severities = new Set(
+    rows.map((f) => (f.tier === "needs-review" ? "Needs review" : f.severity)),
+  );
+  for (const sev of severities)
+    await expect(
+      rail.getByRole("heading", { name: new RegExp(`^${sev}$`, "i") }),
+    ).toBeVisible();
+
+  await group.getByRole("button", { name: "Element" }).click();
+  await expect(rail.locator("button[data-finding]")).toHaveCount(rows.length);
+  const elements = new Set(rows.map((f) => f.element));
+  await expect(rail.locator("h3")).toHaveCount(elements.size);
+
+  const first = rail.locator("button[data-finding]").first();
+  const key = (await first.getAttribute("data-finding")) ?? "";
+  await first.click();
+  await expect(page).toHaveURL(new RegExp(`f=${key}(&|$)`));
+  await expect(first).toHaveAttribute("aria-pressed", "true");
+});
+
+test("the summary counts failures, review items and undecided criteria and compares with the previous audit", async ({
+  page,
+  request,
+}) => {
+  test.setTimeout(180_000);
+  const finished = async (runId: string) =>
+    expect
+      .poll(
+        async () =>
+          (await (await request.get(`/api/runs/${runId}`)).json()).status,
+        { timeout: 120_000 },
+      )
+      .toBe("done");
+  const first = await request.post("/api/runs", {
+    data: { folder: FOLDERS.mobile },
+  });
+  await finished((await first.json()).run_id);
+  const second = await request.post("/api/runs", {
+    data: { folder: FOLDERS.mobile },
+  });
+  const id = (await second.json()).run_id as string;
+  await finished(id);
+
+  const findings: { tier: string; status: string }[] = await (
+    await request.get(`/api/runs/${id}/findings?viewport=mobile`)
+  ).json();
+  const failures = findings.filter(
+    (f) => f.tier === "automated" && f.status !== "dismissed",
+  ).length;
+  const review = findings.filter(
+    (f) => f.tier === "needs-review" && f.status !== "dismissed",
+  ).length;
+  const delta: {
+    previous_run_id: string | null;
+    fixed: { viewport: string }[];
+    new: { viewport: string }[];
+    still_present: { viewport: string }[];
+  } = await (await request.get(`/api/runs/${id}/delta`)).json();
+  expect(delta.previous_run_id).not.toBeNull();
+  const n = (rows: { viewport: string }[]) =>
+    rows.filter((r) => r.viewport === "mobile").length;
+  expect(n(delta.still_present)).toBeGreaterThan(0);
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openReport(page, id);
+  const summary = page.getByRole("region", { name: "Summary" });
+  const verdict = summary.getByTestId("verdict");
+  await expect(verdict).toContainText(
+    `${failures} failure${failures === 1 ? "" : "s"}`,
+  );
+  await expect(verdict).toContainText(
+    review === 0
+      ? "No findings need review"
+      : `${review} finding${review === 1 ? " needs" : "s need"} review`,
+  );
+  await expect(verdict).toContainText(/criteri(on|a) could not be decided/);
+  await expect(
+    summary.getByRole("img", { name: /criteria decided/ }),
+  ).toBeVisible();
+  await expect(summary.getByTestId("since-last")).toHaveText(
+    new RegExp(
+      `^${n(delta.fixed)} fixed · ${n(delta.new)} new · ${n(delta.still_present)} still present`,
+    ),
+  );
+  await expect(
+    summary.getByText(
+      "This tool checks 8 of the 86 WCAG 2.2 success criteria.",
+    ),
+  ).toBeVisible();
+  await expect(
+    summary.getByRole("link", { name: "What this result does not mean" }),
+  ).toHaveAttribute("href", "/help");
+});
+
+test("the view tabs link to the table, compare and coverage views and keep the URL state", async ({
+  page,
+  request,
+}) => {
+  const id = await ensureRun(request, "mobile");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openReport(page, id, "?sc=2.4.13");
+  const tabs = page.getByRole("navigation", { name: "Report views" });
+  await expect(tabs.getByRole("link", { name: "Findings" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  await tabs.getByRole("link", { name: "Table", exact: true }).click();
+  await expect(page).toHaveURL(/view=table/);
+  expect(page.url()).toContain("sc=2.4.13");
+  await tabs.getByRole("link", { name: "Findings" }).click();
+  await expect(page).not.toHaveURL(/view=table/);
+  await expect(
+    tabs.getByRole("link", { name: "Compare with rules only" }),
+  ).toHaveAttribute("href", new RegExp(`/runs/${id}/compare`));
+  await expect(tabs.getByRole("link", { name: "Coverage" })).toHaveAttribute(
+    "href",
+    new RegExp(`/runs/${id}/coverage`),
+  );
+  await tabs.getByRole("link", { name: "Coverage" }).click();
+  await expect(page).toHaveURL(/\/coverage/);
+});
+
+for (const scheme of ["light", "dark"] as const) {
+  test(`the redesigned report has zero axe violations at 390 px (${scheme})`, async ({
+    page,
+    request,
+  }) => {
+    test.setTimeout(150_000);
+    const id = await ensureRun(request, "mobile");
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openReport(page, id);
+    const scan = async () => {
+      await settle(page);
+      const results = await new AxeBuilder({ page })
+        .withTags(TAGS)
+        .disableRules(["color-contrast-enhanced"])
+        .analyze();
+      expect(results.violations).toEqual([]);
+    };
+    await scan();
+    await page.getByRole("tab", { name: "Criteria" }).click();
+    await scan();
+    await page
+      .getByRole("navigation", { name: "Criteria" })
+      .getByRole("group", { name: "Group by" })
+      .getByRole("button", { name: "Severity" })
+      .click();
+    await scan();
+    await page.getByRole("tab", { name: "Canvas" }).click();
+    await hit(page);
+    await expect(
+      page.getByRole("tabpanel", { name: "Detail" }).getByRole("heading", {
+        level: 2,
+      }),
+    ).toBeVisible();
+    await scan();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+  });
+
+  test(`group-by, decided and dropdown states have zero axe violations at 1440 px (${scheme})`, async ({
+    page,
+    request,
+  }) => {
+    test.setTimeout(150_000);
+    const id = await ensureRun(request, "mobile");
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openReport(page, id);
+    const scan = async () => {
+      await settle(page);
+      const results = await new AxeBuilder({ page })
+        .withTags(TAGS)
+        .disableRules(["color-contrast-enhanced"])
+        .analyze();
+      expect(results.violations).toEqual([]);
+    };
+    const group = page
+      .getByRole("navigation", { name: "Criteria" })
+      .getByRole("group", { name: "Group by" });
+    for (const by of ["Element", "Severity", "Criterion"]) {
+      await group.getByRole("button", { name: by }).click();
+      await scan();
+    }
+    await hit(page);
+    await page.getByRole("button", { name: "Dismiss", exact: true }).click();
+    await expect(page.getByRole("menu")).toBeVisible();
+    await scan();
+    await page.keyboard.press("Escape");
+    await page
+      .getByRole("button", { name: "Mark as fixed", exact: true })
+      .click();
+    await expect(page.getByTestId("decision-notice")).toBeVisible();
+    await scan();
+    await page.getByRole("button", { name: "Reopen" }).click();
+    await expect(page.getByTestId("decision-notice")).toHaveCount(0);
+  });
+}
 
 test("a focus finding offers the Focused, Unfocused and Diff views", async ({
   page,
@@ -300,7 +619,11 @@ test("report at 1440x900 matches the committed snapshot", async ({
   await settle(page);
   await expect(page).toHaveScreenshot("report-1440x900.png", {
     maxDiffPixelRatio: 0.01,
-    mask: [page.getByRole("complementary", { name: "Sidebar" })],
+    mask: [
+      page.getByRole("complementary", { name: "Sidebar" }),
+      page.locator("time"),
+      page.getByTestId("since-last"),
+    ],
   });
 });
 
@@ -377,7 +700,7 @@ test("severity, provenance, search and viewport filters come back from the URL",
   await expect(
     page.getByRole("searchbox", { name: "Search findings" }),
   ).toHaveValue("tiny");
-  await page.getByRole("button", { name: "Table", exact: true }).click();
+  await openTable(page);
   await page
     .getByRole("button", { name: /^Filter by severity, \d selected/ })
     .click();
@@ -386,8 +709,6 @@ test("severity, provenance, search and viewport filters come back from the URL",
   ).toBeVisible();
   await expect(page.getByRole("checkbox", { name: /Serious/ })).toBeChecked();
 });
-
-const status = (page: Page) => page.getByTestId("report-status");
 
 test("the table view shows no literal source text and a no-match note only when empty", async ({
   page,
@@ -431,7 +752,7 @@ test("announcements: selection, clearing, filtering and copying go to one persis
     .getByRole("button", { name: /2\.4\.11/ })
     .click();
   await expect(status(page)).toHaveText(/^Showing \d+ findings?$/);
-  await page.getByRole("button", { name: "Table", exact: true }).click();
+  await openTable(page);
   await page
     .getByRole("navigation", { name: "Criteria" })
     .getByRole("button", { name: "All criteria" })
@@ -455,7 +776,7 @@ test("j and k only act from inside the findings workspace", async ({
   await page.setViewportSize({ width: 1440, height: 900 });
   await openReport(page, id);
   await page.locator("body").press("j");
-  await page.getByRole("button", { name: "Table", exact: true }).press("j");
+  await page.getByRole("link", { name: "Table", exact: true }).press("j");
   await expect(page).not.toHaveURL(/f=/);
   await tabStop(page).focus();
   await page.keyboard.press("Enter");
@@ -604,8 +925,12 @@ test("names and roles: unique box names, no selector or None:1, distinct filter 
     .getByRole("navigation", { name: "Criteria" })
     .getByRole("button", { name: "All criteria" })
     .click();
-  await page.getByRole("button", { name: "Table", exact: true }).click();
-  await expect(page.getByRole("group", { name: "View mode" })).toBeVisible();
+  await openTable(page);
+  await expect(
+    page
+      .getByRole("navigation", { name: "Report views" })
+      .getByRole("link", { name: "Table", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
   await expect(
     page
       .getByRole("button", { name: /^Select \d\.\d+(?:\.\d+)? .+, .+, .+/ })
@@ -626,4 +951,40 @@ test("names and roles: unique box names, no selector or None:1, distinct filter 
   const check = await page.getByRole("checkbox").first().boundingBox();
   expect(check?.width).toBeGreaterThanOrEqual(24);
   expect(check?.height).toBeGreaterThanOrEqual(24);
+});
+
+test("J and K are ignored when single-key shortcuts are off, and a fixed finding stays marked in the rail", async ({
+  page,
+  request,
+}) => {
+  const id = await ensureRun(request, "mobile");
+  await page.addInitScript(() =>
+    window.localStorage.setItem(
+      "wcag-auditor.settings",
+      JSON.stringify({ shortcuts: false }),
+    ),
+  );
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openReport(page, id);
+  await tabStop(page).focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/f=/);
+  const url = page.url();
+  await page.keyboard.press("j");
+  await page.keyboard.press("k");
+  expect(page.url()).toBe(url);
+  await expect(
+    page.getByRole("button", { name: "Next finding" }),
+  ).not.toHaveAttribute("aria-keyshortcuts", "J");
+  await page
+    .getByRole("button", { name: "Mark as fixed", exact: true })
+    .click();
+  await expect(
+    page
+      .getByRole("navigation", { name: "Criteria" })
+      .getByText("Fix not verified")
+      .first(),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Reopen" }).click();
+  await expect(page.getByTestId("decision-notice")).toHaveCount(0);
 });

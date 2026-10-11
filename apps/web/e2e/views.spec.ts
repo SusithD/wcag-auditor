@@ -249,12 +249,12 @@ test("the report links to coverage and compare", async ({ page, request }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(`/runs/${id}`);
   await page
-    .getByRole("navigation", { name: "Run views" })
+    .getByRole("navigation", { name: /^(Run|Report) views$/ })
     .getByRole("link", { name: "Coverage" })
     .click();
   await expect(page).toHaveURL(/\/coverage/);
   await page
-    .getByRole("navigation", { name: "Run views" })
+    .getByRole("navigation", { name: /^(Run|Report) views$/ })
     .getByRole("link", { name: "Compare" })
     .click();
   await expect(page).toHaveURL(/\/compare/);

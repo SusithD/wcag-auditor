@@ -71,7 +71,7 @@ export function FocusPairView({
       data-pair-region="true"
       role="region"
       aria-label={`Focus pair view for ${label}`}
-      className="flex h-full w-full items-start justify-center overflow-auto p-3 pb-16"
+      className="flex h-full w-full items-start justify-center overflow-auto p-3"
     >
       {failed ? (
         <p role="alert" className="text-body text-muted-foreground">

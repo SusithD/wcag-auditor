@@ -1,6 +1,6 @@
 "use client";
 
-import { Maximize, Minus, Plus, ScanLine } from "lucide-react";
+import { Maximize, Minus, Plus } from "lucide-react";
 import {
   type KeyboardEvent,
   useCallback,
@@ -15,6 +15,7 @@ import {
   TransformComponent,
   TransformWrapper,
 } from "react-zoom-pan-pinch";
+import { StatusShape } from "@/components/ds";
 import { Button } from "@/components/ui/button";
 import {
   ContextMenu,
@@ -23,7 +24,6 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { Kbd } from "@/components/ui/kbd";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Tooltip,
   TooltipContent,
@@ -36,15 +36,19 @@ import {
   cycle,
   type Finding,
   fitTransform,
-  fitWidth,
   readingOrder,
   SC_TITLES,
-  SEV_DASH,
-  SEV_GLYPH,
   sevKey,
 } from "@/lib/report";
 import { FocusPairView, type PairMode } from "./focus-pair";
 import { focusWhenReady } from "./focus-when-ready";
+import { kindOf, SvgGlyph } from "./glyph";
+import { isEstimated } from "./logic";
+import { Seg } from "./seg";
+
+const PAD_L = 24;
+const PAD_R = 40;
+const PAD_T = 16;
 
 type Props = {
   runId: string;
@@ -80,11 +84,11 @@ export function Canvas({
   const uid = useId();
   const wrapper = useRef<ReactZoomPanPinchRef>(null);
   const frame = useRef<HTMLDivElement>(null);
+  const well = useRef<HTMLDivElement>(null);
   const svg = useRef<SVGSVGElement>(null);
   const boxRefs = useRef(new Map<string, SVGGElement>());
-  const [labels, setLabels] = useState(false);
-  const [minimap, setMinimap] = useState(false);
-  const [view, setView] = useState({ scale: 1, x: 0, y: 0 });
+  const [labels, setLabels] = useState(findings.length <= 8);
+  const [view, setView] = useState({ scale: 1, x: 0, y: 0, fit: true });
   const [focusedKey, setFocusedKey] = useState<string | null>(null);
   const [rovingKey, setRovingKey] = useState<string | null>(null);
   const pendingFocus = useRef<"pair" | "box" | null>(null);
@@ -108,16 +112,22 @@ export function Canvas({
   const animation = prefersReducedMotion() ? 0 : 240;
 
   const containerSize = useCallback(() => {
-    const el = frame.current;
+    const el = well.current;
     return { w: el?.clientWidth ?? 800, h: el?.clientHeight ?? 600 };
   }, []);
 
   const fit = useCallback(
     (time = 0) => {
       const c = containerSize();
-      const scale = fitWidth(size.w, c);
+      const room = Math.max(c.w - PAD_L - PAD_R, 1);
+      const scale = Math.min(1, room / Math.max(size.w, 1));
       autoFit.current = true;
-      wrapper.current?.setTransform(0, 0, scale, time);
+      wrapper.current?.setTransform(
+        PAD_L + (room - size.w * scale) / 2,
+        PAD_T,
+        scale,
+        time,
+      );
     },
     [containerSize, size.w],
   );
@@ -137,7 +147,7 @@ export function Canvas({
   }, [loaded, fit, containerSize]);
 
   useEffect(() => {
-    const el = frame.current;
+    const el = well.current;
     if (!el || !loaded) return;
     const observer = new ResizeObserver(() => {
       if (autoFit.current && !selectedRef.current?.bbox) fit(0);
@@ -187,7 +197,7 @@ export function Canvas({
       left >= 48 &&
       top >= 48 &&
       left + b.w * scale <= c.w - 48 &&
-      top + b.h * scale <= c.h - 96
+      top + b.h * scale <= c.h - 48
     )
       return;
     w.setTransform(
@@ -230,7 +240,12 @@ export function Canvas({
       }
       cancelAnimationFrame(raf.current);
       raf.current = requestAnimationFrame(() =>
-        setView({ scale: state.scale, x: state.positionX, y: state.positionY }),
+        setView({
+          scale: state.scale,
+          x: state.positionX,
+          y: state.positionY,
+          fit: autoFit.current,
+        }),
       );
     },
     [sync],
@@ -313,6 +328,8 @@ export function Canvas({
 
   const alt = `${label ? `${label}: ` : ""}Full-page screenshot of ${url}, ${viewport} viewport, ${findings.length} findings; use the findings table for details`;
   const canPair = selected?.focus_index != null && focusStops > 0;
+  const pct = Math.round(view.scale * 100);
+  const zoomLabel = `${view.fit ? "Fit, " : ""}${pct}%`;
 
   return (
     <ContextMenu
@@ -338,221 +355,282 @@ export function Canvas({
             role="group"
             aria-label={`${label ? `${label} ` : ""}screenshot canvas`}
             tabIndex={boxes.length === 0 ? 0 : -1}
-            className="relative h-full min-h-96 overflow-hidden bg-muted outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-focus"
+            className="flex h-full min-h-96 flex-col bg-subtle outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
           />
         }
       >
-        {pairMode !== "page" && selected?.focus_index != null ? (
-          <FocusPairView
-            runId={runId}
-            viewport={viewport}
-            index={selected.focus_index}
-            mode={pairMode}
-            label={`${selected.sc} ${SC_TITLES[selected.sc] ?? ""}`}
-          />
-        ) : (
-          <TransformWrapper
-            ref={wrapper}
-            minScale={0.05}
-            maxScale={6}
-            limitToBounds={false}
-            wheel={{ activationKeys: ["Control", "Meta"] }}
-            doubleClick={{ disabled: true }}
-            onTransform={onTransform}
-            onPanningStart={() => {
-              autoFit.current = false;
-            }}
-            onZoomStart={() => {
-              autoFit.current = false;
-            }}
-          >
-            <TransformComponent
-              wrapperStyle={{ width: "100%", height: "100%" }}
-              contentStyle={{ width: size.w, height: size.h }}
-            >
-              <div
-                className="relative"
-                style={{ width: size.w, height: size.h }}
+        <div
+          ref={well}
+          className="relative min-h-0 flex-1 overflow-hidden bg-[radial-gradient(var(--line)_1px,transparent_1px)] bg-size-[16px_16px]"
+        >
+          {pairMode !== "page" && selected?.focus_index != null ? (
+            <div className="absolute inset-0">
+              <FocusPairView
+                runId={runId}
+                viewport={viewport}
+                index={selected.focus_index}
+                mode={pairMode}
+                label={`${selected.sc} ${SC_TITLES[selected.sc] ?? ""}`}
+              />
+            </div>
+          ) : (
+            <div className="absolute inset-0">
+              <TransformWrapper
+                ref={wrapper}
+                minScale={0.05}
+                maxScale={6}
+                limitToBounds={false}
+                wheel={{ activationKeys: ["Control", "Meta"] }}
+                doubleClick={{ disabled: true }}
+                onTransform={onTransform}
+                onPanningStart={() => {
+                  autoFit.current = false;
+                }}
+                onZoomStart={() => {
+                  autoFit.current = false;
+                }}
               >
-                {/* biome-ignore lint/performance/noImgElement: full-page screenshot served by the API */}
-                <img
-                  src={`/api/runs/${runId}/assets/${viewport}/screenshot`}
-                  alt={alt}
-                  width={size.w}
-                  height={size.h}
-                  onLoad={() => setLoaded(true)}
-                  draggable={false}
-                  className="block max-w-none select-none"
-                />
-                <svg
-                  ref={svg}
-                  viewBox={`0 0 ${size.w} ${size.h}`}
-                  width={size.w}
-                  height={size.h}
-                  className="absolute inset-0"
-                  style={{ ["--inv" as string]: 1 }}
-                  role="group"
-                  aria-label={`${label ? `${label}: ` : ""}${boxes.length} findings on the page`}
+                <TransformComponent
+                  wrapperStyle={{ width: "100%", height: "100%" }}
+                  contentStyle={{ width: size.w, height: size.h }}
                 >
-                  {boxes.map((f, position) => {
-                    const b = f.bbox;
-                    if (!b) return null;
-                    const key = sevKey(f);
-                    const isSel = f.key === selectedKey;
-                    const dim = selectedKey !== null && !isSel;
-                    return (
-                      <g
-                        key={f.key}
-                        ref={(el) => {
-                          if (el) boxRefs.current.set(f.key, el);
-                          else boxRefs.current.delete(f.key);
-                        }}
-                        role="button"
-                        tabIndex={f.key === tabKey ? 0 : -1}
-                        aria-label={ariaLabel(f, position + 1, boxes.length)}
-                        aria-describedby={`${uid}-${f.key}`}
-                        aria-pressed={isSel}
-                        data-key={f.key}
-                        data-sev={key}
-                        data-selected={isSel}
-                        className="group cursor-pointer outline-none"
-                        onClick={() => onSelect(f.key)}
-                        onContextMenu={() => onSelect(f.key)}
-                        onKeyDown={(e) => onBoxKey(e, f)}
-                        onFocus={() => {
-                          setFocusedKey(f.key);
-                          setRovingKey(f.key);
-                          ensureVisible(f);
-                        }}
-                        onBlur={() =>
-                          setFocusedKey((k) => (k === f.key ? null : k))
-                        }
-                      >
-                        <desc id={`${uid}-${f.key}`}>{f.element}</desc>
-                        {focusedKey === f.key ? (
-                          <>
+                  <div
+                    className="relative rounded-[4px] bg-white shadow-[0_0_0_1px_var(--line),0_12px_28px_-12px_rgb(0_0_55/0.22)]"
+                    style={{ width: size.w, height: size.h }}
+                  >
+                    {/* biome-ignore lint/performance/noImgElement: full-page screenshot served by the API */}
+                    <img
+                      src={`/api/runs/${runId}/assets/${viewport}/screenshot`}
+                      alt={alt}
+                      width={size.w}
+                      height={size.h}
+                      onLoad={() => setLoaded(true)}
+                      draggable={false}
+                      className="block max-w-none select-none dark:brightness-90"
+                    />
+                    <svg
+                      ref={svg}
+                      viewBox={`0 0 ${size.w} ${size.h}`}
+                      width={size.w}
+                      height={size.h}
+                      className="absolute inset-0 overflow-visible"
+                      style={{ ["--inv" as string]: 1 }}
+                      role="group"
+                      aria-label={`${label ? `${label}: ` : ""}${boxes.length} findings on the page`}
+                    >
+                      {boxes.map((f, position) => {
+                        const b = f.bbox;
+                        if (!b) return null;
+                        const key = sevKey(f);
+                        const isSel = f.key === selectedKey;
+                        const isFocus = focusedKey === f.key;
+                        const dim = selectedKey !== null && !isSel;
+                        const colour = isSel
+                          ? "var(--accent)"
+                          : `var(--${key === "needs-review" ? "review" : key})`;
+                        const strokeWidth = isSel ? 3 : 2;
+                        const showTag =
+                          (labels || isSel || isFocus) &&
+                          dismissedKey !== f.key;
+                        const tagWidth = showTag ? 26 + f.sc.length * 6.6 : 20;
+                        const w = Math.max(b.w, 1);
+                        const h = Math.max(b.h, 1);
+                        return (
+                          <g
+                            key={f.key}
+                            ref={(el) => {
+                              if (el) boxRefs.current.set(f.key, el);
+                              else boxRefs.current.delete(f.key);
+                            }}
+                            role="button"
+                            tabIndex={f.key === tabKey ? 0 : -1}
+                            aria-label={ariaLabel(
+                              f,
+                              position + 1,
+                              boxes.length,
+                            )}
+                            aria-describedby={`${uid}-${f.key}`}
+                            aria-pressed={isSel}
+                            data-key={f.key}
+                            data-sev={key}
+                            data-selected={isSel}
+                            data-estimated={isEstimated(f)}
+                            className="group cursor-pointer outline-none"
+                            onClick={() => onSelect(f.key)}
+                            onContextMenu={() => onSelect(f.key)}
+                            onKeyDown={(e) => onBoxKey(e, f)}
+                            onFocus={() => {
+                              setFocusedKey(f.key);
+                              setRovingKey(f.key);
+                              ensureVisible(f);
+                            }}
+                            onBlur={() =>
+                              setFocusedKey((k) => (k === f.key ? null : k))
+                            }
+                          >
+                            <desc id={`${uid}-${f.key}`}>{f.element}</desc>
+                            {isFocus ? (
+                              <>
+                                <rect
+                                  x={b.x}
+                                  y={b.y}
+                                  width={w}
+                                  height={h}
+                                  fill="none"
+                                  stroke="var(--halo)"
+                                  strokeWidth={16}
+                                  vectorEffect="non-scaling-stroke"
+                                />
+                                <rect
+                                  x={b.x}
+                                  y={b.y}
+                                  width={w}
+                                  height={h}
+                                  fill="none"
+                                  stroke="var(--ring)"
+                                  strokeWidth={10}
+                                  vectorEffect="non-scaling-stroke"
+                                />
+                              </>
+                            ) : null}
                             <rect
                               x={b.x}
                               y={b.y}
-                              width={Math.max(b.w, 1)}
-                              height={Math.max(b.h, 1)}
-                              fill="none"
+                              width={w}
+                              height={h}
+                              rx={3}
+                              data-hit="true"
+                              opacity={dim ? 0.45 : 1}
+                              fill={`color-mix(in srgb, ${colour} ${isSel ? 7 : 5}%, transparent)`}
                               stroke="var(--halo)"
-                              strokeWidth={16}
+                              strokeWidth={strokeWidth + 4}
                               vectorEffect="non-scaling-stroke"
                             />
                             <rect
                               x={b.x}
                               y={b.y}
-                              width={Math.max(b.w, 1)}
-                              height={Math.max(b.h, 1)}
+                              width={w}
+                              height={h}
+                              rx={3}
                               fill="none"
-                              stroke="var(--accent-focus)"
-                              strokeWidth={10}
+                              stroke={colour}
+                              strokeWidth={strokeWidth}
+                              strokeDasharray={
+                                isEstimated(f) ? "6 4" : undefined
+                              }
+                              data-stroke="true"
+                              opacity={dim ? 0.45 : 1}
                               vectorEffect="non-scaling-stroke"
                             />
-                          </>
-                        ) : null}
-                        <rect
-                          x={b.x}
-                          y={b.y}
-                          width={Math.max(b.w, 1)}
-                          height={Math.max(b.h, 1)}
-                          data-hit="true"
-                          opacity={dim ? 0.4 : 1}
-                          fill={`color-mix(in srgb, var(--sev-${key === "needs-review" ? "review" : key}) ${isSel || focusedKey === f.key ? 16 : 8}%, transparent)`}
-                          stroke="var(--halo)"
-                          strokeWidth={4}
-                          vectorEffect="non-scaling-stroke"
-                        />
-                        <rect
-                          x={b.x}
-                          y={b.y}
-                          width={Math.max(b.w, 1)}
-                          height={Math.max(b.h, 1)}
-                          fill="none"
-                          stroke={`var(--sev-${key === "needs-review" ? "review" : key})`}
-                          strokeWidth={key === "needs-review" ? 1.5 : 2}
-                          strokeDasharray={SEV_DASH[key]}
-                          data-stroke="true"
-                          opacity={dim ? 0.4 : 1}
-                          vectorEffect="non-scaling-stroke"
-                        />
-                        <text
-                          x={b.x}
-                          y={b.y}
-                          dy="-0.3em"
-                          className="pointer-events-none select-none"
-                          style={{
-                            fontSize: "calc(12px * var(--inv))",
-                            fill: `var(--sev-${key === "needs-review" ? "review" : key})`,
-                            paintOrder: "stroke",
-                            stroke: "var(--halo)",
-                            strokeWidth: "calc(3px * var(--inv))",
-                            fontWeight: 600,
-                          }}
-                        >
-                          {SEV_GLYPH[key]}
-                          {(labels || isSel || focusedKey === f.key) &&
-                          dismissedKey !== f.key
-                            ? ` ${f.sc} ${SC_TITLES[f.sc] ?? ""}`
-                            : ""}
-                        </text>
-                      </g>
-                    );
-                  })}
-                </svg>
-              </div>
-            </TransformComponent>
-          </TransformWrapper>
-        )}
+                            {dismissedKey !== f.key ? (
+                              <g
+                                className="pointer-events-none select-none"
+                                opacity={dim ? 0.7 : 1}
+                                style={{
+                                  transform: `translate(${b.x}px, ${b.y}px) scale(var(--inv)) translate(0px, -24px)`,
+                                }}
+                              >
+                                <rect
+                                  width={tagWidth}
+                                  height={20}
+                                  rx={5}
+                                  fill={
+                                    isSel ? "var(--accent)" : "var(--surface)"
+                                  }
+                                  stroke={colour}
+                                  strokeWidth={1.5}
+                                />
+                                <SvgGlyph
+                                  kind={kindOf(key)}
+                                  x={6}
+                                  y={5}
+                                  size={10}
+                                  color={isSel ? "var(--on-accent)" : colour}
+                                />
+                                {showTag ? (
+                                  <text
+                                    x={20}
+                                    y={14}
+                                    fontSize={11}
+                                    fontFamily="var(--font-geist-mono), monospace"
+                                    fill={
+                                      isSel ? "var(--on-accent)" : "var(--ink)"
+                                    }
+                                  >
+                                    {f.sc}
+                                  </text>
+                                ) : null}
+                              </g>
+                            ) : null}
+                          </g>
+                        );
+                      })}
+                    </svg>
+                  </div>
+                </TransformComponent>
+              </TransformWrapper>
+            </div>
+          )}
 
-        {minimap && pairMode === "page" ? (
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute right-3 top-3 w-36 overflow-hidden rounded-md border bg-background"
-          >
-            {/* biome-ignore lint/performance/noImgElement: thumbnail of the same screenshot */}
-            <img
-              src={`/api/runs/${runId}/assets/${viewport}/screenshot`}
-              alt=""
-              className="block w-full"
-            />
+          {pairMode === "page" ? (
             <div
-              className="absolute border-2 border-accent-focus"
-              style={{
-                left: `${Math.max(0, (-view.x / view.scale / size.w) * 100)}%`,
-                top: `${Math.max(0, (-view.y / view.scale / size.h) * 100)}%`,
-                width: `${Math.min(100, ((frame.current?.clientWidth ?? 0) / view.scale / size.w) * 100)}%`,
-                height: `${Math.min(100, ((frame.current?.clientHeight ?? 0) / view.scale / size.h) * 100)}%`,
-              }}
-            />
-          </div>
-        ) : null}
+              aria-hidden="true"
+              className="pointer-events-none absolute top-6 right-3.5 bottom-6 w-2.5 rounded-full bg-track"
+            >
+              <span
+                className="absolute -right-[3px] -left-[3px] rounded-[4px] border-[1.5px] border-ink-3"
+                style={{
+                  top: `${Math.min(95, Math.max(0, (-view.y / view.scale / size.h) * 100))}%`,
+                  height: `${Math.min(100, ((well.current?.clientHeight ?? 0) / view.scale / size.h) * 100)}%`,
+                }}
+              />
+              {boxes.map((f) => {
+                const b = f.bbox;
+                if (!b) return null;
+                const key = sevKey(f);
+                return (
+                  <span
+                    key={f.key}
+                    className="absolute left-0 -translate-y-1/2"
+                    style={{
+                      top: `${Math.min(100, Math.max(0, ((b.y + b.h / 2) / size.h) * 100))}%`,
+                    }}
+                  >
+                    <StatusShape
+                      kind={key === "needs-review" ? "review" : key}
+                      className="size-2.5"
+                    />
+                  </span>
+                );
+              })}
+            </div>
+          ) : null}
+        </div>
 
         <div
           role="toolbar"
           aria-label={`${label ? `${label} ` : ""}canvas controls`}
-          className="absolute inset-x-0 bottom-3 mx-auto flex w-max max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-1 rounded-lg border bg-popover p-1 shadow-md"
+          className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 border-t border-line bg-surface px-3 py-2"
         >
           {pairMode === "page" ? (
-            <>
+            <div className="flex items-center gap-0.5">
               <Tip label="Zoom out" kbd="−">
                 <Button
                   variant="ghost"
-                  size="icon"
-                  className="min-h-[24px] min-w-[24px]"
+                  size="icon-sm"
                   aria-label="Zoom out"
                   onClick={() => wrapper.current?.zoomOut(0.4, animation)}
                 >
                   <Minus aria-hidden="true" />
                 </Button>
               </Tip>
+              <span className="num min-w-16 text-center text-dense text-ink-2">
+                {zoomLabel}
+              </span>
               <Tip label="Zoom in" kbd="+">
                 <Button
                   variant="ghost"
-                  size="icon"
-                  className="min-h-[24px] min-w-[24px]"
+                  size="icon-sm"
                   aria-label="Zoom in"
                   onClick={() => wrapper.current?.zoomIn(0.4, animation)}
                 >
@@ -562,8 +640,7 @@ export function Canvas({
               <Tip label="Fit width" kbd="0">
                 <Button
                   variant="ghost"
-                  size="icon"
-                  className="min-h-[24px] min-w-[24px]"
+                  size="icon-sm"
                   aria-label="Fit to width"
                   onClick={() => fit(animation)}
                 >
@@ -573,70 +650,64 @@ export function Canvas({
               <Button
                 variant="ghost"
                 size="sm"
-                className="min-h-[24px] min-w-[24px]"
                 aria-label="100% zoom"
                 onClick={zoomToActual}
               >
                 100%
               </Button>
-              <Button
-                variant={labels ? "secondary" : "ghost"}
-                size="sm"
-                className="min-h-[24px] min-w-[24px]"
-                aria-pressed={labels}
-                onClick={() => setLabels((v) => !v)}
-              >
-                Labels
-              </Button>
-              <Button
-                variant={minimap ? "secondary" : "ghost"}
-                size="sm"
-                className="min-h-[24px] min-w-[24px]"
-                aria-pressed={minimap}
-                onClick={() => setMinimap((v) => !v)}
-              >
-                <ScanLine aria-hidden="true" />
-                Minimap
-              </Button>
-            </>
+            </div>
           ) : null}
-          <ToggleGroup
-            variant="outline"
-            size="sm"
-            value={[pairMode === "page" ? "page" : pairMode]}
-            onValueChange={(v) => v[0] && onPairMode(v[0] as PairMode)}
-            aria-label={`${label ? `${label} ` : ""}focus pair view`}
-          >
-            <ToggleGroupItem
-              value="page"
-              aria-label="Page view"
-              className="min-h-[24px] min-w-[24px]"
+          {pairMode === "page" ? (
+            <div
+              role="group"
+              aria-label="Box legend"
+              className="flex gap-4 text-xs text-ink-2 max-[720px]:hidden"
             >
-              Page
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="focused"
-              disabled={!canPair}
-              className="min-h-[24px] min-w-[24px]"
-            >
-              Focused
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="unfocused"
-              disabled={!canPair}
-              className="min-h-[24px] min-w-[24px]"
-            >
-              Unfocused
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="diff"
-              disabled={!canPair}
-              className="min-h-[24px] min-w-[24px]"
-            >
-              Diff
-            </ToggleGroupItem>
-          </ToggleGroup>
-          <Kbd aria-hidden="true">F</Kbd>
+              <span className="inline-flex items-center gap-1.5">
+                <i className="inline-block h-2.5 w-[18px] rounded-[2px] border-2 border-ink-2" />
+                Measured
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <i className="inline-block h-2.5 w-[18px] rounded-[2px] border-2 border-dashed border-ink-2" />
+                Estimated by the detector
+              </span>
+            </div>
+          ) : null}
+          <div className="ml-auto flex flex-wrap items-center gap-2">
+            {pairMode === "page" ? (
+              <Seg<"labels" | "boxes">
+                small
+                label="Labels"
+                value={labels ? "labels" : "boxes"}
+                onChange={(v) => setLabels(v === "labels")}
+                options={[
+                  { value: "labels", label: "Labels" },
+                  { value: "boxes", label: "Boxes only" },
+                ]}
+              />
+            ) : null}
+            {canPair || pairMode !== "page" ? (
+              <>
+                <Seg<PairMode>
+                  small
+                  label={`${label ? `${label} ` : ""}focus pair view`}
+                  value={pairMode}
+                  onChange={onPairMode}
+                  options={[
+                    { value: "page", label: "Page", name: "Page view" },
+                    { value: "focused", label: "Focused", disabled: !canPair },
+                    {
+                      value: "unfocused",
+                      label: "Unfocused",
+                      disabled: !canPair,
+                    },
+                    { value: "diff", label: "Diff", disabled: !canPair },
+                  ]}
+                />
+                <Kbd aria-hidden="true">F</Kbd>
+              </>
+            ) : null}
+          </div>
         </div>
       </ContextMenuTrigger>
       <ContextMenuContent finalFocus={false}>
