@@ -40,6 +40,7 @@ import {
   SC_TITLES,
   sevKey,
 } from "@/lib/report";
+import { cn } from "@/lib/utils";
 import { FocusPairView, type PairMode } from "./focus-pair";
 import { focusWhenReady } from "./focus-when-ready";
 import { kindOf, SvgGlyph } from "./glyph";
@@ -48,7 +49,10 @@ import { Seg } from "./seg";
 
 const PAD_L = 24;
 const PAD_R = 40;
-const PAD_T = 16;
+const PAD_T = 32;
+const PAD_B = 24;
+const PIN_SMALL_BELOW = 0.5;
+const PIN_SMALL_FACTOR = 0.8;
 
 type Props = {
   runId: string;
@@ -93,6 +97,7 @@ export function Canvas({
   const [rovingKey, setRovingKey] = useState<string | null>(null);
   const pendingFocus = useRef<"pair" | "box" | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [wellWidth, setWellWidth] = useState(0);
   const raf = useRef(0);
   const autoFit = useRef(true);
   const applying = useRef(false);
@@ -149,7 +154,9 @@ export function Canvas({
   useEffect(() => {
     const el = well.current;
     if (!el || !loaded) return;
+    setWellWidth(el.clientWidth);
     const observer = new ResizeObserver(() => {
+      setWellWidth(el.clientWidth);
       if (autoFit.current && !selectedRef.current?.bbox) fit(0);
     });
     observer.observe(el);
@@ -231,6 +238,12 @@ export function Canvas({
       state: { scale: number; positionX: number; positionY: number },
     ) => {
       svg.current?.style.setProperty("--inv", String(1 / state.scale));
+      svg.current?.style.setProperty(
+        "--pin",
+        String(
+          (state.scale < PIN_SMALL_BELOW ? PIN_SMALL_FACTOR : 1) / state.scale,
+        ),
+      );
       if (sync && !applying.current) {
         sync.bus.publish(sync.id, {
           x: state.positionX,
@@ -328,6 +341,11 @@ export function Canvas({
 
   const alt = `${label ? `${label}: ` : ""}Full-page screenshot of ${url}, ${viewport} viewport, ${findings.length} findings; use the findings table for details`;
   const canPair = selected?.focus_index != null && focusStops > 0;
+  const fitScale = Math.min(
+    1,
+    Math.max(wellWidth - PAD_L - PAD_R, 1) / Math.max(size.w, 1),
+  );
+  const fitHeight = Math.ceil(size.h * fitScale) + PAD_T + PAD_B;
   const pct = Math.round(view.scale * 100);
   const zoomLabel = `${view.fit ? "Fit, " : ""}${pct}%`;
 
@@ -355,13 +373,20 @@ export function Canvas({
             role="group"
             aria-label={`${label ? `${label} ` : ""}screenshot canvas`}
             tabIndex={boxes.length === 0 ? 0 : -1}
-            className="flex h-full min-h-96 flex-col bg-subtle outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+            className="flex h-full min-h-96 flex-col bg-subtle max-lg:h-auto max-lg:min-h-0 outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
           />
         }
       >
         <div
           ref={well}
-          className="relative min-h-0 flex-1 overflow-hidden bg-[radial-gradient(var(--line)_1px,transparent_1px)] bg-size-[16px_16px]"
+          style={{ ["--fit-h" as string]: `${fitHeight}px` }}
+          className={cn(
+            "relative min-h-0 flex-1 overflow-hidden max-lg:flex-none",
+            view.fit && pairMode === "page"
+              ? "max-lg:h-[min(var(--fit-h),75dvh)]"
+              : "max-lg:h-[max(var(--fit-h),70dvh)]",
+            "bg-[radial-gradient(var(--line)_1px,transparent_1px)] bg-size-[16px_16px]",
+          )}
         >
           {pairMode !== "page" && selected?.focus_index != null ? (
             <div className="absolute inset-0">
@@ -414,7 +439,7 @@ export function Canvas({
                       width={size.w}
                       height={size.h}
                       className="absolute inset-0 overflow-visible"
-                      style={{ ["--inv" as string]: 1 }}
+                      style={{ ["--inv" as string]: 1, ["--pin" as string]: 1 }}
                       role="group"
                       aria-label={`${label ? `${label}: ` : ""}${boxes.length} findings on the page`}
                     >
@@ -430,7 +455,9 @@ export function Canvas({
                           : `var(--${key === "needs-review" ? "review" : key})`;
                         const strokeWidth = isSel ? 3 : 2;
                         const showTag =
-                          (labels || isSel || isFocus) &&
+                          ((labels && view.scale >= PIN_SMALL_BELOW) ||
+                            isSel ||
+                            isFocus) &&
                           dismissedKey !== f.key;
                         const tagWidth = showTag ? 26 + f.sc.length * 6.6 : 20;
                         const w = Math.max(b.w, 1);
@@ -527,7 +554,7 @@ export function Canvas({
                                 className="pointer-events-none select-none"
                                 opacity={dim ? 0.7 : 1}
                                 style={{
-                                  transform: `translate(${b.x}px, ${b.y}px) scale(var(--inv)) translate(0px, -24px)`,
+                                  transform: `translate(${b.x}px, ${b.y}px) scale(var(--pin)) translate(0px, -24px)`,
                                 }}
                               >
                                 <rect

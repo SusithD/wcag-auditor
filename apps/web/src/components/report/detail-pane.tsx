@@ -460,7 +460,7 @@ export function DetailPane({
             <img
               src={`/api/runs/${runId}/assets/${finding.viewport}/crop/${finding.key}`}
               alt={cropAlt}
-              className="mt-1 h-auto max-h-56 w-auto max-w-full rounded-md border border-line"
+              className="mt-1 aspect-[16/7] w-full rounded-md border border-line bg-subtle object-contain"
               style={{ imageRendering: "pixelated" }}
             />
           ) : null}

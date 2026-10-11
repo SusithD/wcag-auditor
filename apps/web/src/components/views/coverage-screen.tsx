@@ -249,12 +249,12 @@ export function CoverageScreen({ runId }: { runId: string }) {
           </p>
         ) : (
           <>
-            <ul className="mt-3 flex flex-col gap-2">
-              {catalogue.data.entries.map((e) => (
-                <li key={e.sc}>
-                  <Panel as="div">
+            <Panel as="div" className="mt-3">
+              <ul className="divide-y divide-line">
+                {catalogue.data.entries.map((e) => (
+                  <li key={e.sc}>
                     <details>
-                      <summary className="flex min-h-10 cursor-pointer flex-wrap items-center gap-x-2 px-4 py-1.5 font-medium text-ink">
+                      <summary className="flex min-h-11 cursor-pointer flex-wrap items-center gap-x-2 px-4 py-2 font-medium text-ink">
                         <ScCode code={e.sc} /> {e.name}
                         <span className="ml-auto text-dense font-normal text-ink-3">
                           Level {e.level}, {plainWording(e.detectability)}
@@ -284,10 +284,10 @@ export function CoverageScreen({ runId }: { runId: string }) {
                         ]}
                       />
                     </details>
-                  </Panel>
-                </li>
-              ))}
-            </ul>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
             {catalogue.data.coverage_claim ? (
               <p className="mt-3 text-dense text-ink-3">
                 {emphasisSegments(
