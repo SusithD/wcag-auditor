@@ -155,7 +155,7 @@ export function CommandPalette({
       modal
     >
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/30 transition-opacity duration-100 data-ending-style:opacity-0 data-starting-style:opacity-0" />
+        <Dialog.Backdrop className="fixed inset-0 z-50 bg-scrim transition-opacity duration-100 data-ending-style:opacity-0 data-starting-style:opacity-0" />
         <Dialog.Popup
           data-slot="command-palette"
           initialFocus={inputRef}

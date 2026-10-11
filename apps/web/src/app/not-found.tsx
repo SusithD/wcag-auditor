@@ -13,7 +13,7 @@ export default function NotFound() {
         title="Page not found"
         action={
           <Link href="/" className={buttonVariants({ variant: "primary" })}>
-            Back to Overview
+            Back to overview
           </Link>
         }
       >

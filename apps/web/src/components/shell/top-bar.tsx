@@ -8,6 +8,7 @@ import { Kbd } from "@/components/ds";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { defaultCrumbs } from "@/lib/shell";
+import { cn } from "@/lib/utils";
 import { BrandMark } from "./brand-mark";
 import { useShell } from "./shell-context";
 
@@ -27,8 +28,8 @@ function Breadcrumbs() {
   const items = crumbs ?? defaultCrumbs(pathname);
   if (items.length === 0) return <div className="flex-1" />;
   return (
-    <nav aria-label="Breadcrumb" className="min-w-0 flex-1">
-      <ol className="m-0 flex min-w-0 list-none items-center gap-1.5 p-0 text-dense text-ink-3">
+    <nav aria-label="Breadcrumb" className="min-w-0 flex-1 overflow-hidden">
+      <ol className="m-0 flex min-w-0 list-none items-center gap-1.5 overflow-hidden p-0 text-dense text-ink-3">
         {items.map((crumb, index) => {
           const last = index === items.length - 1;
           return (
@@ -38,7 +39,12 @@ function Breadcrumbs() {
                   <ChevronRight className="size-3.5" strokeWidth={1.5} />
                 </li>
               ) : null}
-              <li className="min-w-0 truncate">
+              <li
+                className={cn(
+                  "min-w-0 overflow-hidden text-ellipsis whitespace-nowrap",
+                  index === 0 && !last && "shrink-0",
+                )}
+              >
                 {last ? (
                   <span aria-current="page" className="font-medium text-ink">
                     {crumb.label}
@@ -91,14 +97,14 @@ export function TopBar({
       <Breadcrumbs />
       <div
         ref={setActionsEl}
-        className="flex items-center gap-2 empty:hidden"
+        className="flex shrink-0 items-center gap-2 empty:hidden"
       />
       <button
         type="button"
         aria-haspopup="dialog"
         aria-label="Search"
         onClick={onOpenSearch}
-        className="flex h-[32px] w-[320px] cursor-pointer items-center gap-2 rounded-md border border-line bg-canvas pr-2 pl-2.5 text-left text-dense text-ink-3 transition-colors duration-hover hover:bg-subtle max-[1100px]:w-[220px] max-[720px]:w-[32px] max-[720px]:justify-center max-[720px]:p-0"
+        className="flex h-[32px] w-[320px] shrink-0 cursor-pointer items-center gap-2 rounded-md border border-line bg-canvas pr-2 pl-2.5 text-left text-dense text-ink-3 transition-colors duration-hover hover:bg-subtle max-[1100px]:w-[220px] max-[720px]:w-[32px] max-[720px]:justify-center max-[720px]:p-0"
       >
         <Search
           className="size-4 shrink-0"

@@ -33,6 +33,7 @@ export function PanelHeader({
 }) {
   return (
     <div
+      data-ds="panel-header"
       className={cn(
         "flex min-h-12 items-center justify-between gap-3 border-b border-line px-4",
         className,
@@ -51,5 +52,7 @@ export function PanelHeader({
 }
 
 export function PanelBody({ className, ...props }: ComponentProps<"div">) {
-  return <div className={cn("p-4", className)} {...props} />;
+  return (
+    <div data-ds="panel-body" className={cn("p-4", className)} {...props} />
+  );
 }

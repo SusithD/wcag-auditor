@@ -2,7 +2,7 @@ export function BrandMark() {
   return (
     <span
       aria-hidden="true"
-      className="grid size-6 shrink-0 place-items-center rounded-md bg-navy dark:bg-[#2b2b8c]"
+      className="grid size-6 shrink-0 place-items-center rounded-md bg-brand text-brand-fg"
     >
       <svg
         viewBox="0 0 16 16"
@@ -12,12 +12,12 @@ export function BrandMark() {
       >
         <path
           d="M3 3.5h6.5M3 8h10M3 12.5h4"
-          stroke="#fff"
+          stroke="currentColor"
           strokeWidth="1.5"
           strokeLinecap="round"
           fill="none"
         />
-        <circle cx="12" cy="3.5" r="1.4" fill="#fff" />
+        <circle cx="12" cy="3.5" r="1.4" fill="currentColor" />
       </svg>
     </span>
   );

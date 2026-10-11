@@ -20,7 +20,8 @@ export function Status({
       data-ds="status"
       className={cn(
         "inline-flex items-center gap-1.5 text-dense whitespace-nowrap",
-        strong ? "font-medium text-ink" : "text-ink-2",
+        "text-ink",
+        strong && "font-medium",
         zero && "text-ink-3",
         className,
       )}

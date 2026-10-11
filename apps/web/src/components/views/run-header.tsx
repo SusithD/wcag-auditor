@@ -66,7 +66,7 @@ export function RunHeader({
         items={[
           { label: "Audits", href: "/audits" },
           {
-            label: middleTruncate(host, 20),
+            label: host,
             href: `/runs/${runId}?vp=${viewport}`,
           },
           { label: VIEW_NAME[current] },

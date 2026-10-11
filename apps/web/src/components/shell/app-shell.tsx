@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type ReactNode, useEffect, useState } from "react";
+import { useSettings } from "@/components/settings/use-settings";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -88,8 +89,16 @@ function FullShell({ children }: { children: ReactNode }) {
   );
 }
 
+function useApplyDensity() {
+  const [settings] = useSettings();
+  useEffect(() => {
+    document.documentElement.dataset.density = settings.density;
+  }, [settings.density]);
+}
+
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  useApplyDensity();
   if (isParticipantRoute(pathname))
     return <FocusedShell>{children}</FocusedShell>;
   return (

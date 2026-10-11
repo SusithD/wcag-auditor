@@ -18,7 +18,7 @@ export function ViewMessage({
       <h1
         ref={focusOnMount}
         tabIndex={-1}
-        className="t-section text-ink outline-none"
+        className="t-page text-ink outline-none"
       >
         {title}
       </h1>

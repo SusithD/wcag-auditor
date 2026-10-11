@@ -20,6 +20,9 @@
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
   --color-navy: var(--navy);
+  --color-brand: var(--brand);
+  --color-brand-fg: var(--brand-fg);
+  --color-scrim: var(--scrim);
   --color-tint: var(--tint);
   --color-accent: var(--accent);
   --color-accent-fill: var(--accent-fill);
@@ -128,6 +131,9 @@
   --accent-fill: var(--navy);
   --accent-fill-hover: var(--navy-700);
   --on-accent: #ffffff;
+  --brand: #000055;
+  --brand-fg: #ffffff;
+  --scrim: rgb(0 0 0 / 0.3);
   --ring: var(--navy);
   --critical: #a8281f;
   --serious: #9a4300;
@@ -194,6 +200,8 @@
   --accent-fill: #ecedf2;
   --accent-fill-hover: #ffffff;
   --on-accent: #000055;
+  --brand: #2b2b8c;
+  --brand-fg: #ffffff;
   --ring: #b4b4ec;
   --critical: #ff8f85;
   --serious: #f2a054;
@@ -229,6 +237,22 @@
   body {
     @apply bg-canvas font-sans text-body text-ink antialiased;
   }
+}
+
+[data-density="compact"] [data-slot="table-body"] [data-slot="table-row"] {
+  height: 40px;
+}
+[data-density="compact"] [data-slot="table-cell"] {
+  padding-block: 0.25rem;
+}
+[data-density="compact"] [data-ds="panel-header"] {
+  min-height: 2.5rem;
+}
+[data-density="compact"] [data-ds="panel-body"] {
+  padding: 0.75rem;
+}
+[data-density="compact"] [data-finding-id] {
+  padding-block: 0.5rem;
 }
 
 @utility shadow-float {
