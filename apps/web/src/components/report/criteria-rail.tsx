@@ -93,9 +93,9 @@ export function CriteriaRail({
           <button
             type="button"
             data-sc=""
-            aria-current={active === null ? "page" : undefined}
+            aria-pressed={active === null}
             onClick={() => onSelect(null)}
-            className="relative flex min-h-8 w-full items-center gap-2 rounded-md px-2 text-left text-body hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:before:absolute aria-[current=page]:before:inset-y-1 aria-[current=page]:before:left-0 aria-[current=page]:before:w-0.5 aria-[current=page]:before:bg-accent-focus"
+            className="relative flex min-h-8 w-full items-center gap-2 rounded-md px-2 text-left text-body hover:bg-muted aria-pressed:bg-muted aria-pressed:before:absolute aria-pressed:before:inset-y-1 aria-pressed:before:left-0 aria-pressed:before:w-0.5 aria-pressed:before:bg-accent-focus"
           >
             All criteria
           </button>
@@ -113,12 +113,17 @@ export function CriteriaRail({
               <button
                 type="button"
                 data-sc={sc}
-                aria-current={active === sc ? "page" : undefined}
+                aria-pressed={active === sc}
                 onClick={() => onSelect(active === sc ? null : sc)}
-                className="relative grid min-h-9 w-full grid-cols-[auto_1fr_auto] items-center gap-x-2 rounded-md px-2 py-1 text-left text-body hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:before:absolute aria-[current=page]:before:inset-y-1 aria-[current=page]:before:left-0 aria-[current=page]:before:w-0.5 aria-[current=page]:before:bg-accent-focus"
+                className="relative grid min-h-9 w-full grid-cols-[auto_1fr_auto] items-center gap-x-2 rounded-md px-2 py-1 text-left text-body hover:bg-muted aria-pressed:bg-muted aria-pressed:before:absolute aria-pressed:before:inset-y-1 aria-pressed:before:left-0 aria-pressed:before:w-0.5 aria-pressed:before:bg-accent-focus"
               >
                 <span className="font-mono text-label">{sc}</span>
-                <span className="truncate">{SC_TITLES[sc]}</span>
+                <span
+                  className="line-clamp-2 break-words"
+                  title={`${sc} ${SC_TITLES[sc]}`}
+                >
+                  {SC_TITLES[sc]}
+                </span>
                 <span className="flex items-center gap-2 font-mono text-label">
                   <span className="sr-only">
                     {c.critical} critical, {c.serious} serious, {c.minor} minor

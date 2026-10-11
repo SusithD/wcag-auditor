@@ -15,3 +15,7 @@ export function useViewportParam(available: Viewport[]) {
     router.replace(`${pathname}?vp=${vp}`, { scroll: false });
   return { viewport, setViewport };
 }
+
+export function focusOnMount(element: HTMLElement | null) {
+  element?.focus();
+}

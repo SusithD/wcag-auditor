@@ -10,6 +10,8 @@ import {
   type Finding,
   PROV_GLYPH,
   PROV_LABEL,
+  plainText,
+  plainValue,
   SC_TITLES,
   SEV_GLYPH,
   SEV_LABEL,
@@ -31,18 +33,32 @@ type Props = {
   saveError: boolean;
   empty: boolean;
   readOnly?: boolean;
+  onBack?: () => void;
+  onAnnounce?: (message: string) => void;
 };
 
-function CopyButton({ text, label }: { text: string; label: string }) {
+function CopyButton({
+  text,
+  label,
+  format,
+  onCopied,
+}: {
+  text: string;
+  label: string;
+  format: string;
+  onCopied?: (message: string) => void;
+}) {
   const [done, setDone] = useState(false);
   return (
     <Button
       variant="ghost"
       size="sm"
+      className="min-h-[24px] min-w-[24px]"
       aria-label={label}
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(text);
+          onCopied?.(`${format} copied`);
           setDone(true);
           setTimeout(() => setDone(false), 1500);
         } catch {
@@ -68,11 +84,17 @@ export function DetailPane({
   saveError,
   empty,
   readOnly = false,
+  onBack,
+  onAnnounce,
 }: Props) {
   if (!finding) {
     return (
       <div className="p-4 text-body text-muted-foreground">
-        <h2 className="text-h3 font-semibold text-foreground">
+        <h2
+          id="detail-h"
+          tabIndex={-1}
+          className="text-h3 font-semibold text-foreground outline-none"
+        >
           Finding details
         </h2>
         <p className="mt-2">
@@ -92,10 +114,22 @@ export function DetailPane({
   return (
     <article aria-labelledby="detail-h" className="flex h-full flex-col">
       <div className="flex-1 space-y-4 overflow-y-auto p-4">
+        {onBack ? (
+          <Button
+            variant="outline"
+            size="sm"
+            className="min-h-[24px] min-w-[24px]"
+            onClick={onBack}
+          >
+            <ChevronLeft aria-hidden="true" />
+            Back to findings
+          </Button>
+        ) : null}
         <header>
           <h2
             id="detail-h"
-            className="flex flex-wrap items-center gap-2 text-h3 font-semibold"
+            tabIndex={-1}
+            className="flex flex-wrap items-center gap-2 text-h3 font-semibold outline-none"
           >
             <span
               className={`inline-flex items-center gap-1 text-body text-sev-${key === "needs-review" ? "review" : key}`}
@@ -111,7 +145,7 @@ export function DetailPane({
             {g ? (
               <a
                 href={g.understanding}
-                className="inline-flex min-h-6 items-center rounded-full border px-2 font-mono text-label underline underline-offset-4"
+                className="inline-flex min-h-[24px] items-center rounded-full border px-2 font-mono text-label underline underline-offset-4"
               >
                 {finding.sc} on w3.org
                 <span className="sr-only"> (Understanding document)</span>
@@ -141,7 +175,7 @@ export function DetailPane({
           </p>
         </header>
 
-        {g ? <p className="text-body">{g.what_failed}</p> : null}
+        {g ? <p className="text-body">{plainText(g.what_failed)}</p> : null}
 
         <section
           aria-labelledby="evidence-h"
@@ -156,7 +190,7 @@ export function DetailPane({
                 <dt className="text-caption text-muted-foreground">
                   {r.label}
                 </dt>
-                <dd className="font-mono text-body">{r.value}</dd>
+                <dd className="font-mono text-body">{plainValue(r.value)}</dd>
               </div>
             ))}
           </dl>
@@ -198,13 +232,20 @@ export function DetailPane({
             <h3 id="fix-h" className="text-row font-semibold">
               How to fix
             </h3>
-            <p className="mt-1 text-body">{g.nearest_passing}</p>
+            <p className="mt-1 text-body">{plainText(g.nearest_passing)}</p>
             <Tabs defaultValue={g.fix_html ? "html" : "css"} className="mt-2">
               <TabsList>
                 {g.fix_html ? (
-                  <TabsTrigger value="html">HTML</TabsTrigger>
+                  <TabsTrigger
+                    value="html"
+                    className="min-h-[24px] min-w-[24px]"
+                  >
+                    HTML
+                  </TabsTrigger>
                 ) : null}
-                <TabsTrigger value="css">CSS</TabsTrigger>
+                <TabsTrigger value="css" className="min-h-[24px] min-w-[24px]">
+                  CSS
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="css">
                 <div className="flex items-start gap-2">
@@ -216,7 +257,12 @@ export function DetailPane({
                   >
                     <code>{g.fix_css}</code>
                   </pre>
-                  <CopyButton text={g.fix_css} label="Copy CSS" />
+                  <CopyButton
+                    text={g.fix_css}
+                    label="Copy CSS"
+                    format="CSS"
+                    onCopied={onAnnounce}
+                  />
                 </div>
               </TabsContent>
               {g.fix_html ? (
@@ -230,7 +276,12 @@ export function DetailPane({
                     >
                       <code>{g.fix_html}</code>
                     </pre>
-                    <CopyButton text={g.fix_html} label="Copy HTML" />
+                    <CopyButton
+                      text={g.fix_html}
+                      label="Copy HTML"
+                      format="HTML"
+                      onCopied={onAnnounce}
+                    />
                   </div>
                 </TabsContent>
               ) : null}
@@ -256,6 +307,7 @@ export function DetailPane({
           <div className="flex gap-1" role="group" aria-label="Finding status">
             <Button
               size="sm"
+              className="min-h-[24px] min-w-[24px]"
               variant={finding.status === "fixed" ? "secondary" : "outline"}
               aria-pressed={finding.status === "fixed"}
               disabled={saving}
@@ -267,6 +319,7 @@ export function DetailPane({
             </Button>
             <Button
               size="sm"
+              className="min-h-[24px] min-w-[24px]"
               variant={finding.status === "ignored" ? "secondary" : "outline"}
               aria-pressed={finding.status === "ignored"}
               disabled={saving}
@@ -282,20 +335,24 @@ export function DetailPane({
           <Button
             size="sm"
             variant="ghost"
+            className="min-h-[24px] min-w-[24px]"
             onClick={onPrev}
             aria-label="Previous finding"
+            aria-keyshortcuts="K"
           >
             <ChevronLeft aria-hidden="true" />
             <Kbd aria-hidden="true">K</Kbd>
           </Button>
-          <span className="font-mono text-label" aria-live="polite">
+          <span className="font-mono text-label">
             {index + 1} of {total}
           </span>
           <Button
             size="sm"
             variant="ghost"
+            className="min-h-[24px] min-w-[24px]"
             onClick={onNext}
             aria-label="Next finding"
+            aria-keyshortcuts="J"
           >
             <Kbd aria-hidden="true">J</Kbd>
             <ChevronRight aria-hidden="true" />

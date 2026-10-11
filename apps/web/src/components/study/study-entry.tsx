@@ -6,11 +6,12 @@ import { api } from "@/api/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useStudyConfig } from "@/hooks/use-study";
+
+const BAD_CODE =
+  "That code was not found. Check it against the card the researcher gave you, or ask them.";
 
 export function StudyEntry() {
   const router = useRouter();
-  const config = useStudyConfig();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -30,10 +31,7 @@ export function StudyEntry() {
       body: { code: trimmed },
     });
     if (e || !data) {
-      const detail = (e as { detail?: unknown } | undefined)?.detail;
-      setError(
-        typeof detail === "string" ? detail : "That code could not be used.",
-      );
+      setError(BAD_CODE);
       setBusy(false);
       document.getElementById("study-code")?.focus();
       return;
@@ -50,12 +48,6 @@ export function StudyEntry() {
       <p className="mb-6 mt-1 text-body text-muted-foreground">
         Enter the participant code the researcher gave you to begin.
       </p>
-      {config.data && !config.data.ethics_approved ? (
-        <p className="mb-4 rounded-md border bg-muted px-3 py-2 text-caption">
-          Ethics approval is not recorded yet, so only synthetic participant
-          codes (SYN01 to SYN16) work.
-        </p>
-      ) : null}
       <form onSubmit={submit} noValidate>
         <Label htmlFor="study-code">Participant code</Label>
         <Input

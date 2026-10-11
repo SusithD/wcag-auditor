@@ -69,6 +69,7 @@ export function ConsentStep({
             <input
               ref={i === 0 ? first : undefined}
               type="checkbox"
+              aria-required="true"
               aria-invalid={error && !required[i] ? true : undefined}
               aria-describedby={
                 error && !required[i] ? "consent-error" : undefined
@@ -155,10 +156,16 @@ export function DemographicsStep({
       <div className="space-y-4">
         {Object.entries(materials.demographics).map(([key, options]) => (
           <div key={key}>
-            <Label htmlFor={`demo-${key}`}>{LABELS[key] ?? key}</Label>
+            <Label htmlFor={`demo-${key}`}>
+              {LABELS[key] ?? key}{" "}
+              <span className="font-normal text-muted-foreground">
+                (required)
+              </span>
+            </Label>
             <select
               id={`demo-${key}`}
               value={answers[key] ?? ""}
+              aria-required="true"
               aria-invalid={error && !answers[key] ? true : undefined}
               aria-describedby={
                 error && !answers[key] ? "demo-error" : undefined

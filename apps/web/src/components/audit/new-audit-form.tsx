@@ -25,7 +25,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Toggle } from "@/components/ui/toggle";
 import { normalizeUrl } from "@/lib/url";
 
 const ALL_VIEWPORTS: Viewport[] = ["desktop", "mobile"];
@@ -222,7 +222,7 @@ export function NewAuditForm() {
               multiple
               disabled={submitting}
               onChange={(e) => e.target.files && addFiles(e.target.files)}
-              className="mt-3 block min-h-6 w-full text-body file:mr-3 file:min-h-6 file:rounded-md file:border file:border-input file:bg-background file:px-2.5 file:text-body"
+              className="mt-3 block min-h-8 w-full text-body file:mr-3 file:min-h-8 file:rounded-md file:border file:border-input file:bg-background file:px-2.5 file:text-body"
             />
           </fieldset>
           {files.length > 0 ? (
@@ -260,20 +260,28 @@ export function NewAuditForm() {
         }
       >
         <legend className="mb-2 text-body font-medium">Viewports</legend>
-        <ToggleGroup
-          multiple
-          variant="outline"
-          value={viewports}
-          onValueChange={(v) => setViewports(v as Viewport[])}
-          aria-label="Viewports"
-        >
-          <ToggleGroupItem value="desktop">Desktop</ToggleGroupItem>
-          <ToggleGroupItem value="mobile">Mobile</ToggleGroupItem>
-        </ToggleGroup>
+        <div className="flex gap-2">
+          {ALL_VIEWPORTS.map((vp) => (
+            <Toggle
+              key={vp}
+              variant="outline"
+              pressed={viewports.includes(vp)}
+              onPressedChange={(on) =>
+                setViewports(
+                  ALL_VIEWPORTS.filter((v) =>
+                    v === vp ? on : viewports.includes(v),
+                  ),
+                )
+              }
+            >
+              {vp === "desktop" ? "Desktop" : "Mobile"}
+            </Toggle>
+          ))}
+        </div>
       </fieldset>
 
       <Collapsible className="mt-4">
-        <CollapsibleTrigger className="group inline-flex min-h-6 items-center gap-1 text-body font-medium">
+        <CollapsibleTrigger className="group inline-flex min-h-8 items-center gap-1 text-body font-medium">
           <ChevronRight
             aria-hidden="true"
             className="size-4 transition-transform group-data-[panel-open]:rotate-90"
@@ -288,11 +296,11 @@ export function NewAuditForm() {
               onValueChange={(v) => setCondition(v as Condition)}
               aria-label="Condition"
             >
-              <Label className="min-h-6 gap-2">
+              <Label className="min-h-8 gap-2">
                 <RadioGroupItem value="hybrid" />
                 Hybrid (rule and pixel channels)
               </Label>
-              <Label className="min-h-6 gap-2">
+              <Label className="min-h-8 gap-2">
                 <RadioGroupItem value="rule_only" />
                 Rule-only (axe-core)
               </Label>
@@ -311,7 +319,7 @@ export function NewAuditForm() {
               value={budget}
               disabled={submitting}
               onChange={(e) => setBudget(Number(e.target.value))}
-              className="mt-2 block min-h-6 w-full accent-primary"
+              className="mt-2 block min-h-8 w-full accent-primary"
             />
           </div>
         </CollapsibleContent>

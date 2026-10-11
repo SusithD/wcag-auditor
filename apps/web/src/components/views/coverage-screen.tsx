@@ -6,9 +6,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useFindings, useOverview } from "@/hooks/use-report-data";
 import { useCatalogue } from "@/hooks/use-run-views";
+import { emphasisSegments, plainWording } from "@/lib/coverage-text";
 import { type Finding, SC_LIST, SC_TITLES, type Viewport } from "@/lib/report";
 import { RunNav } from "./run-nav";
-import { useViewportParam } from "./viewport-state";
+import { focusOnMount, useViewportParam } from "./viewport-state";
 
 const VERDICT = {
   automated: { glyph: "●", text: "Automated verdict" },
@@ -61,6 +62,7 @@ export function CoverageScreen({ runId }: { runId: string }) {
   if (!run.data || overview.isPending || findings.isPending || !viewport) {
     return (
       <div className="p-6" aria-busy="true">
+        <title>Coverage - WCAG Auditor</title>
         <Skeleton className="h-64 w-full max-w-4xl" />
       </div>
     );
@@ -87,7 +89,13 @@ export function CoverageScreen({ runId }: { runId: string }) {
       <title>{`Coverage - ${overview.data.url}`}</title>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-h2 font-semibold">Coverage</h1>
+          <h1
+            ref={focusOnMount}
+            tabIndex={-1}
+            className="text-h2 font-semibold outline-none"
+          >
+            Coverage
+          </h1>
           <p className="font-mono text-label text-muted-foreground">
             {overview.data.url}
           </p>
@@ -112,17 +120,23 @@ export function CoverageScreen({ runId }: { runId: string }) {
         </div>
       </div>
 
+      <p
+        id="coverage-caption"
+        className="mt-4 pb-2 text-caption text-muted-foreground"
+      >
+        Which channel returned a verdict for each criterion, and how many
+        findings it produced
+      </p>
       <div
-        className="mt-4 overflow-x-auto"
+        className="relative overflow-x-auto"
         role="region"
-        aria-label="Coverage grid"
+        aria-labelledby="coverage-caption"
         tabIndex={0}
       >
-        <table className="w-full border-collapse text-row">
-          <caption className="pb-2 text-left text-caption text-muted-foreground">
-            Which channel returned a verdict for each criterion, and how many
-            findings it produced
-          </caption>
+        <table
+          className="w-full border-collapse text-row"
+          aria-labelledby="coverage-caption"
+        >
           <thead>
             <tr>
               <th
@@ -158,6 +172,7 @@ export function CoverageScreen({ runId }: { runId: string }) {
                   return (
                     <td key={c.key} className="border-b px-3 py-2">
                       <span aria-hidden="true">{v.glyph}</span> {v.text}
+                      <span className="sr-only">, </span>
                       <span className="ml-2 font-mono text-label text-muted-foreground">
                         {countFor(findings.data, sc, c.key)} findings
                       </span>
@@ -211,7 +226,7 @@ export function CoverageScreen({ runId }: { runId: string }) {
                       <span className="font-mono text-label">{e.sc}</span>{" "}
                       {e.name}
                       <span className="ml-auto text-caption font-normal text-muted-foreground">
-                        Level {e.level}, {e.detectability}
+                        Level {e.level}, {plainWording(e.detectability)}
                       </span>
                     </summary>
                     <dl className="grid gap-2 px-3 pb-3 text-body sm:grid-cols-2">
@@ -232,7 +247,15 @@ export function CoverageScreen({ runId }: { runId: string }) {
             </ul>
             {catalogue.data.coverage_claim ? (
               <p className="mt-3 text-caption text-muted-foreground">
-                {catalogue.data.coverage_claim}
+                {emphasisSegments(
+                  plainWording(catalogue.data.coverage_claim),
+                ).map((seg) =>
+                  seg.strong ? (
+                    <strong key={seg.at}>{seg.text}</strong>
+                  ) : (
+                    <span key={seg.at}>{seg.text}</span>
+                  ),
+                )}
               </p>
             ) : null}
           </>
@@ -244,13 +267,14 @@ export function CoverageScreen({ runId }: { runId: string }) {
 
 function Row({
   label,
-  value,
+  value: raw,
   wide,
 }: {
   label: string;
   value: string;
   wide?: boolean;
 }) {
+  const value = plainWording(raw);
   return (
     <div className={wide ? "sm:col-span-2" : undefined}>
       <dt className="text-caption text-muted-foreground">{label}</dt>
@@ -262,7 +286,14 @@ function Row({
 function Message({ title }: { title: string }) {
   return (
     <div className="mx-auto max-w-160 px-6 py-12">
-      <h1 className="text-h2 font-semibold">{title}</h1>
+      <title>{`${title} - Coverage`}</title>
+      <h1
+        ref={focusOnMount}
+        tabIndex={-1}
+        className="text-h2 font-semibold outline-none"
+      >
+        {title}
+      </h1>
     </div>
   );
 }

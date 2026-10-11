@@ -122,3 +122,20 @@ export function capturedViewports(events: StageEvent[]): string[] {
     .filter((ev) => ev.stage.startsWith("captured:"))
     .map((ev) => ev.stage.split(":")[1]);
 }
+
+const STATE_TEXT: Record<Step["status"], string> = {
+  done: "done",
+  current: "in progress",
+  pending: "waiting",
+  failed: "failed",
+};
+
+export function stepSpokenName(step: Step): string {
+  const name =
+    step.group === "modules" ? `Criterion ${step.label}` : step.label;
+  return `${name}, ${STATE_TEXT[step.status]}`;
+}
+
+export function groupSpokenName(name: string, status: Step["status"]): string {
+  return `${name}, ${STATE_TEXT[status]}`;
+}

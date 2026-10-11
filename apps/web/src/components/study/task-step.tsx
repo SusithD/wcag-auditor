@@ -51,12 +51,24 @@ export function TaskStep({ code, index }: { code: string; index: number }) {
   );
 
   useEffect(() => {
-    if (view.data) heading.current?.focus();
-  }, [view.data]);
+    if (view.data || view.isError) heading.current?.focus();
+  }, [view.data, view.isError]);
 
   if (view.isError) {
     return (
-      <FormError message="This task could not be opened. Ask the researcher for help." />
+      <div>
+        <title>Task could not be opened - study</title>
+        <h1
+          ref={heading}
+          tabIndex={-1}
+          className="text-h2 font-semibold outline-none"
+        >
+          This task could not be opened
+        </h1>
+        <p role="alert" className="mt-2 text-body">
+          Ask the researcher for help.
+        </p>
+      </div>
     );
   }
   if (!view.data) {
@@ -94,6 +106,12 @@ export function TaskStep({ code, index }: { code: string; index: number }) {
           Task {t.position_in_block} of {t.block_size}
         </h1>
         <p className="text-body text-muted-foreground">{t.brief}</p>
+        <a
+          href="#fix-text"
+          className="sr-only focus-visible:not-sr-only focus-visible:mt-2 focus-visible:inline-block focus-visible:rounded-md focus-visible:bg-background focus-visible:px-3 focus-visible:py-2 focus-visible:text-body"
+        >
+          Skip to your fix
+        </a>
       </header>
       <div className="grid gap-4 xl:grid-cols-[1fr_360px]">
         <div className="min-w-0 overflow-hidden rounded-lg border">

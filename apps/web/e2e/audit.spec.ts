@@ -111,7 +111,7 @@ test("the New Audit form can be completed with the keyboard alone", async ({
   await tabTo(urlField);
   await page.keyboard.type("ftp://nope");
   await page.keyboard.press("Enter");
-  await expect(page.getByText(/starts with http/)).toBeVisible();
+  await expect(page.getByText(/Enter a full address/)).toBeVisible();
   await expect(urlField).toHaveAttribute("aria-invalid", "true");
   await expect(urlField).toBeFocused();
 
@@ -153,4 +153,99 @@ test("selecting no viewport is rejected inline without leaving the page", async 
     "at least one viewport",
   );
   await expect(page).toHaveURL(/\/$/);
+});
+
+test("text that is not a web address is rejected inline and keeps focus on the field", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.locator("form[data-ready=true]").waitFor();
+  const field = page.getByLabel("Web address");
+  await field.fill("not a url ///");
+  await page.getByRole("button", { name: /^Audit/ }).click();
+  await expect(
+    page.getByText("Enter a full address such as https://example.com"),
+  ).toBeVisible();
+  await expect(field).toHaveAttribute("aria-invalid", "true");
+  await expect(field).toBeFocused();
+  await expect(page).toHaveURL(/\/$/);
+});
+
+test("both viewport toggles are reachable with Tab", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("form[data-ready=true]").waitFor();
+  await page.getByLabel("Web address").focus();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Desktop" })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Mobile" })).toBeFocused();
+});
+
+test("a failed run explains the problem in plain words and offers a way forward", async ({
+  page,
+}) => {
+  const id = "b".repeat(32);
+  await page.route(`**/api/runs/${id}`, (r) =>
+    r.fulfill({
+      json: {
+        id,
+        created_at: "2026-10-10T12:00:00",
+        source_kind: "url",
+        source: "https://nonexistent.invalid",
+        viewports: ["desktop"],
+        condition: "hybrid",
+        status: "failed",
+        stage_status: {},
+        error:
+          "Page.goto: net::ERR_NAME_NOT_RESOLVED at https://nonexistent.invalid/",
+        counts: { critical: 0, serious: 0, minor: 0, needs_review: 0 },
+        available_viewports: [],
+      },
+    }),
+  );
+  await page.route(`**/api/runs/${id}/events`, (r) =>
+    r.fulfill({ contentType: "text/event-stream", body: "" }),
+  );
+  await page.goto(`/runs/${id}`);
+  await expect(page.locator("main").getByRole("alert")).toContainText(
+    "We could not reach that address. Check it and try again.",
+  );
+  await expect(page.getByText("Page.goto")).toBeHidden();
+  await expect(page.getByText("What went wrong")).toBeFocused();
+  await page.getByRole("button", { name: "Technical details" }).click();
+  await expect(page.getByText(/ERR_NAME_NOT_RESOLVED/)).toBeVisible();
+  await expect(page).toHaveTitle(/Audit failed - /);
+  await page.getByRole("link", { name: "Start a new audit" }).click();
+  await expect(page).toHaveURL(/\/$/);
+});
+
+test("an unknown run and an unknown page have their own titles and a way back", async ({
+  page,
+}) => {
+  await page.goto(`/runs/${"f".repeat(32)}`);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Audit not found" }),
+  ).toBeVisible();
+  await expect(page).toHaveTitle("Audit not found - WCAG Auditor");
+  await expect(
+    page.getByRole("link", { name: "Back to New audit" }),
+  ).toBeVisible();
+  await page.goto("/no-such-page");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Page not found" }),
+  ).toBeVisible();
+  await expect(page).toHaveTitle("Page not found - WCAG Auditor");
+});
+
+test("client navigation updates the title and moves focus to the heading", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.locator("form[data-ready=true]").waitFor();
+  await page.getByRole("link", { name: "Evaluation" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+  await expect(page).toHaveTitle("Evaluation");
+  await expect(page.locator("head title")).toHaveCount(1);
+  await page.getByRole("link", { name: "New audit" }).click();
+  await expect(page).toHaveTitle("New audit - WCAG Auditor");
 });

@@ -3,13 +3,13 @@ import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import "./globals.css";
+import { RouteFocus } from "@/components/route-focus";
 import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryProvider } from "@/lib/query";
 
 export const metadata: Metadata = {
-  title: "WCAG Auditor",
   description: "ML-assisted WCAG 2.2 auditor for web UI screenshots",
 };
 
@@ -32,6 +32,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <TooltipProvider>
               <Suspense fallback={<header className="h-12 border-b" />}>
                 <SiteHeader />
+              </Suspense>
+              <Suspense fallback={null}>
+                <RouteFocus />
               </Suspense>
               <main id="main" tabIndex={-1} className="flex-1 outline-none">
                 {children}

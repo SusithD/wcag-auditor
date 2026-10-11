@@ -134,6 +134,12 @@ export function StudyAdmin() {
           {tasks.error.message}
         </p>
       ) : null}
+      <p role="status" className="mt-2 text-body">
+        {message ??
+          (tasks.isSuccess
+            ? `Loaded ${tasks.data.length} ${tasks.data.length === 1 ? "task" : "tasks"}`
+            : "")}
+      </p>
       {saved && !tasks.isError ? (
         <>
           <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -155,9 +161,6 @@ export function StudyAdmin() {
               </Button>
             ))}
           </div>
-          <p role="status" className="mt-2 text-body">
-            {message}
-          </p>
           <div
             role="region"
             aria-label="Task ratings"
@@ -193,7 +196,7 @@ export function StudyAdmin() {
               <tbody>
                 {(tasks.data ?? []).map((t) => (
                   <RatingRow
-                    key={`${t.id}-${t.success}-${t.notes}`}
+                    key={`${t.participant_code}-${t.task_id}`}
                     task={t}
                     onRate={rate}
                   />
