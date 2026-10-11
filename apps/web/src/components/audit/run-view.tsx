@@ -418,6 +418,14 @@ export function RunView({ runId }: { runId: string }) {
   const sofar = findingsSoFar(events);
   const failures = sofar.critical + sofar.serious + sofar.minor;
   const checked = criteriaChecked(raw);
+  const found = (
+    [
+      ["critical", "Critical", sofar.critical],
+      ["serious", "Serious", sofar.serious],
+      ["minor", "Minor", sofar.minor],
+      ["review", "Needs review", sofar.needs_review],
+    ] as const
+  ).filter(([, , n]) => n > 0);
   const started = new Date(
     /Z|[+-]\d\d:?\d\d$/.test(run.created_at)
       ? run.created_at
@@ -541,30 +549,23 @@ export function RunView({ runId }: { runId: string }) {
             right={<span className="num">{failures} failures</span>}
           />
           <PanelBody>
-            <ul className="m-0 flex list-none flex-col p-0">
-              {(
-                [
-                  ["critical", "Critical", sofar.critical],
-                  ["serious", "Serious", sofar.serious],
-                  ["minor", "Minor", sofar.minor],
-                  ["review", "Needs review", sofar.needs_review],
-                ] as const
-              ).map(([kind, label, n]) => (
-                <li
-                  key={kind}
-                  className="flex min-h-9 items-center justify-between gap-3 border-b border-line py-1.5 last:border-b-0"
-                >
-                  <Status kind={kind} zero={n === 0} strong={n > 0}>
-                    {label}
-                  </Status>
-                  <span
-                    className={`num font-semibold ${n === 0 ? "font-normal text-ink-3" : ""}`}
+            {found.length > 0 ? (
+              <ul className="m-0 flex list-none flex-col p-0">
+                {found.map(([kind, label, n]) => (
+                  <li
+                    key={kind}
+                    className="flex min-h-9 items-center justify-between gap-3 border-b border-line py-1.5 last:border-b-0"
                   >
-                    {n}
-                  </span>
-                </li>
-              ))}
-            </ul>
+                    <Status kind={kind} strong>
+                      {label}
+                    </Status>
+                    <span className="num font-semibold">{n}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="m-0 text-body text-ink-2">Nothing found yet.</p>
+            )}
             <p className="mb-0 mt-3 text-dense text-ink-3">
               Counts update when each viewport finishes its checks.
             </p>
