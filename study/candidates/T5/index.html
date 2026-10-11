@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thistlebank Clay Studio - Autumn evening classes</title>
+<style>
+*{box-sizing:border-box}
+html{font-size:100%}
+body{margin:0;background:#faf3ea;color:#2b1d14;font-family:Georgia,"Times New Roman",serif;line-height:1.65;font-size:1.0625rem}
+a{color:#8a3418;text-decoration:underline;text-underline-offset:3px;display:inline-block;padding:2px 0;min-height:24px}
+a:hover{color:#5c200c}
+:focus-visible{outline:3px solid #1d4f91;outline-offset:3px}
+h1,h2,h3{font-family:"Palatino Linotype",Palatino,Georgia,serif;line-height:1.2;color:#3a1f12;margin:0 0 .6em}
+h1{font-size:clamp(2.1rem,5vw,3.4rem)}
+h2{font-size:clamp(1.6rem,3.4vw,2.2rem);margin-top:0}
+h3{font-size:1.25rem}
+p{margin:0 0 1em}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+.skip{position:absolute;left:12px;top:-60px;background:#fff;color:#3a1f12;border:2px solid #3a1f12;padding:10px 16px;z-index:5;text-decoration:none}
+.skip:focus{top:8px}
+header.site{background:#3a1f12;color:#fbeede}
+header.site .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px;padding-top:14px;padding-bottom:14px}
+.brand{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:1.45rem;color:#fbeede;text-decoration:none;display:flex;align-items:center;gap:10px;font-weight:700}
+nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 8px}
+nav a{color:#fbeede;text-decoration:none;padding:8px 12px;border-radius:4px;min-height:40px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:.95rem}
+nav a:hover,nav a[aria-current="page"]{background:#5b3622;color:#fff}
+header.site :focus-visible{outline-color:#ffd9a8}
+.hero{background:#f6e8d6;padding:48px 0 40px}
+.hero .wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:32px;align-items:center}
+.eyebrow{font-family:system-ui,sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:.8rem;color:#7a3014;font-weight:700;margin-bottom:.5em}
+.btn{display:inline-block;background:#8a3418;color:#fff;border:2px solid #8a3418;border-radius:6px;padding:10px 22px;font:700 1rem system-ui,sans-serif;text-decoration:none;cursor:pointer;min-height:44px}
+.btn:hover{background:#5c200c;border-color:#5c200c;color:#fff}
+.btn.alt{background:transparent;color:#8a3418}
+.btn.alt:hover{background:#8a3418;color:#fff}
+section{padding:44px 0}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:#fff;border:1px solid #d9c3ab;border-radius:10px;padding:22px}
+.card .meta{font-family:system-ui,sans-serif;font-size:.9rem;color:#5b3a28;margin-bottom:.8em}
+.card svg{display:block;margin-bottom:12px}
+.band{background:#efe0cd}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start}
+ol.steps{padding-left:1.3em;margin:0}
+ol.steps li{margin-bottom:.8em}
+table{border-collapse:collapse;width:100%;background:#fff;font-family:system-ui,sans-serif;font-size:.95rem}
+caption{text-align:left;font-family:Georgia,serif;font-size:1.05rem;padding:0 0 8px;color:#3a1f12;font-weight:700}
+th,td{border:1px solid #cfb79c;padding:10px 12px;text-align:left}
+thead th{background:#3a1f12;color:#fff}
+form{background:#fff;border:1px solid #d9c3ab;border-radius:10px;padding:24px;max-width:640px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.field{margin-bottom:18px}
+label,.lbl{display:block;font-weight:600;margin-bottom:6px;color:#2b1d14}
+input[type=text],input[type=email],select,textarea{width:100%;min-height:44px;padding:9px 12px;border:2px solid #6b4a36;border-radius:6px;background:#fff;color:#2b1d14;font:inherit}
+textarea{min-height:110px}
+.hint{font-size:.9rem;color:#5b3a28;margin:4px 0 0}
+.seats{display:flex;align-items:center;gap:14px}
+.seats output{font-size:1.4rem;font-weight:700;min-width:1.5em;text-align:center}
+.mini{display:flex;gap:2px}
+.mini button{width:20px;height:20px;padding:0;margin:0;border:1px solid #6b4a36;border-radius:3px;background:#f3e3d0;color:#2b1d14;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.mini svg{width:12px;height:12px;display:block}
+details{background:#fff;border:1px solid #d9c3ab;border-radius:8px;margin-bottom:10px}
+summary{cursor:pointer;padding:12px 16px;font-weight:700;font-family:system-ui,sans-serif;min-height:44px}
+details p{padding:0 16px;margin:0 0 14px}
+footer{background:#3a1f12;color:#fbeede;padding:36px 0;font-family:system-ui,sans-serif;font-size:.95rem}
+footer a{color:#ffd9a8}
+footer :focus-visible{outline-color:#ffd9a8}
+footer ul{list-style:none;margin:0;padding:0}
+footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:28px}
+footer h2{color:#fff;font-size:1.05rem;font-family:system-ui,sans-serif}
+@media (max-width:820px){
+ .hero .wrap,.two,.cards,footer .cols{grid-template-columns:1fr}
+ table{font-size:.88rem}
+ th,td{padding:8px}
+}
+.disclaimer{margin:0;font-size:.9rem}
+.hero p:has(.btn){display:flex;flex-wrap:wrap;gap:12px}
+</style>
+</head>
+<body>
+<header class="site">
+<a class="skip" href="#main">Skip to main content</a>
+<div class="wrap">
+<a class="brand" href="#top">
+<svg width="34" height="34" viewBox="0 0 34 34" role="img" aria-label="Thistlebank Clay Studio logo, a round-bellied pot"><path d="M10 6h14l-2 4c5 2 8 7 8 12 0 5-5 8-13 8S4 27 4 22c0-5 3-10 8-12z" fill="#e7a46a"/><rect x="9" y="4" width="16" height="3" rx="1.5" fill="#fbeede"/></svg>
+Thistlebank Clay Studio</a>
+<nav aria-label="Main">
+<ul>
+<li><a href="#classes" aria-current="page">Classes</a></li>
+<li><a href="#timetable">Timetable</a></li>
+<li><a href="#studio">The studio</a></li>
+<li><a href="#book">Book a place</a></li>
+<li><a href="#faq">Questions</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<main id="main">
+<div id="top" class="hero">
+<div class="wrap">
+<div>
+<p class="eyebrow">Autumn term, six Tuesday evenings</p>
+<h1>Make something by hand this autumn</h1>
+<p>Thistlebank is a small, friendly pottery studio above the old grain store in the fictional village of Thistlebank. Our evening classes run for six weeks, and no experience is needed and all clay, glazes and firing included in the price. You take home finished pieces that are fired, glazed and ready to use.</p>
+<p><a class="btn" href="#book">Reserve your seats</a> <a class="btn alt" href="#classes">See the classes</a></p>
+</div>
+<svg viewBox="0 0 320 300" role="img" aria-label="Illustration of three hand-thrown pots, a tall jug, a wide bowl and a small round vase, on a wooden shelf" style="width:100%;height:auto">
+<rect x="10" y="250" width="300" height="16" rx="4" fill="#8a5a3a"/>
+<path d="M60 250c-14-30-14-80 6-120h30c20 40 20 90 6 120z" fill="#c4572d"/>
+<rect x="64" y="118" width="38" height="14" rx="6" fill="#a5421e"/>
+<path d="M120 250c-6-30 4-48 40-48s46 18 40 48z" fill="#e0a548"/>
+<ellipse cx="160" cy="202" rx="44" ry="8" fill="#b97f26"/>
+<path d="M230 250c-22-8-24-44-4-62l-6-12h30l-6 12c20 18 18 54-4 62z" fill="#4e7d6b"/>
+</svg>
+</div>
+</div>
+
+<section id="classes">
+<div class="wrap">
+<h2>Choose your class</h2>
+<p>Every class is capped at eight people so the tutor can sit with you at the wheel or bench. Choose the one you like best. Your skill does not matter. Beginners are very welcome in all of them.</p>
+<div class="cards">
+<article class="card">
+<svg width="64" height="48" viewBox="0 0 64 48" role="img" aria-label="Small icon of a potter's wheel"><ellipse cx="32" cy="34" rx="26" ry="9" fill="#d9b48c"/><path d="M20 30c0-12 6-20 12-20s12 8 12 20z" fill="#c4572d"/></svg>
+<h3>Wheel basics</h3>
+<p class="meta">Tuesdays 18:00 to 20:30, 6 weeks, 8 places</p>
+<p>Centre the clay, open it up and pull the walls. By week four most people have made a good mug, and by week six a bowl they are happy to show to friends.</p>
+<p><a href="#book">Book wheel basics</a></p>
+</article>
+<article class="card">
+<svg width="64" height="48" viewBox="0 0 64 48" role="img" aria-label="Small icon of a coiled clay pot"><path d="M14 40h36M16 32h32M18 24h28M22 16h20" stroke="#4e7d6b" stroke-width="6" stroke-linecap="round" fill="none"/></svg>
+<h3>Hand-building</h3>
+<p class="meta">Tuesdays 18:00 to 20:30, 6 weeks, 8 places</p>
+<p>Pinch, coil and slab techniques for plant pots, trays and sculptural forms. A calm class for anyone who prefers to work slowly and talk while they work.</p>
+<p><a href="#book">Book hand-building</a></p>
+</article>
+<article class="card">
+<svg width="64" height="48" viewBox="0 0 64 48" role="img" aria-label="Small icon of a paintbrush glazing a tile"><rect x="10" y="22" width="30" height="20" rx="3" fill="#e0a548"/><path d="M34 6l18 14-6 6-14-18z" fill="#2b1d14"/></svg>
+<h3>Glaze studio</h3>
+<p class="meta">Tuesdays 18:00 to 20:30, 6 weeks, 6 places</p>
+<p>For people who already have bisque-fired pieces. Learn to test colours, layer glazes and avoid the drips that glue a mug to the kiln shelf.</p>
+<p><a href="#book">Book glaze studio</a></p>
+</article>
+</div>
+</div>
+</section>
+
+<section id="timetable" class="band">
+<div class="wrap">
+<h2>Term timetable</h2>
+<table>
+<caption>Autumn term dates and topics</caption>
+<thead><tr><th scope="col">Week</th><th scope="col">Date</th><th scope="col">Focus</th></tr></thead>
+<tbody>
+<tr><th scope="row">1</th><td>6 October</td><td>Introduction to clay, tools and safety</td></tr>
+<tr><th scope="row">2</th><td>13 October</td><td>Centring, or pinch pots for hand-builders</td></tr>
+<tr><th scope="row">3</th><td>20 October</td><td>Cylinders, or coil walls</td></tr>
+<tr><th scope="row">4</th><td>27 October</td><td>Handles, lips and feet</td></tr>
+<tr><th scope="row">5</th><td>3 November</td><td>Trimming and decorating before the bisque firing</td></tr>
+<tr><th scope="row">6</th><td>10 November</td><td>Glazing day, with tea</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section id="studio">
+<div class="wrap two">
+<div>
+<h2>A relaxed, friendly studio</h2>
+<p>Thistlebank started when two friends bought a used kiln and some old wooden benches. Today the studio has six electric wheels, a long glazing table and a corner with armchairs where people drink tea while the kiln is on.</p>
+<p>We keep classes small and the music quiet. Aprons are provided, but please wear clothes that can get dirty with wet clay. You do not need to shower afterwards, but please wash your hands.</p>
+<p>Read our <a href="#faq">frequently asked questions</a> if you are wondering about accessibility, parking or what happens to your pots between weeks.</p>
+</div>
+<div>
+<h3>How a Tuesday evening works</h3>
+<ol class="steps">
+<li>Arrive from 17:45, choose an apron and a stool and say hello.</li>
+<li>A short demonstration from your tutor, about fifteen minutes.</li>
+<li>Time at the wheel or bench, with a tutor always close by.</li>
+<li>Tidy-up together, then label your pieces for the shelf.</li>
+<li>Tea and biscuits while we plan next week.</li>
+</ol>
+</div>
+</div>
+</section>
+
+<section id="book" class="band">
+<div class="wrap">
+<h2>Book a place</h2>
+<p>Tell us who is coming and which class you would like. We will email a confirmation within one working day and keep your seats for three days, and you pay at the studio.</p>
+<form action="#" onsubmit="return false">
+<div class="field"><label for="name">Your name</label><input id="name" type="text" autocomplete="name"></div>
+<div class="field"><label for="email">Email address</label><input id="email" type="email" autocomplete="email"><p class="hint">We only use this to confirm your booking.</p></div>
+<div class="field"><label for="cls">Class</label>
+<select id="cls"><option>Wheel basics</option><option>Hand-building</option><option>Glaze studio</option></select></div>
+<div class="field">
+<div class="seats" role="group" aria-labelledby="seats-label">
+<span id="seats-label" class="lbl" style="margin:0">Seats</span>
+<output id="seat-count" aria-live="polite">2</output>
+<div class="mini"><button type="button" id="seat-minus" aria-label="Remove one seat"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h8" stroke="#2b1d14" stroke-width="2" stroke-linecap="round"/></svg></button><button type="button" id="seat-plus" aria-label="Add one seat"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h8M6 2v8" stroke="#2b1d14" stroke-width="2" stroke-linecap="round"/></svg></button></div>
+</div>
+<p class="hint">Up to four seats per booking.</p>
+</div>
+<div class="field"><label for="notes">Anything we should know?</label><textarea id="notes"></textarea></div>
+<button class="btn" type="submit">Request my seats</button>
+</form>
+</div>
+</section>
+
+<section id="faq">
+<div class="wrap">
+<h2>Common questions</h2>
+<details open><summary>Do I need any experience?</summary><p>No. Most of our students have never touched clay. Your tutor will teach at the speed of the slowest learner, and in week one that is usually everyone.</p></details>
+<details open><summary>Is the studio step-free?</summary><p>There is a ramp at the side door and a lift to the first floor. One wheel is on a height-adjustable stand, so please mention it in your booking notes.</p></details>
+<details open><summary>What happens to my pots between weeks?</summary><p>They rest on the labelled shelf, wrapped in plastic so they stay workable. Anything finished is bisque-fired in week five and glaze-fired after the last class.</p></details>
+<details open><summary>Can I cancel?</summary><p>Yes, up to seven days before the first class for a full refund. After that we can usually move you to the next term.</p></details>
+</div>
+</section>
+</main>
+<footer>
+<div class="wrap cols">
+<div><h2>Thistlebank Clay Studio</h2><p>Above the grain store, Mill Row, Thistlebank.</p></div>
+<div><h2>Explore</h2><ul><li><a href="#classes">Classes</a></li><li><a href="#timetable">Timetable</a></li><li><a href="#faq">Questions</a></li></ul></div>
+<div><h2>Contact</h2><ul><li><a href="#book">Book online</a></li><li>Open Tuesdays and Fridays</li></ul></div>
+</div>
+<div class="wrap"><p class="disclaimer">Fictional example page for a research study. All names, events and services are invented.</p></div></footer>
+<script>
+(function(){
+var n=2,out=document.getElementById('seat-count');
+document.getElementById('seat-minus').addEventListener('click',function(){n=Math.max(1,n-1);out.textContent=n});
+document.getElementById('seat-plus').addEventListener('click',function(){n=Math.min(4,n+1);out.textContent=n});
+})();
+</script>
+</body>
+</html>

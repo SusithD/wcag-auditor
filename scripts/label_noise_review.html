@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Label check</title>
+<style>
+:root{--bg:#fff;--fg:#1a1a1a;--muted:#555;--ok:#0b6b2e;--bad:#a4161a;--line:#bbb}
+@media (prefers-color-scheme:dark){:root{--bg:#16181c;--fg:#f0f0f0;--muted:#b0b0b0;--ok:#6fdc8c;--bad:#ff8a8a;--line:#555}}
+body{background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif;margin:0;padding:16px;max-width:760px}
+img{image-rendering:pixelated;border:1px solid var(--line);max-width:100%;min-width:160px;background:#fff}
+button{font:inherit;padding:10px 18px;margin:4px;border:2px solid var(--fg);background:var(--bg);color:var(--fg);cursor:pointer;min-height:44px}
+button:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+.ok{border-color:var(--ok)}.bad{border-color:var(--bad)}
+.meta{color:var(--muted)}
+</style></head><body>
+<h1>Label check</h1>
+<p>The pink rectangle is the dataset's box. Is <strong>both</strong> true: the box encloses one complete element reasonably tightly, <strong>and</strong> the class shown is right for that element?
+Classes: text = plain text; link = hyperlink or menu item; button = button or tab; input = text field, search, select, slider; choice = checkbox, radio, switch; image_icon = picture, icon, logo.</p>
+<p class="meta" id="progress" aria-live="polite"></p>
+<h2 id="cls"></h2>
+<p><img id="img" alt=""></p>
+<div>
+<button id="yes" class="ok" type="button">1 &ndash; correct</button>
+<button id="no" class="bad" type="button">0 &ndash; wrong</button>
+<button id="skip" type="button">S &ndash; skip</button>
+<button id="back" type="button">&larr; back</button>
+</div>
+<p class="meta">Keys: 1 correct, 0 wrong, S skip, Left arrow back. Answers are kept in this browser until you download them.</p>
+<p><button id="dl" type="button">Download answers (CSV)</button></p>
+<script>
+const ITEMS = __ITEMS__;
+const KEY = "label-noise-answers";
+let answers = JSON.parse(localStorage.getItem(KEY) || "{}");
+let pos = ITEMS.findIndex(i => !(i.id in answers)); if (pos < 0) pos = ITEMS.length;
+function show(){
+  const done = Object.keys(answers).length;
+  document.getElementById("progress").textContent = pos >= ITEMS.length ? "All items shown. Download your answers." : `Item ${pos+1} of ${ITEMS.length} (${done} answered)`;
+  if (pos >= ITEMS.length) return;
+  const it = ITEMS[pos];
+  document.getElementById("cls").textContent = "Class: " + it.cls;
+  const img = document.getElementById("img"); img.src = it.crop; img.alt = "Crop with the labelled box in pink, class " + it.cls;
+  img.style.width = Math.max(160, it.w * (it.w < 150 ? 3 : 1.5)) + "px";
+}
+function answer(v){ if (pos >= ITEMS.length) return; if (v !== null) answers[ITEMS[pos].id] = v; localStorage.setItem(KEY, JSON.stringify(answers)); pos++; show(); }
+document.getElementById("yes").onclick = () => answer(1);
+document.getElementById("no").onclick = () => answer(0);
+document.getElementById("skip").onclick = () => answer(null);
+document.getElementById("back").onclick = () => { if (pos > 0) { pos--; delete answers[ITEMS[pos].id]; localStorage.setItem(KEY, JSON.stringify(answers)); show(); } };
+document.addEventListener("keydown", e => { if (e.key === "1") answer(1); else if (e.key === "0") answer(0); else if (e.key.toLowerCase() === "s") answer(null); else if (e.key === "ArrowLeft") document.getElementById("back").click(); });
+document.getElementById("dl").onclick = () => {
+  const rows = ["id,human"].concat(Object.entries(answers).map(([k,v]) => k + "," + v));
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([rows.join("\\n") + "\\n"], {type:"text/csv"})); a.download = "label_noise_human.csv"; a.click();
+};
+show();
+</script></body></html>

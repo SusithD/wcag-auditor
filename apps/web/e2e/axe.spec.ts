@@ -108,7 +108,7 @@ for (const scheme of ["light", "dark"] as const) {
     await page.getByRole("button", { name: "Advanced" }).click();
     await page.getByLabel("Web address").fill("ftp://x");
     await page.getByRole("button", { name: /^Audit/ }).click();
-    await expect(page.getByText(/starts with http/)).toBeVisible();
+    await expect(page.getByText(/Enter a full address/)).toBeVisible();
     await scan(page);
     await page.getByRole("tab", { name: "Screenshots" }).click();
     await scan(page);
@@ -146,3 +146,34 @@ for (const scheme of ["light", "dark"] as const) {
     ).toBeVisible();
   });
 }
+
+test.describe("phone width (390 x 844)", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("home has zero axe violations at 390 px", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("form[data-ready=true]").waitFor();
+    await scan(page);
+    await page.getByRole("button", { name: "Advanced" }).click();
+    await scan(page);
+  });
+
+  test("a finished report has zero axe violations at 390 px", async ({
+    page,
+    request,
+  }) => {
+    test.setTimeout(150_000);
+    const created = await request.post("/api/runs", {
+      data: { folder: FOLDER },
+    });
+    const { run_id } = await created.json();
+    await page.goto(`/runs/${run_id}`);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Audit report" }),
+    ).toBeVisible({ timeout: 120_000 });
+    await expect(
+      page.getByRole("img", { name: /Full-page screenshot/ }),
+    ).toBeVisible();
+    await scan(page);
+  });
+});

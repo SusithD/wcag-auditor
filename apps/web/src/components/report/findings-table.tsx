@@ -20,7 +20,9 @@ import {
   type Finding,
   PROV_GLYPH,
   PROV_LABEL,
+  plainValue,
   type ReportState,
+  rowLabel,
   SC_LIST,
   SC_TITLES,
   SEV_GLYPH,
@@ -76,6 +78,8 @@ function Facet({ label, options, selected, onChange }: FacetProps) {
           <Button
             variant={selected.length ? "secondary" : "outline"}
             size="sm"
+            className="min-h-[24px] min-w-[24px]"
+            aria-label={`Filter by ${label.toLowerCase()}${selected.length ? `, ${selected.length} selected` : ""}`}
           />
         }
       >
@@ -83,16 +87,20 @@ function Facet({ label, options, selected, onChange }: FacetProps) {
         {label}
         {selected.length ? ` (${selected.length})` : ""}
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-64">
+      <PopoverContent
+        align="start"
+        className="w-64"
+        aria-label={`Filter by ${label.toLowerCase()}`}
+      >
         <fieldset>
           <legend className="mb-2 text-body font-medium">{label}</legend>
           <ul className="max-h-64 space-y-0.5 overflow-auto">
             {options.map((o) => (
               <li key={o.value}>
-                <label className="flex min-h-6 items-center gap-2 text-body">
+                <label className="flex min-h-[24px] cursor-pointer items-center gap-2 text-body">
                   <input
                     type="checkbox"
-                    className="size-4"
+                    className="size-[24px] shrink-0"
                     checked={selected.includes(o.value)}
                     onChange={(e) =>
                       onChange(
@@ -216,10 +224,7 @@ export function FindingsTable({
           selected={state.sc}
           onChange={(sc) => onFilter({ sc })}
         />
-        <span
-          className="ml-auto text-caption text-muted-foreground"
-          aria-live="polite"
-        >
+        <span className="ml-auto text-caption text-muted-foreground">
           {findings.length} findings
         </span>
       </div>
@@ -255,7 +260,8 @@ export function FindingsTable({
                   >
                     <button
                       type="button"
-                      className="inline-flex min-h-6 items-center gap-1"
+                      className="inline-flex min-h-[24px] min-w-[24px] items-center gap-1"
+                      aria-label={`Sort by ${String(h.column.columnDef.header).toLowerCase()}${sort === "asc" ? ", sorted ascending" : sort === "desc" ? ", sorted descending" : ""}`}
                       onClick={() => h.column.toggleSorting(sort === "asc")}
                     >
                       {String(h.column.columnDef.header)}
@@ -307,16 +313,18 @@ export function FindingsTable({
                 <tr
                   key={f.key}
                   aria-rowindex={vr.index + 2}
-                  aria-selected={isSel}
+                  data-selected={isSel}
                   data-key={f.key}
                   style={{ height: ROW }}
                   onClick={() => onSelect(f.key)}
-                  className="cursor-pointer border-b hover:bg-muted/60 aria-selected:bg-muted"
+                  className="cursor-pointer border-b hover:bg-muted/60 data-[selected=true]:bg-muted"
                 >
                   <td className="px-3">
                     <button
                       type="button"
-                      className="inline-flex min-h-6 items-center font-mono text-label underline underline-offset-4"
+                      className="inline-flex min-h-[24px] min-w-[24px] items-center font-mono text-label underline underline-offset-4"
+                      aria-label={rowLabel(f)}
+                      data-row-key={f.key}
                       aria-pressed={isSel}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -324,7 +332,6 @@ export function FindingsTable({
                       }}
                     >
                       {f.sc}
-                      <span className="sr-only">, finding {f.key}</span>
                     </button>
                   </td>
                   <td className="px-3">
@@ -342,10 +349,10 @@ export function FindingsTable({
                     {f.element}
                   </td>
                   <td className="px-3 font-mono text-label">
-                    {f.evidence_rows[0]?.value ?? "—"}
+                    {plainValue(f.evidence_rows[0]?.value ?? "—")}
                   </td>
                   <td className="px-3 font-mono text-label">
-                    {f.evidence_rows[1]?.value ?? "—"}
+                    {plainValue(f.evidence_rows[1]?.value ?? "—")}
                   </td>
                   <td className="px-3">
                     <span aria-hidden="true">{PROV_GLYPH[f.provenance]}</span>{" "}
@@ -366,11 +373,11 @@ export function FindingsTable({
             ) : null}
           </tbody>
         </table>
-        items.length === 0 ? (
-        <p className="p-4 text-body text-muted-foreground">
-          No findings match the current filters.
-        </p>
-        ) : null;
+        {items.length === 0 ? (
+          <p className="p-4 text-body text-muted-foreground">
+            No findings match the current filters.
+          </p>
+        ) : null}
       </div>
     </div>
   );

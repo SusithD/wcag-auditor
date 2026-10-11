@@ -26,7 +26,7 @@ wcag-auditor-app = { workspace = true }
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-extend-exclude = ["apps", "fixtures", "services/app/alembic"]
+extend-exclude = ["apps", "fixtures", "services/app/alembic", "docs"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]

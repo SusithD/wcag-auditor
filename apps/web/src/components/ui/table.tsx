@@ -1,13 +1,35 @@
 "use client";
 
-import type * as React from "react";
+import * as React from "react";
 import { cn } from "@/lib/utils";
 
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+function Table({
+  className,
+  regionLabel,
+  ...props
+}: React.ComponentProps<"table"> & { regionLabel?: string }) {
+  const container = React.useRef<HTMLDivElement>(null);
+  const [scrolls, setScrolls] = React.useState(false);
+
+  React.useEffect(() => {
+    const el = container.current;
+    if (!el || !regionLabel) return;
+    const measure = () => setScrolls(el.scrollWidth > el.clientWidth);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    if (el.firstElementChild) observer.observe(el.firstElementChild);
+    return () => observer.disconnect();
+  }, [regionLabel]);
+
   return (
     <div
+      ref={container}
       data-slot="table-container"
-      className="relative w-full overflow-x-auto"
+      className="relative w-full overflow-x-auto focus-visible:outline-2 focus-visible:outline-ring"
+      {...(scrolls
+        ? { role: "region", "aria-label": regionLabel, tabIndex: 0 }
+        : {})}
     >
       <table
         data-slot="table"

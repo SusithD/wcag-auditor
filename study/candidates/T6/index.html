@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fernhill Ramblers - Join the walking club</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#ffffff;color:#1c2b22;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.6;font-size:1.0625rem}
+a{color:#17603a;text-decoration:underline;text-underline-offset:3px;display:inline-block;padding:2px 0;min-height:24px}
+a:hover{color:#0d3d24}
+:focus-visible{outline:3px solid #0b4fb3;outline-offset:3px}
+h1,h2,h3{line-height:1.2;margin:0 0 .6em;color:#10331f}
+h1{font-size:clamp(2rem,5vw,3.2rem);letter-spacing:-.01em}
+h2{font-size:clamp(1.5rem,3.2vw,2rem)}
+h3{font-size:1.15rem}
+p{margin:0 0 1em}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.skip{position:absolute;left:12px;top:-60px;background:#fff;color:#10331f;border:2px solid #10331f;padding:10px 16px;z-index:5}
+.skip:focus{top:8px}
+header.site{border-bottom:4px solid #2f8f5b;background:#f2f8f3}
+header.site .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 24px;padding-top:12px;padding-bottom:12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.3rem;color:#10331f;text-decoration:none}
+nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px}
+nav a{display:block;padding:9px 14px;border-radius:999px;color:#10331f;text-decoration:none;font-weight:600;min-height:40px}
+nav a:hover{background:#d9ecdf}
+nav a[aria-current="page"]{background:#17603a;color:#fff}
+.hero{background:#17603a;color:#fff;padding:56px 0}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:center}
+.hero h1{color:#fff}
+.hero p{font-size:1.15rem;max-width:34em}
+.hero a.btn{background:#fff;color:#0d3d24;border-color:#fff}
+.hero a.btn:hover{background:#e3f3e8}
+.hero :focus-visible{outline-color:#ffe08a}
+.btn{display:inline-block;background:#17603a;color:#fff;border:2px solid #17603a;border-radius:999px;padding:11px 26px;font:700 1rem system-ui,sans-serif;text-decoration:none;cursor:pointer;min-height:44px}
+.btn:hover{background:#0d3d24;border-color:#0d3d24;color:#fff}
+section{padding:48px 0}
+.tint{background:#f2f8f3}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.walk{border:2px solid #2f8f5b;border-radius:16px;padding:20px;background:#fff}
+.walk .tags{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 .9em;padding:0;list-style:none}
+.walk .tags li{background:#e1f1e6;color:#0d3d24;border-radius:999px;padding:3px 12px;font-size:.88rem;font-weight:600}
+.walk svg{display:block;width:100%;height:auto;border-radius:10px;margin-bottom:14px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+dl{margin:0}
+dt{font-weight:700;margin-top:.8em;color:#10331f}
+dd{margin:0 0 .4em}
+table{border-collapse:collapse;width:100%;font-size:.97rem}
+caption{text-align:left;font-weight:700;padding-bottom:8px;color:#10331f}
+th,td{border-bottom:1px solid #9bb8a5;padding:10px 8px;text-align:left}
+thead th{border-bottom:3px solid #2f8f5b}
+.signup{display:grid;grid-template-columns:.8fr 1.2fr;gap:40px;align-items:start}
+form{background:#ffffff;padding:24px;border-radius:12px}
+.field{margin-bottom:20px}
+label{display:block;font-weight:700;margin-bottom:6px;color:#1c2b22}
+input[type=text],input[type=email],input[type=tel],select,textarea{display:block;width:100%;min-height:46px;padding:10px 12px;border:1px solid #c8cfca;border-radius:8px;background:#ffffff;color:#1c2b22;font:inherit}
+textarea{min-height:110px}
+::placeholder{color:#55625a;opacity:1}
+.hint{font-size:.92rem;color:#46544b;margin:5px 0 0}
+.note{border-left:6px solid #2f8f5b;background:#f2f8f3;padding:14px 18px;border-radius:0 10px 10px 0}
+footer{background:#10331f;color:#e6f2ea;padding:38px 0;font-size:.97rem}
+footer a{color:#bfe6cd}
+footer :focus-visible{outline-color:#ffe08a}
+footer h2{color:#fff;font-size:1.05rem}
+footer ul{list-style:none;margin:0;padding:0}
+footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:28px}
+@media (max-width:820px){
+ .hero .wrap,.grid3,.split,.signup,footer .cols{grid-template-columns:1fr}
+ .hero{padding:36px 0}
+}
+.disclaimer{margin:0;font-size:.9rem}
+</style>
+</head>
+<body>
+<header class="site">
+<a class="skip" href="#main">Skip to main content</a>
+<div class="wrap">
+<a class="brand" href="#top"><svg width="36" height="36" viewBox="0 0 36 36" role="img" aria-label="Fernhill Ramblers logo, a fern leaf over a hill"><circle cx="18" cy="18" r="17" fill="#17603a"/><path d="M4 28c6-10 12-14 14-14s8 4 14 14z" fill="#8fd0a8"/><path d="M18 8v14M18 12l-5-2M18 12l5-2M18 16l-5-2M18 16l5-2" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/></svg>Fernhill Ramblers</a>
+<nav aria-label="Main">
+<ul>
+<li><a href="#walks" aria-current="page">Walks</a></li>
+<li><a href="#calendar">Calendar</a></li>
+<li><a href="#about">About us</a></li>
+<li><a href="#join">Join the club</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<main id="main">
+<div id="top" class="hero">
+<div class="wrap">
+<div>
+<h1>Walk, talk and enjoy the outdoors together</h1>
+<p>Fernhill Ramblers is a friendly, volunteer-run walking club for people of every pace. We walk most Saturdays and some Wednesday evenings in summer, across moorland, river paths and gentle ridges. Membership is £5 for the year and your first walk is free.</p>
+<p><a class="btn" href="#join">Sign up to the club</a></p>
+</div>
+<svg viewBox="0 0 400 280" role="img" aria-label="Painted landscape of green hills with a winding path and three small walkers crossing a stone bridge" style="width:100%;height:auto;border-radius:16px">
+<rect width="400" height="280" fill="#cfe8f5"/>
+<circle cx="320" cy="60" r="28" fill="#ffe08a"/>
+<path d="M0 190c60-70 120-90 180-50s120-30 220-20v160H0z" fill="#5fae7e"/>
+<path d="M0 230c80-40 160-30 240-10s110 0 160-20v80H0z" fill="#2f8f5b"/>
+<path d="M170 280c10-30 40-40 30-70s-30-30-20-50" stroke="#f5ead0" stroke-width="10" fill="none" stroke-linecap="round"/>
+<g fill="#10331f"><circle cx="150" cy="215" r="6"/><rect x="146" y="221" width="8" height="16" rx="3"/><circle cx="170" cy="208" r="6"/><rect x="166" y="214" width="8" height="16" rx="3"/><circle cx="190" cy="201" r="6"/><rect x="186" y="207" width="8" height="16" rx="3"/></g>
+</svg>
+</div>
+</div>
+
+<section id="walks">
+<div class="wrap">
+<h2>Walks this month</h2>
+<p>Every walk has a named leader, a sweeper at the back and a plan for rain. The distances are accurate, so please check the effort level before you start.</p>
+<div class="grid3">
+<article class="walk">
+<svg viewBox="0 0 300 140" role="img" aria-label="Sketch of a river bend with a footbridge"><rect width="300" height="140" fill="#e1f1e6"/><path d="M0 100c60-50 120 30 180-20s90-10 120-20v80H0z" fill="#7cc1e6"/><rect x="110" y="64" width="80" height="8" fill="#6b4b2f"/></svg>
+<h3>River Wend circular</h3>
+<ul class="tags"><li>7 km</li><li>Easy</li><li>Saturday 4 Oct</li></ul>
+<p>Flat riverside paths, a stop at a cafe by the halfway bridge and a return through water meadows. Good for new walkers and families with older children.</p>
+<p><a href="#join">Join this walk</a></p>
+</article>
+<article class="walk">
+<svg viewBox="0 0 300 140" role="img" aria-label="Sketch of a rocky ridge under a cloudy sky"><rect width="300" height="140" fill="#dfe8ef"/><path d="M0 120l60-60 40 30 50-70 60 80 40-30 50 50z" fill="#6f7f76"/></svg>
+<h3>Hollin Edge ridge</h3>
+<ul class="tags"><li>14 km</li><li>Strenuous</li><li>Saturday 11 Oct</li></ul>
+<p>A steady climb of 600 metres to a gritstone ridge with long views. The ground is rough, so wear walking boots and carry a waterproof jacket.</p>
+<p><a href="#join">Join this walk</a></p>
+</article>
+<article class="walk">
+<svg viewBox="0 0 300 140" role="img" aria-label="Sketch of an autumn wood with orange and yellow trees"><rect width="300" height="140" fill="#fbf0d8"/><g><circle cx="60" cy="70" r="34" fill="#d98a2b"/><circle cx="130" cy="60" r="38" fill="#e8b13a"/><circle cx="210" cy="72" r="34" fill="#c2641d"/></g><rect x="56" y="92" width="8" height="40" fill="#5b3b20"/><rect x="126" y="90" width="8" height="42" fill="#5b3b20"/><rect x="206" y="92" width="8" height="40" fill="#5b3b20"/></svg>
+<h3>Beechwood autumn stroll</h3>
+<ul class="tags"><li>9 km</li><li>Moderate</li><li>Saturday 25 Oct</li></ul>
+<p>Woodland tracks at the best moment of the year, with a soup stop in the village hall. Dogs on leads are welcome; please tell the leader in advance.</p>
+<p><a href="#join">Join this walk</a></p>
+</article>
+</div>
+</div>
+</section>
+
+<section id="calendar" class="tint">
+<div class="wrap split">
+<div>
+<h2>Autumn calendar</h2>
+<table>
+<caption>Saturday walks, October and November</caption>
+<thead><tr><th scope="col">Date</th><th scope="col">Walk</th><th scope="col">Meet</th></tr></thead>
+<tbody>
+<tr><th scope="row">4 Oct</th><td>River Wend circular</td><td>09:30 car park</td></tr>
+<tr><th scope="row">11 Oct</th><td>Hollin Edge ridge</td><td>08:45 station</td></tr>
+<tr><th scope="row">18 Oct</th><td>Quarry trail and tea</td><td>10:00 chapel</td></tr>
+<tr><th scope="row">25 Oct</th><td>Beechwood stroll</td><td>09:30 village hall</td></tr>
+<tr><th scope="row">1 Nov</th><td>Reservoir round</td><td>09:45 dam wall</td></tr>
+</tbody>
+</table>
+</div>
+<div>
+<h2>What to bring</h2>
+<dl>
+<dt>Footwear</dt><dd>Walking boots or sturdy trail shoes with a good grip. Trainers are fine only on the easy walks.</dd>
+<dt>Clothing</dt><dd>Layers, a waterproof jacket and a warm hat. Cotton gets cold when wet, so wool or synthetics are better.</dd>
+<dt>Food and drink</dt><dd>At least a litre of water and a packed lunch. Many people bring a hot drink in a flask.</dd>
+<dt>Safety</dt><dd>A charged phone, any personal medication and a whistle if you have one. Leaders carry a first aid kit and a map.</dd>
+</dl>
+</div>
+</div>
+</section>
+
+<section id="about">
+<div class="wrap split">
+<div>
+<h2>About the club</h2>
+<p>We began in 1998 as six neighbours who wanted a reason to go outside on Saturdays. Today there are about ninety members, aged from sixteen to eighty-four, and a rota of twelve volunteer leaders who plan routes and check the paths in advance.</p>
+<p>We follow the country code, leave no trace and keep groups to fifteen people, so paths stay quiet and farmers are happy to see us. We wait for everyone, and nobody is hurried.</p>
+</div>
+<div class="note">
+<h3>Walking with a disability or a health condition</h3>
+<p>Tell us what would help and we will choose routes and a pace to suit you. Several of our easy walks have firm, wide paths suitable for most users. Read more on the <a href="#join">sign-up form</a> or ask a leader at the start.</p>
+</div>
+</div>
+</section>
+
+<section id="join" class="tint">
+<div class="wrap signup">
+<div>
+<h2>Join the club</h2>
+<p>Fill in the form and a committee member will email you within three days with your membership number and the details of the next walk. Membership costs £5 a year, paid by card or cash at your first walk.</p>
+<p>Your details stay with the club and are never shared. This is a fictional club.</p>
+</div>
+<form action="#" onsubmit="return false" aria-label="Membership sign-up">
+<div class="field"><label for="fullname">Full name</label><input id="fullname" type="text" autocomplete="name"></div>
+<div class="field"><label for="mail">Email address</label><input id="mail" type="email" autocomplete="email"></div>
+<div class="field"><label for="phone">Mobile number</label><input id="phone" type="tel" autocomplete="tel"><p class="hint">Only used by walk leaders on the day.</p></div>
+<div class="field"><label for="level">Usual walking pace</label>
+<select id="level"><option>Easy, up to 8 km</option><option>Moderate, 8 to 12 km</option><option>Strenuous, 12 km and over</option></select></div>
+<div class="field"><label for="more">Anything we should know?</label><textarea id="more"></textarea></div>
+<button class="btn" type="submit">Send my application</button>
+</form>
+</div>
+</section>
+</main>
+<footer>
+<div class="wrap cols">
+<div><h2>Fernhill Ramblers</h2><p>A volunteer walking club.</p></div>
+<div><h2>Explore</h2><ul><li><a href="#walks">Walks</a></li><li><a href="#calendar">Calendar</a></li><li><a href="#about">About us</a></li></ul></div>
+<div><h2>Contact</h2><ul><li><a href="#join">Sign up</a></li><li>Meet Saturdays</li></ul></div>
+</div>
+<div class="wrap"><p class="disclaimer">Fictional example page for a research study. All names, events and services are invented.</p></div></footer>
+</body>
+</html>

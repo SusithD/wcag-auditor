@@ -76,11 +76,13 @@ export function compareFindings(a: Finding, b: Finding): number {
 }
 
 export function readingOrder(findings: Finding[]): Finding[] {
+  const area = (f: Finding) => (f.bbox?.w ?? 0) * (f.bbox?.h ?? 0);
   return [...findings].sort(
     (a, b) =>
       (a.bbox?.y ?? Number.MAX_SAFE_INTEGER) -
         (b.bbox?.y ?? Number.MAX_SAFE_INTEGER) ||
       (a.bbox?.x ?? 0) - (b.bbox?.x ?? 0) ||
+      area(b) - area(a) ||
       a.key.localeCompare(b.key),
   );
 }
@@ -228,11 +230,53 @@ export function diffPixels(
   return out;
 }
 
-export function ariaLabel(f: Finding): string {
-  const measured = f.evidence_rows[0]
-    ? `, ${f.evidence_rows[0].label.toLowerCase()} ${f.evidence_rows[0].value}`
-    : "";
-  return `${f.sc} ${SC_TITLES[f.sc] ?? ""}, ${SEV_LABEL[sevKey(f)]}${measured}, ${f.element}`;
+const NO_CHANGE = "no measurable change";
+
+export function plainText(text: string): string {
+  return text.replace(/\bNone:1\b/g, NO_CHANGE);
+}
+
+export function plainValue(value: string): string {
+  return value.trim() === "None:1" ? "No measurable change" : plainText(value);
+}
+
+export function shortElement(element: string, max = 40): string {
+  const last = element.split(">").pop()?.trim() || element;
+  return last.length > max ? `${last.slice(0, max - 1)}…` : last;
+}
+
+export function scTitle(f: Pick<Finding, "sc">): string {
+  return `${f.sc} ${SC_TITLES[f.sc] ?? ""}`.trim();
+}
+
+export function measureText(f: Finding): string {
+  const row = f.evidence_rows[0];
+  if (!row) return "";
+  if (row.value.trim() === "None:1") return NO_CHANGE;
+  return `${row.label.charAt(0).toLowerCase()}${row.label.slice(1)} ${plainText(row.value)}`;
+}
+
+export function ariaLabel(f: Finding, n?: number, total?: number): string {
+  const parts = [scTitle(f), SEV_LABEL[sevKey(f)], measureText(f)];
+  if (n && total) parts.push(`${n} of ${total}`);
+  return parts.filter(Boolean).join(", ");
+}
+
+export function rowLabel(f: Finding): string {
+  return `Select ${scTitle(f)}, ${SEV_LABEL[sevKey(f)]}, ${shortElement(f.element)}`;
+}
+
+export function selectionMessage(
+  f: Finding,
+  index: number,
+  total: number,
+): string {
+  const position = index >= 0 ? ` ${index + 1} of ${total}.` : "";
+  return `Selected ${scTitle(f)}, ${SEV_LABEL[sevKey(f)]}. Details shown.${position}`;
+}
+
+export function filterMessage(count: number): string {
+  return `Showing ${count} ${count === 1 ? "finding" : "findings"}`;
 }
 
 export function cycle<T>(

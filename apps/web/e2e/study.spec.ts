@@ -97,15 +97,32 @@ test("the study pages are prepared and the entry rejects unknown and real codes"
   await expect(
     page.getByRole("heading", { level: 1, name: "Accessibility report study" }),
   ).toBeVisible();
-  await expect(page.getByText(/Ethics approval is not recorded/)).toBeVisible();
+  await expect(page.getByText(/Ethics approval is not recorded/)).toHaveCount(
+    0,
+  );
   await page.getByLabel("Participant code").fill("P01");
   await page.getByRole("button", { name: "Start" }).click();
-  await expect(page.getByText("Unknown participant code")).toBeVisible();
+  await expect(
+    page.getByText(
+      "That code was not found. Check it against the card the researcher gave you, or ask them.",
+    ),
+  ).toBeVisible();
   await expect(page.getByLabel("Participant code")).toHaveAttribute(
     "aria-invalid",
     "true",
   );
   await scan(page);
+});
+
+test("study error pages have their own title and heading", async ({ page }) => {
+  await page.goto("/study/NOPE");
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "That participant code was not found",
+    }),
+  ).toBeVisible();
+  await expect(page).toHaveTitle(/Participant code not found/);
 });
 
 test("a participant completes a full AB session with timing, SUS and rubric data recorded", async ({
@@ -126,6 +143,9 @@ test("a participant completes a full AB session with timing, SUS and rubric data
   await expect(page.locator("main [role=alert]")).toContainText(
     "Tick every required statement",
   );
+  await expect(
+    page.getByRole("checkbox", { name: /./ }).first(),
+  ).toHaveAttribute("aria-required", "true");
   await scan(page);
   for (const box of await page.getByRole("checkbox").all()) {
     if (
@@ -145,6 +165,10 @@ test("a participant completes a full AB session with timing, SUS and rubric data
   await expect(page.locator("main [role=alert]")).toContainText(
     "Choose an answer",
   );
+  await expect(page.locator("#demo-age_band")).toHaveAttribute(
+    "aria-required",
+    "true",
+  );
   await scan(page);
   for (const [key, value] of Object.entries(DEMO))
     await page.locator(`#demo-${key}`).selectOption(value);
@@ -160,7 +184,15 @@ test("a participant completes a full AB session with timing, SUS and rubric data
           name: /Full-page screenshot of the task page/,
         }),
       ).toBeVisible();
-      if (n === 1) await scan(page);
+      if (n === 1) {
+        await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+        await page.keyboard.press("Tab");
+        await page
+          .getByRole("link", { name: "Skip to your fix" })
+          .press("Enter");
+        await expect(page.locator("#fix-text")).toBeFocused();
+        await scan(page);
+      }
       await page.getByRole("button", { name: "Done" }).click();
       await expect(page.locator("main [role=alert]")).toContainText(
         "Write or describe",
@@ -274,12 +306,16 @@ test("both conditions render the same interface for the same task and the rule-o
   const ruleBoxes = await page.locator("svg [role=button][data-key]").count();
   await expect(page.getByText(/this report checks/)).toBeVisible();
   await expect(page.getByText(/were not assessed/)).toBeVisible();
-  await expect(page.getByText("Rule-only", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Condition: Rule-only", { exact: true }),
+  ).toBeVisible();
 
   await openFirstTask("SYN03");
   const hybrid = await structure();
   const hybridBoxes = await page.locator("svg [role=button][data-key]").count();
-  await expect(page.getByText("Hybrid", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Condition: Hybrid", { exact: true }),
+  ).toBeVisible();
   expect(ruleOnly).toEqual(hybrid);
   expect(ruleBoxes).toBe(0);
   expect(hybridBoxes).toBeGreaterThan(0);
@@ -356,14 +392,23 @@ test("the study admin page rates fixes and exports, and every participant step p
   test.setTimeout(240_000);
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/study/admin");
+  await expect(page.getByLabel("Administration token")).toHaveAttribute(
+    "type",
+    "password",
+  );
   await page.getByLabel("Administration token").fill("e2e-token");
   await page.getByRole("button", { name: "Unlock" }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: /^Loaded \d+ task/ }),
+  ).toBeVisible();
   await expect(
     page.getByRole("table", { name: /Submitted fixes/ }),
   ).toBeVisible();
   const first = page.getByRole("combobox", { name: /^Success for/ }).first();
+  await first.focus();
   await first.selectOption("yes");
   await expect(first).toHaveValue("yes");
+  await expect(first).toBeFocused();
   const [download] = await Promise.all([
     page.waitForEvent("download"),
     page.getByRole("button", { name: "Export tasks CSV" }).click(),

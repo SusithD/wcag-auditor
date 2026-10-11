@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Report - marlowegreen.example - WCAG Auditor</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+.flip{transform:rotate(180deg)}
+.rhead{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.meta{display:flex;flex-wrap:wrap;gap:6px 16px;color:var(--ink-3);font-size:0.8125rem;margin-top:6px;align-items:center}
+.meta span{display:inline-flex;gap:6px;align-items:center}.meta svg{width:14px;height:14px}
+.hacts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.viewtabs{margin-top:16px}
+.summary{margin-top:16px;padding:16px 16px 12px}
+.verdict{margin:0 0 12px;font-size:0.9375rem;line-height:1.375rem;color:var(--ink-2)}.verdict b{color:var(--ink);font-weight:600}
+.sumdl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0;border-top:1px solid var(--line)}
+.sumdl>div{padding:12px 16px 4px;border-right:1px solid var(--line)}.sumdl>div:first-child{padding-left:0}.sumdl>div:last-child{border-right:0}
+.sumdl dt{font-size:0.75rem;font-weight:500;color:var(--ink-3);margin-bottom:6px}
+.sumdl dd{margin:0;display:flex;align-items:center;gap:12px}.sumdl dd.col{flex-direction:column;align-items:flex-start;gap:6px}
+.big{font-size:1.25rem;line-height:1.75rem;font-weight:600;color:var(--ink)}
+.meter.cov{width:160px}
+.claim{margin:10px 0 0;font-size:0.8125rem;color:var(--ink-3);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.work{display:grid;grid-template-columns:288px minmax(0,1fr) 384px;margin-top:16px;min-height:640px;height:calc(100vh - 56px - 48px);max-height:900px}
+.rail{border-right:1px solid var(--line);padding:12px;overflow:auto}
+.rail-top{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.filter{display:flex;align-items:center;gap:8px;min-height:32px;padding:0 10px;border:1px solid var(--line-strong);border-radius:6px;color:var(--ink-3)}
+.filter svg{width:14px;height:14px}.filter input{border:0;outline:0;background:transparent;font:400 0.8125rem var(--font);color:var(--ink);width:100%}
+.filter:focus-within{outline:2px solid var(--ring);outline-offset:1px}
+.rgroup{margin-top:12px}
+.rtitle{display:flex;justify-content:space-between;font-size:0.75rem;font-weight:600;color:var(--ink-2);padding:4px 8px;margin:0}
+.rtitle .num{color:var(--ink-3);font-weight:500}
+.rgroup ul{list-style:none;margin:0;padding:0}
+.rrow{display:grid;grid-template-columns:14px 40px minmax(0,1fr) auto 18px;gap:8px;align-items:center;min-height:34px;padding:4px 8px;border-radius:6px;color:var(--ink);text-decoration:none;font-size:0.8125rem}
+.rrow:hover{background:var(--subtle)}.rrow.on{background:var(--tint);box-shadow:inset 2px 0 0 var(--accent)}
+.rname{line-height:1.125rem}.rc{color:var(--ink-2);font-size:0.75rem;text-align:right}
+.rail-note{margin:16px 8px 4px;font-size:0.75rem;line-height:1rem;color:var(--ink-3)}
+.stage{display:flex;flex-direction:column;min-width:0;background:var(--subtle)}
+.well{position:relative;flex:1;min-height:0;padding:24px 40px 24px 24px;overflow:hidden;background-image:radial-gradient(var(--line) 1px,transparent 1px);background-size:16px 16px}
+.frame{max-width:880px;margin:0 auto;border-radius:4px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px var(--line),0 12px 28px -12px rgb(0 0 55 / .22)}
+[data-theme="dark"] .frame image{filter:brightness(.9)}
+.shot{display:block;width:100%;height:auto}
+.mark.sel rect{}
+.minimap{position:absolute;right:14px;top:24px;bottom:24px;width:10px;border-radius:5px;background:var(--track)}
+.minimap .viewport{position:absolute;left:-3px;right:-3px;border:1.5px solid var(--ink-3);border-radius:4px}
+.minimap .tick{position:absolute;left:0;width:10px;height:10px;transform:translateY(-50%)}.minimap .tick svg{width:10px;height:10px;display:block}
+.toolrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border-top:1px solid var(--line);background:var(--surface)}
+.tgroup{display:flex;align-items:center;gap:2px}.zoom{min-width:64px;text-align:center;color:var(--ink-2)}
+.legend{display:flex;gap:16px;font-size:0.75rem;color:var(--ink-2)}.legend span{display:inline-flex;align-items:center;gap:6px}
+.lg{width:18px;height:10px;border-radius:2px;display:inline-block}.lg.solid{border:2px solid var(--ink-2)}.lg.dashed{border:2px dashed var(--ink-2)}
+.detail{border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.dscroll{overflow:auto;flex:1}
+.dhead{padding:16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.dtags{display:flex;align-items:center;gap:10px}
+.dtitle{display:flex;align-items:center;gap:8px;font-size:1rem;line-height:1.5rem;font-weight:600}.dtitle .sc{font-size:0.8125rem}
+.bigratio{display:flex;align-items:baseline;gap:10px;font-size:0.8125rem}.bigratio .ratio b{font-size:1.75rem;line-height:2rem;letter-spacing:-0.01em}.bigratio .ratio small{font-size:1rem}
+.ruler{padding:4px 0 2px}
+.rtrack{position:relative;height:6px;border-radius:3px;background:var(--track)}
+.rtrack .gap{position:absolute;top:0;bottom:0;background:var(--serious);border-radius:3px;min-width:3px}
+.rtrack .req{position:absolute;top:-5px;width:2px;height:16px;background:var(--ink);transform:translateX(-1px)}
+.rtrack .meas{position:absolute;top:-4px;width:14px;height:14px;border-radius:50%;background:var(--surface);border:3px solid var(--serious);transform:translateX(-7px)}
+.rticks{position:relative;height:18px;margin-top:6px}
+.rt{position:absolute;transform:translateX(-50%);font-size:0.6875rem;color:var(--ink-3);font-variant-numeric:tabular-nums}.rt i{display:none}
+.dsec{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.dsec-head{display:flex;justify-content:space-between;align-items:center}
+.dlabel{font-size:0.75rem;font-weight:600;color:var(--ink-2);letter-spacing:.01em;margin:0}
+.kv{margin:0}.kv div{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:7px 0;border-bottom:1px solid var(--line);font-size:0.8125rem;align-items:center}.kv div:last-child{border-bottom:0}
+.kv dt{color:var(--ink-3)}.kv dd{margin:0;display:flex;gap:8px;align-items:center;min-width:0}
+.sel-text{overflow-wrap:anywhere}
+.sw{width:14px;height:14px;border-radius:3px;box-shadow:inset 0 0 0 1px var(--line-strong);display:inline-block;flex:none}
+.diff{border:1px solid var(--line);border-radius:6px;overflow:hidden;font-size:0.8125rem}
+.dl{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;padding:6px 10px 6px 0}
+.dl .pm{text-align:center;font-family:var(--mono);color:var(--ink-3)}
+.dl.del{background:var(--critical-bg)}.dl.add{background:var(--pass-bg)}
+.dfootnote{display:flex;gap:8px;align-items:center;padding:8px 10px;border-top:1px solid var(--line);font-size:0.8125rem}
+.drow{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.dfoot{padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);gap:8px}
+.pager{display:flex;align-items:center;gap:2px}.acts{display:flex;gap:8px}
+@media (max-width:1280px){.work{grid-template-columns:260px minmax(0,1fr);height:auto;max-height:none}.detail{grid-column:1/-1;border-left:0;border-top:1px solid var(--line)}.sumdl{grid-template-columns:1fr 1fr}.sumdl>div:nth-child(2){border-right:0}}
+@media (max-width:720px){.work{grid-template-columns:1fr}.rail{border-right:0;border-bottom:1px solid var(--line)}.sumdl{grid-template-columns:1fr}.sumdl>div{border-right:0;padding-left:0}.legend{display:none}}
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-logo" viewBox="0 0 16 16"><path d="M3 3.5h6.5M3 8h10M3 12.5h4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="12" cy="3.5" r="1.4" fill="#fff"/></symbol>
+  <symbol id="i-overview" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></g></symbol>
+  <symbol id="i-audits" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></g></symbol>
+  <symbol id="i-review" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></g></symbol>
+  <symbol id="i-eval" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></g></symbol>
+  <symbol id="i-study" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.6.9 2.7 2.6 3 5.2"/></g></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></g></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></g></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.6 2.6 0 0 1 5 1c0 1.7-2.5 2.2-2.5 3.5M12 17h.01"/></g></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-desktop" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></g></symbol>
+  <symbol id="i-mobile" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></g></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-export" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></g></symbol>
+  <symbol id="i-rerun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></g></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="1.5"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></g></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></g></symbol>
+  <symbol id="i-zoomin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5M11 8v6M8 11h6"/></g></symbol>
+  <symbol id="i-zoomout" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5M8 11h6"/></g></symbol>
+  <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 5h16l-6 7.5V19l-4 1.5v-8z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="sh-critical" viewBox="0 0 12 12"><path d="M6 .6 11.4 6 6 11.4.6 6z" fill="currentColor"/></symbol>
+  <symbol id="sh-serious" viewBox="0 0 12 12"><path d="M6 .9l5.4 10H.6z" fill="currentColor"/></symbol>
+  <symbol id="sh-minor" viewBox="0 0 12 12"><rect x="1.75" y="1.75" width="8.5" height="8.5" rx="1" fill="currentColor"/></symbol>
+  <symbol id="sh-review" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.6" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.6" fill="currentColor"/></symbol>
+  <symbol id="sh-pass" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.9" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M3.7 6.1l1.6 1.6 3-3.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="sh-undecided" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2.2 1.8"/></symbol>
+  <symbol id="sh-failed" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5.4" fill="currentColor"/><path d="M4 4l4 4M8 4l-4 4" stroke="var(--surface,#fff)" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="sh-running" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.6" fill="none" stroke="var(--track,#e9ebf1)" stroke-width="1.5"/><path d="M6 1.4a4.6 4.6 0 0 1 4.6 4.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="sh-done" viewBox="0 0 12 12"><path d="M2.4 6.3l2.4 2.4 4.8-5.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="sh-alert" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5.4" fill="currentColor"/><path d="M6 3.2v3.4" stroke="var(--surface,#fff)" stroke-width="1.5" stroke-linecap="round"/><circle cx="6" cy="8.6" r=".9" fill="var(--surface,#fff)"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></g></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></g></symbol>
+  <symbol id="i-sites" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></g></symbol>
+</svg>
+
+<a class="skip" href="#main">Skip to content</a>
+<div class="app">
+  
+<div class="side">
+  <div class="brand"><span class="mark"><svg aria-hidden="true" focusable="false"><use href="#i-logo"/></svg></span><span class="word">WCAG Auditor</span></div>
+  <div class="side-body">
+    <a class="btn btn-primary btn-block" href="#" title="New audit"><svg aria-hidden="true" focusable="false"><use href="#i-plus"/></svg><span class="lbl">New audit</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="#" title="Overview"><svg aria-hidden="true" focusable="false"><use href="#i-overview"/></svg><span class="lbl">Overview</span></a>
+      <a href="#" aria-current="page" title="Audits"><svg aria-hidden="true" focusable="false"><use href="#i-audits"/></svg><span class="lbl">Audits</span></a>
+      <a href="#" title="Review queue"><svg aria-hidden="true" focusable="false"><use href="#i-review"/></svg><span class="lbl">Review queue</span><span class="count" aria-hidden="true">312</span><span class="sr">, 312 waiting</span></a>
+      <a href="#" title="Sites"><svg aria-hidden="true" focusable="false"><use href="#i-sites"/></svg><span class="lbl">Sites</span></a>
+      <div class="nav-title" aria-hidden="true">Research</div>
+      <a href="#" title="Evaluation"><svg aria-hidden="true" focusable="false"><use href="#i-eval"/></svg><span class="lbl">Evaluation</span></a>
+      <a href="#" title="Study"><svg aria-hidden="true" focusable="false"><use href="#i-study"/></svg><span class="lbl">Study</span></a>
+    </nav>
+    <nav class="nav recent" aria-label="Recent sites"><div class="nav-title">Recent sites</div><a href="#" title="marlowegreen.example"><span class="site-dot" aria-hidden="true">M</span><span class="lbl">marlowegreen.example</span></a><a href="#" title="kettleandcrumb.example"><span class="site-dot" aria-hidden="true">K</span><span class="lbl">kettleandcrumb.example</span></a><a href="#" title="fernlea-health.example"><span class="site-dot" aria-hidden="true">F</span><span class="lbl">fernlea-health.example</span></a></nav>
+    <nav class="nav" aria-label="Settings and help" style="margin-top:auto">
+      <a href="#" title="Settings"><svg aria-hidden="true" focusable="false"><use href="#i-settings"/></svg><span class="lbl">Settings</span></a>
+      <a href="#" title="Help and method"><svg aria-hidden="true" focusable="false"><use href="#i-help"/></svg><span class="lbl">Help and method</span></a>
+    </nav>
+  </div>
+  <div class="side-foot"><span class="avatar" aria-hidden="true">SA</span><div class="who"><div style="font-weight:500">Susith Alwis</div><div class="t-faint" style="font-size:0.75rem">Researcher</div></div></div>
+</div>
+  <div class="main">
+    
+<header class="topbar">
+  <div class="mobilebar"><button class="btn btn-ghost btn-icon" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true" focusable="false"><use href="#i-menu"/></svg></button><span class="mark"><svg aria-hidden="true" focusable="false"><use href="#i-logo"/></svg></span></div>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Audits</a><svg aria-hidden="true" focusable="false"><use href="#i-chevron"/></svg><b>marlowegreen.example</b></nav>
+  <div style="flex:1"></div>
+  
+  <button class="searchbtn" aria-haspopup="dialog" aria-label="Search"><svg aria-hidden="true" focusable="false"><use href="#i-search"/></svg><span>Search</span><span class="kbds" aria-hidden="true"><span class="kbd">⌘</span><span class="kbd">K</span></span></button>
+  <button class="btn btn-ghost btn-icon toggle-theme" aria-label="Dark theme" aria-pressed="false" onclick="toggleTheme()"><svg class="moon" aria-hidden="true" focusable="false"><use href="#i-moon"/></svg><svg class="sun" aria-hidden="true" focusable="false"><use href="#i-sun"/></svg></button>
+</header>
+    <main id="main" class="content" style="max-width:none" tabindex="-1">
+
+      <div class="rhead">
+        <div>
+          <h1 class="t-page">marlowegreen.example</h1>
+          <div class="meta"><span class="mono">/about/our-story</span><span><svg aria-hidden="true" focusable="false"><use href="#i-desktop"/></svg>Desktop, 1280 × 800 px</span><span>Detector and rules</span><span>Captured <time datetime="2026-10-11T21:40">12 min ago</time></span></div>
+        </div>
+        <div class="hacts">
+          <div class="seg" role="group" aria-label="Viewport"><button aria-pressed="true"><svg aria-hidden="true" focusable="false"><use href="#i-desktop"/></svg>Desktop</button><button aria-pressed="false"><svg aria-hidden="true" focusable="false"><use href="#i-mobile"/></svg>Mobile</button></div>
+          <button class="btn"><svg aria-hidden="true" focusable="false"><use href="#i-export"/></svg>Export report<svg aria-hidden="true" focusable="false"><use href="#i-down"/></svg></button>
+          <button class="btn"><svg aria-hidden="true" focusable="false"><use href="#i-rerun"/></svg>Run again</button>
+        </div>
+      </div>
+      <nav class="tabs viewtabs" aria-label="Report views"><a href="#" aria-current="page">Findings</a><a href="#">Table</a><a href="#">Compare with rules only</a><a href="#">Coverage</a></nav>
+      
+<section class="panel summary" aria-labelledby="sum-h">
+  <h2 id="sum-h" class="sr">Summary</h2>
+  <p class="verdict"><b>6 failures</b> in the 5 criteria the tool could decide. <b>2 findings</b> need review, and <b>2 criteria</b> could not be decided on this page.</p>
+  <dl class="sumdl">
+    <div><dt>Failures</dt><dd><span class="num big">6</span><span class="sev"><span class="status s-critical zero"><svg aria-hidden="true" focusable="false"><use href="#sh-critical"/></svg><span class="num">0</span><span class="sr"> critical</span></span><span class="status s-serious"><svg aria-hidden="true" focusable="false"><use href="#sh-serious"/></svg><span class="num">2</span><span class="sr"> serious</span></span><span class="status s-minor"><svg aria-hidden="true" focusable="false"><use href="#sh-minor"/></svg><span class="num">4</span><span class="sr"> minor</span></span></span></dd></div>
+    <div><dt>Needs review</dt><dd><span class="num big">2</span><span class="t-faint t-dense">boxes the detector estimated</span></dd></div>
+    <div><dt>Criteria</dt><dd class="col"><span class="meter cov" role="img" aria-label="5 decided, 1 needs review, 2 could not be decided, of 8"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="rev"></i><i class="und"></i><i class="und"></i></span><span class="t-faint t-dense"><span class="num">5</span> decided · <span class="num">1</span> to review · <span class="num">2</span> not decided</span></dd></div>
+    <div><dt>Since last audit</dt><dd><span class="t-muted t-dense"><span class="num">3</span> fixed · <span class="num">0</span> new · <span class="num">6</span> still present</span></dd></div>
+  </dl>
+  <p class="claim">This tool checks 8 of the 86 WCAG 2.2 success criteria. <a class="link" href="#">What this result does not mean</a></p>
+</section>
+      <div class="panel work">
+<nav class="rail" aria-label="Criteria">
+  <h2 class="sr">Criteria</h2>
+  <div class="rail-top">
+    <label class="sr" for="rf">Filter criteria</label>
+    <div class="filter"><svg aria-hidden="true" focusable="false"><use href="#i-search"/></svg><input id="rf" placeholder="Filter criteria"></div>
+    <div class="seg sm" role="group" aria-label="Group by"><button aria-pressed="true">Criterion</button><button aria-pressed="false">Element</button><button aria-pressed="false">Severity</button></div>
+  </div>
+  <div class="rgroup"><h3 class="rtitle"><span>Failed</span><span class="num">3</span></h3><ul><li><a href="#" class="rrow on" aria-current="true">
+<span class="status s-serious"><svg aria-hidden="true" focusable="false"><use href="#sh-serious"/></svg></span><span class="sc">1<span class="d">.</span>4<span class="d">.</span>3</span><span class="rname">Contrast (Minimum)</span><span class="level">AA</span><span class="num rc">2<span class="sr"> findings</span></span></a></li><li><a href="#" class="rrow">
+<span class="status s-minor"><svg aria-hidden="true" focusable="false"><use href="#sh-minor"/></svg></span><span class="sc">2<span class="d">.</span>5<span class="d">.</span>8</span><span class="rname">Target size (Minimum)</span><span class="level">AA</span><span class="num rc">1<span class="sr"> findings</span></span></a></li><li><a href="#" class="rrow">
+<span class="status s-minor"><svg aria-hidden="true" focusable="false"><use href="#sh-minor"/></svg></span><span class="sc">2<span class="d">.</span>4<span class="d">.</span>13</span><span class="rname">Focus appearance</span><span class="level">AAA</span><span class="num rc">3<span class="sr"> findings</span></span></a></li></ul></div><div class="rgroup"><h3 class="rtitle"><span>Needs review</span><span class="num">1</span></h3><ul><li><a href="#" class="rrow">
+<span class="status s-review"><svg aria-hidden="true" focusable="false"><use href="#sh-review"/></svg></span><span class="sc">1<span class="d">.</span>4<span class="d">.</span>11</span><span class="rname">Non-text contrast</span><span class="level">AA</span><span class="num rc">2<span class="sr"> findings</span></span></a></li></ul></div><div class="rgroup"><h3 class="rtitle"><span>No issue found</span><span class="num">2</span></h3><ul><li><a href="#" class="rrow">
+<span class="status s-pass"><svg aria-hidden="true" focusable="false"><use href="#sh-pass"/></svg></span><span class="sc">2<span class="d">.</span>4<span class="d">.</span>7</span><span class="rname">Focus visible</span><span class="level">AA</span></a></li><li><a href="#" class="rrow">
+<span class="status s-pass"><svg aria-hidden="true" focusable="false"><use href="#sh-pass"/></svg></span><span class="sc">2<span class="d">.</span>4<span class="d">.</span>11</span><span class="rname">Focus not obscured</span><span class="level">AA</span></a></li></ul></div><div class="rgroup"><h3 class="rtitle"><span>Could not decide</span><span class="num">2</span></h3><ul><li><a href="#" class="rrow">
+<span class="status s-undecided"><svg aria-hidden="true" focusable="false"><use href="#sh-undecided"/></svg></span><span class="sc">2<span class="d">.</span>4<span class="d">.</span>12</span><span class="rname">Focus not obscured</span><span class="level">AAA</span></a></li><li><a href="#" class="rrow">
+<span class="status s-undecided"><svg aria-hidden="true" focusable="false"><use href="#sh-undecided"/></svg></span><span class="sc">2<span class="d">.</span>5<span class="d">.</span>7</span><span class="rname">Dragging movements</span><span class="level">AA</span></a></li></ul></div>
+  <p class="rail-note">Severity estimates impact on users. Any failure of an A or AA criterion fails conformance.</p>
+</nav>
+<section class="stage" aria-labelledby="stage-h">
+  <h2 id="stage-h" class="sr">Screenshot</h2>
+  <div class="well">
+    <div class="frame">
+      <svg class="shot" viewBox="0 1360 1280 1090" role="group" aria-label="Screenshot of marlowegreen.example, desktop, 2 findings in view. The findings table lists every finding.">
+        <image href="assets/page.webp" x="0" y="1150" width="1280" height="1300"/>
+        
+<g class="mark sel" role="button" tabindex="0" aria-label="Serious, 1.4.3 Contrast, 4.48 to 1, paragraph in Our story" aria-pressed="true">
+  <rect x="104" y="1799" width="520" height="128" rx="3" fill="rgb(0 0 85 / 0.05)" stroke="#ffffff" stroke-width="9"/>
+  <rect x="104" y="1799" width="520" height="128" rx="3" fill="none" stroke="var(--accent)" stroke-width="4"/>
+  <g transform="translate(104,1757)"><rect width="90" height="34" rx="6" fill="var(--accent)" stroke="var(--accent)" stroke-width="1.5"/><text x="14" y="23" font-family="Geist Mono" font-size="20" fill="var(--on-accent)">1.4.3</text></g>
+</g>
+<g class="mark" role="button" tabindex="-1" aria-label="Needs review, 1.4.11 Non-text contrast, estimated box, button Ask about volunteering" aria-pressed="false">
+  <rect x="681" y="1417" width="227" height="44" rx="3" fill="none" stroke="#ffffff" stroke-width="8"/>
+  <rect x="681" y="1417" width="227" height="44" rx="3" fill="none" stroke="var(--review)" stroke-width="3" stroke-dasharray="7 4"/>
+  <g transform="translate(681,1375)"><rect width="103" height="34" rx="6" fill="var(--surface)" stroke="var(--review)" stroke-width="1.5"/><text x="14" y="23" font-family="Geist Mono" font-size="20" fill="var(--ink)">1.4.11</text></g>
+</g>
+      </svg>
+    </div>
+    <div class="minimap" aria-hidden="true"><span class="viewport" style="top:30%;height:22%"></span><span class="tick s-minor" style="top:12%" title="Finding at 12% of the page"><svg aria-hidden="true" focusable="false"><use href="#sh-minor"/></svg></span><span class="tick s-review" style="top:34%" title="Finding at 34% of the page"><svg aria-hidden="true" focusable="false"><use href="#sh-review"/></svg></span><span class="tick s-serious" style="top:55%" title="Finding at 55% of the page"><svg aria-hidden="true" focusable="false"><use href="#sh-serious"/></svg></span><span class="tick s-serious" style="top:58%" title="Finding at 58% of the page"><svg aria-hidden="true" focusable="false"><use href="#sh-serious"/></svg></span><span class="tick s-minor" style="top:82%" title="Finding at 82% of the page"><svg aria-hidden="true" focusable="false"><use href="#sh-minor"/></svg></span><span class="tick s-minor" style="top:90%" title="Finding at 90% of the page"><svg aria-hidden="true" focusable="false"><use href="#sh-minor"/></svg></span></div>
+  </div>
+  <div class="toolrow" role="toolbar" aria-label="Screenshot">
+    <div class="tgroup">
+      <button class="btn btn-ghost btn-icon" aria-label="Zoom out"><svg aria-hidden="true" focusable="false"><use href="#i-zoomout"/></svg></button>
+      <span class="num t-dense zoom" aria-live="polite">Fit, 66%</span>
+      <button class="btn btn-ghost btn-icon" aria-label="Zoom in"><svg aria-hidden="true" focusable="false"><use href="#i-zoomin"/></svg></button>
+      <button class="btn btn-ghost btn-icon" aria-label="Fit to width"><svg aria-hidden="true" focusable="false"><use href="#i-fit"/></svg></button>
+    </div>
+    <div class="legend" aria-label="Box legend"><span><i class="lg solid"></i>Measured</span><span><i class="lg dashed"></i>Estimated by the detector</span></div>
+    <div class="seg sm" role="group" aria-label="Labels"><button aria-pressed="true">Labels</button><button aria-pressed="false">Boxes only</button></div>
+  </div>
+</section>
+<section class="detail" aria-labelledby="fd-h">
+  <div class="dscroll">
+    <div class="dhead">
+      <div class="dtags"><span class="tag tag-serious"><svg aria-hidden="true" focusable="false"><use href="#sh-serious"/></svg>Serious</span><span class="t-faint t-dense">Automated · measured</span></div>
+      <h2 id="fd-h" class="dtitle"><span class="sc">1<span class="d">.</span>4<span class="d">.</span>3</span><span>Contrast (Minimum)</span><span class="level">AA</span></h2>
+      <div class="bigratio"><span class="ratio num"><b>4.48</b><small>:1</small></span><span class="t-faint">needs 4.5:1 · short by <span class="num">0.02</span></span></div>
+      
+<div class="ruler" role="img" aria-label="Measured 4.48 to 1, required 4.5 to 1, short by 0.02">
+  <div class="rtrack"><span class="gap" style="left:77.1%;width:0.23%"></span><span class="req" style="left:77.3%"></span><span class="meas" style="left:77.1%"></span></div>
+  <div class="rticks"><span class="rt" style="left:0.0%"><i></i>1</span><span class="rt" style="left:56.5%"><i></i>3</span><span class="rt" style="left:77.3%"><i></i>4.5</span><span class="rt" style="left:100.0%"><i></i>7</span></div>
+</div>
+    </div>
+    <div class="dsec">
+      <h3 class="dlabel">Evidence</h3>
+      <dl class="kv"><div><dt>Foreground</dt><dd><span class="sw" style="background:#777777"></span><span class="mono">#777777</span></dd></div><div><dt>Background</dt><dd><span class="sw" style="background:#FFFFFF"></span><span class="mono">#FFFFFF</span></dd></div><div><dt>Text</dt><dd>16 px <span class="t-faint">· regular weight · normal text</span></dd></div><div><dt>Element</dt><dd><span class="mono sel-text">section#story &gt; p.story</span></dd></div><div><dt>Found by</dt><dd>Browser rule and pixel measurement</dd></div></dl>
+    </div>
+    <div class="dsec">
+      <div class="dsec-head"><h3 class="dlabel">Suggested fix</h3><div class="seg sm" role="group" aria-label="Fix format"><button aria-pressed="true">CSS</button><button aria-pressed="false">HTML</button></div></div>
+      <div class="diff" role="group" aria-label="Suggested CSS change">
+        <div class="dl del"><span class="pm" aria-hidden="true">−</span><span class="mono">color: #777777;</span><span class="sw" style="background:#777777"></span></div>
+        <div class="dl add"><span class="pm" aria-hidden="true">+</span><span class="mono">color: #767676;</span><span class="sw" style="background:#767676"></span></div>
+        <div class="dfootnote"><span class="ratio num"><b>4.48</b><small>:1</small></span><span class="t-faint">→</span><span class="ratio num"><b>4.54</b><small>:1</small></span><span class="t-faint">on #FFFFFF</span></div>
+      </div>
+      <div class="drow"><button class="btn btn-sm"><svg aria-hidden="true" focusable="false"><use href="#i-copy"/></svg>Copy CSS</button><a class="link" href="#">Understanding 1.4.3<svg aria-hidden="true" focusable="false"><use href="#i-ext"/></svg><span class="sr"> (W3C, opens in a new tab)</span></a></div>
+    </div>
+  </div>
+  <div class="dfoot">
+    <div class="pager"><button class="btn btn-ghost btn-icon" aria-label="Previous finding" aria-keyshortcuts="K"><svg class="flip" aria-hidden="true" focusable="false"><use href="#i-chevron"/></svg></button><span class="num t-dense t-muted">1 of 8</span><button class="btn btn-ghost btn-icon" aria-label="Next finding" aria-keyshortcuts="J"><svg aria-hidden="true" focusable="false"><use href="#i-chevron"/></svg></button></div>
+    <div class="acts"><button class="btn">Dismiss<svg aria-hidden="true" focusable="false"><use href="#i-down"/></svg></button><button class="btn btn-primary"><svg aria-hidden="true" focusable="false"><use href="#i-check"/></svg>Mark as fixed</button></div>
+  </div>
+</section></div>
+    </main>
+  </div>
+</div>
+<script>
+function toggleTheme(){const d=document.documentElement;const dark=d.dataset.theme!=="dark";d.dataset.theme=dark?"dark":"light";document.querySelectorAll(".toggle-theme").forEach(x=>x.setAttribute("aria-pressed",String(dark)));}
+if(location.hash==="#dark"){toggleTheme();}
+</script>
+</body>
+</html>

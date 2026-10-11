@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useOverview } from "@/hooks/use-report-data";
 import { useCompare } from "@/hooks/use-run-views";
-import { counterpart, SyncBus } from "@/lib/compare";
+import { counterpart, diffRowLabel, SyncBus } from "@/lib/compare";
 import {
   type Finding,
   SC_TITLES,
@@ -19,7 +19,7 @@ import {
   type Viewport,
 } from "@/lib/report";
 import { RunNav } from "./run-nav";
-import { useViewportParam } from "./viewport-state";
+import { focusOnMount, useViewportParam } from "./viewport-state";
 
 export function CompareScreen({ runId }: { runId: string }) {
   const run = useQuery({
@@ -61,6 +61,7 @@ export function CompareScreen({ runId }: { runId: string }) {
   if (!run.data || !viewport || overview.isPending || compare.isPending) {
     return (
       <div className="p-6" aria-busy="true">
+        <title>Compare - WCAG Auditor</title>
         <Skeleton className="h-96 w-full" />
       </div>
     );
@@ -95,7 +96,11 @@ export function CompareScreen({ runId }: { runId: string }) {
       <title>{`Compare - ${overview.data.url}`}</title>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-h2 font-semibold">
+          <h1
+            ref={focusOnMount}
+            tabIndex={-1}
+            className="text-h2 font-semibold outline-none"
+          >
             Compare hybrid and rule-only
           </h1>
           <p className="font-mono text-label text-muted-foreground">
@@ -142,7 +147,11 @@ export function CompareScreen({ runId }: { runId: string }) {
               {data.hybrid.length} findings
             </span>
           </h2>
-          <div className="h-[70dvh] overflow-hidden rounded-lg border">
+          <div
+            role="group"
+            aria-label="Hybrid report"
+            className="h-[70dvh] overflow-hidden rounded-lg border"
+          >
             <Canvas
               runId={runId}
               viewport={viewport}
@@ -166,7 +175,11 @@ export function CompareScreen({ runId }: { runId: string }) {
               {data.rule_only.length} findings
             </span>
           </h2>
-          <div className="h-[70dvh] overflow-hidden rounded-lg border">
+          <div
+            role="group"
+            aria-label="Rule-only report"
+            className="h-[70dvh] overflow-hidden rounded-lg border"
+          >
             <Canvas
               runId={runId}
               viewport={viewport}
@@ -201,7 +214,7 @@ export function CompareScreen({ runId }: { runId: string }) {
               selects it on its canvas.
             </p>
             <ul className="mt-2 divide-y rounded-lg border bg-card">
-              {diff.map(({ side, finding }) => {
+              {diff.map(({ side, finding }, index) => {
                 const k = sevKey(finding);
                 const selected =
                   (side === "hybrid" ? hybridKey : ruleKey) === finding.key;
@@ -237,6 +250,9 @@ export function CompareScreen({ runId }: { runId: string }) {
                           Only in {side === "hybrid" ? "hybrid" : "rule-only"}
                         </span>
                       </span>
+                      <span className="sr-only">
+                        {diffRowLabel({ side, finding }, index, diff.length)}
+                      </span>
                     </button>
                   </li>
                 );
@@ -252,7 +268,14 @@ export function CompareScreen({ runId }: { runId: string }) {
 function Message({ title, detail }: { title: string; detail?: string }) {
   return (
     <div className="mx-auto max-w-160 px-6 py-12">
-      <h1 className="text-h2 font-semibold">{title}</h1>
+      <title>{`${title} - Compare`}</title>
+      <h1
+        ref={focusOnMount}
+        tabIndex={-1}
+        className="text-h2 font-semibold outline-none"
+      >
+        {title}
+      </h1>
       {detail ? (
         <p className="mt-2 text-body text-muted-foreground">{detail}</p>
       ) : null}

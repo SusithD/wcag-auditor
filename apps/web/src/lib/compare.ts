@@ -29,3 +29,17 @@ export class SyncBus {
       if (id !== source) listener(view);
   }
 }
+
+export type DiffRowSource = {
+  side: "hybrid" | "rule_only";
+  finding: { sc: string; element: string; key: string };
+};
+
+export function diffRowLabel(
+  row: DiffRowSource,
+  index: number,
+  total: number,
+): string {
+  const hint = row.finding.element.replace(/\s+/g, " ").trim().slice(0, 40);
+  return `Item ${index + 1} of ${total}${hint ? `, ${hint}` : ""}`;
+}

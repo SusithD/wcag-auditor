@@ -6,6 +6,7 @@ from typing import Any
 import numpy as np
 
 from auditor.elements.base import Element
+from auditor.modules import reasons
 from auditor.modules.color import (
     RGB,
     blend,
@@ -141,6 +142,7 @@ def run(ctx: ModuleContext) -> list[Finding]:
                     "text": el.text,
                     "dom_ref": el.dom_ref,
                     "exception_tested": ["disabled", "svg-text"],
+                    **({} if large is not None else {reasons.KEY: reasons.TEXT_SIZE_UNKNOWN}),
                 },
                 guidance_key=GUIDANCE_KEY,
             )

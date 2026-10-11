@@ -2,8 +2,10 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Circle, CircleAlert, CircleDot } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { api, screenshotUrl, TERMINAL, type Viewport } from "@/api/client";
+import { PageTitle } from "@/components/page-title";
 import { ReportScreen } from "@/components/report/report-screen";
 import { SeverityTriplet } from "@/components/severity-triplet";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -18,7 +20,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRunEvents } from "@/hooks/use-run-events";
 import {
@@ -26,10 +33,12 @@ import {
   capturedViewports,
   currentStage,
   findingsSoFar,
+  groupSpokenName,
   type Step,
   stageLabel,
+  stepSpokenName,
 } from "@/lib/stages";
-import { middleTruncate } from "@/lib/url";
+import { describeRunError, middleTruncate } from "@/lib/url";
 
 function announcement(stage: string | undefined, viewport: string | null) {
   if (!stage) return "Queued";
@@ -47,13 +56,6 @@ function StepIcon({ status }: { status: Step["status"] }) {
     <Circle {...common} className="size-4 shrink-0 text-muted-foreground" />
   );
 }
-
-const STATE_TEXT: Record<Step["status"], string> = {
-  done: "done",
-  current: "in progress",
-  pending: "waiting",
-  failed: "failed",
-};
 
 function Stepper({ steps }: { steps: Step[] }) {
   const plain = steps.filter((s) => !s.group);
@@ -77,10 +79,13 @@ function Stepper({ steps }: { steps: Step[] }) {
       className="flex min-h-6 items-center gap-2 py-0.5 text-body"
     >
       <StepIcon status={s.status} />
-      <span className={s.status === "pending" ? "text-muted-foreground" : ""}>
+      <span
+        aria-hidden="true"
+        className={s.status === "pending" ? "text-muted-foreground" : ""}
+      >
         {s.label}
-        <span className="sr-only">, {STATE_TEXT[s.status]}</span>
       </span>
+      <span className="sr-only">{stepSpokenName(s)}</span>
     </li>
   );
 
@@ -94,12 +99,15 @@ function Stepper({ steps }: { steps: Step[] }) {
         <div className="flex min-h-6 items-center gap-2 text-body">
           <StepIcon status={modulesState} />
           <span
+            aria-hidden="true"
             className={
               modulesState === "pending" ? "text-muted-foreground" : ""
             }
           >
             Criteria
-            <span className="sr-only">, {STATE_TEXT[modulesState]}</span>
+          </span>
+          <span className="sr-only">
+            {groupSpokenName("Criteria", modulesState)}
           </span>
         </div>
         <ol className="ml-6 mt-0.5 space-y-0.5 border-l pl-3">
@@ -108,8 +116,8 @@ function Stepper({ steps }: { steps: Step[] }) {
               key={m.id}
               className={`font-mono text-label ${m.status === "pending" ? "text-muted-foreground" : ""}`}
             >
-              {m.label}
-              <span className="sr-only">, {STATE_TEXT[m.status]}</span>
+              <span aria-hidden="true">{m.label}</span>
+              <span className="sr-only">{stepSpokenName(m)}</span>
             </li>
           ))}
         </ol>
@@ -154,7 +162,13 @@ function Canvas({
 
 export function RunView({ runId }: { runId: string }) {
   const queryClient = useQueryClient();
-  const { data: run, isError } = useQuery({
+  const {
+    data: run,
+    isError,
+    error,
+    refetch,
+    isFetching,
+  } = useQuery({
     queryKey: ["run", runId],
     queryFn: async () => {
       const { data, error, response } = await api.GET("/runs/{run_id}", {
@@ -170,6 +184,7 @@ export function RunView({ runId }: { runId: string }) {
   const terminalNow = run ? TERMINAL.has(run.status) : false;
   const { events } = useRunEvents(runId, !terminalNow);
   const heading = useRef<HTMLHeadingElement>(null);
+  const alertTitle = useRef<HTMLDivElement>(null);
   const wasRunning = useRef(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
 
@@ -177,26 +192,66 @@ export function RunView({ runId }: { runId: string }) {
   useEffect(() => {
     if (run && !terminal) wasRunning.current = true;
     if (terminal && wasRunning.current) {
-      heading.current?.focus();
+      (alertTitle.current ?? heading.current)?.focus();
       wasRunning.current = false;
     }
   }, [run, terminal]);
 
+  const failedWithError =
+    run?.status === "failed" || run?.status === "cancelled"
+      ? Boolean(run.error)
+      : false;
+  useEffect(() => {
+    if (failedWithError) alertTitle.current?.focus();
+  }, [failedWithError]);
+
   if (isError && !run) {
+    const missing = error instanceof Error && error.message === "missing";
     return (
       <div className="mx-auto max-w-160 px-6 py-12">
-        <h1 ref={heading} tabIndex={-1} className="text-h2 font-semibold">
-          This run could not be loaded
+        <PageTitle
+          title={`${missing ? "Audit not found" : "Audit unavailable"} - WCAG Auditor`}
+        />
+        <h1
+          ref={heading}
+          tabIndex={-1}
+          className="text-h2 font-semibold outline-none"
+        >
+          {missing ? "Audit not found" : "This audit could not be loaded"}
         </h1>
         <p className="mt-2 text-body text-muted-foreground">
-          It may not exist, or the audit service is not reachable.
+          {missing
+            ? "There is no audit with this address. It may have been removed, or the address may have a typing mistake."
+            : "The audit service did not answer. Check that it is running, then try again."}
         </p>
+        <div className="mt-6 flex flex-wrap gap-2">
+          {missing ? null : (
+            <Button
+              type="button"
+              aria-disabled={isFetching}
+              onClick={() => {
+                if (!isFetching) void refetch();
+              }}
+            >
+              Try again
+            </Button>
+          )}
+          <Link
+            href="/"
+            className={buttonVariants({
+              variant: missing ? "default" : "outline",
+            })}
+          >
+            Back to New audit
+          </Link>
+        </div>
       </div>
     );
   }
   if (!run) {
     return (
       <div className="p-6" aria-busy="true">
+        <PageTitle title="Audit - WCAG Auditor" />
         <Skeleton className="h-8 w-64" />
       </div>
     );
@@ -229,7 +284,9 @@ export function RunView({ runId }: { runId: string }) {
     if (!failedAll) return <ReportScreen run={run} headingRef={heading} />;
     return (
       <div className="mx-auto w-full max-w-5xl px-6 py-8">
-        <title>{`${run.status === "cancelled" ? "Audit cancelled" : "Audit failed"} - ${subject}`}</title>
+        <PageTitle
+          title={`${run.status === "cancelled" ? "Audit cancelled" : "Audit failed"} - ${subject}`}
+        />
         <p
           className="font-mono text-label text-muted-foreground"
           title={subject}
@@ -245,17 +302,34 @@ export function RunView({ runId }: { runId: string }) {
         </h1>
         {run.error ? (
           <Alert className="mt-4" variant="destructive">
-            <AlertTitle>What went wrong</AlertTitle>
-            <AlertDescription>{run.error}</AlertDescription>
+            <AlertTitle ref={alertTitle} tabIndex={-1} className="outline-none">
+              What went wrong
+            </AlertTitle>
+            <AlertDescription>
+              <p>{describeRunError(run.error)}</p>
+              <Collapsible className="mt-2">
+                <CollapsibleTrigger className="inline-flex min-h-8 items-center text-body underline underline-offset-4">
+                  Technical details
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <pre className="mt-1 max-h-60 overflow-auto whitespace-pre-wrap break-words font-mono text-label">
+                    {run.error}
+                  </pre>
+                </CollapsibleContent>
+              </Collapsible>
+            </AlertDescription>
           </Alert>
         ) : null}
+        <Link href="/" className={`${buttonVariants()} mt-6`}>
+          Start a new audit
+        </Link>
       </div>
     );
   }
 
   return (
     <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-8 lg:grid-cols-[240px_1fr_240px]">
-      <title>{`Auditing - ${subject}`}</title>
+      <PageTitle title={`Auditing - ${subject}`} />
       <div className="lg:col-span-3">
         <p
           className="font-mono text-label text-muted-foreground"

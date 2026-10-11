@@ -197,4 +197,13 @@
   svg [data-key][data-selected="true"] rect {
     stroke: Highlight;
   }
+  svg [data-key][data-sev="serious"] rect[data-stroke] {
+    stroke-dasharray: 8 4;
+  }
+  svg [data-key][data-sev="minor"] rect[data-stroke] {
+    stroke-dasharray: 2 3;
+  }
+  svg [data-key][data-selected="true"] rect[data-stroke] {
+    stroke-width: 5px;
+  }
 }

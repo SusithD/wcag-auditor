@@ -10,6 +10,7 @@ from auditor import pipeline, protocol
 from auditor.detector import export_onnx
 from auditor.elements import detector as detector_mod
 from auditor.elements.detector import MODEL_ENV, DetectorElementSource
+from auditor.modules import reasons
 from auditor.schema import BBox
 from PIL import Image
 
@@ -61,6 +62,7 @@ def test_low_contrast_detected_field_gives_a_needs_review_1_4_11_finding(
     hits = [f for f in run.findings if f.sc == "1.4.11"]
     assert hits and {f.tier for f in hits} == {"needs-review"}
     assert hits[0].evidence["ratio"] < hits[0].evidence["threshold"]
+    assert "detector" in hits[0].evidence[reasons.KEY]
     assert hits[0].bbox == BBox(x=100, y=100, w=200, h=40)
 
 
@@ -107,6 +109,7 @@ def test_undersized_detected_targets_stay_needs_review_never_a_confirmed_fail(
         assert f.tier == "needs-review" and f.provenance == "pixel"
         assert f.evidence["size_px"]["w"] < size and f.evidence["size_px"]["h"] < size
         assert f.evidence["method"] == "dom-box" and f.evidence["text"] is None
+        assert "not from the DOM" in f.evidence[reasons.KEY]
     assert not [f for f in run.findings if f.tier == "automated"]
 
 

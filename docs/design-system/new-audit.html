@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New audit - WCAG Auditor</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+.compose { max-width: 760px; }
+.compose .page-head { align-items: flex-start; margin-bottom: 16px; }
+.compose .tabs { margin-bottom: 16px; }
+.form { display: flex; flex-direction: column; }
+.group { padding: 24px; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid var(--line); border-top: 0; margin: 0; min-width: 0; }
+.group:first-child { border-radius: var(--r-lg) var(--r-lg) 0 0; }
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.card { position: relative; display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border: 1px solid var(--line-control); border-radius: var(--r-md); background: var(--surface); cursor: pointer; min-height: 64px; }
+.card:hover { background: var(--subtle); }
+.card input { position: absolute; opacity: 0; width: 100%; height: 100%; inset: 0; margin: 0; cursor: pointer; }
+.card .mk { width: 20px; height: 20px; flex: none; margin-top: 1px; border: 1px solid var(--line-strong); background: var(--surface); display: grid; place-items: center; color: var(--on-accent); }
+.card.box .mk { border-radius: 4px; }
+.card.radio .mk { border-radius: 50%; }
+.card .mk svg { width: 12px; height: 12px; opacity: 0; }
+.card.radio .mk::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--on-accent); opacity: 0; }
+.card:has(input:checked) { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--tint); }
+.card:has(input:checked) .mk { background: var(--accent-fill); border-color: var(--accent-fill); }
+.card:has(input:checked) .mk svg, .card:has(input:checked) .mk::after { opacity: 1; }
+.card:has(input:focus-visible) { outline: 2px solid var(--ring); outline-offset: 2px; }
+.card .ct { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.card .cn { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.card .cn svg { width: 16px; height: 16px; color: var(--ink-2); }
+.card .cd { color: var(--ink-2); font-size: 0.8125rem; }
+.adv { padding: 0; border-bottom: 1px solid var(--line); }
+.adv summary { list-style: none; display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 24px; cursor: pointer; font-weight: 600; }
+.adv summary::-webkit-details-marker { display: none; }
+.adv summary svg { width: 14px; height: 14px; color: var(--ink-3); transition: none; }
+.adv[open] summary svg { transform: rotate(180deg); }
+.adv summary:hover { background: var(--subtle); }
+.adv summary:focus-visible { outline-offset: -2px; }
+.adv-body { padding: 8px 24px 24px; display: flex; flex-direction: column; gap: 16px; }
+.row2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+select.input { appearance: none; background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2362657c' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center; padding-right: 32px; }
+.chk { display: flex; gap: 12px; align-items: flex-start; }
+.chk input { width: 16px; height: 16px; margin: 2px 0 0; flex: none; accent-color: var(--accent-fill); }
+.chk label { font-weight: 500; display: block; }
+.chk .hint { display: block; font-weight: 400; margin-top: 2px; }
+.chk .meta { display: inline-flex; align-items: center; gap: 6px; }
+.num-in { max-width: 120px; }
+.foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 24px; flex-wrap: wrap; }
+.foot .acts { display: flex; gap: 8px; }
+.recent-h { margin: 32px 0 8px; display: flex; align-items: baseline; justify-content: space-between; }
+.recent-list { list-style: none; margin: 0; padding: 0; }
+.recent-list li { display: grid; grid-template-columns: minmax(0, 1fr) 128px auto 96px; align-items: center; gap: 16px; min-height: 48px; padding: 8px 16px; border-bottom: 1px solid var(--line); }
+.recent-list li:last-child { border-bottom: 0; }
+.recent-list .addr { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recent-list .addr small { display: block; font-weight: 400; color: var(--ink-3); font-size: 0.75rem; }
+.recent-list .act { justify-self: end; }
+.compose .scope { margin-top: 24px; }
+@media (max-width: 720px) {
+  .cards, .row2 { grid-template-columns: minmax(0, 1fr); }
+  .group, .adv-body, .foot { padding-left: 16px; padding-right: 16px; }
+  .adv summary { padding: 0 16px; }
+  .group { padding-top: 16px; padding-bottom: 16px; }
+  .foot { flex-direction: column; align-items: stretch; }
+  .foot .acts { justify-content: flex-end; }
+  .recent-list li { grid-template-columns: minmax(0, 1fr) auto; row-gap: 4px; }
+  .recent-list .when { grid-column: 1; grid-row: 2; }
+  .recent-list .fails { grid-column: 2; grid-row: 1; }
+  .recent-list .act { grid-column: 2; grid-row: 2; }
+}
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-logo" viewBox="0 0 16 16"><path d="M3 3.5h6.5M3 8h10M3 12.5h4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="12" cy="3.5" r="1.4" fill="#fff"/></symbol>
+  <symbol id="i-overview" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></g></symbol>
+  <symbol id="i-audits" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></g></symbol>
+  <symbol id="i-review" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></g></symbol>
+  <symbol id="i-eval" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></g></symbol>
+  <symbol id="i-study" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.6.9 2.7 2.6 3 5.2"/></g></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></g></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></g></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.6 2.6 0 0 1 5 1c0 1.7-2.5 2.2-2.5 3.5M12 17h.01"/></g></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-desktop" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></g></symbol>
+  <symbol id="i-mobile" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></g></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-export" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></g></symbol>
+  <symbol id="i-rerun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></g></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="1.5"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></g></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></g></symbol>
+  <symbol id="i-zoomin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5M11 8v6M8 11h6"/></g></symbol>
+  <symbol id="i-zoomout" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5M8 11h6"/></g></symbol>
+  <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 5h16l-6 7.5V19l-4 1.5v-8z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="sh-critical" viewBox="0 0 12 12"><path d="M6 .6 11.4 6 6 11.4.6 6z" fill="currentColor"/></symbol>
+  <symbol id="sh-serious" viewBox="0 0 12 12"><path d="M6 .9l5.4 10H.6z" fill="currentColor"/></symbol>
+  <symbol id="sh-minor" viewBox="0 0 12 12"><rect x="1.75" y="1.75" width="8.5" height="8.5" rx="1" fill="currentColor"/></symbol>
+  <symbol id="sh-review" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.6" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.6" fill="currentColor"/></symbol>
+  <symbol id="sh-pass" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.9" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M3.7 6.1l1.6 1.6 3-3.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="sh-undecided" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2.2 1.8"/></symbol>
+  <symbol id="sh-failed" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5.4" fill="currentColor"/><path d="M4 4l4 4M8 4l-4 4" stroke="var(--surface,#fff)" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="sh-running" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.6" fill="none" stroke="var(--track,#e9ebf1)" stroke-width="1.5"/><path d="M6 1.4a4.6 4.6 0 0 1 4.6 4.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="sh-done" viewBox="0 0 12 12"><path d="M2.4 6.3l2.4 2.4 4.8-5.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="sh-alert" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5.4" fill="currentColor"/><path d="M6 3.2v3.4" stroke="var(--surface,#fff)" stroke-width="1.5" stroke-linecap="round"/><circle cx="6" cy="8.6" r=".9" fill="var(--surface,#fff)"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></g></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></g></symbol>
+  <symbol id="i-sites" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></g></symbol>
+</svg>
+
+<a class="skip" href="#main">Skip to content</a>
+<div class="app">
+  
+<div class="side">
+  <div class="brand"><span class="mark"><svg aria-hidden="true" focusable="false"><use href="#i-logo"/></svg></span><span class="word">WCAG Auditor</span></div>
+  <div class="side-body">
+    <a class="btn btn-primary btn-block" href="#" title="New audit"><svg aria-hidden="true" focusable="false"><use href="#i-plus"/></svg><span class="lbl">New audit</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="#" aria-current="page" title="Overview"><svg aria-hidden="true" focusable="false"><use href="#i-overview"/></svg><span class="lbl">Overview</span></a>
+      <a href="#" title="Audits"><svg aria-hidden="true" focusable="false"><use href="#i-audits"/></svg><span class="lbl">Audits</span></a>
+      <a href="#" title="Review queue"><svg aria-hidden="true" focusable="false"><use href="#i-review"/></svg><span class="lbl">Review queue</span><span class="count" aria-hidden="true">312</span><span class="sr">, 312 waiting</span></a>
+      <a href="#" title="Sites"><svg aria-hidden="true" focusable="false"><use href="#i-sites"/></svg><span class="lbl">Sites</span></a>
+      <div class="nav-title" aria-hidden="true">Research</div>
+      <a href="#" title="Evaluation"><svg aria-hidden="true" focusable="false"><use href="#i-eval"/></svg><span class="lbl">Evaluation</span></a>
+      <a href="#" title="Study"><svg aria-hidden="true" focusable="false"><use href="#i-study"/></svg><span class="lbl">Study</span></a>
+    </nav>
+    <nav class="nav recent" aria-label="Recent sites"><div class="nav-title">Recent sites</div><a href="#" title="marlowegreen.example"><span class="site-dot" aria-hidden="true">M</span><span class="lbl">marlowegreen.example</span></a><a href="#" title="kettleandcrumb.example"><span class="site-dot" aria-hidden="true">K</span><span class="lbl">kettleandcrumb.example</span></a><a href="#" title="fernlea-health.example"><span class="site-dot" aria-hidden="true">F</span><span class="lbl">fernlea-health.example</span></a></nav>
+    <nav class="nav" aria-label="Settings and help" style="margin-top:auto">
+      <a href="#" title="Settings"><svg aria-hidden="true" focusable="false"><use href="#i-settings"/></svg><span class="lbl">Settings</span></a>
+      <a href="#" title="Help and method"><svg aria-hidden="true" focusable="false"><use href="#i-help"/></svg><span class="lbl">Help and method</span></a>
+    </nav>
+  </div>
+  <div class="side-foot"><span class="avatar" aria-hidden="true">SA</span><div class="who"><div style="font-weight:500">Susith Alwis</div><div class="t-faint" style="font-size:0.75rem">Researcher</div></div></div>
+</div>
+  <div class="main">
+    
+<header class="topbar">
+  <div class="mobilebar"><button class="btn btn-ghost btn-icon" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true" focusable="false"><use href="#i-menu"/></svg></button><span class="mark"><svg aria-hidden="true" focusable="false"><use href="#i-logo"/></svg></span></div>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Overview</a><svg aria-hidden="true" focusable="false"><use href="#i-chevron"/></svg><b aria-current="page">New audit</b></nav>
+  <div style="flex:1"></div>
+  
+  <button class="searchbtn" aria-haspopup="dialog" aria-label="Search"><svg aria-hidden="true" focusable="false"><use href="#i-search"/></svg><span>Search</span><span class="kbds" aria-hidden="true"><span class="kbd">⌘</span><span class="kbd">K</span></span></button>
+  <button class="btn btn-ghost btn-icon toggle-theme" aria-label="Dark theme" aria-pressed="false" onclick="toggleTheme()"><svg class="moon" aria-hidden="true" focusable="false"><use href="#i-moon"/></svg><svg class="sun" aria-hidden="true" focusable="false"><use href="#i-sun"/></svg></button>
+</header>
+    <main id="main" class="content" tabindex="-1">
+
+<div class="compose">
+  <div class="page-head"><div>
+    <h1 class="t-page">New audit</h1>
+    <p>We open the page in Chromium, capture it at the sizes you choose, and check 8 WCAG 2.2 criteria.</p>
+  </div></div>
+  <nav class="tabs" aria-label="Audit source">
+    <a href="#" aria-current="page">Web address</a>
+    <a href="#">Screenshots</a>
+  </nav>
+
+  <form class="panel form" action="#" onsubmit="return false">
+    <div class="group">
+      <div class="field">
+        <label for="url">Web address</label>
+        <input class="input" id="url" name="url" type="url" placeholder="https://example.com" autocomplete="url" aria-describedby="url-hint" inputmode="url">
+        <span class="hint" id="url-hint">The page must be publicly reachable.</span>
+      </div>
+    </div>
+
+    <div class="group" role="group" aria-labelledby="vp-l">
+      <div class="flabel" id="vp-l">Viewports</div>
+      <div class="cards">
+        <label class="card box"><input type="checkbox" name="viewport" value="desktop" checked><span class="mk" aria-hidden="true"><svg aria-hidden="true" focusable="false"><use href="#i-check"/></svg></span><span class="ct"><span class="cn"><svg aria-hidden="true" focusable="false"><use href="#i-desktop"/></svg>Desktop</span><span class="cd"><span class="num">1280 × 800 px</span></span></span></label>
+        <label class="card box"><input type="checkbox" name="viewport" value="mobile" checked><span class="mk" aria-hidden="true"><svg aria-hidden="true" focusable="false"><use href="#i-check"/></svg></span><span class="ct"><span class="cn"><svg aria-hidden="true" focusable="false"><use href="#i-mobile"/></svg>Mobile</span><span class="cd"><span class="num">390 × 844 px</span></span></span></label>
+      </div>
+    </div>
+
+    <div class="group" role="radiogroup" aria-labelledby="me-l">
+      <div class="flabel" id="me-l">Method</div>
+      <div class="cards">
+        <label class="card radio"><input type="radio" name="method" value="hybrid" checked><span class="mk" aria-hidden="true"></span><span class="ct"><span class="cn">Detector and rules</span><span class="cd">Rules plus the element detector; some findings need review</span></span></label>
+        <label class="card radio"><input type="radio" name="method" value="rules"><span class="mk" aria-hidden="true"></span><span class="ct"><span class="cn">Rules only</span><span class="cd">Browser rules only; fewer criteria can be decided</span></span></label>
+      </div>
+    </div>
+
+    <details class="adv" open>
+      <summary>Advanced<svg aria-hidden="true" focusable="false"><use href="#i-down"/></svg></summary>
+      <div class="adv-body">
+        <div class="row2">
+          <div class="field">
+            <label for="wait">Wait for</label>
+            <select class="input" id="wait" name="wait"><option>Page load</option><option>Network idle</option></select>
+          </div>
+          <div class="field">
+            <label for="focus">Focus steps</label>
+            <input class="input num num-in" id="focus" name="focus" type="number" min="1" max="60" value="15" aria-describedby="focus-hint">
+            <span class="hint" id="focus-hint">How many Tab presses to record</span>
+          </div>
+        </div>
+        <div class="chk">
+          <input type="checkbox" id="cookies" name="cookies" checked aria-describedby="cookies-hint">
+          <div><label for="cookies">Dismiss cookie banners</label><span class="hint" id="cookies-hint">A banner left open changes contrast results</span></div>
+        </div>
+        <div class="chk">
+          <input type="checkbox" id="compare" name="compare" checked aria-describedby="compare-hint">
+          <div><label for="compare">Compare with the previous audit of this address</label><span class="hint" id="compare-hint">Last audit 11 Oct, <span class="num">6</span> failures</span></div>
+        </div>
+      </div>
+    </details>
+
+    <div class="foot">
+      <span class="t-faint">Takes about 1 to 2 minutes.</span>
+      <div class="acts">
+        <button type="button" class="btn btn-lg">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-lg">Run audit<span class="kbd" aria-hidden="true">⌘↵</span></button>
+      </div>
+    </div>
+  </form>
+
+  <section aria-labelledby="recent-h">
+    <div class="recent-h"><h2 class="t-section" id="recent-h">Recent addresses</h2><a class="link" href="#">All audits</a></div>
+    <div class="panel"><ul class="recent-list"><li><span class="addr">marlowegreen.example<small>/about/our-story</small></span><span class="when t-faint num">11 Oct</span><span class="fails"><span class="sev"><span class="status s-critical zero"><svg aria-hidden="true" focusable="false"><use href="#sh-critical"/></svg><span class="num">0</span><span class="sr"> critical,</span></span><span class="status s-serious"><svg aria-hidden="true" focusable="false"><use href="#sh-serious"/></svg><span class="num">6</span><span class="sr"> serious,</span></span><span class="status s-minor"><svg aria-hidden="true" focusable="false"><use href="#sh-minor"/></svg><span class="num">2</span><span class="sr"> minor,</span></span></span></span><span class="act"><a class="quiet" href="#" aria-label="Run again for marlowegreen.example"><svg aria-hidden="true" focusable="false"><use href="#i-rerun"/></svg>Run again</a></span></li><li><span class="addr">kettleandcrumb.example<small>/recipes</small></span><span class="when t-faint num">11 Oct</span><span class="fails"><span class="sev"><span class="status s-critical"><svg aria-hidden="true" focusable="false"><use href="#sh-critical"/></svg><span class="num">1</span><span class="sr"> critical,</span></span><span class="status s-serious"><svg aria-hidden="true" focusable="false"><use href="#sh-serious"/></svg><span class="num">3</span><span class="sr"> serious,</span></span><span class="status s-minor"><svg aria-hidden="true" focusable="false"><use href="#sh-minor"/></svg><span class="num">4</span><span class="sr"> minor,</span></span></span></span><span class="act"><a class="quiet" href="#" aria-label="Run again for kettleandcrumb.example"><svg aria-hidden="true" focusable="false"><use href="#i-rerun"/></svg>Run again</a></span></li><li><span class="addr">fernlea-health.example<small>/appointments</small></span><span class="when t-faint num">9 Oct</span><span class="fails"><span class="sev"><span class="status s-critical zero"><svg aria-hidden="true" focusable="false"><use href="#sh-critical"/></svg><span class="num">0</span><span class="sr"> critical,</span></span><span class="status s-serious"><svg aria-hidden="true" focusable="false"><use href="#sh-serious"/></svg><span class="num">2</span><span class="sr"> serious,</span></span><span class="status s-minor"><svg aria-hidden="true" focusable="false"><use href="#sh-minor"/></svg><span class="num">1</span><span class="sr"> minor,</span></span></span></span><span class="act"><a class="quiet" href="#" aria-label="Run again for fernlea-health.example"><svg aria-hidden="true" focusable="false"><use href="#i-rerun"/></svg>Run again</a></span></li></ul></div>
+  </section>
+
+  <p class="scope">This tool checks 8 of the 86 WCAG 2.2 success criteria. Results are not a conformance claim.</p>
+</div>
+    </main>
+  </div>
+</div>
+<script>
+function toggleTheme(){const d=document.documentElement;const dark=d.dataset.theme!=="dark";d.dataset.theme=dark?"dark":"light";document.querySelectorAll(".toggle-theme").forEach(x=>x.setAttribute("aria-pressed",String(dark)));}
+if(location.hash==="#dark"){toggleTheme();}
+</script>
+</body>
+</html>

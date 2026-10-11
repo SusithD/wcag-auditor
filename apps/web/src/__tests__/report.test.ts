@@ -7,13 +7,20 @@ import {
   diffPixels,
   EMPTY_STATE,
   type Finding,
+  filterMessage,
   fitTransform,
   formatBytes,
+  measureText,
   parseState,
+  plainText,
+  plainValue,
   readingOrder,
+  rowLabel,
   scoreSegments,
+  selectionMessage,
   serialiseState,
   sevKey,
+  shortElement,
   swatches,
 } from "@/lib/report";
 
@@ -193,8 +200,11 @@ describe("evidence helpers", () => {
     expect([0, 0.12, 0.5, 0.9, 1].map(scoreSegments)).toEqual([0, 0, 2, 4, 4]);
   });
   it("labels boxes with criterion, severity, first measurement and element", () => {
+    expect(ariaLabel(finding({}), 2, 21)).toBe(
+      "1.4.3 Contrast (Minimum), Serious, measured contrast 2.05:1, 2 of 21",
+    );
     expect(ariaLabel(finding({}))).toBe(
-      "1.4.3 Contrast (Minimum), Serious, measured contrast 2.05:1, h2",
+      "1.4.3 Contrast (Minimum), Serious, measured contrast 2.05:1",
     );
   });
   it("formats sizes", () => {
@@ -210,5 +220,47 @@ describe("evidence helpers", () => {
     const d = diffPixels(a, b);
     expect(Array.from(d.slice(0, 3))).toEqual([245, 245, 245]);
     expect(Array.from(d.slice(4, 7))).toEqual([220, 38, 38]);
+  });
+});
+
+describe("order, names and messages", () => {
+  it("puts the larger box first when two boxes start at the same point", () => {
+    const small = finding({ key: "a", bbox: { x: 5, y: 5, w: 2, h: 2 } });
+    const large = finding({ key: "b", bbox: { x: 5, y: 5, w: 90, h: 40 } });
+    expect(readingOrder([small, large]).map((f) => f.key)).toEqual(["b", "a"]);
+  });
+
+  it("writes no measurable change instead of None:1", () => {
+    const f = finding({
+      sc: "2.4.7",
+      evidence_rows: [{ label: "Strongest state change", value: "None:1" }],
+    });
+    expect(measureText(f)).toBe("no measurable change");
+    expect(ariaLabel(f, 1, 3)).toBe(
+      "2.4.7 Focus Visible, Serious, no measurable change, 1 of 3",
+    );
+    expect(plainValue("None:1")).toBe("No measurable change");
+    expect(plainValue("1.18:1")).toBe("1.18:1");
+    expect(plainText("a contrast of None:1 was found")).toBe(
+      "a contrast of no measurable change was found",
+    );
+  });
+
+  it("keeps the selector out of the box name and shortens it for rows", () => {
+    const f = finding({ element: "#post-1 > .box > .item-article > a.title" });
+    expect(ariaLabel(f, 1, 2)).not.toContain("#post-1");
+    expect(shortElement(f.element)).toBe("a.title");
+    expect(shortElement(`div.${"x".repeat(80)}`, 10)).toHaveLength(10);
+    expect(rowLabel(f)).toBe(
+      "Select 1.4.3 Contrast (Minimum), Serious, a.title",
+    );
+  });
+
+  it("builds the announcements", () => {
+    expect(selectionMessage(finding({}), 2, 21)).toBe(
+      "Selected 1.4.3 Contrast (Minimum), Serious. Details shown. 3 of 21.",
+    );
+    expect(filterMessage(10)).toBe("Showing 10 findings");
+    expect(filterMessage(1)).toBe("Showing 1 finding");
   });
 });

@@ -79,6 +79,7 @@ def test_without_dom_style_the_pixel_path_marks_needs_review() -> None:
     el = el.model_copy(update={"style": {}})
     (f,) = sc_1_4_3.run(ctx(img, [el]))
     assert f.tier == "needs-review" and f.evidence["method"] == "pixel"
+    assert "size and weight unknown" in f.evidence["needs_review_reason"]
     assert f.evidence["large_text"] is None and f.evidence["threshold"] == 4.5
 
 

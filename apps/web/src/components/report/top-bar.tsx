@@ -45,17 +45,18 @@ export function TopBar({
 }: Props) {
   const [opened, setOpened] = useState(false);
   const exports = useExports(runId, viewport, opened);
+  const Heading = embedded ? "h2" : "h1";
 
   return (
     <div className="flex min-h-12 flex-wrap items-center gap-x-4 gap-y-1 border-b px-4 py-1.5">
       <div className="min-w-0 flex-1">
-        <h1
+        <Heading
           ref={headingRef}
           tabIndex={-1}
           className="text-row font-semibold outline-none"
         >
           Audit report
-        </h1>
+        </Heading>
         <p
           className="truncate font-mono text-label text-muted-foreground"
           title={subject}
@@ -67,7 +68,7 @@ export function TopBar({
         <RunNav runId={runId} current="report" query={`?vp=${viewport}`} />
       )}
       <Badge variant="outline">
-        {condition === "hybrid" ? "Hybrid" : "Rule-only"}
+        Condition: {condition === "hybrid" ? "Hybrid" : "Rule-only"}
       </Badge>
       {viewports.length > 1 ? (
         <ToggleGroup
@@ -78,7 +79,11 @@ export function TopBar({
           aria-label="Viewport"
         >
           {viewports.map((vp) => (
-            <ToggleGroupItem key={vp} value={vp}>
+            <ToggleGroupItem
+              key={vp}
+              value={vp}
+              className="min-h-[24px] min-w-[24px]"
+            >
               {vp === "desktop" ? "Desktop" : "Mobile"}
             </ToggleGroupItem>
           ))}
@@ -89,14 +94,26 @@ export function TopBar({
         size="sm"
         value={[view]}
         onValueChange={(v) => v[0] && onView(v[0] as ReportView)}
-        aria-label="Findings view"
+        aria-label="View mode"
       >
-        <ToggleGroupItem value="canvas">Canvas</ToggleGroupItem>
-        <ToggleGroupItem value="table">Table</ToggleGroupItem>
+        <ToggleGroupItem value="canvas" className="min-h-[24px] min-w-[24px]">
+          Canvas
+        </ToggleGroupItem>
+        <ToggleGroupItem value="table" className="min-h-[24px] min-w-[24px]">
+          Table
+        </ToggleGroupItem>
       </ToggleGroup>
       {embedded ? null : (
         <DropdownMenu onOpenChange={(o) => o && setOpened(true)}>
-          <DropdownMenuTrigger render={<Button variant="outline" size="sm" />}>
+          <DropdownMenuTrigger
+            render={
+              <Button
+                variant="outline"
+                size="sm"
+                className="min-h-[24px] min-w-[24px]"
+              />
+            }
+          >
             <Download aria-hidden="true" />
             Export
           </DropdownMenuTrigger>

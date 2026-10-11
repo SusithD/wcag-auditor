@@ -180,6 +180,13 @@ export function EvalScreen() {
   );
 }
 
+const COUNT_TERMS: Record<string, string> = {
+  TP: "True positives: findings that match the ground truth",
+  FP: "False positives: findings with no match in the ground truth",
+  FN: "False negatives: ground-truth findings that were missed",
+  Dup: "Duplicates: extra reports of a finding already matched",
+};
+
 function Results({
   evalId,
   view,
@@ -278,75 +285,85 @@ function Results({
             {STRATUM_LABEL[stratum].toLowerCase()} stratum
           </h2>
           {asTable ? (
-            <div
-              role="region"
-              aria-label="Per-criterion results"
-              tabIndex={0}
-              className="mt-2 overflow-x-auto"
-            >
-              <table className="w-full border-collapse text-row">
-                <caption className="sr-only">
-                  Per-criterion results for {CONDITION_LABEL[condition]} on the{" "}
-                  {stratum} stratum
-                </caption>
-                <thead>
-                  <tr>
-                    {[
-                      "Criterion",
-                      "TP",
-                      "FP",
-                      "FN",
-                      "Dup",
-                      "Precision",
-                      "Recall",
-                      "F1",
-                    ].map((h) => (
-                      <th
-                        key={h}
-                        scope="col"
-                        className="border-b px-3 py-2 text-left font-medium"
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {cells.map((c) => (
-                    <tr key={c.sc}>
-                      <th
-                        scope="row"
-                        className="border-b px-3 py-2 text-left font-normal"
-                      >
-                        <span className="font-mono text-label">{c.sc}</span>{" "}
-                        {SC_TITLES[c.sc]}
-                      </th>
-                      <td className="border-b px-3 py-2 font-mono text-label">
-                        {c.tp}
-                      </td>
-                      <td className="border-b px-3 py-2 font-mono text-label">
-                        {c.fp}
-                      </td>
-                      <td className="border-b px-3 py-2 font-mono text-label">
-                        {c.fn}
-                      </td>
-                      <td className="border-b px-3 py-2 font-mono text-label">
-                        {c.duplicates}
-                      </td>
-                      <td className="border-b px-3 py-2 font-mono text-label">
-                        {fmt(c.precision)} {fmtCi(c.precision_ci)}
-                      </td>
-                      <td className="border-b px-3 py-2 font-mono text-label">
-                        {fmt(c.recall)} {fmtCi(c.recall_ci)}
-                      </td>
-                      <td className="border-b px-3 py-2 font-mono text-label">
-                        {fmt(c.f1)} {fmtCi(c.f1_ci)}
-                      </td>
+            <>
+              <div
+                role="region"
+                aria-label="Per-criterion results"
+                tabIndex={0}
+                className="mt-2 overflow-x-auto"
+              >
+                <table className="w-full border-collapse text-row">
+                  <caption className="sr-only">
+                    Per-criterion results for {CONDITION_LABEL[condition]} on
+                    the {stratum} stratum
+                  </caption>
+                  <thead>
+                    <tr>
+                      {[
+                        "Criterion",
+                        "TP",
+                        "FP",
+                        "FN",
+                        "Dup",
+                        "Precision",
+                        "Recall",
+                        "F1",
+                      ].map((h) => (
+                        <th
+                          key={h}
+                          scope="col"
+                          className="border-b px-3 py-2 text-left font-medium"
+                        >
+                          {COUNT_TERMS[h] ? (
+                            <abbr title={COUNT_TERMS[h]}>{h}</abbr>
+                          ) : (
+                            h
+                          )}
+                        </th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {cells.map((c) => (
+                      <tr key={c.sc}>
+                        <th
+                          scope="row"
+                          className="border-b px-3 py-2 text-left font-normal"
+                        >
+                          <span className="font-mono text-label">{c.sc}</span>{" "}
+                          {SC_TITLES[c.sc]}
+                        </th>
+                        <td className="border-b px-3 py-2 font-mono text-label">
+                          {c.tp}
+                        </td>
+                        <td className="border-b px-3 py-2 font-mono text-label">
+                          {c.fp}
+                        </td>
+                        <td className="border-b px-3 py-2 font-mono text-label">
+                          {c.fn}
+                        </td>
+                        <td className="border-b px-3 py-2 font-mono text-label">
+                          {c.duplicates}
+                        </td>
+                        <td className="border-b px-3 py-2 font-mono text-label">
+                          {fmt(c.precision)} {fmtCi(c.precision_ci)}
+                        </td>
+                        <td className="border-b px-3 py-2 font-mono text-label">
+                          {fmt(c.recall)} {fmtCi(c.recall_ci)}
+                        </td>
+                        <td className="border-b px-3 py-2 font-mono text-label">
+                          {fmt(c.f1)} {fmtCi(c.f1_ci)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-2 text-caption text-muted-foreground">
+                TP true positives, FP false positives, FN missed findings, Dup
+                duplicate reports of one finding.
+              </p>
+            </>
           ) : (
             <div className="mt-2">
               <EvalChart

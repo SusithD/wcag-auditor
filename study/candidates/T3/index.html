@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kettle &amp; Crumb - Home recipes</title>
+<style>
+:root{--brand:#8a2b1d;--soft:#fbf3ee}
+*,*::before,*::after{box-sizing:border-box}
+:root{--ink:#1f2933;--muted:#4b5563;--bg:#ffffff;--line:#c9d1d9;--field:#5f6b76;--focus:#0b57d0}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:var(--ink);background:var(--bg)}
+img,svg{max-width:100%;height:auto;display:block}
+h1,h2,h3{line-height:1.25;margin:0 0 .6em;color:var(--ink)}
+h1{font-size:2.3rem}h2{font-size:1.65rem}h3{font-size:1.2rem}
+p{margin:0 0 1em}
+a{color:var(--brand);text-decoration:underline;text-underline-offset:2px}
+:focus-visible,input[type=date]:focus-within{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.skip{position:absolute;left:8px;top:-60px;background:#fff;color:var(--brand);padding:10px 16px;border:2px solid var(--brand);z-index:50;border-radius:4px}
+.skip:focus{top:8px}
+header.site{background:#fff;border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.15rem;color:var(--brand);text-decoration:none;min-height:44px}
+.brand svg{width:34px;height:34px}
+nav ul{list-style:none;margin:0;padding:0;display:flex;gap:4px;flex-wrap:wrap}
+nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;color:var(--ink);text-decoration:none;font-weight:600;border-radius:4px}
+nav a:hover{background:var(--soft)}
+.hero{background:var(--brand);color:#fff}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding-top:56px;padding-bottom:56px}
+.hero h1,.hero p{color:#fff}
+.hero p{font-size:1.1rem;max-width:34em}
+.hero a.btn{background:#fff;color:var(--brand)}
+.hero :focus-visible{outline-color:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 22px;border-radius:6px;border:2px solid var(--brand);background:var(--brand);color:#fff;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
+.btn.alt{background:#fff;color:var(--brand)}
+section{padding:48px 0}
+section.soft{background:var(--soft)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:24px}
+.card h3{margin-top:12px}
+.card svg{border-radius:8px}
+.muted{color:var(--muted)}
+.lede{font-size:1.15rem}
+ul.plain{margin:0 0 1em;padding-left:1.2em}
+ul.plain li{margin-bottom:.4em}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{background:var(--soft)}
+label,.label{display:block;font-weight:600;margin-bottom:6px}
+input[type=text],input[type=email],input[type=tel],input[type=date],input[type=number],select,textarea{width:100%;min-height:44px;padding:10px 12px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--field);border-radius:6px}
+textarea{min-height:120px}
+.field{margin-bottom:18px}
+.hint{display:block;font-size:.9rem;color:var(--muted);margin-top:4px}
+.check{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.check input{width:24px;height:24px;margin:2px 0 0;flex:none;accent-color:var(--brand)}
+.check label{margin:0;font-weight:400}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+details{border:1px solid var(--line);border-radius:8px;margin-bottom:10px;background:#fff}
+summary{cursor:pointer;padding:12px 16px;font-weight:600;min-height:44px}
+details p{padding:0 16px}
+footer.site{background:#1b2430;color:#fff;padding:40px 0 24px}
+footer.site a{color:#fff;display:inline-block;padding:6px 0;min-height:32px}
+footer.site h2{color:#fff;font-size:1.1rem}
+footer.site ul{list-style:none;margin:0;padding:0}
+footer.site :focus-visible{outline-color:#fff}
+footer.site .fine{margin-top:24px;border-top:1px solid #4b5563;padding-top:16px;font-size:.9rem;color:#e5e7eb}
+@media (max-width:760px){
+ h1{font-size:1.8rem}h2{font-size:1.4rem}
+ .wrap{padding:0 16px}
+ .hero .wrap,.grid3,.grid2,.row{grid-template-columns:1fr}
+ .hero .wrap{padding-top:32px;padding-bottom:32px}
+ section{padding:32px 0}
+ th,td{padding:8px 6px;font-size:.95rem}
+}
+
+header.site{position:fixed;top:0;left:0;right:0;height:72px;z-index:20}
+header.site .bar{min-height:72px;flex-wrap:nowrap}
+main{padding-top:72px}
+.hero .wrap{padding-top:48px;padding-bottom:48px}
+@media (max-width:760px){
+ header.site nav li:not(.keep){display:none}
+ .brand span{font-size:1rem}
+}
+
+.disclaimer{margin:0;font-size:.9rem}
+</style>
+</head>
+<body id="top">
+
+<header class="site"><a class="skip" href="#main">Skip to main content</a><div class="wrap bar">
+<a class="brand" href="#top"><svg viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="16" fill="#8a2b1d"/><path d="M9 22l8-12 8 12z" fill="#fff"/></svg><span>Kettle &amp; Crumb</span></a>
+<nav aria-label="Main"><ul>
+<li><a href="#recipes">Recipes</a></li><li><a href="#seasonal">Seasonal</a></li><li><a href="#tips">Kitchen tips</a></li><li class="keep"><a href="#share">Share a recipe</a></li>
+</ul></nav></div></header>
+<main id="main">
+<div class="hero"><div class="wrap"><div>
+<h1>Home cooking worth repeating</h1>
+<p>Kettle &amp; Crumb is a small collection of tried and tested recipes from home cooks. Every dish is tested at least three times and written for ordinary kitchens.</p>
+<p><a class="btn" href="#recipes">Browse the recipes</a></p></div>
+<svg viewBox="0 0 480 280" role="img" aria-label="Illustration of a bowl of tomato and bean stew"><rect width="480" height="280" fill="#f3d9c4"/><ellipse cx="240" cy="160" rx="150" ry="80" fill="#fff"/><ellipse cx="240" cy="154" rx="118" ry="58" fill="#c9772b"/><circle cx="200" cy="146" r="14" fill="#a12b2b"/><circle cx="256" cy="160" r="12" fill="#2e7d32"/><circle cx="290" cy="140" r="10" fill="#f4c542"/></svg></div></div>
+
+<section id="share" class="soft"><div class="wrap"><div class="grid2"><div>
+<h2>Share your recipe</h2>
+<p>Have a dish your family asks for again and again? Send it to us. Our test kitchen volunteers will cook it, tidy the method and publish it with your name if you would like.</p>
+<ul class="plain"><li>We reply within two weeks</li><li>Your email is never shown on the site</li><li>You keep full credit for your recipe</li></ul></div>
+<form class="card" action="#" onsubmit="return false">
+<div class="field"><label for="rname">Recipe name</label><input id="rname" type="text"></div>
+<div class="field"><label for="yname">Your name</label><input id="yname" type="text" autocomplete="name"></div>
+<div class="field"><label for="yemail">Email address</label><input id="yemail" type="email" autocomplete="email"></div>
+<div class="field"><label for="time">Total cooking time in minutes</label><input id="time" type="number" min="1" inputmode="numeric"></div>
+<div class="field"><label for="serves">Serves</label><select id="serves"><option>2</option><option>4</option><option>6</option><option>8 or more</option></select></div>
+<div class="field"><label for="ingredients">Ingredients</label><textarea id="ingredients"></textarea><span class="hint">One ingredient per line.</span></div>
+<div class="field"><label for="method">Method</label><textarea id="method"></textarea></div>
+<div class="check"><input id="credit" type="checkbox"><label for="credit">Publish my name with the recipe</label></div>
+<button class="btn" type="submit">Send my recipe</button></form></div></div></section>
+
+<section id="recipes"><div class="wrap">
+<h2>Popular this week</h2>
+<p class="lede">These three were saved and cooked more than any others over the past seven days.</p>
+<div class="grid3">
+<article class="card"><svg viewBox="0 0 480 280" role="img" aria-label="Illustration of a bowl of tomato and bean stew"><rect width="480" height="280" fill="#f3d9c4"/><ellipse cx="240" cy="160" rx="150" ry="80" fill="#fff"/><ellipse cx="240" cy="154" rx="118" ry="58" fill="#c9772b"/><circle cx="200" cy="146" r="14" fill="#a12b2b"/><circle cx="256" cy="160" r="12" fill="#2e7d32"/><circle cx="290" cy="140" r="10" fill="#f4c542"/></svg><h3>Smoky tomato and bean stew</h3><p>A one-pot supper that keeps well and tastes better the next day. Serve with crusty bread.</p><p class="muted">40 minutes, serves 4</p><p><a href="#share">Read the recipe</a></p></article>
+<article class="card"><svg viewBox="0 0 480 280" role="img" aria-label="Illustration of a bowl of herb and lemon rice"><rect width="480" height="280" fill="#e0ecd5"/><ellipse cx="240" cy="160" rx="150" ry="80" fill="#fff"/><ellipse cx="240" cy="154" rx="118" ry="58" fill="#7aa35a"/><circle cx="200" cy="146" r="14" fill="#a12b2b"/><circle cx="256" cy="160" r="12" fill="#2e7d32"/><circle cx="290" cy="140" r="10" fill="#f4c542"/></svg><h3>Lemon and herb rice</h3><p>Fluffy rice with parsley, lemon zest and toasted almonds. A quick side for almost anything.</p><p class="muted">25 minutes, serves 4</p><p><a href="#share">Read the recipe</a></p></article>
+<article class="card"><svg viewBox="0 0 480 280" role="img" aria-label="Illustration of a plate of oat and apple cookies"><rect width="480" height="280" fill="#f6e7c8"/><ellipse cx="240" cy="160" rx="150" ry="80" fill="#fff"/><ellipse cx="240" cy="154" rx="118" ry="58" fill="#b8742a"/><circle cx="200" cy="146" r="14" fill="#a12b2b"/><circle cx="256" cy="160" r="12" fill="#2e7d32"/><circle cx="290" cy="140" r="10" fill="#f4c542"/></svg><h3>Oat and apple cookies</h3><p>Soft, chewy and lightly spiced. A good way to use up the last of the autumn apples.</p><p class="muted">35 minutes, makes 18</p><p><a href="#share">Read the recipe</a></p></article>
+</div></div></section>
+
+<section id="seasonal" class="soft"><div class="wrap">
+<h2>Cooking with the season</h2>
+<div class="grid2"><div>
+<p>Autumn is the season of squash, apples, mushrooms and the first proper soups. We have gathered some of our favourite ways to make the most of what is cheap, local and at its best right now.</p>
+<ul class="plain"><li>Roast squash with sage and brown butter</li><li>Baked apples with cinnamon oats</li><li>Garlic mushroom toast</li><li>Leek and potato soup</li></ul>
+<p><a href="#tips">Jump to our storage tips</a></p></div>
+<table><caption class="muted" style="text-align:left;padding:0 0 8px">What is at its best this month</caption>
+<thead><tr><th scope="col">Ingredient</th><th scope="col">Best for</th><th scope="col">Keeps</th></tr></thead><tbody>
+<tr><td>Butternut squash</td><td>Roasting, soup</td><td>2 months</td></tr>
+<tr><td>Cooking apples</td><td>Baking, sauce</td><td>3 weeks</td></tr>
+<tr><td>Mushrooms</td><td>Frying, risotto</td><td>5 days</td></tr>
+<tr><td>Leeks</td><td>Soup, pies</td><td>2 weeks</td></tr></tbody></table></div>
+</div></section>
+
+<section id="tips"><div class="wrap">
+<h2>Kitchen tips</h2>
+<div class="grid3">
+<div class="card"><h3>Season in layers</h3><p>Add a little salt early and the rest at the end. Tasting as you go gives you far more control than a single big pinch.</p></div>
+<div class="card"><h3>Rest your dough</h3><p>Cookie dough chilled for thirty minutes spreads less and tastes deeper. Even a short rest makes a visible difference.</p></div>
+<div class="card"><h3>Freeze in portions</h3><p>Stews and soups freeze well. Cool them fully, then store in single servings so lunch is always a quick defrost away.</p></div>
+</div>
+<p style="margin-top:24px"><strong>Can I swap butter for oil?</strong> In most baking you can use a mild oil at about three quarters of the butter weight. Flavour will be lighter.</p>
+<p><strong>How do I scale a recipe up?</strong> Multiply the ingredients, but increase seasoning and cooking time more gently and taste before adding more.</p>
+</div></section>
+
+</main>
+<footer class="site"><div class="wrap"><div class="grid3"><div><h2>Cook</h2><ul><li><a href="#top">All recipes</a></li><li><a href="#top">Seasonal</a></li><li><a href="#top">Kitchen tips</a></li></ul></div><div><h2>Community</h2><ul><li><a href="#top">Share a recipe</a></li><li><a href="#top">Test kitchen</a></li><li><a href="#top">Newsletter</a></li></ul></div><div><h2>About</h2><ul><li><a href="#top">Contact</a></li><li><a href="#top">Credits</a></li><li><a href="#top">Privacy notice</a></li></ul></div></div><p class="fine">Kettle &amp; Crumb is a fictional recipe site created for a research study. Not a real publication.</p></div><div class="wrap"><p class="disclaimer">Fictional example page for a research study. All names, events and services are invented.</p></div></footer>
+
+<script>document.getElementById('time').addEventListener('focus',function(e){e.currentTarget.scrollIntoView({block:'start'});});</script>
+</body>
+</html>

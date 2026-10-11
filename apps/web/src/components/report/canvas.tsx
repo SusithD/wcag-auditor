@@ -5,6 +5,7 @@ import {
   type KeyboardEvent,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -43,6 +44,7 @@ import {
   sevKey,
 } from "@/lib/report";
 import { FocusPairView, type PairMode } from "./focus-pair";
+import { focusWhenReady } from "./focus-when-ready";
 
 type Props = {
   runId: string;
@@ -57,6 +59,7 @@ type Props = {
   focusStops: number;
   label?: string;
   sync?: { bus: SyncBus; id: string };
+  onAnnounce?: (message: string) => void;
 };
 
 export function Canvas({
@@ -72,7 +75,9 @@ export function Canvas({
   focusStops,
   label,
   sync,
+  onAnnounce,
 }: Props) {
+  const uid = useId();
   const wrapper = useRef<ReactZoomPanPinchRef>(null);
   const frame = useRef<HTMLDivElement>(null);
   const svg = useRef<SVGSVGElement>(null);
@@ -81,6 +86,8 @@ export function Canvas({
   const [minimap, setMinimap] = useState(false);
   const [view, setView] = useState({ scale: 1, x: 0, y: 0 });
   const [focusedKey, setFocusedKey] = useState<string | null>(null);
+  const [rovingKey, setRovingKey] = useState<string | null>(null);
+  const pendingFocus = useRef<"pair" | "box" | null>(null);
   const [loaded, setLoaded] = useState(false);
   const raf = useRef(0);
   const autoFit = useRef(true);
@@ -91,15 +98,13 @@ export function Canvas({
     () => readingOrder(findings.filter((f) => f.bbox)),
     [findings],
   );
-  const painted = useMemo(
-    () => [...boxes].sort((a, b) => area(b) - area(a)),
-    [boxes],
-  );
   const selected = findings.find((f) => f.key === selectedKey) ?? null;
   const tabKey =
-    selectedKey && boxes.some((b) => b.key === selectedKey)
-      ? selectedKey
-      : boxes[0]?.key;
+    rovingKey && boxes.some((b) => b.key === rovingKey)
+      ? rovingKey
+      : selectedKey && boxes.some((b) => b.key === selectedKey)
+        ? selectedKey
+        : boxes[0]?.key;
   const animation = prefersReducedMotion() ? 0 : 240;
 
   const containerSize = useCallback(() => {
@@ -151,6 +156,22 @@ export function Canvas({
   }, [selectedKeyNow, pairMode, loaded, containerSize, animation]);
 
   useEffect(() => () => cancelAnimationFrame(raf.current), []);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: run once per pair-mode change, using the flag set by the F key
+  useEffect(() => {
+    const target = pendingFocus.current;
+    pendingFocus.current = null;
+    if (!target) return;
+    return focusWhenReady(() => {
+      if (target === "pair")
+        return pairMode === "page"
+          ? null
+          : frame.current?.querySelector<HTMLElement>("[data-pair-region]");
+      if (pairMode !== "page") return null;
+      const box = selectedKey ? boxRefs.current.get(selectedKey) : null;
+      return box ?? frame.current;
+    });
+  }, [pairMode]);
   // biome-ignore lint/correctness/useExhaustiveDependencies: a new focus target re-shows its label
   useEffect(() => setDismissedKey(null), [focusedKey]);
 
@@ -254,8 +275,15 @@ export function Canvas({
 
   function onFrameKey(event: KeyboardEvent<HTMLDivElement>) {
     const w = wrapper.current;
-    if (!w || (event.target as HTMLElement).closest("button, [role=radio]"))
+    if (!w || pairMode !== "page") {
+      if ((event.key === "f" || event.key === "F") && canPair) {
+        pendingFocus.current = pairMode === "page" ? "pair" : "box";
+        onPairMode(pairMode === "page" ? "focused" : "page");
+        event.preventDefault();
+      }
       return;
+    }
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
     const step = 80;
     if (["+", "=", "-", "_"].includes(event.key) || event.shiftKey)
       autoFit.current = false;
@@ -267,15 +295,17 @@ export function Canvas({
     else if (event.shiftKey && event.key === "ArrowUp") w.panBy(0, step);
     else if (event.shiftKey && event.key === "ArrowDown") w.panBy(0, -step);
     else if (event.key === "f" || event.key === "F") {
-      if (selected?.focus_index != null)
-        onPairMode(pairMode === "page" ? "focused" : "page");
+      if (!canPair) return;
+      pendingFocus.current = "pair";
+      onPairMode("focused");
     } else return;
     event.preventDefault();
   }
 
-  async function copy(text: string) {
+  async function copy(text: string, message: string) {
     try {
       await navigator.clipboard.writeText(text);
+      onAnnounce?.(message);
     } catch {
       return;
     }
@@ -285,7 +315,19 @@ export function Canvas({
   const canPair = selected?.focus_index != null && focusStops > 0;
 
   return (
-    <ContextMenu>
+    <ContextMenu
+      onOpenChange={(open) => {
+        if (open) return;
+        setTimeout(
+          () =>
+            focusWhenReady(() => {
+              const box = selectedKey ? boxRefs.current.get(selectedKey) : null;
+              return box ?? frame.current;
+            }),
+          0,
+        );
+      }}
+    >
       <ContextMenuTrigger
         render={
           <div
@@ -293,7 +335,10 @@ export function Canvas({
             onKeyDown={onFrameKey}
             onWheel={onWheel}
             data-testid="canvas"
-            className="relative h-full min-h-96 overflow-hidden bg-muted"
+            role="group"
+            aria-label={`${label ? `${label} ` : ""}screenshot canvas`}
+            tabIndex={boxes.length === 0 ? 0 : -1}
+            className="relative h-full min-h-96 overflow-hidden bg-muted outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-focus"
           />
         }
       >
@@ -349,7 +394,7 @@ export function Canvas({
                   role="group"
                   aria-label={`${label ? `${label}: ` : ""}${boxes.length} findings on the page`}
                 >
-                  {painted.map((f) => {
+                  {boxes.map((f, position) => {
                     const b = f.bbox;
                     if (!b) return null;
                     const key = sevKey(f);
@@ -364,9 +409,11 @@ export function Canvas({
                         }}
                         role="button"
                         tabIndex={f.key === tabKey ? 0 : -1}
-                        aria-label={ariaLabel(f)}
+                        aria-label={ariaLabel(f, position + 1, boxes.length)}
+                        aria-describedby={`${uid}-${f.key}`}
                         aria-pressed={isSel}
                         data-key={f.key}
+                        data-sev={key}
                         data-selected={isSel}
                         className="group cursor-pointer outline-none"
                         onClick={() => onSelect(f.key)}
@@ -374,12 +421,14 @@ export function Canvas({
                         onKeyDown={(e) => onBoxKey(e, f)}
                         onFocus={() => {
                           setFocusedKey(f.key);
+                          setRovingKey(f.key);
                           ensureVisible(f);
                         }}
                         onBlur={() =>
                           setFocusedKey((k) => (k === f.key ? null : k))
                         }
                       >
+                        <desc id={`${uid}-${f.key}`}>{f.element}</desc>
                         {focusedKey === f.key ? (
                           <>
                             <rect
@@ -425,6 +474,7 @@ export function Canvas({
                           stroke={`var(--sev-${key === "needs-review" ? "review" : key})`}
                           strokeWidth={key === "needs-review" ? 1.5 : 2}
                           strokeDasharray={SEV_DASH[key]}
+                          data-stroke="true"
                           opacity={dim ? 0.4 : 1}
                           vectorEffect="non-scaling-stroke"
                         />
@@ -491,6 +541,7 @@ export function Canvas({
                 <Button
                   variant="ghost"
                   size="icon"
+                  className="min-h-[24px] min-w-[24px]"
                   aria-label="Zoom out"
                   onClick={() => wrapper.current?.zoomOut(0.4, animation)}
                 >
@@ -501,6 +552,7 @@ export function Canvas({
                 <Button
                   variant="ghost"
                   size="icon"
+                  className="min-h-[24px] min-w-[24px]"
                   aria-label="Zoom in"
                   onClick={() => wrapper.current?.zoomIn(0.4, animation)}
                 >
@@ -511,6 +563,7 @@ export function Canvas({
                 <Button
                   variant="ghost"
                   size="icon"
+                  className="min-h-[24px] min-w-[24px]"
                   aria-label="Fit to width"
                   onClick={() => fit(animation)}
                 >
@@ -520,6 +573,7 @@ export function Canvas({
               <Button
                 variant="ghost"
                 size="sm"
+                className="min-h-[24px] min-w-[24px]"
                 aria-label="100% zoom"
                 onClick={zoomToActual}
               >
@@ -528,6 +582,7 @@ export function Canvas({
               <Button
                 variant={labels ? "secondary" : "ghost"}
                 size="sm"
+                className="min-h-[24px] min-w-[24px]"
                 aria-pressed={labels}
                 onClick={() => setLabels((v) => !v)}
               >
@@ -536,6 +591,7 @@ export function Canvas({
               <Button
                 variant={minimap ? "secondary" : "ghost"}
                 size="sm"
+                className="min-h-[24px] min-w-[24px]"
                 aria-pressed={minimap}
                 onClick={() => setMinimap((v) => !v)}
               >
@@ -551,26 +607,42 @@ export function Canvas({
             onValueChange={(v) => v[0] && onPairMode(v[0] as PairMode)}
             aria-label={`${label ? `${label} ` : ""}focus pair view`}
           >
-            <ToggleGroupItem value="page" aria-label="Page view">
+            <ToggleGroupItem
+              value="page"
+              aria-label="Page view"
+              className="min-h-[24px] min-w-[24px]"
+            >
               Page
             </ToggleGroupItem>
-            <ToggleGroupItem value="focused" disabled={!canPair}>
+            <ToggleGroupItem
+              value="focused"
+              disabled={!canPair}
+              className="min-h-[24px] min-w-[24px]"
+            >
               Focused
             </ToggleGroupItem>
-            <ToggleGroupItem value="unfocused" disabled={!canPair}>
+            <ToggleGroupItem
+              value="unfocused"
+              disabled={!canPair}
+              className="min-h-[24px] min-w-[24px]"
+            >
               Unfocused
             </ToggleGroupItem>
-            <ToggleGroupItem value="diff" disabled={!canPair}>
+            <ToggleGroupItem
+              value="diff"
+              disabled={!canPair}
+              className="min-h-[24px] min-w-[24px]"
+            >
               Diff
             </ToggleGroupItem>
           </ToggleGroup>
           <Kbd aria-hidden="true">F</Kbd>
         </div>
       </ContextMenuTrigger>
-      <ContextMenuContent>
+      <ContextMenuContent finalFocus={false}>
         <ContextMenuItem
           disabled={!selected}
-          onClick={() => selected && copy(selected.element)}
+          onClick={() => selected && copy(selected.element, "Selector copied")}
         >
           Copy selector
         </ContextMenuItem>
@@ -582,6 +654,7 @@ export function Canvas({
               selected.evidence_rows
                 .map((r) => `${r.label}: ${r.value}`)
                 .join("\n"),
+              "Evidence copied",
             )
           }
         >
@@ -590,10 +663,6 @@ export function Canvas({
       </ContextMenuContent>
     </ContextMenu>
   );
-}
-
-function area(f: Finding) {
-  return (f.bbox?.w ?? 0) * (f.bbox?.h ?? 0);
 }
 
 function Tip({

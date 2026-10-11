@@ -116,7 +116,12 @@ test("coverage shows eight criteria, the reliable count per channel and the cata
 }) => {
   const id = await ensureRun(request);
   await page.goto(`/runs/${id}/coverage`);
-  const grid = page.getByRole("region", { name: "Coverage grid" });
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Coverage" }),
+  ).toBeFocused();
+  const grid = page.getByRole("region", {
+    name: /Which channel returned a verdict/,
+  });
   await expect(grid.getByRole("row")).toHaveCount(1 + 8 + 1);
   await expect(grid.getByText("SCs with a reliable verdict")).toBeVisible();
   await expect(
@@ -125,6 +130,49 @@ test("coverage shows eight criteria, the reliable count per channel and the cata
   await expect(page.getByText("Decision procedure").first()).toBeHidden();
   await page.getByText("1.4.3 Contrast (Minimum)").last().click();
   await expect(page.getByText("Decision procedure").first()).toBeVisible();
+
+  const main = page.locator("main");
+  await expect(main).not.toContainText("**");
+  await expect(main).not.toContainText("RQ3");
+  await expect(main).not.toContainText("(+DOM)");
+  await expect(main).not.toContainText("needs-review");
+  await expect(main.locator("p strong").first()).toHaveText(/\d of 8/);
+  await expect(grid.getByRole("cell").first()).toContainText(
+    /verdict, \d+ findings/,
+  );
+  await expect(grid.locator("caption")).toHaveCount(0);
+});
+
+test("focus moves to the page heading after in-page navigation", async ({
+  page,
+  request,
+}) => {
+  const id = await ensureRun(request);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(`/runs/${id}/coverage`);
+  await page
+    .getByRole("navigation", { name: "Run views" })
+    .getByRole("link", { name: "Compare" })
+    .click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: /Compare hybrid/ }),
+  ).toBeFocused();
+  await expect(
+    page.getByRole("group", { name: "Hybrid report" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("group", { name: "Rule-only report" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /Item 1 of \d+/ }),
+  ).toBeVisible();
+  await page
+    .getByRole("navigation", { name: "Run views" })
+    .getByRole("link", { name: "Coverage" })
+    .click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Coverage" }),
+  ).toBeFocused();
 });
 
 test("compare keeps the two canvases and selection in step", async ({

@@ -68,6 +68,7 @@ export function FocusPairView({
   return (
     <div
       tabIndex={0}
+      data-pair-region="true"
       role="region"
       aria-label={`Focus pair view for ${label}`}
       className="flex h-full w-full items-start justify-center overflow-auto p-3 pb-16"

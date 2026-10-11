@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { age, middleTruncate } from "@/lib/url";
+import { age } from "@/lib/url";
 
 const STATUS_LABEL: Record<string, string> = {
   queued: "Queued",
@@ -29,6 +29,12 @@ function label(run: RunSummary) {
   if (run.source_kind === "url") return run.source.replace(/^https?:\/\//, "");
   if (run.source_kind === "folder") return run.source.split("/").slice(-1)[0];
   return "Uploaded screenshots";
+}
+
+function runName(run: RunSummary) {
+  const condition = run.condition === "hybrid" ? "hybrid" : "rule-only";
+  const status = (STATUS_LABEL[run.status] ?? run.status).toLowerCase();
+  return `${label(run)}, ${condition}, ${status}, ${age(run.created_at)}`;
 }
 
 export function RecentRuns() {
@@ -67,14 +73,14 @@ export function RecentRuns() {
           No audits yet. Run your first one above.
         </p>
       ) : (
-        <Table className="mt-2">
+        <Table className="mt-2" regionLabel="Recent runs, scrollable table">
           <TableCaption className="sr-only">
             The ten most recent audits
           </TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>Page</TableHead>
-              <TableHead>Viewports</TableHead>
+              <TableHead className="hidden md:table-cell">Viewports</TableHead>
               <TableHead>Condition</TableHead>
               <TableHead>Findings</TableHead>
               <TableHead>Age</TableHead>
@@ -84,16 +90,19 @@ export function RecentRuns() {
           <TableBody>
             {data.map((run) => (
               <TableRow key={run.id} className="h-9">
-                <TableCell className="max-w-56">
+                <TableCell>
                   <Link
                     href={`/runs/${run.id}`}
-                    className="inline-flex min-h-6 items-center underline underline-offset-4"
+                    className="inline-block min-h-8 max-w-40 truncate align-middle leading-8 underline underline-offset-4 md:max-w-56"
                     title={label(run)}
+                    aria-label={runName(run)}
                   >
-                    {middleTruncate(label(run))}
+                    {label(run)}
                   </Link>
                 </TableCell>
-                <TableCell>{run.viewports.join(", ")}</TableCell>
+                <TableCell className="hidden md:table-cell">
+                  {run.viewports.join(", ")}
+                </TableCell>
                 <TableCell>
                   <Badge variant="outline">
                     {run.condition === "hybrid" ? "Hybrid" : "Rule-only"}

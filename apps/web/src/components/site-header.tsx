@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const LINK =
-  "inline-flex min-h-7 items-center rounded-md px-2.5 text-body hover:bg-muted";
+  "inline-flex min-h-8 items-center rounded-md px-2.5 text-body hover:bg-muted";
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -15,7 +15,7 @@ export function SiteHeader() {
     <header className="flex h-12 items-center justify-between border-b px-6">
       <Link
         href={participant ? "/study" : "/"}
-        className="inline-flex min-h-6 items-center font-mono text-label"
+        className="inline-flex min-h-8 items-center font-mono text-label"
       >
         {participant ? "accessibility report study" : "wcag-auditor"}
       </Link>

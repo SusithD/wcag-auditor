@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api, type RunSummary } from "@/api/client";
 import {
   Alert,
@@ -21,12 +21,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -38,11 +33,14 @@ import {
 import { useReportState } from "@/hooks/use-report-state";
 import {
   applyFilters,
-  compareFindings,
   countBySev,
   cycle,
   type Finding,
+  filterMessage,
+  type ReportState,
+  readingOrder,
   SC_LIST,
+  selectionMessage,
   type Viewport,
 } from "@/lib/report";
 import { Canvas } from "./canvas";
@@ -50,6 +48,7 @@ import { CriteriaRail } from "./criteria-rail";
 import { DetailPane } from "./detail-pane";
 import { FindingsTable } from "./findings-table";
 import type { PairMode } from "./focus-pair";
+import { focusWhenReady } from "./focus-when-ready";
 import { TopBar } from "./top-bar";
 
 function isTyping(target: EventTarget | null) {
@@ -58,6 +57,17 @@ function isTyping(target: EventTarget | null) {
     !!el &&
     (el.isContentEditable ||
       ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName))
+  );
+}
+
+type FocusRequest = { kind: "detail" | "origin" | "table"; n: number };
+
+function originElement(key: string | null) {
+  if (!key) return null;
+  const root = document.getElementById("canvas-region");
+  return (
+    root?.querySelector<HTMLElement>(`svg [role=button][data-key="${key}"]`) ??
+    root?.querySelector<HTMLElement>(`button[data-row-key="${key}"]`)
   );
 }
 
@@ -83,6 +93,25 @@ export function ReportScreen({
   const [pairMode, setPairMode] = useState<PairMode>("page");
   const [tab, setTab] = useState("canvas");
   const [query, setQuery] = useState(state.q);
+  const [message, setMessage] = useState("");
+  const [focusRequest, setFocusRequest] = useState<FocusRequest | null>(null);
+  const workspace = useRef<HTMLDivElement>(null);
+  const originKey = useRef<string | null>(null);
+  const announceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+
+  const announce = useCallback((text: string) => {
+    clearTimeout(announceTimer.current);
+    setMessage("");
+    announceTimer.current = setTimeout(() => setMessage(text), 60);
+  }, []);
+  useEffect(() => () => clearTimeout(announceTimer.current), []);
+  const requestFocus = useCallback(
+    (kind: FocusRequest["kind"]) =>
+      setFocusRequest((prev) => ({ kind, n: (prev?.n ?? 0) + 1 })),
+    [],
+  );
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: write the debounced search box to the URL only when it differs
   useEffect(() => {
@@ -100,12 +129,11 @@ export function ReportScreen({
   const setStatus = useSetStatus(run.id, vp);
 
   const all = findingsQuery.data ?? [];
-  const visible = useMemo(
-    () => applyFilters(all, state).sort(compareFindings),
-    [all, state],
-  );
+  const filtered = useMemo(() => applyFilters(all, state), [all, state]);
+  const visible = useMemo(() => readingOrder(filtered), [filtered]);
   const selected = visible.find((f) => f.key === state.f) ?? null;
   const selectedIndex = selected ? visible.indexOf(selected) : -1;
+  const selectedKeyNow = selected?.key;
   const counts = useMemo(() => {
     const out: Record<string, ReturnType<typeof countBySev>> = {};
     for (const sc of SC_LIST)
@@ -118,11 +146,48 @@ export function ReportScreen({
   const select = useCallback(
     (key: string | null) => {
       update({ f: key });
-      if (key) setTab("detail");
+      const target = key ? visible.find((f) => f.key === key) : null;
+      if (key) originKey.current = key;
+      if (target)
+        announce(
+          selectionMessage(target, visible.indexOf(target), visible.length),
+        );
+      else announce("Selection cleared");
+      if (key && !medium) {
+        setTab("detail");
+        requestFocus("detail");
+      }
       setPairMode("page");
     },
-    [update],
+    [update, visible, announce, medium, requestFocus],
   );
+
+  const onFilter = useCallback(
+    (patch: Partial<ReportState>) => {
+      update(patch);
+      announce(filterMessage(applyFilters(all, { ...state, ...patch }).length));
+    },
+    [update, announce, all, state],
+  );
+
+  useEffect(() => {
+    if (!focusRequest) return;
+    const done = () => setFocusRequest(null);
+    if (focusRequest.kind === "detail")
+      return focusWhenReady(
+        () => (selectedKeyNow ? document.getElementById("detail-h") : null),
+        done,
+      );
+    if (focusRequest.kind === "table")
+      return focusWhenReady(
+        () => document.getElementById("findings-table"),
+        done,
+      );
+    return focusWhenReady(() => {
+      const el = originElement(originKey.current);
+      return el?.closest("[inert]") ? null : el;
+    }, done);
+  }, [focusRequest, selectedKeyNow]);
 
   const step = useCallback(
     (delta: number) => {
@@ -144,6 +209,7 @@ export function ReportScreen({
         event.metaKey ||
         event.ctrlKey ||
         event.altKey ||
+        !workspace.current?.contains(event.target as Node | null) ||
         (event.target as HTMLElement | null)?.closest?.(
           "[role=menu], [role=dialog], [role=alertdialog], [role=listbox]",
         )
@@ -186,19 +252,30 @@ export function ReportScreen({
   if (!vp || findingsQuery.isError || overview.isError) {
     return (
       <div className="mx-auto max-w-160 px-6 py-12">
-        <h1
-          ref={headingRef}
-          tabIndex={-1}
-          className="text-h2 font-semibold outline-none"
-        >
-          The report could not be shown
-        </h1>
+        {embedded ? null : <title>{`Report - ${subject}`}</title>}
+        {embedded ? (
+          <h2
+            ref={headingRef}
+            tabIndex={-1}
+            className="text-h2 font-semibold outline-none"
+          >
+            The report could not be shown
+          </h2>
+        ) : (
+          <h1
+            ref={headingRef}
+            tabIndex={-1}
+            className="text-h2 font-semibold outline-none"
+          >
+            The report could not be shown
+          </h1>
+        )}
         <p className="mt-2 text-body text-muted-foreground">
           {run.error ?? "The findings for this run could not be loaded."}
         </p>
         {run.error ? (
           <Collapsible className="mt-3">
-            <CollapsibleTrigger className="min-h-6 text-body underline underline-offset-4">
+            <CollapsibleTrigger className="min-h-[24px] text-body underline underline-offset-4">
               Show details
             </CollapsibleTrigger>
             <CollapsibleContent>
@@ -229,7 +306,7 @@ export function ReportScreen({
       total={visible.length}
       onQuery={setQuery}
       onSelect={(sc) => {
-        update({ sc: sc ? [sc] : [], f: null });
+        onFilter({ sc: sc ? [sc] : [], f: null });
         if (!medium) setTab("canvas");
       }}
       onEnterCanvas={() => document.getElementById("canvas-region")?.focus()}
@@ -246,6 +323,15 @@ export function ReportScreen({
       total={visible.length}
       onPrev={() => step(-1)}
       onNext={() => step(1)}
+      onAnnounce={announce}
+      onBack={
+        medium
+          ? undefined
+          : () => {
+              setTab("canvas");
+              requestFocus("origin");
+            }
+      }
       onStatus={(status) =>
         selected && setStatus.mutate({ id: selected.id, status })
       }
@@ -265,7 +351,7 @@ export function ReportScreen({
       state={state}
       selectedKey={selected?.key ?? null}
       onSelect={(key) => select(key)}
-      onFilter={(patch) => update(patch)}
+      onFilter={onFilter}
     />
   ) : (
     <div className="relative h-full">
@@ -283,6 +369,7 @@ export function ReportScreen({
         pairMode={pairMode}
         onPairMode={setPairMode}
         focusStops={overview.data?.focus_stops ?? 0}
+        onAnnounce={announce}
       />
       {all.length === 0 ? (
         <div className="pointer-events-none absolute inset-3 rounded-lg border-2 border-emerald-600 motion-safe:animate-[pulse_1.2s_ease-in-out_1] dark:border-emerald-400">
@@ -321,22 +408,19 @@ export function ReportScreen({
       </Alert>
     ) : null;
 
-  const skip = (
-    <div className="flex gap-2 px-4">
-      <a
-        href="#canvas-region"
-        className="sr-only focus-visible:not-sr-only focus-visible:rounded-md focus-visible:bg-background focus-visible:px-2 focus-visible:py-1"
-      >
+  const skipClass =
+    "sr-only focus-visible:not-sr-only focus-visible:rounded-md focus-visible:border focus-visible:bg-background focus-visible:px-2 focus-visible:py-1";
+  const skip = embedded ? null : (
+    <div className="absolute left-4 top-1 z-30 flex gap-2">
+      <a href="#canvas-region" className={skipClass}>
         Skip to canvas
       </a>
       <button
         type="button"
-        className="sr-only focus-visible:not-sr-only focus-visible:rounded-md focus-visible:bg-background focus-visible:px-2 focus-visible:py-1"
+        className={skipClass}
         onClick={() => {
           update({ view: "table" });
-          requestAnimationFrame(() =>
-            document.getElementById("findings-table")?.focus(),
-          );
+          requestFocus("table");
         }}
       >
         Skip to findings table
@@ -344,12 +428,12 @@ export function ReportScreen({
     </div>
   );
 
-  const body = wide ? (
+  const layout = wide ? (
     <ResizablePanelGroup orientation="horizontal" className="min-h-0 flex-1">
       <ResizablePanel
-        defaultSize={280}
-        minSize={240}
-        maxSize={420}
+        defaultSize="21.5rem"
+        minSize="18.5rem"
+        maxSize="32.5rem"
         groupResizeBehavior="preserve-pixel-size"
       >
         {rail}
@@ -367,9 +451,9 @@ export function ReportScreen({
       </ResizablePanel>
       <ResizableHandle withHandle aria-label="Resize detail pane" />
       <ResizablePanel
-        defaultSize={380}
-        minSize={320}
-        maxSize={560}
+        defaultSize="29rem"
+        minSize="24.5rem"
+        maxSize="43rem"
         groupResizeBehavior="preserve-pixel-size"
       >
         <aside aria-label="Finding detail" className="h-full">
@@ -378,7 +462,7 @@ export function ReportScreen({
       </ResizablePanel>
     </ResizablePanelGroup>
   ) : medium ? (
-    <div className="grid min-h-0 flex-1 grid-cols-[280px_1fr]">
+    <div className="grid min-h-0 flex-1 grid-cols-[21.5rem_1fr]">
       <div className="min-h-0 border-r">{rail}</div>
       <section
         id="canvas-region"
@@ -388,17 +472,22 @@ export function ReportScreen({
       >
         {main}
       </section>
-      <Sheet open={!!selected} onOpenChange={(open) => !open && select(null)}>
+      <Sheet
+        open={!!selected}
+        onOpenChange={(open) => {
+          if (open) return;
+          select(null);
+          requestFocus("origin");
+        }}
+      >
         <SheetContent
           side="right"
+          aria-labelledby="detail-h"
+          initialFocus={() => document.getElementById("detail-h")}
+          finalFocus={false}
           className="w-[380px] max-w-full p-0 sm:max-w-[380px]"
         >
-          <SheetHeader className="sr-only">
-            <SheetTitle>Finding details</SheetTitle>
-          </SheetHeader>
-          <aside aria-label="Finding detail" className="h-full">
-            {detail}
-          </aside>
+          <div className="h-full">{detail}</div>
         </SheetContent>
       </Sheet>
     </div>
@@ -434,23 +523,43 @@ export function ReportScreen({
     </Tabs>
   );
 
+  const body = (
+    <div ref={workspace} className="flex min-h-0 flex-1 flex-col">
+      {layout}
+    </div>
+  );
+
   return (
-    <div className={`flex ${className} flex-col`}>
+    <div className={`relative flex ${className} flex-col`}>
+      {embedded ? null : <title>{`Report - ${subject}`}</title>}
+      <div
+        role="status"
+        aria-live="polite"
+        data-testid="report-status"
+        className="sr-only"
+      >
+        {message}
+      </div>
       {skip}
-      <TopBar
-        runId={run.id}
-        subject={embedded ? "Task page" : subject}
-        embedded={embedded}
-        condition={run.condition}
-        viewport={vp}
-        viewports={available}
-        view={state.view}
-        headingRef={headingRef}
-        onViewport={(next) => update({ vp: next, f: null })}
-        onView={(view) => update({ view })}
-      />
-      {banner}
-      {body}
+      <div
+        className="flex min-h-0 flex-1 flex-col"
+        inert={!wide && medium && !!selected}
+      >
+        <TopBar
+          runId={run.id}
+          subject={embedded ? "Task page" : subject}
+          embedded={embedded}
+          condition={run.condition}
+          viewport={vp}
+          viewports={available}
+          view={state.view}
+          headingRef={headingRef}
+          onViewport={(next) => update({ vp: next, f: null })}
+          onView={(view) => update({ view })}
+        />
+        {banner}
+        {body}
+      </div>
     </div>
   );
 }

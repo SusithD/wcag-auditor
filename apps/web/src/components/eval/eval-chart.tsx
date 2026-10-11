@@ -92,7 +92,7 @@ export function EvalChart({
       </div>
       <figcaption className="mt-1 text-caption text-muted-foreground">
         Bars show precision, recall and F1 per criterion; whiskers are the 95%
-        bootstrap interval over pages. Use “View as table” for the exact values.
+        bootstrap interval over pages.
       </figcaption>
     </figure>
   );

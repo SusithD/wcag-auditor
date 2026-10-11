@@ -4,7 +4,9 @@ import {
   capturedViewports,
   currentStage,
   findingsSoFar,
+  groupSpokenName,
   stageLabel,
+  stepSpokenName,
 } from "@/lib/stages";
 
 const ev = (
@@ -114,5 +116,24 @@ describe("stage model", () => {
       "Criterion 1.4.3 (mobile)",
     );
     expect(stageLabel("rules", null)).toBe("Rule channel");
+  });
+});
+
+describe("spoken step names", () => {
+  const step = (
+    id: string,
+    label: string,
+    status: "pending" | "current" | "done" | "failed",
+    group?: "modules",
+  ) => ({ id, label, status, group });
+
+  it("joins the state with one comma and names criteria in full", () => {
+    expect(stepSpokenName(step("queued", "Queued", "current"))).toBe(
+      "Queued, in progress",
+    );
+    expect(
+      stepSpokenName(step("module:1.4.3", "1.4.3", "pending", "modules")),
+    ).toBe("Criterion 1.4.3, waiting");
+    expect(groupSpokenName("Criteria", "done")).toBe("Criteria, done");
   });
 });

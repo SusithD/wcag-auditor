@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 
 from auditor.elements.base import Element
+from auditor.modules import reasons
 from auditor.modules.color import score_from_margin
 from auditor.modules.context import ModuleContext
 from auditor.schema import BBox, Finding
@@ -110,6 +111,11 @@ def run(ctx: ModuleContext) -> list[Finding]:
                     "method": "dom-box",
                     "dom_ref": el.dom_ref,
                     "text": el.text,
+                    **(
+                        {reasons.KEY: reasons.DETECTOR_TARGET}
+                        if el.style.get("source") == "detector"
+                        else {}
+                    ),
                 },
                 guidance_key=GUIDANCE_KEY,
             )

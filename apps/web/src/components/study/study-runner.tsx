@@ -39,11 +39,13 @@ export function StudyRunner({ code }: { code: string }) {
   if (session.isError) {
     return (
       <div className="mx-auto max-w-160 px-6 py-12">
+        <title>Participant code not found - study</title>
         <h1 className="text-h2 font-semibold">
           That participant code was not found
         </h1>
         <p className="mt-2 text-body text-muted-foreground">
-          Check the code the researcher gave you.
+          That code was not found. Check it against the card the researcher gave
+          you, or ask them.
         </p>
       </div>
     );
@@ -51,6 +53,7 @@ export function StudyRunner({ code }: { code: string }) {
   if (!session.data || !materials.data) {
     return (
       <div className="p-6" aria-busy="true">
+        <title>Loading - study</title>
         <Skeleton className="h-8 w-64" />
       </div>
     );
