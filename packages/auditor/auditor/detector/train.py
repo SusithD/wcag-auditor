@@ -240,7 +240,9 @@ def resolve_resume(out: Path, epochs: int, stop_after_epoch: int | None) -> Path
     done, path = found[-1][0] + 1, found[-1][1]
     limit = min(epochs, stop_after_epoch) if stop_after_epoch is not None else epochs
     if done >= limit:
-        print(f"{path.name} already covers {done} epochs; this phase ends at {limit}", file=sys.stderr)
+        print(
+            f"{path.name} already covers {done} epochs; this phase ends at {limit}", file=sys.stderr
+        )
         raise SystemExit(EXIT_PHASE_DONE)
     return path
 
