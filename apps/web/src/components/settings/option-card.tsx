@@ -93,7 +93,7 @@ export function SegmentedRadio({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="inline-flex gap-0.5 rounded-md bg-subtle p-0.5">
+    <div className="inline-flex w-fit gap-0.5 rounded-md bg-subtle p-0.5">
       {options.map((o) => (
         <label
           key={o.value}
