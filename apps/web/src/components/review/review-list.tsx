@@ -17,7 +17,6 @@ export function ReviewList({
   checked,
   onCheck,
   onCheckGroup,
-  compact,
   bulkReasonOpen,
   onBulkConfirm,
   onBulkDismissStart,
@@ -33,7 +32,6 @@ export function ReviewList({
   checked: Set<number>;
   onCheck: (id: number) => void;
   onCheckGroup: (group: Group) => void;
-  compact: boolean;
   bulkReasonOpen: boolean;
   onBulkConfirm: () => void;
   onBulkDismissStart: () => void;
@@ -113,19 +111,20 @@ export function ReviewList({
                         <div
                           data-finding-id={f.id}
                           className={cn(
-                            "relative flex items-start gap-3 px-4 hover:bg-subtle",
-                            compact ? "py-2" : "py-3",
+                            "relative flex items-start gap-3 px-4 py-3 hover:bg-subtle",
                             on &&
                               "bg-tint before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:bg-accent",
                           )}
                         >
-                          <input
-                            type="checkbox"
-                            checked={checked.has(f.id)}
-                            onChange={() => onCheck(f.id)}
-                            aria-label={`Select ${f.sc} ${label}, ${siteLabel(item.site)}`}
-                            className="mt-0.5 size-4 shrink-0 accent-accent-fill"
-                          />
+                          <label className="-ml-1 grid size-6 shrink-0 cursor-pointer place-items-center">
+                            <input
+                              type="checkbox"
+                              checked={checked.has(f.id)}
+                              onChange={() => onCheck(f.id)}
+                              aria-label={`Select ${f.sc} ${label}, ${siteLabel(item.site)}`}
+                              className="size-4 cursor-pointer accent-accent-fill"
+                            />
+                          </label>
                           <button
                             type="button"
                             aria-current={on ? "true" : undefined}

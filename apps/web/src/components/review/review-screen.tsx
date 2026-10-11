@@ -6,7 +6,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "@/api/client";
 import { FilterSelect } from "@/components/audits/filter-select";
-import { EmptyState, PageHeader, Panel } from "@/components/ds";
+import { EmptyState, PageHeader, Panel, Status } from "@/components/ds";
+import { useSites } from "@/components/overview/use-overview";
 import { useSettings } from "@/components/settings/use-settings";
 import { WideContent } from "@/components/shell";
 import { siteLabel } from "@/components/sites/site-label";
@@ -88,14 +89,7 @@ export function ReviewScreen() {
       return data;
     },
   });
-  const sites = useQuery({
-    queryKey: ["sites"],
-    queryFn: async () => {
-      const { data, error } = await api.GET("/sites");
-      if (error) throw new Error("Could not load sites");
-      return data;
-    },
-  });
+  const sites = useSites();
 
   const items = review.data?.items ?? [];
   const groups = useMemo(
@@ -132,6 +126,7 @@ export function ReviewScreen() {
   const [formError, setFormError] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const headingRef = useRef<HTMLHeadingElement>(null);
   const radioRefs = useRef<Record<Choice, HTMLInputElement | null>>({
@@ -226,7 +221,7 @@ export function ReviewScreen() {
       else if (key === "k") move(-1);
       else if (key === "c") choose("confirmed");
       else if (key === "x") choose("dismissed");
-      else if (key === "?") choose("unsure");
+      else if (key === "u") choose("unsure");
       else return;
       event.preventDefault();
     }
@@ -236,19 +231,21 @@ export function ReviewScreen() {
 
   async function patchMany(ids: number[], body: Patch) {
     const results = await Promise.all(
-      ids.map(async (id) => {
-        const { error } = await api.PATCH("/findings/{finding_id}", {
-          params: { path: { finding_id: id } },
-          body,
-        });
-        return !error;
-      }),
+      ids.map((id) =>
+        api
+          .PATCH("/findings/{finding_id}", {
+            params: { path: { finding_id: id } },
+            body,
+          })
+          .then(({ error }) => !error)
+          .catch(() => false),
+      ),
     );
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["review"] }),
       queryClient.invalidateQueries({ queryKey: ["sites"] }),
       queryClient.invalidateQueries({ queryKey: ["summary"] }),
-    ]);
+    ]).catch(() => undefined);
     return results.filter(Boolean).length;
   }
 
@@ -275,12 +272,17 @@ export function ReviewScreen() {
     }
     setBusy(true);
     setFormError(null);
-    const ok = await patchMany([selected.finding.id], {
-      status: choice,
-      reason: choice === "dismissed" ? dismissReason : undefined,
-      note: note.trim() || undefined,
-    });
-    setBusy(false);
+    setActionError(null);
+    let ok = 0;
+    try {
+      ok = await patchMany([selected.finding.id], {
+        status: choice,
+        reason: choice === "dismissed" ? dismissReason : undefined,
+        note: note.trim() || undefined,
+      });
+    } finally {
+      setBusy(false);
+    }
     if (!ok) {
       setFormError("The decision could not be saved. Try again.");
       return;
@@ -303,13 +305,20 @@ export function ReviewScreen() {
 
   async function undo(item: ReviewItem) {
     setBusy(true);
-    const ok = await patchMany([item.finding.id], { status: "open" });
-    setBusy(false);
-    setMessage(
-      ok
-        ? `Decision undone for ${describe(item)}. It is back in the queue.`
-        : `The decision on ${describe(item)} could not be undone.`,
-    );
+    setActionError(null);
+    let ok = 0;
+    try {
+      ok = await patchMany([item.finding.id], { status: "open" });
+    } finally {
+      setBusy(false);
+    }
+    if (ok) {
+      setMessage(
+        `Decision undone for ${describe(item)}. It is back in the queue.`,
+      );
+    } else {
+      setActionError(`The decision on ${describe(item)} could not be undone.`);
+    }
   }
 
   async function bulk(body: Patch) {
@@ -318,15 +327,24 @@ export function ReviewScreen() {
     );
     if (ids.length === 0) return;
     setBusy(true);
-    const ok = await patchMany(ids, body);
-    setBusy(false);
+    setActionError(null);
+    let ok = 0;
+    try {
+      ok = await patchMany(ids, body);
+    } finally {
+      setBusy(false);
+    }
     setChecked(new Set());
     setBulkReasonOpen(false);
-    setMessage(
-      ok === ids.length
-        ? `${ok} findings marked ${choiceWord(body.status).toLowerCase()}.`
-        : `${ok} of ${ids.length} findings were saved. The rest failed; try those again.`,
-    );
+    if (ok === ids.length) {
+      setMessage(
+        `${ok} findings marked ${choiceWord(body.status).toLowerCase()}.`,
+      );
+    } else {
+      setActionError(
+        `${ok} of ${ids.length} findings were saved. The rest failed; try those again.`,
+      );
+    }
   }
 
   const siteOptions = [
@@ -384,7 +402,6 @@ export function ReviewScreen() {
             />
             <ToggleGroup
               variant="outline"
-              size="sm"
               value={[state]}
               onValueChange={(v) =>
                 v[0] &&
@@ -396,11 +413,7 @@ export function ReviewScreen() {
               aria-label="Status"
             >
               {STATES.map((s) => (
-                <ToggleGroupItem
-                  key={s.value}
-                  value={s.value}
-                  className="min-h-[24px] min-w-[24px]"
-                >
+                <ToggleGroupItem key={s.value} value={s.value}>
                   {s.label}
                   {s.value === state && review.data ? (
                     <span className="num ml-1">{total}</span>
@@ -414,6 +427,16 @@ export function ReviewScreen() {
       <p role="status" aria-live="polite" className="sr-only">
         {message}
       </p>
+      {actionError ? (
+        <p
+          role="alert"
+          className="mb-3 mt-0 flex items-center gap-2 text-dense font-medium"
+        >
+          <Status kind="critical">
+            <span className="text-ink">{actionError}</span>
+          </Status>
+        </p>
+      ) : null}
 
       {review.isPending ? (
         <Panel as="div">
@@ -515,7 +538,6 @@ export function ReviewScreen() {
                 return next;
               })
             }
-            compact={settings.density === "compact"}
             bulkReasonOpen={bulkReasonOpen}
             onBulkConfirm={() => bulk({ status: "confirmed" })}
             onBulkDismissStart={() => setBulkReasonOpen((open) => !open)}

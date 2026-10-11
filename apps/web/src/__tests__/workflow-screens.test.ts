@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   choiceOf,
   groupByReason,
+  isTypingTarget,
   nextIndex,
   reasonSentence,
   reasonTitle,
@@ -12,6 +13,36 @@ import {
 } from "@/components/settings/use-settings";
 import { siteLabel, splitSite } from "@/components/sites/site-label";
 import { deltaWords } from "@/components/sites/sites-screen";
+
+describe("review shortcuts", () => {
+  const input = (type: string) => {
+    const el = document.createElement("input");
+    el.type = type;
+    return el;
+  };
+
+  it("blocks shortcuts only in text-like fields", () => {
+    for (const type of [
+      "text",
+      "search",
+      "email",
+      "url",
+      "number",
+      "password",
+      "tel",
+    ])
+      expect(isTypingTarget(input(type))).toBe(true);
+    expect(isTypingTarget(document.createElement("textarea"))).toBe(true);
+    expect(isTypingTarget(document.createElement("select"))).toBe(true);
+  });
+
+  it("lets radios, checkboxes and buttons pass", () => {
+    expect(isTypingTarget(input("radio"))).toBe(false);
+    expect(isTypingTarget(input("checkbox"))).toBe(false);
+    expect(isTypingTarget(document.createElement("button"))).toBe(false);
+    expect(isTypingTarget(null)).toBe(false);
+  });
+});
 
 describe("review model", () => {
   it("turns a reason into a short title and a sentence", () => {

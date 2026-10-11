@@ -115,10 +115,23 @@ export function choiceWord(status: string): string {
   }
 }
 
+const TEXT_INPUT_TYPES = new Set([
+  "text",
+  "search",
+  "email",
+  "url",
+  "number",
+  "password",
+  "tel",
+]);
+
 export function isTypingTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
   if (target.isContentEditable) return true;
-  return ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
+  if (target.tagName === "TEXTAREA" || target.tagName === "SELECT") return true;
+  if (target instanceof HTMLInputElement)
+    return TEXT_INPUT_TYPES.has(target.type);
+  return false;
 }
 
 export function formatDecided(iso: string | null | undefined): string {

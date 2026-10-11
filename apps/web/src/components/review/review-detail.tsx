@@ -120,7 +120,7 @@ export function ReviewDetail({
       value: "unsure",
       title: "Cannot tell, keep in queue",
       description: "Leave it waiting for someone else to check.",
-      key: "?",
+      key: "U",
     },
   ];
 
@@ -171,7 +171,7 @@ export function ReviewDetail({
               <img
                 src={`/api/runs/${item.run_id}/assets/${item.viewport}/crop/${f.key}`}
                 alt={`Crop of the element: ${f.element}`}
-                className="max-h-48 max-w-full rounded-md border border-line bg-white"
+                className="max-h-48 max-w-full rounded-md border border-line bg-surface"
               />
               <figcaption className="mt-1.5 text-xs text-ink-3">
                 Element crop
@@ -233,6 +233,9 @@ export function ReviewDetail({
                     ref={reasonRef}
                     role="group"
                     aria-label="Reason"
+                    aria-describedby={
+                      error && !reason ? "review-error" : undefined
+                    }
                     className="mt-3 flex flex-wrap items-center gap-2"
                   >
                     <span className="w-full text-xs font-medium text-ink-3">
@@ -294,7 +297,7 @@ export function ReviewDetail({
               <span className="inline-flex items-center gap-1">
                 <Kbd>C</Kbd>
                 <Kbd>X</Kbd>
-                <Kbd>?</Kbd> decide
+                <Kbd>U</Kbd> decide
               </span>
             </>
           ) : (
