@@ -6,6 +6,7 @@ import json
 import os
 import platform
 import random
+import sys
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
@@ -19,6 +20,8 @@ MODELS = {"nano": "RFDETRNano", "small": "RFDETRSmall"}
 
 
 MASK = 2**31 - 1
+EXIT_PHASE_DONE = 3
+EXIT_CONFIG_MISMATCH = 4
 
 
 def epoch_seed(seed: int, epoch: int, salt: int = 0) -> int:
@@ -237,7 +240,8 @@ def resolve_resume(out: Path, epochs: int, stop_after_epoch: int | None) -> Path
     done, path = found[-1][0] + 1, found[-1][1]
     limit = min(epochs, stop_after_epoch) if stop_after_epoch is not None else epochs
     if done >= limit:
-        raise SystemExit(f"{path.name} already covers {done} epochs; this phase ends at {limit}")
+        print(f"{path.name} already covers {done} epochs; this phase ends at {limit}", file=sys.stderr)
+        raise SystemExit(EXIT_PHASE_DONE)
     return path
 
 
@@ -249,7 +253,8 @@ def check_resume_config(out: Path, current: dict[str, Any]) -> None:
     recorded = json.loads(recorded_path.read_text())
     changed = {k: (recorded.get(k), v) for k, v in current.items() if recorded.get(k) != v}
     if changed:
-        raise SystemExit(f"resume settings differ from {recorded_path}: {changed}")
+        print(f"resume settings differ from {recorded_path}: {changed}", file=sys.stderr)
+        raise SystemExit(EXIT_CONFIG_MISMATCH)
 
 
 def checkpoint_epoch(path: Path | None) -> int:
