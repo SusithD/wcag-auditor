@@ -1,9 +1,10 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { api, type RunSummary } from "@/api/client";
+import type { RunSummary } from "@/api/client";
+import { Panel, StatusShape } from "@/components/ds";
+import { PageCrumbs, WideContent } from "@/components/shell";
 import {
   Alert,
   AlertAction,
@@ -25,11 +26,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import {
-  useFindings,
-  useOverview,
-  useSetStatus,
-} from "@/hooks/use-report-data";
+import { useFindings, useOverview } from "@/hooks/use-report-data";
 import { useReportState } from "@/hooks/use-report-state";
 import {
   applyFilters,
@@ -49,7 +46,17 @@ import { DetailPane } from "./detail-pane";
 import { FindingsTable } from "./findings-table";
 import type { PairMode } from "./focus-pair";
 import { focusWhenReady } from "./focus-when-ready";
-import { TopBar } from "./top-bar";
+import { type GroupBy, sourceParts, tally as tallyOf } from "./logic";
+import { ReportHeader, ViewTabs } from "./report-header";
+import { SummaryPanel } from "./summary-panel";
+import { EmbeddedBar } from "./top-bar";
+import {
+  type DecisionVars,
+  useDecideFinding,
+  useDelta,
+  useRunAgain,
+} from "./use-report-queries";
+import { useShortcutsEnabled } from "./use-shortcuts-setting";
 
 function isTyping(target: EventTarget | null) {
   const el = target as HTMLElement | null;
@@ -71,6 +78,15 @@ function originElement(key: string | null) {
   );
 }
 
+function decisionMessage(vars: Omit<DecisionVars, "id">): string {
+  if (vars.status === "fixed")
+    return "Marked as fixed. Fix not verified until a later audit no longer finds it.";
+  if (vars.status === "dismissed")
+    return `Dismissed${vars.reason ? `: ${vars.reason}` : ""}.`;
+  if (vars.status === "open") return "Reopened.";
+  return "Decision saved.";
+}
+
 export function ReportScreen({
   run,
   headingRef,
@@ -83,15 +99,16 @@ export function ReportScreen({
   className?: string;
 }) {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const { state, update } = useReportState();
   const wide = useMediaQuery(
-    embedded ? "(min-width: 1760px)" : "(min-width: 1280px)",
+    embedded ? "(min-width: 1760px)" : "(min-width: 1440px)",
     true,
   );
   const medium = useMediaQuery("(min-width: 1024px)", true);
+  const shortcuts = useShortcutsEnabled();
   const [pairMode, setPairMode] = useState<PairMode>("page");
   const [tab, setTab] = useState("canvas");
+  const [groupBy, setGroupBy] = useState<GroupBy>("criterion");
   const [query, setQuery] = useState(state.q);
   const [message, setMessage] = useState("");
   const [focusRequest, setFocusRequest] = useState<FocusRequest | null>(null);
@@ -126,7 +143,9 @@ export function ReportScreen({
   ) as Viewport | undefined;
   const overview = useOverview(run.id, vp);
   const findingsQuery = useFindings(run.id, vp);
-  const setStatus = useSetStatus(run.id, vp);
+  const decide = useDecideFinding(run.id, vp);
+  const since = useDelta(run.id, !embedded && !!vp);
+  const rerun = useRunAgain(run, (id) => router.push(`/runs/${id}`));
 
   const all = findingsQuery.data ?? [];
   const filtered = useMemo(() => applyFilters(all, state), [all, state]);
@@ -142,6 +161,12 @@ export function ReportScreen({
       );
     return out;
   }, [all, state]);
+  const coverage = overview.data?.coverage ?? [];
+  const summary = useMemo(() => tallyOf(all, coverage), [all, coverage]);
+
+  const resetDecision = decide.reset;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a save error belongs to the finding it happened on
+  useEffect(() => resetDecision(), [selectedKeyNow]);
 
   const select = useCallback(
     (key: string | null) => {
@@ -202,6 +227,7 @@ export function ReportScreen({
   );
 
   useEffect(() => {
+    if (!shortcuts) return;
     function onKey(event: KeyboardEvent) {
       if (
         isTyping(event.target) ||
@@ -222,28 +248,9 @@ export function ReportScreen({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [step]);
+  }, [step, shortcuts]);
 
-  const retry = useMutation({
-    mutationFn: async () => {
-      const base = { condition: run.condition, max_focus_steps: 15 };
-      const body =
-        run.source_kind === "url"
-          ? { ...base, url: run.source, viewports: run.viewports }
-          : run.source_kind === "folder"
-            ? { ...base, folder: run.source }
-            : null;
-      if (!body) throw new Error("This source cannot be retried");
-      const { data, error } = await api.POST("/runs", { body });
-      if (error || !data) throw new Error("Retry failed");
-      return data.run_id;
-    },
-    onSuccess: async (id) => {
-      await queryClient.invalidateQueries({ queryKey: ["runs"] });
-      router.push(`/runs/${id}`);
-    },
-  });
-
+  const source = sourceParts(run.source_kind, run.source, overview.data?.url);
   const subject =
     run.source_kind === "url"
       ? run.source
@@ -257,7 +264,7 @@ export function ReportScreen({
           <h2
             ref={headingRef}
             tabIndex={-1}
-            className="text-h2 font-semibold outline-none"
+            className="t-section text-ink outline-none"
           >
             The report could not be shown
           </h2>
@@ -265,23 +272,23 @@ export function ReportScreen({
           <h1
             ref={headingRef}
             tabIndex={-1}
-            className="text-h2 font-semibold outline-none"
+            className="t-page text-ink outline-none"
           >
             The report could not be shown
           </h1>
         )}
-        <p className="mt-2 text-body text-muted-foreground">
+        <p className="mt-2 text-body text-ink-2">
           {run.error ?? "The findings for this run could not be loaded."}
         </p>
         {run.error ? (
           <Collapsible className="mt-3">
-            <CollapsibleTrigger className="min-h-[24px] text-body underline underline-offset-4">
+            <CollapsibleTrigger className="min-h-6 text-body underline underline-offset-4">
               Show details
             </CollapsibleTrigger>
             <CollapsibleContent>
               <pre
                 tabIndex={0}
-                className="mt-2 overflow-auto rounded-md border bg-muted p-2 font-mono text-label"
+                className="mt-2 overflow-auto rounded-md border border-line bg-subtle p-2 font-mono text-xs"
               >
                 {run.error}
               </pre>
@@ -293,36 +300,41 @@ export function ReportScreen({
   }
 
   const loading = overview.isPending || findingsQuery.isPending;
-  const checkedCount = (overview.data?.coverage ?? []).filter(
+  const checkedCount = coverage.filter(
     (c) =>
       c.hybrid_verdict === "automated" || c.hybrid_verdict === "needs-review",
   ).length;
   const rail = (
     <CriteriaRail
+      findings={all}
+      visible={visible}
       counts={counts}
-      coverage={overview.data?.coverage ?? []}
+      coverage={coverage}
       active={state.sc.length === 1 ? state.sc[0] : null}
+      selectedKey={selected?.key ?? null}
       query={query}
+      groupBy={groupBy}
       total={visible.length}
       onQuery={setQuery}
-      onSelect={(sc) => {
+      onGroupBy={setGroupBy}
+      onSelectCriterion={(sc) => {
         onFilter({ sc: sc ? [sc] : [], f: null });
         if (!medium) setTab("canvas");
       }}
+      onSelectFinding={select}
       onEnterCanvas={() => document.getElementById("canvas-region")?.focus()}
     />
   );
 
-  const detailIndex = selectedIndex;
-  const saveFailed = setStatus.isError;
   const detail = (
     <DetailPane
       runId={run.id}
       finding={selected}
-      index={detailIndex}
+      index={selectedIndex}
       total={visible.length}
       onPrev={() => step(-1)}
       onNext={() => step(1)}
+      shortcuts={shortcuts}
       onAnnounce={announce}
       onBack={
         medium
@@ -332,11 +344,12 @@ export function ReportScreen({
               requestFocus("origin");
             }
       }
-      onStatus={(status) =>
-        selected && setStatus.mutate({ id: selected.id, status })
-      }
-      saving={setStatus.isPending}
-      saveError={saveFailed}
+      onDecide={(vars) => {
+        if (!selected) return;
+        announce(decisionMessage(vars));
+        decide.mutate({ id: selected.id, ...vars });
+      }}
+      saveError={decide.isError}
       empty={visible.length === 0}
     />
   );
@@ -372,12 +385,15 @@ export function ReportScreen({
         onAnnounce={announce}
       />
       {all.length === 0 ? (
-        <div className="pointer-events-none absolute inset-3 rounded-lg border-2 border-emerald-600 motion-safe:animate-[pulse_1.2s_ease-in-out_1] dark:border-emerald-400">
-          <p className="pointer-events-auto m-4 inline-block rounded-md bg-background p-3 text-body">
-            {checkedCount === 8
-              ? "No violations found in the 8 in-scope criteria."
-              : `No violations found in the ${checkedCount} of 8 criteria this report checks. The other ${8 - checkedCount} were not assessed, so this is not a clean result for them.`}{" "}
-            {embedded ? "" : "The coverage view shows what was checked."}
+        <div className="pointer-events-none absolute top-4 left-4 z-10 max-w-md">
+          <p className="pointer-events-auto flex items-start gap-2.5 rounded-lg border border-line bg-surface p-3 text-body text-ink shadow-float">
+            <StatusShape kind="pass" className="mt-1" />
+            <span>
+              {checkedCount === 8
+                ? "No violations found in the 8 in-scope criteria."
+                : `No violations found in the ${checkedCount} of 8 criteria this report checks. The other ${8 - checkedCount} were not assessed, so this is not a clean result for them.`}{" "}
+              {embedded ? "" : "The coverage view shows what was checked."}
+            </span>
           </p>
         </div>
       ) : null}
@@ -386,7 +402,7 @@ export function ReportScreen({
 
   const banner =
     run.status === "partial" && !embedded ? (
-      <Alert className="m-3">
+      <Alert className="mt-4">
         <AlertTitle>
           {available.length === 1
             ? `${available[0] === "desktop" ? "Mobile" : "Desktop"} capture failed`
@@ -398,8 +414,8 @@ export function ReportScreen({
             <Button
               size="sm"
               variant="outline"
-              onClick={() => retry.mutate()}
-              disabled={retry.isPending}
+              onClick={() => rerun.mutate()}
+              disabled={rerun.isPending}
             >
               Retry
             </Button>
@@ -409,9 +425,9 @@ export function ReportScreen({
     ) : null;
 
   const skipClass =
-    "sr-only focus-visible:not-sr-only focus-visible:rounded-md focus-visible:border focus-visible:bg-background focus-visible:px-2 focus-visible:py-1";
+    "sr-only focus-visible:not-sr-only focus-visible:rounded-md focus-visible:border focus-visible:border-line focus-visible:bg-surface focus-visible:px-2 focus-visible:py-1";
   const skip = embedded ? null : (
-    <div className="absolute left-4 top-1 z-30 flex gap-2">
+    <div className="absolute top-0 left-0 z-30 flex gap-2">
       <a href="#canvas-region" className={skipClass}>
         Skip to canvas
       </a>
@@ -431,9 +447,9 @@ export function ReportScreen({
   const layout = wide ? (
     <ResizablePanelGroup orientation="horizontal" className="min-h-0 flex-1">
       <ResizablePanel
-        defaultSize="21.5rem"
-        minSize="18.5rem"
-        maxSize="32.5rem"
+        defaultSize="17rem"
+        minSize="15rem"
+        maxSize="28rem"
         groupResizeBehavior="preserve-pixel-size"
       >
         {rail}
@@ -451,9 +467,9 @@ export function ReportScreen({
       </ResizablePanel>
       <ResizableHandle withHandle aria-label="Resize detail pane" />
       <ResizablePanel
-        defaultSize="29rem"
-        minSize="24.5rem"
-        maxSize="43rem"
+        defaultSize="23rem"
+        minSize="20rem"
+        maxSize="40rem"
         groupResizeBehavior="preserve-pixel-size"
       >
         <aside aria-label="Finding detail" className="h-full">
@@ -462,8 +478,8 @@ export function ReportScreen({
       </ResizablePanel>
     </ResizablePanelGroup>
   ) : medium ? (
-    <div className="grid min-h-0 flex-1 grid-cols-[21.5rem_1fr]">
-      <div className="min-h-0 border-r">{rail}</div>
+    <div className="grid min-h-0 flex-1 grid-cols-[18rem_1fr]">
+      <div className="min-h-0 border-r border-line">{rail}</div>
       <section
         id="canvas-region"
         tabIndex={-1}
@@ -497,7 +513,7 @@ export function ReportScreen({
       onValueChange={(v) => setTab(String(v))}
       className="flex min-h-0 flex-1 flex-col"
     >
-      <TabsList className="mx-3 mt-2">
+      <TabsList className="mx-3 mt-2 w-auto">
         <TabsTrigger value="criteria">Criteria</TabsTrigger>
         <TabsTrigger value="canvas">Canvas</TabsTrigger>
         <TabsTrigger value="detail">Detail</TabsTrigger>
@@ -529,36 +545,86 @@ export function ReportScreen({
     </div>
   );
 
-  return (
-    <div className={`relative flex ${className} flex-col`}>
-      {embedded ? null : <title>{`Report - ${subject}`}</title>}
-      <div
-        role="status"
-        aria-live="polite"
-        data-testid="report-status"
-        className="sr-only"
-      >
-        {message}
+  const statusRegion = (
+    <div
+      role="status"
+      aria-live="polite"
+      data-testid="report-status"
+      className="sr-only"
+    >
+      {message}
+    </div>
+  );
+  const inertWhileSheet = !wide && medium && !!selected;
+
+  if (embedded) {
+    return (
+      <div className={`relative flex ${className} flex-col`}>
+        {statusRegion}
+        <div className="flex min-h-0 flex-1 flex-col" inert={inertWhileSheet}>
+          <EmbeddedBar
+            subject="Task page"
+            condition={run.condition}
+            viewport={vp}
+            viewports={available}
+            view={state.view}
+            headingRef={headingRef}
+            onViewport={(next) => update({ vp: next, f: null })}
+            onView={(view) => update({ view })}
+          />
+          {body}
+        </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="relative">
+      <title>{`Report - ${subject}`}</title>
+      <PageCrumbs
+        items={[{ label: "Audits", href: "/audits" }, { label: source.host }]}
+      />
+      <WideContent />
+      {statusRegion}
       {skip}
-      <div
-        className="flex min-h-0 flex-1 flex-col"
-        inert={!wide && medium && !!selected}
-      >
-        <TopBar
+      <div inert={inertWhileSheet}>
+        <ReportHeader
           runId={run.id}
-          subject={embedded ? "Task page" : subject}
-          embedded={embedded}
+          source={source}
+          createdAt={run.created_at}
           condition={run.condition}
           viewport={vp}
           viewports={available}
-          view={state.view}
           headingRef={headingRef}
+          canRerun={run.source_kind !== "upload"}
+          rerunning={rerun.isPending}
+          rerunFailed={rerun.isError}
           onViewport={(next) => update({ vp: next, f: null })}
-          onView={(view) => update({ view })}
+          onRerun={() => rerun.mutate()}
         />
+        <ViewTabs runId={run.id} state={state} viewport={vp} />
         {banner}
-        {body}
+        {loading ? (
+          <Panel className="mt-4 p-4" aria-busy="true">
+            <Skeleton className="h-28 w-full" />
+          </Panel>
+        ) : (
+          <SummaryPanel
+            tally={summary}
+            viewport={vp}
+            delta={{
+              data: since.data,
+              pending: since.isPending,
+              error: since.isError,
+            }}
+          />
+        )}
+        <Panel
+          as="div"
+          className="mt-4 flex h-[max(40rem,calc(100dvh-7rem))] max-h-[56.25rem] flex-col overflow-hidden"
+        >
+          {body}
+        </Panel>
       </div>
     </div>
   );

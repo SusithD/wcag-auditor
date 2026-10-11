@@ -10,6 +10,7 @@ import {
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ArrowDown, ArrowUp, ListFilter } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Status } from "@/components/ds";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -335,12 +336,9 @@ export function FindingsTable({
                     </button>
                   </td>
                   <td className="px-3">
-                    <span
-                      className={`inline-flex items-center gap-1 text-sev-${k === "needs-review" ? "review" : k}`}
-                    >
-                      <span aria-hidden="true">{SEV_GLYPH[k]}</span>
+                    <Status kind={k === "needs-review" ? "review" : k} strong>
                       {SEV_LABEL[k]}
-                    </span>
+                    </Status>
                   </td>
                   <td
                     className="max-w-56 truncate px-3 font-mono text-label"
@@ -354,10 +352,7 @@ export function FindingsTable({
                   <td className="px-3 font-mono text-label">
                     {plainValue(f.evidence_rows[1]?.value ?? "—")}
                   </td>
-                  <td className="px-3">
-                    <span aria-hidden="true">{PROV_GLYPH[f.provenance]}</span>{" "}
-                    {PROV_LABEL[f.provenance]}
-                  </td>
+                  <td className="px-3">{PROV_LABEL[f.provenance]}</td>
                   <td className="px-3">{TIER_LABEL[f.tier]}</td>
                   <td className="px-3 font-mono text-label">
                     {f.score.toFixed(2)}
