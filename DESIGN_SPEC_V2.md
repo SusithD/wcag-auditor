@@ -10,7 +10,7 @@ v1 is disciplined but flat: pure zinc neutrals, no brand colour, a primary butto
 
 1. **Honest by design.** The product's difference is that it says what it did not decide: tiers (Automated / Needs review), coverage (Decided / Partly / Could not / Not on this page), uncertainty (intervals with plain verdicts). The UI makes honesty the most legible thing on screen. Never a single headline "score". "0 violations" always reads "0 found in the N criteria we could decide; M could not be checked."
 2. **Evidence first.** Every claim sits next to the pixels, measured value or screenshot that supports it.
-3. **Calm, dense, premium.** One accent colour, tint-based elevation, generous but not wasteful spacing, quiet motion.
+3. **Calm, dense, premium.** One accent colour (navy), tint-based elevation, generous but not wasteful spacing, quiet motion.
 4. **Exemplary accessibility.** An accessibility auditor's own UI must pass its own audit (AA everywhere, AAA focus appearance, 24 px targets measured in px, forced-colors and reduced-motion honoured). `@axe-core/playwright` zero violations is a CI gate on every route and state.
 5. **No decoration that carries meaning, no meaning carried by decoration.** Gradients and illustrations are static, `aria-hidden`, and never behind small text.
 
@@ -30,7 +30,19 @@ Neutrals are a slightly cool ramp (hue about 270, very low chroma). Roles, not s
 | `--text` | `#17171C` (17.1 on bg) | `#EDEDF0` (16.8 on bg) |
 | `--text-muted` | `#5B5B66` (6.70 white, 5.95 sunken, 5.79 hover) | `#A0A0AB` (6.96 surface, 6.40 raised, 5.95 hover) |
 
-Accent (one brand colour, used for primary action, links, selection and focus): light `#4338CA` (7.90 on white, 7.01 on sunken, text on it `#FFFFFF` 7.90), dark `#A5B4FC` (9.04 on surface, 8.31 on raised, text on it `#0B0B0E` 9.86). Tint fills: 8% (light) and 14% (dark) of the accent. Focus ring: 3 px in the accent plus 2 px offset in `--bg`; verified at least 3:1 against both adjacent colours.
+Accent (one brand colour, chosen by the owner: deep navy `#000055`; used for primary actions, links, selection and focus):
+
+| Role | Light | Dark |
+|---|---|---|
+| `--accent` | `#000055` (18.56 on white, 17.80 on bg, 16.47 on sunken) | `#9DB0FF` (8.66 on surface, 7.96 on raised, 7.40 on hover, 9.44 on bg) |
+| `--accent-fg` (text on accent) | `#FFFFFF` (18.56) | `#000055` (8.92) |
+| `--accent-tint` (selection, hover fills) | `#000055` at 8% over white = `#EBEBF1` (navy text 15.64, muted text 5.64) | `#9DB0FF` at 14% |
+| `--ring` | `#000055`, 3 px + 2 px offset in `--bg` | `#9DB0FF` |
+| Links | `#000055`, always underlined | `#9DB0FF`, always underlined |
+
+Brand surface (top bar and front-door hero): light mode uses navy `#000055` as a surface with `#FFFFFF` text (18.56), muted text `#C9CCF0` (11.83) and links `#9FB2FF` (9.09). In dark mode navy on the near-black page is 1.06:1 (invisible), so the dark brand surface is lifted to `#0D0D45` with a 1 px `#2A2A6B` border (re-verify when built).
+
+Highlight (decorative and large text only, never on light surfaces): amber `#FFC83D` on navy surfaces (12.01), used for the logo mark, an accent word in the hero headline, small markers and the "sample report" tag. Navy text on amber is 12.01.
 
 Severity and status (colour + glyph + stroke, never colour alone). Text on `--sunken` (light) or `--raised` (dark):
 
@@ -38,7 +50,7 @@ Severity and status (colour + glyph + stroke, never colour alone). Text on `--su
 |---|---|---|---|---|---|---|
 | Critical | `#B42318` | 5.83 | `#FDA29B` | 8.53 | ● | solid 2 px |
 | Serious | `#9A5200` | 5.20 | `#FDB022` | 9.00 | ▲ | dashed 2 px |
-| Minor | `#1D4ED8` | 5.94 | `#93C5FD` | 9.19 | ■ | dotted 2 px |
+| Minor | `#7E22CE` (violet; blue is now the brand) | 6.19 on sunken, 6.98 on white | `#D8B4FE` | 9.37 | ■ | dotted 2 px |
 | Needs review | `#5B5B66` | 5.95 | `#A0A0AB` | 6.40 | ◇ | solid 1.5 px |
 | Pass / decided | `#067647` | 5.05 | `#6CE9A6` | 10.92 | ✓ | n/a |
 
@@ -155,7 +167,7 @@ Changing audit semantics, API, evaluation numbers or ethics-reviewed study wordi
 - Gate per phase: `make check` and the full Playwright suite green serially, committed on branch `ui-redesign`.
 
 ## 11. Decisions for the owner
-1. Accent colour: indigo `#4338CA` / `#A5B4FC` proposed; any change needs the contrast table recomputed.
+1. Accent colour: decided by the owner: deep navy `#000055` (light) with `#9DB0FF` as its dark-mode companion; amber `#FFC83D` as a highlight on navy surfaces only. Minor severity moved from blue to violet so it cannot be confused with the brand.
 2. Dark mode default: follow the system (current), or default light.
 3. Command palette and density toggle: include in Phase 2 (recommended) or defer.
 4. Sample report on the front door: use a project fixture capture (recommended) or none.
