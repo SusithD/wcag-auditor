@@ -368,16 +368,13 @@ test.describe("focus on route change", () => {
   test("command palette navigation moves focus to the level-1 heading", async ({
     page,
   }) => {
-    test.fail(
-      true,
-      "the palette closing restores focus after the route heading is focused",
-    );
     await page.goto("/audits");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await hydrated(page);
     await page.keyboard.press("ControlOrMeta+k");
     const dialog = page.getByRole("dialog", { name: "Search" });
     await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole("combobox")).toBeFocused();
     await page.keyboard.type("review");
     await expect(
       dialog.getByRole("option", { name: "Review queue" }),
@@ -388,6 +385,21 @@ test.describe("focus on route change", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "Review queue" }),
     ).toBeFocused();
+  });
+
+  test("Esc closes the command palette and returns focus to the Search button", async ({
+    page,
+  }) => {
+    await page.goto("/audits");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await hydrated(page);
+    const search = page.getByRole("button", { name: /^Search/ });
+    await search.click();
+    const dialog = page.getByRole("dialog", { name: "Search" });
+    await expect(dialog).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(search).toBeFocused();
   });
 
   test("the browser back and forward buttons move focus to the level-1 heading", async ({

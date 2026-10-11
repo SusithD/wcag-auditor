@@ -45,9 +45,13 @@ export function CommandPalette({
   const [active, setActive] = useState(0);
   const base = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigating = useRef(false);
 
   const commands = useMemo<Command[]>(() => {
-    const go = (href: string) => () => router.push(href);
+    const go = (href: string) => () => {
+      navigating.current = true;
+      router.push(href);
+    };
     const dark = resolvedTheme === "dark";
     const nav = (
       id: string,
@@ -147,6 +151,7 @@ export function CommandPalette({
       open={open}
       onOpenChange={(next) => {
         onOpenChange(next);
+        if (next) navigating.current = false;
         if (!next) {
           setQuery("");
           setActive(0);
@@ -159,6 +164,7 @@ export function CommandPalette({
         <Dialog.Popup
           data-slot="command-palette"
           initialFocus={inputRef}
+          finalFocus={() => !navigating.current}
           className="fixed top-[12vh] left-1/2 z-50 flex max-h-[70vh] w-[min(560px,calc(100%-2rem))] -translate-x-1/2 flex-col overflow-hidden rounded-lg bg-surface text-ink shadow-float outline-none transition-opacity duration-100 data-ending-style:opacity-0 data-starting-style:opacity-0"
         >
           <Dialog.Title className="sr-only">Search</Dialog.Title>
