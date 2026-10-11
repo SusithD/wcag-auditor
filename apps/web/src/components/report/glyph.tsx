@@ -1,32 +1,6 @@
-type Kind = "critical" | "serious" | "minor" | "review";
+import { SHAPES } from "@/components/ds";
 
-const PATHS: Record<Kind, React.ReactNode> = {
-  critical: <path d="M6 .6 11.4 6 6 11.4.6 6z" fill="currentColor" />,
-  serious: <path d="M6 .9l5.4 10H.6z" fill="currentColor" />,
-  minor: (
-    <rect
-      x="1.75"
-      y="1.75"
-      width="8.5"
-      height="8.5"
-      rx="1"
-      fill="currentColor"
-    />
-  ),
-  review: (
-    <>
-      <circle
-        cx="6"
-        cy="6"
-        r="4.6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-      />
-      <circle cx="6" cy="6" r="1.6" fill="currentColor" />
-    </>
-  ),
-};
+type Kind = "critical" | "serious" | "minor" | "review";
 
 export function SvgGlyph({
   kind,
@@ -43,7 +17,7 @@ export function SvgGlyph({
 }) {
   return (
     <g transform={`translate(${x} ${y}) scale(${size / 12})`} style={{ color }}>
-      {PATHS[kind]}
+      {SHAPES[kind]}
     </g>
   );
 }

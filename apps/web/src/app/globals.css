@@ -251,6 +251,9 @@
 [data-density="compact"] [data-ds="panel-body"] {
   padding: 0.75rem;
 }
+[data-density="compact"] [data-nav][aria-pressed] {
+  min-height: 28px;
+}
 [data-density="compact"] [data-finding-id] {
   padding-block: 0.5rem;
 }

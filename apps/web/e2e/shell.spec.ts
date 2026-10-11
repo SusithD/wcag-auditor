@@ -255,7 +255,11 @@ for (const [width, height] of [
       await page.keyboard.press("Escape");
       if (width < 720) {
         await page.getByRole("button", { name: "Open menu" }).click();
-        await expect(page.getByRole("dialog", { name: "Menu" })).toBeVisible();
+        const drawer = page.getByRole("dialog", { name: "Menu" });
+        await expect(drawer).toBeVisible();
+        await drawer.evaluate((el) =>
+          Promise.all(el.getAnimations().map((a) => a.finished)),
+        );
         await scan(page, "drawer");
       }
     });

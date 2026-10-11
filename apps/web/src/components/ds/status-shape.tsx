@@ -15,7 +15,7 @@ export type ShapeKind =
 
 const CUT = "var(--surface, #fff)";
 
-const SHAPES: Record<ShapeKind, ReactNode> = {
+export const SHAPES: Record<ShapeKind, ReactNode> = {
   critical: <path d="M6 .6 11.4 6 6 11.4.6 6z" fill="currentColor" />,
   serious: <path d="M6 .9l5.4 10H.6z" fill="currentColor" />,
   minor: (

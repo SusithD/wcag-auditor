@@ -19,13 +19,7 @@ export const SC_LEVELS: Record<string, "A" | "AA" | "AAA"> = {
   "2.5.8": "AA",
 };
 
-export const DISMISS_REASONS = [
-  "Tool error",
-  "Decorative or not interactive",
-  "Third-party content",
-  "Large text",
-  "Other",
-] as const;
+export { DISMISS_REASONS } from "@/lib/dismiss-reasons";
 
 export type Bucket = "failed" | "review" | "clear" | "undecided";
 

@@ -280,7 +280,7 @@ test.describe("review queue", () => {
     await expect(
       page.getByRole("radio", { name: /Confirm issue/ }),
     ).toBeChecked();
-    await page.keyboard.press("?");
+    await page.keyboard.press("u");
     await expect(
       page.getByRole("radio", { name: /Cannot tell/ }),
     ).toBeChecked();

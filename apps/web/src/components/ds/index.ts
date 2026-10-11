@@ -18,5 +18,10 @@ export { Ratio } from "./ratio";
 export { ScCode } from "./sc-code";
 export { SeverityCounts } from "./severity-counts";
 export { Status } from "./status";
-export { SHAPE_KINDS, type ShapeKind, StatusShape } from "./status-shape";
+export {
+  SHAPE_KINDS,
+  SHAPES,
+  type ShapeKind,
+  StatusShape,
+} from "./status-shape";
 export { Tag, type TagTone } from "./tag";

@@ -39,25 +39,23 @@ function Breadcrumbs() {
                   <ChevronRight className="size-3.5" strokeWidth={1.5} />
                 </li>
               ) : null}
-              <li
-                className={cn(
-                  "min-w-0 overflow-hidden text-ellipsis whitespace-nowrap",
-                  index === 0 && !last && "shrink-0",
-                )}
-              >
+              <li className={cn("min-w-0", index === 0 && !last && "shrink-0")}>
                 {last ? (
-                  <span aria-current="page" className="font-medium text-ink">
+                  <span
+                    aria-current="page"
+                    className="block truncate font-medium text-ink"
+                  >
                     {crumb.label}
                   </span>
                 ) : crumb.href ? (
                   <Link
                     href={crumb.href}
-                    className="inline-flex min-h-[24px] items-center text-ink-3 no-underline hover:text-ink"
+                    className="block min-h-[24px] truncate leading-6 text-ink-3 no-underline hover:text-ink"
                   >
                     {crumb.label}
                   </Link>
                 ) : (
-                  <span>{crumb.label}</span>
+                  <span className="block truncate">{crumb.label}</span>
                 )}
               </li>
             </Fragment>

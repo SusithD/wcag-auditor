@@ -241,7 +241,7 @@ test("client navigation updates the title and moves focus to the heading", async
   await page.locator("form[data-ready=true]").waitFor();
   await page.getByRole("link", { name: "Evaluation" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
-  await expect(page).toHaveTitle("Evaluation");
+  await expect(page).toHaveTitle("Evaluation - WCAG Auditor");
   await expect(page.locator("head title")).toHaveCount(1);
   await page.getByRole("link", { name: "New audit" }).click();
   await expect(page).toHaveTitle("New audit - WCAG Auditor");

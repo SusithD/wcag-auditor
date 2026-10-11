@@ -4,12 +4,7 @@ export type ReviewItem = components["schemas"]["ReviewItem"];
 export type Choice = "confirmed" | "dismissed" | "unsure";
 export type QueueState = "waiting" | "decided" | "all";
 
-export const DISMISS_REASONS = [
-  "Large text",
-  "Decorative",
-  "Tool error",
-  "Other",
-] as const;
+export { DISMISS_REASONS } from "@/lib/dismiss-reasons";
 
 export const CRITERIA_OPTIONS = [
   { value: "1.4.3", label: "1.4.3 Contrast (Minimum)" },

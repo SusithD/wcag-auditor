@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RunSummary } from "@/api/client";
 import { Panel, StatusShape } from "@/components/ds";
+import { useSettings } from "@/components/settings/use-settings";
 import { PageCrumbs, WideContent } from "@/components/shell";
 import {
   Alert,
@@ -56,7 +57,6 @@ import {
   useDelta,
   useRunAgain,
 } from "./use-report-queries";
-import { useShortcutsEnabled } from "./use-shortcuts-setting";
 
 function isTyping(target: EventTarget | null) {
   const el = target as HTMLElement | null;
@@ -105,7 +105,7 @@ export function ReportScreen({
     true,
   );
   const medium = useMediaQuery("(min-width: 1024px)", true);
-  const shortcuts = useShortcutsEnabled();
+  const [{ shortcuts }] = useSettings();
   const [pairMode, setPairMode] = useState<PairMode>("page");
   const [tab, setTab] = useState("canvas");
   const [groupBy, setGroupBy] = useState<GroupBy>("criterion");
