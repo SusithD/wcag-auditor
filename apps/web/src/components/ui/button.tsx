@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center gap-2 rounded-md border border-transparent text-dense/none font-medium whitespace-nowrap transition-colors duration-hover select-none disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-critical [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center gap-2 rounded-md border text-dense/none font-medium whitespace-nowrap transition-colors duration-hover select-none disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-critical [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
@@ -16,10 +16,10 @@ const buttonVariants = cva(
         primary:
           "border-accent-fill bg-accent-fill text-on-accent shadow-[inset_0_1px_0_rgb(255_255_255/0.12)] hover:border-accent-fill-hover hover:bg-accent-fill-hover",
         ghost:
-          "bg-transparent text-ink-2 hover:bg-subtle hover:text-ink aria-expanded:bg-subtle aria-expanded:text-ink",
+          "border-transparent bg-transparent text-ink-2 hover:bg-subtle hover:text-ink aria-expanded:bg-subtle aria-expanded:text-ink",
         destructive:
           "border-line-control bg-surface text-critical shadow-btn hover:bg-critical-bg",
-        link: "text-accent underline underline-offset-3 hover:text-ink",
+        link: "border-transparent text-accent underline underline-offset-3 hover:text-ink",
       },
       size: {
         default: "h-[32px] px-3",
