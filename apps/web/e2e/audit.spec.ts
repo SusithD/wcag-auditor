@@ -43,9 +43,7 @@ test("a queued run can be cancelled from the progress screen after confirming", 
   });
   const queuedId = (await second.json()).run_id;
   await page.goto(`/runs/${queuedId}`);
-  await expect(
-    page.getByRole("heading", { level: 1, name: "Auditing" }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await page.getByRole("button", { name: "Cancel audit" }).click();
   await page
     .getByRole("alertdialog")
@@ -77,9 +75,8 @@ test("progress shows the stepper, one live region and a cancel confirmation", as
   const created = await request.post("/api/runs", { data: { folder } });
   const { run_id } = await created.json();
   await page.goto(`/runs/${run_id}`);
-  await expect(
-    page.getByRole("navigation", { name: "Audit steps" }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Steps" })).toBeVisible();
+  await expect(page.getByRole("list", { name: "Steps" })).toBeVisible();
   await expect(page.locator("[role=status], output")).toHaveCount(1);
   await expect(page.locator('[aria-current="step"]').first()).toBeVisible();
   await page.getByRole("button", { name: "Cancel audit" }).click();
@@ -96,9 +93,9 @@ test("progress shows the stepper, one live region and a cancel confirmation", as
 test("the New Audit form can be completed with the keyboard alone", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/audit/new");
   await page.locator("form[data-ready=true]").waitFor();
-  const urlField = page.getByLabel("Web address");
+  const urlField = page.getByRole("textbox", { name: "Web address" });
 
   async function tabTo(locator: ReturnType<typeof page.locator>, max = 40) {
     for (let i = 0; i < max; i += 1) {
@@ -120,14 +117,13 @@ test("the New Audit form can be completed with the keyboard alone", async ({
   await expect(urlField).not.toHaveAttribute("aria-invalid", "true");
 
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("button", { name: "Desktop" })).toBeFocused();
+  await expect(page.getByRole("checkbox", { name: /Desktop/ })).toBeFocused();
   await page.keyboard.press("Space");
-  await expect(page.getByRole("button", { name: "Desktop" })).toHaveAttribute(
-    "aria-pressed",
-    "false",
-  );
+  await expect(
+    page.getByRole("checkbox", { name: /Desktop/ }),
+  ).not.toBeChecked();
 
-  await tabTo(page.getByRole("button", { name: /^Audit/ }));
+  await tabTo(page.getByRole("button", { name: /^Run audit/ }));
   await page.keyboard.press("Enter");
   await page.waitForURL(/\/runs\/[0-9a-f]{32}$/);
   await expect(
@@ -143,42 +139,42 @@ test("the New Audit form can be completed with the keyboard alone", async ({
 test("selecting no viewport is rejected inline without leaving the page", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/audit/new");
   await page.locator("form[data-ready=true]").waitFor();
-  await page.getByLabel("Web address").fill("example.com");
-  await page.getByRole("button", { name: "Desktop" }).click();
-  await page.getByRole("button", { name: "Mobile" }).click();
-  await page.getByRole("button", { name: /^Audit/ }).click();
+  await page.getByRole("textbox", { name: "Web address" }).fill("example.com");
+  await page.getByRole("checkbox", { name: /Desktop/ }).uncheck();
+  await page.getByRole("checkbox", { name: /Mobile/ }).uncheck();
+  await page.getByRole("button", { name: /^Run audit/ }).click();
   await expect(page.locator("form [role=alert]")).toContainText(
     "at least one viewport",
   );
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/audit\/new$/);
 });
 
 test("text that is not a web address is rejected inline and keeps focus on the field", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/audit/new");
   await page.locator("form[data-ready=true]").waitFor();
-  const field = page.getByLabel("Web address");
+  const field = page.getByRole("textbox", { name: "Web address" });
   await field.fill("not a url ///");
-  await page.getByRole("button", { name: /^Audit/ }).click();
+  await page.getByRole("button", { name: /^Run audit/ }).click();
   await expect(
     page.getByText("Enter a full address such as https://example.com"),
   ).toBeVisible();
   await expect(field).toHaveAttribute("aria-invalid", "true");
   await expect(field).toBeFocused();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/audit\/new$/);
 });
 
-test("both viewport toggles are reachable with Tab", async ({ page }) => {
-  await page.goto("/");
+test("both viewport cards are reachable with Tab", async ({ page }) => {
+  await page.goto("/audit/new");
   await page.locator("form[data-ready=true]").waitFor();
-  await page.getByLabel("Web address").focus();
+  await page.getByRole("textbox", { name: "Web address" }).focus();
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("button", { name: "Desktop" })).toBeFocused();
+  await expect(page.getByRole("checkbox", { name: /Desktop/ })).toBeFocused();
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("button", { name: "Mobile" })).toBeFocused();
+  await expect(page.getByRole("checkbox", { name: /Mobile/ })).toBeFocused();
 });
 
 test("a failed run explains the problem in plain words and offers a way forward", async ({
@@ -215,8 +211,9 @@ test("a failed run explains the problem in plain words and offers a way forward"
   await page.getByRole("button", { name: "Technical details" }).click();
   await expect(page.getByText(/ERR_NAME_NOT_RESOLVED/)).toBeVisible();
   await expect(page).toHaveTitle(/Audit failed - /);
+  await expect(page.getByRole("button", { name: "Run again" })).toBeVisible();
   await page.getByRole("link", { name: "Start a new audit" }).click();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/audit\/new$/);
 });
 
 test("an unknown run and an unknown page have their own titles and a way back", async ({
@@ -240,7 +237,7 @@ test("an unknown run and an unknown page have their own titles and a way back", 
 test("client navigation updates the title and moves focus to the heading", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/audit/new");
   await page.locator("form[data-ready=true]").waitFor();
   await page.getByRole("link", { name: "Evaluation" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
