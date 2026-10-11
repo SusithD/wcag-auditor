@@ -48,6 +48,7 @@ type Props = {
   onSelectCriterion: (sc: string | null) => void;
   onSelectFinding: (key: string) => void;
   onEnterCanvas: () => void;
+  embedded?: boolean;
 };
 
 const ROW =
@@ -86,6 +87,7 @@ export function CriteriaRail({
   onSelectCriterion,
   onSelectFinding,
   onEnterCanvas,
+  embedded = false,
 }: Props) {
   const list = useRef<HTMLDivElement>(null);
   const [roving, setRoving] = useState<string | null>(null);
@@ -312,8 +314,9 @@ export function CriteriaRail({
         )}
       </div>
       <p className="mx-2 mt-4 mb-1 text-xs text-ink-3">
-        Severity estimates impact on users. Any failure of an A or AA criterion
-        fails conformance.
+        {embedded
+          ? "Severity estimates impact on users. Any failure of an A or AA criterion fails conformance."
+          : "Severity describes impact on users, not conformance. This tool checks 8 of the 86 WCAG 2.2 success criteria."}
       </p>
     </nav>
   );

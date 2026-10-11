@@ -33,7 +33,7 @@ const CRITERIA: {
     level: "AA",
     measures:
       "Borders, icons and states of controls against their surroundings.",
-    how: "3:1. Graphics and colours estimated from pixels are needs review.",
+    how: "3:1. Graphics are marked needs review.",
     provenance: "Pixel",
   },
   {
@@ -41,7 +41,7 @@ const CRITERIA: {
     name: "Focus Visible",
     level: "AA",
     measures: "Whether keyboard focus changes what is drawn.",
-    how: "Compares a focused and an unfocused screenshot of each stop. WCAG gives no number, so the tool uses a fixed change threshold from Protocol v1.1.",
+    how: "Compares a focused and an unfocused screenshot of each stop. WCAG gives no number, so the tool counts focus as visible if the change is at least 1.5:1, the threshold fixed by Protocol v1.1.",
     provenance: "Pixel",
   },
   {
@@ -75,7 +75,7 @@ const CRITERIA: {
     level: "AA",
     measures:
       "Custom sliders and drag widgets that have no single-pointer alternative.",
-    how: "Needs the page HTML. Native range inputs pass. Without HTML the criterion cannot be assessed.",
+    how: "Needs the page HTML. Native range inputs are not flagged. Without HTML the criterion shows as Could not decide.",
     provenance: "Page HTML",
   },
   {
@@ -91,7 +91,7 @@ const CRITERIA: {
 const TIERS: { tag: ReactNode; text: string }[] = [
   {
     tag: <Tag>Automated</Tag>,
-    text: "The tool measured it and is confident in the verdict. A person can still disagree, and the review queue records that.",
+    text: "The tool measured it and reports a result. A person can still disagree, and the review queue records that.",
   },
   {
     tag: <Tag tone="review">Needs review</Tag>,
@@ -99,7 +99,7 @@ const TIERS: { tag: ReactNode; text: string }[] = [
   },
   {
     tag: <Tag>Not assessable</Tag>,
-    text: "The input needed was missing, so no verdict is given. It is never counted as a pass.",
+    text: "The input needed was missing, so the criterion shows as Could not decide. It is never counted as No issue found.",
   },
 ];
 
@@ -114,7 +114,29 @@ const PROVENANCE: { tag: string; text: string }[] = [
   },
   {
     tag: "Rule and pixel",
-    text: "Both channels reported the same place. Solid boxes are measured; dashed boxes are estimated by the detector.",
+    text: "Both channels reported the same place.",
+  },
+];
+
+const BOXES: { tag: string; text: string }[] = [
+  {
+    tag: "Measured",
+    text: "Drawn as a solid box. The tool measured this position.",
+  },
+  {
+    tag: "Estimated by the detector",
+    text: "Drawn as a dashed box. The element detector estimated the position from the screenshot.",
+  },
+];
+
+const METHODS: { tag: string; text: string }[] = [
+  {
+    tag: "Detector and rules",
+    text: "Decides all 8 criteria with the page HTML and 5 of 8 from a screenshot alone.",
+  },
+  {
+    tag: "Rules only",
+    text: "Decides 2 of 8 criteria.",
   },
 ];
 
@@ -143,15 +165,21 @@ const COVERAGE: {
     word: "Could not decide",
     text: "The tool had no reliable way to decide with the input it was given.",
   },
+  {
+    shape: "undecided",
+    word: "No verdict",
+    text: "The method returned nothing for the criterion.",
+  },
 ];
 
 const LIMITS = [
   "This tool checks 8 of the 86 WCAG 2.2 success criteria. The other 78 are not checked at all.",
-  "No issue found is not the same as conformance. A page can pass all eight checks and still fail other criteria.",
+  "No issue found is not the same as conformance. A page with no issue found on all eight can still fail other criteria.",
   "Severity describes impact, not conformance. A minor finding is still a failure of the criterion.",
   "Screenshots show one state of the page. Content behind logins, hover menus and other states is not seen.",
+  "Focus checks cover only the recorded focus steps.",
   "Detector boxes are estimates. Where a result depends on one, it is marked needs review.",
-  "A fix marked as fixed stays unverified until a later audit no longer finds the problem.",
+  "A fix you mark as fixed shows as Fix not verified until a later audit no longer finds the problem.",
   "Automated checks do not replace testing with people who use assistive technology.",
 ];
 
@@ -159,6 +187,8 @@ const SECTIONS = [
   { id: "criteria", label: "The 8 criteria" },
   { id: "tiers", label: "Tiers" },
   { id: "provenance", label: "Provenance" },
+  { id: "boxes", label: "Box legend" },
+  { id: "methods", label: "Methods" },
   { id: "coverage", label: "Coverage states" },
   { id: "limits", label: "What this result does not mean" },
   { id: "protocol", label: "Protocol" },
@@ -226,9 +256,9 @@ export function HelpScreen() {
         <Section id="criteria" title="The 8 criteria">
           <PanelBody className="pb-0 text-ink-2">
             <p className="m-0">
-              Each result names its criterion and its WCAG level. The tool
-              targets level A and AA criteria and also reports two AAA focus
-              criteria.
+              Each result names its criterion and its WCAG level. Six of the
+              eight criteria are level AA and two are level AAA (2.4.12 and
+              2.4.13).
             </p>
           </PanelBody>
           <ul className="m-0 list-none p-0">
@@ -268,6 +298,26 @@ export function HelpScreen() {
               key: p.tag,
               head: <Tag>{p.tag}</Tag>,
               text: p.text,
+            }))}
+          />
+        </Section>
+
+        <Section id="boxes" title="Box legend">
+          <Rows
+            items={BOXES.map((b) => ({
+              key: b.tag,
+              head: <Tag>{b.tag}</Tag>,
+              text: b.text,
+            }))}
+          />
+        </Section>
+
+        <Section id="methods" title="Methods">
+          <Rows
+            items={METHODS.map((m) => ({
+              key: m.tag,
+              head: <Tag>{m.tag}</Tag>,
+              text: m.text,
             }))}
           />
         </Section>

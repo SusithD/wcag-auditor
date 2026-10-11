@@ -1,5 +1,6 @@
 import type { components } from "@/api/types";
 import { Panel, PanelHeader, QuietLink, StatusShape } from "@/components/ds";
+import { DETECTOR_VAL_MAP } from "@/lib/detector";
 import { plural, weekComparison, weekRange } from "@/lib/overview";
 
 type Week = components["schemas"]["WeekSummary"];
@@ -71,9 +72,9 @@ export function MethodPanel() {
       text: (
         <>
           Findings that depend on the element detector are marked{" "}
-          <b className="font-semibold text-ink">Needs review</b>. Detector
-          accuracy is <span className="num">0.239</span> mAP on the WebUI
-          validation set.
+          <b className="font-semibold text-ink">Needs review</b>. The element
+          detector scores <span className="num">{DETECTOR_VAL_MAP}</span> mAP
+          (50:95) on the WebUI validation set.
         </>
       ),
     },

@@ -323,6 +323,7 @@ export function ReportScreen({
       }}
       onSelectFinding={select}
       onEnterCanvas={() => document.getElementById("canvas-region")?.focus()}
+      embedded={embedded}
     />
   );
 
@@ -389,9 +390,13 @@ export function ReportScreen({
           <p className="pointer-events-auto flex items-start gap-2.5 rounded-lg border border-line bg-surface p-3 text-body text-ink shadow-float">
             <StatusShape kind="pass" className="mt-1" />
             <span>
-              {checkedCount === 8
-                ? "No violations found in the 8 in-scope criteria."
-                : `No violations found in the ${checkedCount} of 8 criteria this report checks. The other ${8 - checkedCount} were not assessed, so this is not a clean result for them.`}{" "}
+              {embedded
+                ? checkedCount === 8
+                  ? "No violations found in the 8 in-scope criteria."
+                  : `No violations found in the ${checkedCount} of 8 criteria this report checks. The other ${8 - checkedCount} were not assessed, so this is not a clean result for them.`
+                : checkedCount === 8
+                  ? "No issue found in the 8 criteria this tool checks. It checks 8 of the 86 WCAG 2.2 success criteria."
+                  : `No issue found in the ${checkedCount} criteria the tool could decide. The other ${8 - checkedCount} could not be decided.`}{" "}
               {embedded ? "" : "The coverage view shows what was checked."}
             </span>
           </p>
