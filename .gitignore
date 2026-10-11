@@ -26,3 +26,6 @@ __pycache__/
 coverage/
 playwright-report/
 test-results/
+
+# design-system preview captures (webp versions are committed)
+docs/design-system/previews/**/*.png
