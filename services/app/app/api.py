@@ -130,6 +130,29 @@ def _capture_folders(run_dir: Path) -> dict[str, Path]:
     return folders
 
 
+def summarise_run(settings: Settings, row: Run) -> RunSummary:
+    summary = _read_summary(settings.runs_dir / row.id)
+    counts = SeverityCounts()
+    available: list[Viewport] = []
+    for vp, info in (summary.get("viewports") or {}).items():
+        available.append(vp)
+        for key, value in info.get("counts", {}).items():
+            setattr(counts, key, getattr(counts, key) + int(value))
+    return RunSummary(
+        id=row.id,
+        created_at=row.created_at,
+        source_kind=row.source_kind,
+        source=row.source,
+        viewports=row.viewports,
+        condition=row.condition,
+        status=row.status,
+        stage_status=row.stage_status,
+        error=row.error,
+        counts=counts,
+        available_viewports=sorted(available),
+    )
+
+
 def build_router(settings: Settings) -> APIRouter:
     router = APIRouter()
 
@@ -139,26 +162,7 @@ def build_router(settings: Settings) -> APIRouter:
         return settings.runs_dir / run_id
 
     def summarise(row: Run) -> RunSummary:
-        summary = _read_summary(settings.runs_dir / row.id)
-        counts = SeverityCounts()
-        available: list[Viewport] = []
-        for vp, info in (summary.get("viewports") or {}).items():
-            available.append(vp)
-            for key, value in info.get("counts", {}).items():
-                setattr(counts, key, getattr(counts, key) + int(value))
-        return RunSummary(
-            id=row.id,
-            created_at=row.created_at,
-            source_kind=row.source_kind,
-            source=row.source,
-            viewports=row.viewports,
-            condition=row.condition,
-            status=row.status,
-            stage_status=row.stage_status,
-            error=row.error,
-            counts=counts,
-            available_viewports=sorted(available),
-        )
+        return summarise_run(settings, row)
 
     def _store_upload(raw: bytes, name: str | None, base: Path, seen: list[Viewport]) -> Viewport:
         try:

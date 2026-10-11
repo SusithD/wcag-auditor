@@ -28,7 +28,7 @@ type Props = {
   total: number;
   onPrev: () => void;
   onNext: () => void;
-  onStatus: (status: "open" | "fixed" | "ignored") => void;
+  onStatus: (status: "open" | "fixed" | "dismissed") => void;
   saving: boolean;
   saveError: boolean;
   empty: boolean;
@@ -320,14 +320,14 @@ export function DetailPane({
             <Button
               size="sm"
               className="min-h-[24px] min-w-[24px]"
-              variant={finding.status === "ignored" ? "secondary" : "outline"}
-              aria-pressed={finding.status === "ignored"}
+              variant={finding.status === "dismissed" ? "secondary" : "outline"}
+              aria-pressed={finding.status === "dismissed"}
               disabled={saving}
               onClick={() =>
-                onStatus(finding.status === "ignored" ? "open" : "ignored")
+                onStatus(finding.status === "dismissed" ? "open" : "dismissed")
               }
             >
-              {finding.status === "ignored" ? "Ignored" : "Ignore"}
+              {finding.status === "dismissed" ? "Ignored" : "Ignore"}
             </Button>
           </div>
         )}

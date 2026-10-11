@@ -3,12 +3,13 @@ from __future__ import annotations
 import csv
 import io
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import FileResponse, Response
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -17,7 +18,7 @@ from app.config import Settings
 from app.ingest import capture_for, ingest_run
 from app.models import CaptureRow, FindingRow
 
-Status = Literal["open", "fixed", "ignored"]
+Status = Literal["open", "fixed", "dismissed", "confirmed", "unsure"]
 Verdict = Literal["automated", "needs-review", "not-assessable", "none"]
 
 
@@ -50,6 +51,14 @@ class BBoxOut(BaseModel):
     h: float
 
 
+class Decision(BaseModel):
+    status: Status = "open"
+    reason: str | None = None
+    note: str | None = None
+    decided_at: datetime | None = None
+    decided_by: str | None = None
+
+
 class FindingOut(BaseModel):
     id: int
     key: str
@@ -66,6 +75,8 @@ class FindingOut(BaseModel):
     evidence_rows: list[EvidenceRow]
     has_crop: bool
     status: Status
+    decision: Decision = Field(default_factory=Decision)
+    needs_review_reason: str | None = None
 
 
 class CoverageCellOut(BaseModel):
@@ -109,6 +120,8 @@ class CompareOut(BaseModel):
 
 class FindingPatch(BaseModel):
     status: Status
+    reason: str | None = None
+    note: str | None = None
 
 
 def related(a: FindingOut, b: FindingOut, iou_min: float, containment_min: float) -> bool:
@@ -158,6 +171,53 @@ def _load_report(run_dir: Path, viewport: str) -> dict[str, Any]:
     return data
 
 
+def load_report_lenient(run_dir: Path, viewport: str) -> dict[str, Any]:
+    path = run_dir / viewport / "report.json"
+    try:
+        data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return data
+
+
+def finding_out(row: FindingRow, viewport: str, report: dict[str, Any]) -> FindingOut:
+    key = row.key or ""
+    guidance = report.get("guidance", {}).get(key)
+    rows = report.get("evidence_rows", {}).get(key, [])
+    reason = row.evidence.get("needs_review_reason")
+    return FindingOut(
+        id=row.id,
+        key=key,
+        viewport=viewport,
+        sc=row.sc,
+        bbox=BBoxOut(**row.bbox) if row.bbox else None,
+        focus_index=row.focus_index,
+        severity=row.severity,
+        tier=row.tier,
+        score=row.score,
+        provenance=row.provenance,
+        element=_element(row.evidence),
+        guidance=GuidanceOut(**guidance) if guidance else None,
+        evidence_rows=[EvidenceRow(label=a, value=b) for a, b in rows],
+        has_crop=key in report.get("crops", {}),
+        status=row.status,
+        decision=Decision(
+            status=row.status,
+            reason=row.decision_reason,
+            note=row.decision_note,
+            decided_at=_aware(row.decided_at),
+            decided_by=row.decided_by,
+        ),
+        needs_review_reason=str(reason) if reason else None,
+    )
+
+
+def _aware(value: datetime | None) -> datetime | None:
+    if value is not None and value.tzinfo is None:
+        return value.replace(tzinfo=UTC)
+    return value
+
+
 def build_report_router(settings: Settings) -> APIRouter:
     router = APIRouter()
 
@@ -178,26 +238,7 @@ def build_report_router(settings: Settings) -> APIRouter:
         return capture
 
     def to_out(row: FindingRow, viewport: str, report: dict[str, Any]) -> FindingOut:
-        key = row.key or ""
-        guidance = report.get("guidance", {}).get(key)
-        rows = report.get("evidence_rows", {}).get(key, [])
-        return FindingOut(
-            id=row.id,
-            key=key,
-            viewport=viewport,
-            sc=row.sc,
-            bbox=BBoxOut(**row.bbox) if row.bbox else None,
-            focus_index=row.focus_index,
-            severity=row.severity,
-            tier=row.tier,
-            score=row.score,
-            provenance=row.provenance,
-            element=_element(row.evidence),
-            guidance=GuidanceOut(**guidance) if guidance else None,
-            evidence_rows=[EvidenceRow(label=a, value=b) for a, b in rows],
-            has_crop=key in report.get("crops", {}),
-            status=row.status,
-        )
+        return finding_out(row, viewport, report)
 
     @router.get("/runs/{run_id}/overview", response_model=Overview)
     def overview(run_id: str, viewport: Viewport) -> Overview:
@@ -422,7 +463,18 @@ def build_report_router(settings: Settings) -> APIRouter:
             capture = session.get(CaptureRow, row.capture_id)
             assert capture is not None
             report = _load_report(Path(capture.path).parent, capture.viewport)
+            reason = (body.reason or "").strip()
+            if body.status == "dismissed" and not reason:
+                raise HTTPException(422, "Give a reason for dismissing a finding")
             row.status = body.status
+            if body.status == "open":
+                row.decision_reason = row.decision_note = None
+                row.decided_at = row.decided_by = None
+            else:
+                row.decision_reason = reason or None
+                row.decision_note = (body.note or "").strip() or None
+                row.decided_at = datetime.now(UTC)
+                row.decided_by = settings.decided_by_name
             session.commit()
             return to_out(row, capture.viewport, report)
 

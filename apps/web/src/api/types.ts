@@ -532,6 +532,74 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/runs/{run_id}/delta": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Run Delta */
+    get: operations["run_delta_runs__run_id__delta_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/review": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Review */
+    get: operations["review_review_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/sites": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Sites */
+    get: operations["sites_sites_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/summary/week": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Week */
+    get: operations["week_summary_week_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/uploads": {
     parameters: {
       query?: never;
@@ -798,6 +866,38 @@ export interface components {
       /** Answers */
       answers: string[];
     };
+    /** Decision */
+    Decision: {
+      /**
+       * Status
+       * @default open
+       * @enum {string}
+       */
+      status: "open" | "fixed" | "dismissed" | "confirmed" | "unsure";
+      /** Reason */
+      reason?: string | null;
+      /** Note */
+      note?: string | null;
+      /** Decided At */
+      decided_at?: string | null;
+      /** Decided By */
+      decided_by?: string | null;
+    };
+    /** DeltaOut */
+    DeltaOut: {
+      /** Run Id */
+      run_id: string;
+      /** Previous Run Id */
+      previous_run_id: string | null;
+      /** Fixed */
+      fixed: components["schemas"]["FindingOut"][];
+      /** New */
+      new: components["schemas"]["FindingOut"][];
+      /** Still Present */
+      still_present: components["schemas"]["FindingOut"][];
+      /** Fixes Verified */
+      fixes_verified: components["schemas"]["FindingOut"][];
+    };
     /** DeltaRow */
     DeltaRow: {
       /** Stratum */
@@ -1004,7 +1104,10 @@ export interface components {
        * Status
        * @enum {string}
        */
-      status: "open" | "fixed" | "ignored";
+      status: "open" | "fixed" | "dismissed" | "confirmed" | "unsure";
+      decision?: components["schemas"]["Decision"];
+      /** Needs Review Reason */
+      needs_review_reason?: string | null;
     };
     /** FindingPatch */
     FindingPatch: {
@@ -1012,12 +1115,23 @@ export interface components {
        * Status
        * @enum {string}
        */
-      status: "open" | "fixed" | "ignored";
+      status: "open" | "fixed" | "dismissed" | "confirmed" | "unsure";
+      /** Reason */
+      reason?: string | null;
+      /** Note */
+      note?: string | null;
     };
     /** FixSubmission */
     FixSubmission: {
       /** Fix Text */
       fix_text: string;
+    };
+    /** FixesToVerify */
+    FixesToVerify: {
+      /** Findings */
+      findings: number;
+      /** Sites */
+      sites: number;
     };
     /** GuidanceOut */
     GuidanceOut: {
@@ -1125,6 +1239,42 @@ export interface components {
       /** Notes */
       notes?: string | null;
     };
+    /** ReasonCount */
+    ReasonCount: {
+      /** Reason */
+      reason: string | null;
+      /** Count */
+      count: number;
+    };
+    /** ReviewItem */
+    ReviewItem: {
+      finding: components["schemas"]["FindingOut"];
+      /** Run Id */
+      run_id: string;
+      /** Source */
+      source: string;
+      /** Site */
+      site: string;
+      /**
+       * Viewport
+       * @enum {string}
+       */
+      viewport: "desktop" | "mobile";
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+    };
+    /** ReviewOut */
+    ReviewOut: {
+      /** Items */
+      items: components["schemas"]["ReviewItem"][];
+      /** Counts By Reason */
+      counts_by_reason: components["schemas"]["ReasonCount"][];
+      /** Total */
+      total: number;
+    };
     /** RunCreate */
     RunCreate: {
       /** Url */
@@ -1187,6 +1337,19 @@ export interface components {
       /** Available Viewports */
       available_viewports: ("desktop" | "mobile")[];
     };
+    /** RunningAudit */
+    RunningAudit: {
+      /** Run Id */
+      run_id: string;
+      /** Source */
+      source: string;
+      /** Status */
+      status: string;
+      /** Stage Status */
+      stage_status: {
+        [key: string]: unknown;
+      };
+    };
     /** SessionCreate */
     SessionCreate: {
       /** Code */
@@ -1230,6 +1393,22 @@ export interface components {
        * @default 0
        */
       needs_review: number;
+    };
+    /** SiteRow */
+    SiteRow: {
+      /** Site */
+      site: string;
+      latest_run: components["schemas"]["RunSummary"];
+      /** Previous Run Id */
+      previous_run_id: string | null;
+      /** Failures */
+      failures: number;
+      /** Failures Delta */
+      failures_delta: number | null;
+      /** To Review */
+      to_review: number;
+      /** Criteria Decided */
+      criteria_decided: number;
     };
     /** StepInfo */
     StepInfo: {
@@ -1338,6 +1517,22 @@ export interface components {
       input?: unknown;
       /** Context */
       ctx?: Record<string, never>;
+    };
+    /** WeekSummary */
+    WeekSummary: {
+      /** Audits This Week */
+      audits_this_week: number;
+      /** Audits Last Week */
+      audits_last_week: number;
+      /** Fixes Verified This Week */
+      fixes_verified_this_week: number;
+      /** Decisions This Week */
+      decisions_this_week: number;
+      /** Median Criteria Decided */
+      median_criteria_decided: number;
+      /** Running */
+      running: components["schemas"]["RunningAudit"][];
+      fixes_to_verify: components["schemas"]["FixesToVerify"];
     };
   };
   responses: never;
@@ -2344,6 +2539,113 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  run_delta_runs__run_id__delta_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        run_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeltaOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  review_review_get: {
+    parameters: {
+      query?: {
+        state?: "waiting" | "decided" | "all";
+        site?: string | null;
+        sc?: string | null;
+        reason?: string | null;
+        limit?: number;
+        offset?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ReviewOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  sites_sites_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SiteRow"][];
+        };
+      };
+    };
+  };
+  week_summary_week_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WeekSummary"];
         };
       };
     };

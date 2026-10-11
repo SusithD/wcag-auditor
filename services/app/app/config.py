@@ -24,6 +24,7 @@ class Settings:
     study_dir: Path | None = None
     study_ethics_approved: bool = False
     study_admin_token: str | None = None
+    decided_by_name: str = "Local user"
 
     @property
     def catalogue_file(self) -> Path:
@@ -70,4 +71,5 @@ class Settings:
             study_dir=_path(os.environ.get("STUDY_DIR")),
             study_ethics_approved=os.environ.get("STUDY_ETHICS_APPROVED") == "1",
             study_admin_token=os.environ.get("STUDY_ADMIN_TOKEN") or None,
+            decided_by_name=os.environ.get("DECIDED_BY_NAME") or "Local user",
         )

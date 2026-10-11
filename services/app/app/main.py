@@ -19,6 +19,7 @@ from app.jobs import JobResult, JobRunner
 from app.models import EvalRun, Run
 from app.report_api import build_report_router
 from app.study_api import build_study_router
+from app.workflow_api import build_workflow_router
 
 ALEMBIC_INI = Path(__file__).resolve().parents[1] / "alembic.ini"
 
@@ -106,6 +107,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(build_report_router(cfg))
     app.include_router(build_eval_router(cfg))
     app.include_router(build_study_router(cfg))
+    app.include_router(build_workflow_router(cfg))
     app.include_router(build_router(cfg))
     return app
 
