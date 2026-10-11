@@ -59,7 +59,9 @@ export function QuickAudit() {
       router.push(`/runs/${runId}`);
     } catch (err) {
       setFailure(
-        err instanceof Error ? err.message : "The audit could not be started",
+        err instanceof Error
+          ? err.message
+          : "The audit could not be started. Try again.",
       );
       submitLock.current = false;
       setSubmitting(false);
@@ -146,7 +148,7 @@ export function FirstRun() {
     },
     {
       title: "Check",
-      text: "Browser rules and an element detector check 8 WCAG 2.2 criteria.",
+      text: "The tool checks 8 WCAG 2.2 criteria using browser rules and, if you choose it, an element detector.",
     },
     {
       title: "Review",

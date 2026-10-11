@@ -45,7 +45,8 @@ export function useDecideFinding(
           note: vars.note,
         },
       });
-      if (error || !data) throw new Error("The decision could not be saved");
+      if (error || !data)
+        throw new Error("The decision could not be saved. Try again.");
       return data;
     },
     onMutate: async (vars) => {
@@ -101,7 +102,8 @@ export function useRunAgain(
             : null;
       if (!body) throw new Error("This source cannot be run again");
       const { data, error } = await api.POST("/runs", { body });
-      if (error || !data) throw new Error("The audit could not be started");
+      if (error || !data)
+        throw new Error("The audit could not be started. Try again.");
       return data.run_id;
     },
     onSuccess: async (id) => {

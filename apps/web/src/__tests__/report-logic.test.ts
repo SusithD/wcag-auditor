@@ -122,15 +122,15 @@ describe("tally and verdict sentence", () => {
 
   it("says no failures when criteria were decided and nothing failed", () => {
     const t = tally([], COVERAGE);
-    expect(verdictText(t).startsWith("No failures in the 5 criteria")).toBe(
-      true,
-    );
+    expect(
+      verdictText(t).startsWith("No failures found in the 5 criteria"),
+    ).toBe(true);
   });
 
-  it("says nobody was left undecided when every criterion has a verdict", () => {
+  it("counts zero undecided criteria when every criterion has a verdict", () => {
     const all = COVERAGE.map((c) => cell(c.sc, "automated"));
     expect(verdictText(tally([], all))).toMatch(
-      /no criterion was left undecided\.$/,
+      /0 criteria could not be decided on this page\.$/,
     );
   });
 });
@@ -256,10 +256,10 @@ describe("contrast ruler maths", () => {
     expect(r.passes).toBe(true);
     expect(r.shortBy).toBe(0);
     expect(rulerLabel({ measured: 5, required: 4.5 })).toBe(
-      "Measured 5.00 to 1, required 4.5 to 1, meets the requirement",
+      "Measured 5.00:1, required 4.5:1, at or above the required ratio",
     );
     expect(rulerLabel({ measured: 4.48, required: 4.5 })).toBe(
-      "Measured 4.48 to 1, required 4.5 to 1, short by 0.02",
+      "Measured 4.48:1, required 4.5:1, short by 0.02",
     );
   });
 

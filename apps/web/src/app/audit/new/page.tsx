@@ -13,7 +13,7 @@ export default function NewAuditPage() {
       />
       <PageHeader
         title="New audit"
-        description="We open the page in Chromium, capture it at the sizes you choose, and check 8 WCAG 2.2 criteria."
+        description="We open the page in Chromium and capture it at the sizes you choose. The tool checks 8 WCAG 2.2 criteria using browser rules and, if you choose it, an element detector."
         className="mb-4"
       />
       <NewAuditForm />

@@ -109,7 +109,7 @@ export function verdictSentence(t: Tally): VerdictPart[] {
   } else {
     push("No failures", true);
     push(
-      ` in the ${plural(t.decided, "criterion", "criteria")} the tool could decide. `,
+      ` found in the ${plural(t.decided, "criterion", "criteria")} the tool could decide. `,
     );
   }
   if (t.review > 0) {
@@ -119,13 +119,8 @@ export function verdictSentence(t: Tally): VerdictPart[] {
     push("No findings", true);
     push(" need review, and ");
   }
-  if (t.undecided > 0) {
-    push(plural(t.undecided, "criterion", "criteria"), true);
-    push(" could not be decided on this page.");
-  } else {
-    push("no criterion", true);
-    push(" was left undecided.");
-  }
+  push(plural(t.undecided, "criterion", "criteria"), true);
+  push(" could not be decided on this page.");
   return parts;
 }
 
@@ -325,8 +320,8 @@ export function rulerLabel(pair: RatioPair): string {
   const m = pair.measured.toFixed(2);
   const q = pair.required.toString();
   return r.passes
-    ? `Measured ${m} to 1, required ${q} to 1, meets the requirement`
-    : `Measured ${m} to 1, required ${q} to 1, short by ${r.shortBy.toFixed(2)}`;
+    ? `Measured ${m}:1, required ${q}:1, at or above the required ratio`
+    : `Measured ${m}:1, required ${q}:1, short by ${r.shortBy.toFixed(2)}`;
 }
 
 function channel(hex: number): number {
