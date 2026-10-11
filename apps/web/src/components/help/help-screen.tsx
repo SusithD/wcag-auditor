@@ -132,11 +132,11 @@ const BOXES: { tag: string; text: string }[] = [
 const METHODS: { tag: string; text: string }[] = [
   {
     tag: "Detector and rules",
-    text: "Decides all 8 criteria with the page HTML and 5 of 8 from a screenshot alone.",
+    text: "Decides all 8 criteria with the page HTML. From uploaded screenshots alone, the tool checks 1.4.3, 1.4.11 and 2.5.8 and marks them Needs review; the other five could not be decided.",
   },
   {
     tag: "Rules only",
-    text: "Decides 2 of 8 criteria.",
+    text: "Decides 2 of 8 criteria. From uploaded screenshots alone, only 1.4.3 is checked and marked Needs review; the other seven could not be decided.",
   },
 ];
 

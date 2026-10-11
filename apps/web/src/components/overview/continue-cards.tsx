@@ -48,7 +48,10 @@ export function RunningCard({ running }: { running: Week["running"] }) {
       <p className={TEXT}>
         The audit keeps running if you leave. Open it to follow the steps.
       </p>
-      <QuietLink href={`/runs/${first.run_id}`} className="mt-auto self-start">
+      <QuietLink
+        href={`/runs/${first.run_id}`}
+        className="-ml-2 mt-auto self-start"
+      >
         View progress
       </QuietLink>
     </Panel>
@@ -109,7 +112,7 @@ export function ReviewCard({ review }: { review: Review }) {
           </li>
         ))}
       </ul>
-      <QuietLink href="/review" className="mt-auto self-start">
+      <QuietLink href="/review" className="-ml-2 mt-auto self-start">
         Open queue
       </QuietLink>
     </Panel>

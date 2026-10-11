@@ -377,7 +377,11 @@ export function ReviewScreen() {
       <WideContent />
       <PageHeader
         title="Review queue"
-        description="Findings marked Needs review. A person needs to check each one."
+        description={
+          <span className="block max-w-md">
+            Findings marked Needs review. A person needs to check each one.
+          </span>
+        }
         actions={
           <div
             role="group"
