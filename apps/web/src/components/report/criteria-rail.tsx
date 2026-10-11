@@ -15,7 +15,6 @@ import {
   type CoverageCell,
   type Finding,
   measureText,
-  SC_TITLES,
   SEV_LABEL,
   type SevKey,
   sevKey,
@@ -30,6 +29,7 @@ import {
   type GroupBy,
   groupFindings,
   SC_LEVELS,
+  scTitle,
 } from "./logic";
 import { Seg } from "./seg";
 
@@ -52,7 +52,7 @@ type Props = {
 };
 
 const ROW =
-  "relative grid min-h-[34px] w-full items-center gap-x-2 rounded-md px-2 py-1 text-left text-dense text-ink hover:bg-subtle aria-pressed:bg-tint aria-pressed:shadow-[inset_2px_0_0_var(--accent)]";
+  "relative grid min-h-[34px] w-full items-center gap-x-2 rounded-md px-2 py-1 text-left text-dense text-ink outline-none hover:bg-subtle aria-pressed:bg-tint aria-pressed:shadow-[inset_2px_0_0_var(--accent)] in-data-[kb=true]:focus-visible:outline-2 in-data-[kb=true]:focus-visible:outline-offset-2 in-data-[kb=true]:focus-visible:outline-ring";
 
 function criterionShape(
   bucket: Bucket,
@@ -90,6 +90,21 @@ export function CriteriaRail({
   embedded = false,
 }: Props) {
   const list = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const track = (event: globalThis.KeyboardEvent) => {
+      const el = list.current;
+      if (!el) return;
+      if (/^[jk]$/i.test(event.key)) el.dataset.kb = "false";
+      else if (
+        event.key === "Tab" ||
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown"
+      )
+        el.dataset.kb = "true";
+    };
+    window.addEventListener("keydown", track, true);
+    return () => window.removeEventListener("keydown", track, true);
+  }, []);
   const [roving, setRoving] = useState<string | null>(null);
   // biome-ignore lint/correctness/useExhaustiveDependencies: a new grouping starts from its own default stop
   useEffect(() => setRoving(null), [groupBy]);
@@ -215,15 +230,20 @@ export function CriteriaRail({
                             }
                             className={cn(
                               ROW,
-                              "grid-cols-[14px_40px_minmax(0,1fr)_auto_18px]",
+                              "grid-cols-[14px_44px_minmax(0,1fr)_auto_18px]",
                             )}
                           >
                             <StatusShape
                               kind={criterionShape(bucket, findings, sc)}
                             />
                             <ScCode code={sc} />
-                            <span className="leading-[1.125rem]">
-                              {SC_TITLES[sc]}
+                            <span className="min-w-0 leading-[1.125rem]">
+                              <span
+                                className="block truncate"
+                                title={scTitle(sc)}
+                              >
+                                {scTitle(sc)}
+                              </span>
                               {findings.some(
                                 (f) => f.sc === sc && f.status === "fixed",
                               ) ? (
@@ -285,14 +305,14 @@ export function CriteriaRail({
                         onClick={() => onSelectFinding(f.key)}
                         className={cn(
                           ROW,
-                          "grid-cols-[14px_40px_minmax(0,1fr)_auto]",
+                          "grid-cols-[14px_44px_minmax(0,1fr)_auto]",
                         )}
                       >
                         <StatusShape kind={findingShape(key)} />
                         <ScCode code={f.sc} />
                         <span className="min-w-0 truncate leading-[1.125rem]">
                           {groupBy === "element"
-                            ? measureText(f) || SC_TITLES[f.sc]
+                            ? measureText(f) || scTitle(f.sc)
                             : shortElement(f.element, 28)}
                           {f.status === "fixed" ? (
                             <span className="block text-xs text-ink-3">
@@ -301,7 +321,7 @@ export function CriteriaRail({
                           ) : null}
                         </span>
                         <span className="sr-only">
-                          {SEV_LABEL[key]}, {SC_TITLES[f.sc]}
+                          {SEV_LABEL[key]}, {scTitle(f.sc)}
                         </span>
                         <Level level={SC_LEVELS[f.sc] ?? "AA"} />
                       </button>

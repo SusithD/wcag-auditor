@@ -37,7 +37,7 @@ export function RunNav({
     <nav
       aria-label="Run views"
       className={cn(
-        "flex flex-wrap gap-x-6 border-b border-line max-[720px]:gap-x-4",
+        "flex flex-nowrap gap-x-6 overflow-x-auto shadow-[inset_0_-1px_0_var(--line)] max-[720px]:gap-x-4",
         className,
       )}
     >
@@ -46,7 +46,7 @@ export function RunNav({
           key={item.key}
           href={runViewHref(runId, item.key, query)}
           aria-current={item.key === current ? "page" : undefined}
-          className="-mb-px inline-flex min-h-10 items-center border-b-2 border-transparent font-medium text-ink-2 no-underline transition-colors duration-hover hover:text-ink aria-[current=page]:border-accent aria-[current=page]:text-ink"
+          className="inline-flex min-h-10 shrink-0 items-center border-b-2 whitespace-nowrap border-transparent font-medium text-ink-2 no-underline transition-colors duration-hover hover:text-ink aria-[current=page]:border-accent aria-[current=page]:text-ink"
         >
           {item.label}
         </Link>

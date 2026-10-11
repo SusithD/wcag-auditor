@@ -31,7 +31,6 @@ import {
   type Finding,
   plainText,
   plainValue,
-  SC_TITLES,
   SEV_LABEL,
   sevKey,
   TIER_LABEL,
@@ -48,6 +47,7 @@ import {
   ratioPair,
   ruler,
   SC_LEVELS,
+  scTitle,
   sentence,
 } from "./logic";
 import { Seg } from "./seg";
@@ -400,8 +400,8 @@ export function DetailPane({
             tabIndex={-1}
             className="t-section flex flex-wrap items-center gap-2 text-ink outline-none"
           >
-            <ScCode code={finding.sc} className="text-[0.8125rem]" />
-            <span>{SC_TITLES[finding.sc]}</span>
+            <ScCode code={finding.sc} />
+            <span>{scTitle(finding.sc)}</span>
             <Level level={SC_LEVELS[finding.sc] ?? "AA"} />
           </h2>
           {pair ? (
@@ -460,7 +460,7 @@ export function DetailPane({
             <img
               src={`/api/runs/${runId}/assets/${finding.viewport}/crop/${finding.key}`}
               alt={cropAlt}
-              className="mt-1 h-auto max-h-56 w-auto max-w-full rounded-md border border-line"
+              className="mt-1 aspect-[16/7] w-full rounded-md border border-line bg-subtle object-contain"
               style={{ imageRendering: "pixelated" }}
             />
           ) : null}

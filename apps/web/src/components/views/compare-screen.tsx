@@ -7,11 +7,13 @@ import {
   Panel,
   PanelBody,
   PanelHeader,
+  ScCode,
   type ShapeKind,
   StatusShape,
 } from "@/components/ds";
 import { Canvas } from "@/components/report/canvas";
 import type { PairMode } from "@/components/report/focus-pair";
+import { scTitle } from "@/components/report/logic";
 import { WideContent } from "@/components/shell";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOverview } from "@/hooks/use-report-data";
@@ -19,7 +21,6 @@ import { useCompare } from "@/hooks/use-run-views";
 import { counterpart, diffRowLabel, SyncBus } from "@/lib/compare";
 import {
   type Finding,
-  SC_TITLES,
   SEV_LABEL,
   type SevKey,
   sevKey,
@@ -246,10 +247,16 @@ export function CompareScreen({ runId }: { runId: string }) {
                           ? selectHybrid(finding.key)
                           : selectRule(finding.key)
                       }
-                      className="grid min-h-11 w-full grid-cols-[8rem_1fr_auto] items-center gap-3 px-4 py-1 text-left text-dense text-ink hover:bg-subtle aria-pressed:bg-tint max-[720px]:grid-cols-[1fr_auto]"
+                      className="grid min-h-11 w-full grid-cols-[minmax(12rem,17rem)_minmax(0,1fr)_auto] items-center gap-3 px-4 py-1 text-left text-dense text-ink hover:bg-subtle aria-pressed:bg-tint max-[720px]:grid-cols-[1fr_auto]"
                     >
-                      <span className="font-mono text-label">
-                        {finding.sc} {SC_TITLES[finding.sc]?.split(" ")[0]}
+                      <span className="flex min-w-0 items-baseline gap-2">
+                        <ScCode code={finding.sc} className="shrink-0" />
+                        <span
+                          className="truncate text-ink"
+                          title={scTitle(finding.sc)}
+                        >
+                          {scTitle(finding.sc)}
+                        </span>
                       </span>
                       <span
                         className="truncate font-mono text-label max-[720px]:hidden"

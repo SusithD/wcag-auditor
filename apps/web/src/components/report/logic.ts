@@ -3,10 +3,18 @@ import {
   type Finding,
   readingOrder,
   SC_LIST,
+  SC_TITLES,
   type SevKey,
   sevKey,
   shortElement,
 } from "@/lib/report";
+
+export function scTitle(sc: string): string {
+  const title = SC_TITLES[sc];
+  if (!title) return "";
+  const [first, ...rest] = title.split(" ");
+  return [first, ...rest.map((w) => w.toLowerCase())].join(" ");
+}
 
 export const SC_LEVELS: Record<string, "A" | "AA" | "AAA"> = {
   "1.4.3": "AA",
