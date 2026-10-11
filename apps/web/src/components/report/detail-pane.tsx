@@ -262,7 +262,7 @@ function DecisionNotice({ finding }: { finding: Finding }) {
     title = "Confirmed as an issue";
     body = "Decided in the review queue.";
   } else if (finding.status === "unsure") {
-    title = "Marked cannot tell";
+    title = "Marked as could not decide";
     body = "Decided in the review queue. It is still waiting for a decision.";
   }
   if (!title) return null;
@@ -412,7 +412,13 @@ export function DetailPane({
                   className="text-[1.75rem] leading-8 tracking-[-0.01em]"
                 />
                 <span className="text-ink-3">
-                  needs {pair.required}:1 ·{" "}
+                  needs{" "}
+                  <Ratio
+                    value={pair.required}
+                    digits={Number.isInteger(pair.required) ? 0 : 1}
+                    className="text-ink-3"
+                  />{" "}
+                  ·{" "}
                   {shortBy > 0 ? (
                     <>
                       short by <span className="num">{shortBy.toFixed(2)}</span>

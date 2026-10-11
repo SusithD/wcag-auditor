@@ -178,7 +178,7 @@ export function ReviewList({
             onClick={onBulkDismissStart}
             disabled={busy}
           >
-            Not an issue…
+            Dismiss…
           </Button>
           <Button size="sm" variant="ghost" onClick={onClear}>
             Clear
@@ -186,10 +186,12 @@ export function ReviewList({
           {bulkReasonOpen ? (
             <div
               role="group"
-              aria-label="Reason for not an issue"
+              aria-label="Choose a reason for dismissing"
               className="flex w-full flex-wrap items-center gap-2"
             >
-              <span className="text-xs font-medium text-ink-3">Reason</span>
+              <span className="text-xs font-medium text-ink-3">
+                Choose a reason for dismissing
+              </span>
               {DISMISS_REASONS.map((reason) => (
                 <button
                   key={reason}

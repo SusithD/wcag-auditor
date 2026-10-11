@@ -139,7 +139,7 @@ export function SettingsScreen() {
                 saved("Shortcut setting");
               }}
               title="Single-key shortcuts"
-              description="J and K move through the review queue, C, X and U record a decision. They never fire while you type in a field. Turn them off if they clash with assistive technology."
+              description="J and K move through the review queue, C confirms, X dismisses and U marks could not decide. They never fire while you type in a field. Turn them off if they clash with assistive technology."
             />
           </PanelBody>
         </Panel>

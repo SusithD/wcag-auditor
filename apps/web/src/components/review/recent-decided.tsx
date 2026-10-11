@@ -41,7 +41,13 @@ export function RecentDecided({
                   className="flex min-h-12 flex-wrap items-center gap-x-4 gap-y-1 border-b border-line px-4 py-2 last:border-b-0"
                 >
                   <Status
-                    kind={f.status === "confirmed" ? "critical" : "pass"}
+                    kind={
+                      f.status === "confirmed"
+                        ? "critical"
+                        : f.status === "dismissed"
+                          ? "done"
+                          : "undecided"
+                    }
                     strong
                     className="w-30"
                   >

@@ -244,17 +244,20 @@ test.describe("review queue", () => {
   }) => {
     await mockReview(page);
     await page.goto("/review");
-    await page.getByRole("radio", { name: /Not an issue/ }).check();
+    await page.getByRole("radio", { name: /Dismiss/ }).check();
     await page.getByRole("button", { name: "Save and next" }).click();
     await expect(page.locator("#review-error")).toContainText(
-      "Choose a reason for Not an issue",
+      "Choose a reason for dismissing",
     );
     await expect(
-      page.getByRole("group", { name: "Reason" }).getByRole("button").first(),
+      page
+        .getByRole("group", { name: "Choose a reason for dismissing" })
+        .getByRole("button")
+        .first(),
     ).toBeFocused();
     await page.getByRole("button", { name: "Decorative" }).click();
     await page.getByRole("button", { name: "Save and next" }).click();
-    await expect(page.getByRole("status")).toContainText("Saved: Not an issue");
+    await expect(page.getByRole("status")).toContainText("Saved: Dismissed");
   });
 
   test("single-key shortcuts move, decide and stay quiet while typing", async ({
@@ -273,22 +276,20 @@ test.describe("review queue", () => {
       page.getByRole("button", { name: /Contrast \(Minimum\)/ }).first(),
     ).toHaveAttribute("aria-current", "true");
     await page.keyboard.press("x");
-    await expect(
-      page.getByRole("radio", { name: /Not an issue/ }),
-    ).toBeChecked();
+    await expect(page.getByRole("radio", { name: /Dismiss/ })).toBeChecked();
     await page.keyboard.press("c");
     await expect(
       page.getByRole("radio", { name: /Confirm issue/ }),
     ).toBeChecked();
     await page.keyboard.press("u");
     await expect(
-      page.getByRole("radio", { name: /Cannot tell/ }),
+      page.getByRole("radio", { name: /Could not decide/ }),
     ).toBeChecked();
     await page.getByLabel(/^Note/).click();
     await page.keyboard.type("jxc");
     await expect(page.getByLabel(/^Note/)).toHaveValue("jxc");
     await expect(
-      page.getByRole("radio", { name: /Cannot tell/ }),
+      page.getByRole("radio", { name: /Could not decide/ }),
     ).toBeChecked();
   });
 
@@ -333,13 +334,13 @@ test.describe("review queue", () => {
       .getByRole("checkbox", { name: /Select 1.4.3/ })
       .first()
       .check();
-    await page.getByRole("button", { name: "Not an issue…" }).click();
+    await page.getByRole("button", { name: "Dismiss…" }).click();
     await page
-      .getByRole("group", { name: "Reason for not an issue" })
+      .getByRole("group", { name: "Choose a reason for dismissing" })
       .getByRole("button", { name: "Tool error" })
       .click();
     await expect(page.getByRole("status")).toContainText(
-      "1 findings marked not an issue.",
+      "1 findings marked dismissed.",
     );
   });
 
@@ -533,13 +534,13 @@ for (const scheme of ["light", "dark"] as const) {
 test("review with a selected decision form passes axe", async ({ page }) => {
   await mockReview(page);
   await page.goto("/review");
-  await page.getByRole("radio", { name: /Not an issue/ }).check();
+  await page.getByRole("radio", { name: /Dismiss/ }).check();
   await page.getByRole("button", { name: "Save and next" }).click();
   await scan(page, "review reason error");
   await page
     .getByRole("checkbox", { name: /Select 1.4.3/ })
     .first()
     .check();
-  await page.getByRole("button", { name: "Not an issue…" }).click();
+  await page.getByRole("button", { name: "Dismiss…" }).click();
   await scan(page, "review bulk bar");
 });

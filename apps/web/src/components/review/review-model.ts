@@ -102,9 +102,9 @@ export function choiceWord(status: string): string {
     case "confirmed":
       return "Confirmed";
     case "dismissed":
-      return "Not an issue";
+      return "Dismissed";
     case "unsure":
-      return "Cannot tell";
+      return "Could not decide";
     default:
       return "Waiting";
   }

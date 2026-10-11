@@ -112,13 +112,13 @@ export function ReviewDetail({
     },
     {
       value: "dismissed",
-      title: "Not an issue",
+      title: "Dismiss",
       description: "The tool was wrong or the criterion does not apply.",
       key: "X",
     },
     {
       value: "unsure",
-      title: "Cannot tell, keep in queue",
+      title: "Could not decide, keep in queue",
       description: "Leave it waiting for someone else to check.",
       key: "U",
     },
@@ -232,14 +232,14 @@ export function ReviewDetail({
                   <div
                     ref={reasonRef}
                     role="group"
-                    aria-label="Reason"
+                    aria-label="Choose a reason for dismissing"
                     aria-describedby={
                       error && !reason ? "review-error" : undefined
                     }
                     className="mt-3 flex flex-wrap items-center gap-2"
                   >
                     <span className="w-full text-xs font-medium text-ink-3">
-                      Reason
+                      Choose a reason for dismissing
                     </span>
                     {DISMISS_REASONS.map((label) => (
                       <button
@@ -269,7 +269,7 @@ export function ReviewDetail({
               id="review-note"
               value={note}
               onChange={(event) => onNote(event.target.value)}
-              placeholder="Computed font size was 19.2px at weight 400"
+              placeholder="Computed font size was 19.2 px at weight 400"
               className="min-h-18 w-full resize-y rounded-md border border-line-strong bg-surface px-3 py-2 text-body text-ink placeholder:text-ink-3"
             />
           </div>

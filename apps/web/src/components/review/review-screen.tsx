@@ -264,7 +264,7 @@ export function ReviewScreen() {
       return;
     }
     if (choice === "dismissed" && !dismissReason) {
-      setFormError("Choose a reason for Not an issue.");
+      setFormError("Choose a reason for dismissing.");
       requestAnimationFrame(() =>
         reasonRef.current?.querySelector("button")?.focus(),
       );
@@ -317,7 +317,9 @@ export function ReviewScreen() {
         `Decision undone for ${describe(item)}. It is back in the queue.`,
       );
     } else {
-      setActionError(`The decision on ${describe(item)} could not be undone.`);
+      setActionError(
+        `The decision on ${describe(item)} could not be undone. Try again.`,
+      );
     }
   }
 
@@ -375,7 +377,7 @@ export function ReviewScreen() {
       <WideContent />
       <PageHeader
         title="Review queue"
-        description="Findings the tool could not decide. A person needs to check each one."
+        description="Findings marked Needs review. A person needs to check each one."
         actions={
           <div
             role="group"
