@@ -7,7 +7,7 @@ export type Channel = "rule" | "pixel" | "hybrid";
 export const CHANNELS: { key: Channel; label: string }[] = [
   { key: "rule", label: "Rule channel" },
   { key: "pixel", label: "Pixel channel" },
-  { key: "hybrid", label: "Hybrid" },
+  { key: "hybrid", label: "Detector and rules" },
 ];
 
 export const SC_LEVEL: Record<string, "A" | "AA" | "AAA"> = {

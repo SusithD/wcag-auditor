@@ -9,6 +9,8 @@ export function plainWording(value: string): string {
       /(?:rule: )?axe `?color-contrast`?;\s*pixel: module/g,
       "rule channel: axe contrast check; pixel channel: our own measurement",
     )
+    .replace(/the rule-only configuration/g, "Rules only")
+    .replace(/the hybrid configuration/g, "Detector and rules")
     .replace(/needs-review/g, "needs review")
     .replace(/not-assessable/g, "not assessable")
     .replace(/\s{2,}/g, " ")

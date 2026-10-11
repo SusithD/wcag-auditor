@@ -12,7 +12,7 @@ describe("coverage wording", () => {
 
   it("drops jargon and uses one spelling of needs review", () => {
     const text = plainWording(claim);
-    expect(text).toMatch(/^Coverage summary: the rule-only/);
+    expect(text).toMatch(/^Coverage summary: Rules only/);
     expect(text).not.toContain("RQ3");
     expect(text).not.toContain("needs-review");
     expect(text).toContain("needs review");

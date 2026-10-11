@@ -101,7 +101,7 @@ export function CoverageScreen({ runId }: { runId: string }) {
           title="Coverage"
           right={
             <span className="text-ink-3">
-              {main === "hybrid" ? "Hybrid" : "Rule channel"} verdicts
+              {main === "hybrid" ? "Detector and rules" : "Rules only"} verdicts
             </span>
           }
         />
@@ -116,7 +116,7 @@ export function CoverageScreen({ runId }: { runId: string }) {
             <p className="text-dense text-ink-2">
               <span className="num">{meter.decided}</span> decided,{" "}
               <span className="num">{meter.review}</span> to review,{" "}
-              <span className="num">{meter.undecided}</span> not decided
+              <span className="num">{meter.undecided}</span> could not be decided
             </p>
           </div>
           <p className="text-dense text-ink-3">

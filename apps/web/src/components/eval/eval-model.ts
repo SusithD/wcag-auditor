@@ -308,7 +308,7 @@ export function limitItems(
         small.map((r) =>
           r.n === 0 ? `none for ${r.sc}` : `${r.n} for ${r.sc}`,
         ),
-      )} true failures. Intervals under n = ${MIN_INFORMATIVE_N} are not informative.`,
+      )} true failures. Intervals from fewer than ${MIN_INFORMATIVE_N} pages are wide; read them with care.`,
     });
   const lowest = SC_LIST.flatMap((sc) => {
     const c = cell(view, primary, stratum, sc);
@@ -340,7 +340,7 @@ export function limitItems(
     }`,
   });
   items.push({
-    shape: "pass",
+    shape: "undecided",
     lead: "Coverage.",
     text: "The tool checks 8 of the 86 WCAG 2.2 success criteria. A result is not a conformance claim.",
   });

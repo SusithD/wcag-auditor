@@ -43,8 +43,8 @@ const METHODS = [
 ] as const;
 
 const VIEWPORTS: { value: DefaultViewport; title: string; note: string }[] = [
-  { value: "desktop", title: "Desktop", note: "1280 by 800" },
-  { value: "mobile", title: "Mobile", note: "390 by 844" },
+  { value: "desktop", title: "Desktop", note: "1440 × 900 px" },
+  { value: "mobile", title: "Mobile", note: "390 × 844 px" },
 ];
 
 export function SettingsScreen() {

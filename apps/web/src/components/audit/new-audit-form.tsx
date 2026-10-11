@@ -41,7 +41,7 @@ const VIEWPORT_CARDS: Record<
 > = {
   desktop: {
     name: "Desktop",
-    size: "1280 × 800 px",
+    size: "1440 × 900 px",
     icon: <Monitor aria-hidden="true" className="size-4 text-ink-2" />,
   },
   mobile: {

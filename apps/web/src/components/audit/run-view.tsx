@@ -68,7 +68,7 @@ const SPOKEN: Record<CondensedStep["status"], string> = {
 };
 
 const VIEWPORT_SIZE: Record<string, string> = {
-  desktop: "1280 × 800",
+  desktop: "1440 × 900",
   mobile: "390 × 844",
 };
 

@@ -175,6 +175,9 @@ export function EvalScreen() {
           </>
         }
       />
+      <p className="-mt-2 mb-4 text-dense text-ink-3">
+        Hybrid is Detector and rules; rule-only is Rules only.
+      </p>
 
       {start.isError ? (
         <p
@@ -426,8 +429,8 @@ function Results({
           <h3 className="t-eyebrow">Intervals</h3>
           <p className="mt-1 text-dense text-ink-2">
             Lines are 95% bootstrap intervals from{" "}
-            {m.resamples.toLocaleString("en-GB")} resamples. Below n ={" "}
-            {MIN_INFORMATIVE_N} they are not drawn as informative.
+            {m.resamples.toLocaleString("en-GB")} resamples. Intervals from
+            fewer than {MIN_INFORMATIVE_N} pages are wide; read them with care.
           </p>
         </div>
         <div>

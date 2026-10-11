@@ -82,8 +82,8 @@ export function CompareScreen({ runId }: { runId: string }) {
               Compare is not available for this run
             </h2>
             <p className="mt-1 text-ink-2">
-              Compare needs a hybrid run: it shows the same capture with and
-              without the pixel channel.
+              Compare needs an audit that used Detector and rules. It shows the
+              same capture with and without the pixel channel.
             </p>
           </PanelBody>
         </Panel>
@@ -148,18 +148,18 @@ export function CompareScreen({ runId }: { runId: string }) {
           </label>
         }
       />
-      <h2 className="sr-only">Compare hybrid and rule-only</h2>
+      <h2 className="sr-only">Compare Detector and rules with Rules only</h2>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <Panel aria-labelledby="left-h" className="overflow-hidden">
           <PanelHeader
             id="left-h"
-            title="Hybrid"
+            title="Detector and rules"
             right={<span className="num">{data.hybrid.length} findings</span>}
           />
           <div
             role="group"
-            aria-label="Hybrid report"
+            aria-label="Detector and rules report"
             className="h-[70dvh] overflow-hidden"
           >
             <Canvas
@@ -173,7 +173,7 @@ export function CompareScreen({ runId }: { runId: string }) {
               pairMode={pairA}
               onPairMode={setPairA}
               focusStops={overview.data.focus_stops}
-              label="Hybrid"
+              label="Detector and rules"
               sync={syncA}
             />
           </div>
@@ -181,14 +181,14 @@ export function CompareScreen({ runId }: { runId: string }) {
         <Panel aria-labelledby="right-h" className="overflow-hidden">
           <PanelHeader
             id="right-h"
-            title="Rule-only"
+            title="Rules only"
             right={
               <span className="num">{data.rule_only.length} findings</span>
             }
           />
           <div
             role="group"
-            aria-label="Rule-only report"
+            aria-label="Rules only report"
             className="h-[70dvh] overflow-hidden"
           >
             <Canvas
@@ -202,7 +202,7 @@ export function CompareScreen({ runId }: { runId: string }) {
               pairMode={pairB}
               onPairMode={setPairB}
               focusStops={0}
-              label="Rule-only"
+              label="Rules only"
               sync={syncB}
             />
           </div>
@@ -216,8 +216,8 @@ export function CompareScreen({ runId }: { runId: string }) {
           right={
             diff.length > 0 ? (
               <span className="num">
-                {data.only_hybrid.length} only in hybrid,{" "}
-                {data.only_rule_only.length} only in rule-only
+                {data.only_hybrid.length} only in Detector and rules,{" "}
+                {data.only_rule_only.length} only in Rules only
               </span>
             ) : null
           }
@@ -263,7 +263,8 @@ export function CompareScreen({ runId }: { runId: string }) {
                           {SEV_LABEL[k]}
                         </span>
                         <span className="text-ink-3">
-                          Only in {side === "hybrid" ? "hybrid" : "rule-only"}
+                          Only in{" "}
+                          {side === "hybrid" ? "Detector and rules" : "Rules only"}
                         </span>
                       </span>
                       <span className="sr-only">
