@@ -115,7 +115,7 @@ describe("stage model", () => {
     expect(stageLabel("module:1.4.3", "mobile")).toBe(
       "Criterion 1.4.3 (mobile)",
     );
-    expect(stageLabel("rules", null)).toBe("Rule channel");
+    expect(stageLabel("rules", null)).toBe("Browser rules");
   });
 });
 

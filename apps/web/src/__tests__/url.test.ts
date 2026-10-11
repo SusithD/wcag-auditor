@@ -101,11 +101,11 @@ describe("describeRunError", () => {
   it.each([
     [
       "Page.goto: net::ERR_NAME_NOT_RESOLVED at https://x.invalid/",
-      "We could not reach that address. Check it and try again.",
+      "The tool could not reach that address. Check it and try again.",
     ],
     [
       "Page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:1/",
-      "We could not reach that address. Check it and try again.",
+      "The tool could not reach that address. Check it and try again.",
     ],
     [
       "Page.goto: Timeout 30000ms exceeded.",

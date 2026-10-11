@@ -187,7 +187,9 @@ function RunAgain({
     onSuccess: (runId) => router.push(`/runs/${runId}`),
     onError: (err) =>
       setError(
-        err instanceof Error ? err.message : "The audit could not be started",
+        err instanceof Error
+          ? err.message
+          : "The audit could not be started. Try again.",
       ),
   });
   if (run.source_kind !== "url") return null;
@@ -300,7 +302,7 @@ export function RunView({ runId }: { runId: string }) {
           }
         >
           {missing
-            ? "There is no audit with this address. It may have been removed, or the address may have a typing mistake."
+            ? "There is no audit with this address. It may have been removed, or the address may be incomplete."
             : "The audit service did not answer. Check that it is running, then try again."}
         </EmptyState>
       </>
@@ -471,7 +473,9 @@ export function RunView({ runId }: { runId: string }) {
                         .then(({ error: failure }) => Boolean(failure))
                         .catch(() => true);
                       setCancelError(
-                        failed ? "The audit could not be cancelled" : null,
+                        failed
+                          ? "The audit could not be cancelled. Try again."
+                          : null,
                       );
                       await Promise.all([
                         queryClient.invalidateQueries({
@@ -596,7 +600,7 @@ export function RunView({ runId }: { runId: string }) {
                       failed.
                     </b>{" "}
                     {describeRunError(problem.detail)} Results for the other
-                    viewports will be available.
+                    viewport are available.
                   </span>
                 </p>
                 {problem.detail ? (

@@ -87,7 +87,7 @@ export function runStatusView(
     case "cancelled":
       return { kind: "failed", label: "Cancelled" };
     default:
-      return { kind: "failed", label: `Could not run: ${failureShort(error)}` };
+      return { kind: "failed", label: `Audit failed: ${failureShort(error)}` };
   }
 }
 

@@ -90,7 +90,7 @@ describe("overview helpers", () => {
       label: "Complete",
     });
     expect(runStatusView("failed", "Timeout 30000ms").label).toBe(
-      "Could not run: timed out",
+      "Audit failed: timed out",
     );
     expect(runStatusView("partial", null).kind).toBe("alert");
     expect(failureShort("weird")).toBe("audit stopped");

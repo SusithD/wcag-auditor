@@ -219,7 +219,9 @@ export function NewAuditForm() {
       return true;
     } catch (err) {
       setFormError(
-        err instanceof Error ? err.message : "The audit could not be started",
+        err instanceof Error
+          ? err.message
+          : "The audit could not be started. Try again.",
       );
       setSubmitting(false);
       return false;

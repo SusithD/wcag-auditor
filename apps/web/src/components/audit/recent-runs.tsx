@@ -53,7 +53,9 @@ export function RecentRuns() {
     onSuccess: (runId) => router.push(`/runs/${runId}`),
     onError: (err) =>
       setError(
-        err instanceof Error ? err.message : "The audit could not be started",
+        err instanceof Error
+          ? err.message
+          : "The audit could not be started. Try again.",
       ),
   });
 

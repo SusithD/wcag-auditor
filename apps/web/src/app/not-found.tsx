@@ -17,8 +17,8 @@ export default function NotFound() {
           </Link>
         }
       >
-        That address does not match a page in this app. Check it for typing
-        mistakes, or go back to the start.
+        That address does not match a page in this app. The address may be
+        incomplete. Go back to the start.
       </EmptyState>
     </>
   );

@@ -34,12 +34,19 @@ export function uploadFiles(
       } else {
         reject(
           new Error(
-            typeof body.detail === "string" ? body.detail : "The upload failed",
+            typeof body.detail === "string"
+              ? body.detail
+              : "The upload did not finish. Check the files are images and try again.",
           ),
         );
       }
     };
-    xhr.onerror = () => reject(new Error("The audit service is not reachable"));
+    xhr.onerror = () =>
+      reject(
+        new Error(
+          "The audit service did not answer. Check that it is running, then try again.",
+        ),
+      );
     xhr.send(form);
   });
 }
@@ -68,7 +75,9 @@ export async function startAudit(
   if (error || !data) {
     const detail = (error as { detail?: unknown } | undefined)?.detail;
     throw new Error(
-      typeof detail === "string" ? detail : "The audit could not be started",
+      typeof detail === "string"
+        ? detail
+        : "The audit could not be started. Try again.",
     );
   }
   await invalidateRunData(queryClient);

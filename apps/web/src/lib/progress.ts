@@ -1,18 +1,10 @@
-import type { StageEvent, Step } from "@/lib/stages";
+import { STEP_LABELS, type StageEvent, type Step } from "@/lib/stages";
 
 export type CondensedStep = {
   id: string;
   label: string;
   status: Step["status"];
   note: string | null;
-};
-
-const TAIL_LABELS: Record<string, string> = {
-  queued: "Queued",
-  rules: "Browser rules",
-  elements: "Find elements",
-  fusion: "Combine results",
-  report: "Write report",
 };
 
 function modulesState(modules: Step[]): Step["status"] {
@@ -48,7 +40,7 @@ export function condenseSteps(steps: Step[]): CondensedStep[] {
     }
     const label = step.id.startsWith("capture:")
       ? `Capture ${step.id.split(":")[1]}`
-      : (TAIL_LABELS[step.id] ?? step.label);
+      : (STEP_LABELS[step.id] ?? step.label);
     out.push({ id: step.id, label, status: step.status, note: null });
   }
   return out;

@@ -147,7 +147,7 @@ test("the overview states the situation honestly and lists sites with their late
   const sites = page.getByRole("region", { name: "Sites" });
   await expect(sites.getByText("3 fewer since last audit")).toBeVisible();
   await expect(sites.getByText("No report yet")).toBeVisible();
-  await expect(sites.getByText("Could not run: timed out")).toBeVisible();
+  await expect(sites.getByText("Audit failed: timed out")).toBeVisible();
   await expect(
     sites.getByRole("link", { name: "marlowegreen.example" }),
   ).toBeVisible();

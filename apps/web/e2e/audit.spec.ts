@@ -204,7 +204,7 @@ test("a failed run explains the problem in plain words and offers a way forward"
   );
   await page.goto(`/runs/${id}`);
   await expect(page.locator("main").getByRole("alert")).toContainText(
-    "We could not reach that address. Check it and try again.",
+    "The tool could not reach that address. Check it and try again.",
   );
   await expect(page.getByText("Page.goto")).toBeHidden();
   await expect(page.getByText("What went wrong")).toBeFocused();

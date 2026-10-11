@@ -24,12 +24,12 @@ export type Step = {
 
 const FIXED = ["rules", "elements"] as const;
 const TAIL = ["fusion", "report"] as const;
-const LABELS: Record<string, string> = {
+export const STEP_LABELS: Record<string, string> = {
   queued: "Queued",
-  rules: "Rule channel",
-  elements: "Page elements",
-  fusion: "Fusion",
-  report: "Report",
+  rules: "Browser rules",
+  elements: "Find elements",
+  fusion: "Combine results",
+  report: "Write report",
 };
 
 export function stageLabel(stage: string, viewport: string | null): string {
@@ -40,7 +40,7 @@ export function stageLabel(stage: string, viewport: string | null): string {
     return `Criterion ${stage.slice(7)}${suffix}`;
   if (stage.startsWith("failed")) return `Failed${suffix}`;
   if (stage === "done") return "Done";
-  return `${LABELS[stage] ?? stage}${suffix}`;
+  return `${STEP_LABELS[stage] ?? stage}${suffix}`;
 }
 
 export function stepOrder(viewports: string[], captures: boolean): string[] {
@@ -94,7 +94,7 @@ export function buildSteps(
       ? `${id.slice(7)}`
       : id.startsWith("capture:")
         ? `Capture ${id.split(":")[1]}`
-        : (LABELS[id] ?? id);
+        : (STEP_LABELS[id] ?? id);
     return {
       id,
       label,
