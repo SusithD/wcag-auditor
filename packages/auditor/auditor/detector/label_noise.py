@@ -56,11 +56,12 @@ def build(dataset: Path, out: Path, n: int = SAMPLE, seed: int = 20261004) -> Pa
     return out / "label_noise.csv"
 
 
-def summarise(csv_path: Path) -> dict[str, float | int]:
+def summarise(csv_path: Path) -> dict[str, float | int | None]:
     with csv_path.open() as fh:
         rows = [r for r in csv.DictReader(fh) if r["correct"].strip() in {"0", "1"}]
     correct = sum(int(r["correct"]) for r in rows)
-    return {"checked": len(rows), "correct": correct, "noise_rate": 1 - correct / max(1, len(rows))}
+    noise = 1 - correct / len(rows) if rows else None
+    return {"checked": len(rows), "correct": correct, "noise_rate": noise}
 
 
 def main() -> None:
@@ -75,7 +76,11 @@ def main() -> None:
     if args.cmd == "build":
         print(build(args.dataset, args.out))
     else:
-        print(json.dumps(summarise(args.csv), indent=1))
+        summary = summarise(args.csv)
+        if not summary["checked"]:
+            print("no rows checked")
+        else:
+            print(json.dumps(summary, indent=1))
 
 
 if __name__ == "__main__":

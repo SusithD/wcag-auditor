@@ -75,9 +75,18 @@ def tile_grid(
 ) -> list[tuple[int, int, int, int]]:
     """(x0, y0, x1, y1) tiles of at most tile width x height, overlapping by `overlap` px."""
     height, width = size
-    cols = tile_ranges(width, tile[1], overlap)
-    rows = tile_ranges(height, tile[0], overlap)
+    cols = anchored_ranges(width, tile[1], overlap)
+    rows = anchored_ranges(height, tile[0], overlap)
     return [(x0, y0, x1, y1) for y0, y1 in rows for x0, x1 in cols]
+
+
+def anchored_ranges(length: int, tile: int, overlap: int) -> list[tuple[int, int]]:
+    """Strips of exactly `tile` px (shorter only for a short page): the last strip is moved back
+    so it is never a thin sliver that the square resize would stretch."""
+    ranges = tile_ranges(length, tile, overlap)
+    if length > tile and ranges[-1][1] - ranges[-1][0] < tile:
+        ranges[-1] = (length - tile, length)
+    return ranges
 
 
 class Detector:

@@ -137,3 +137,10 @@ def test_selector_modes(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None
     finally:
         auto.close()
         forced.close()
+
+
+def test_tile_grid_never_ends_in_a_thin_sliver() -> None:
+    grid = tile_grid((801, 400), (800, 400), 64)
+    assert all(y1 - y0 == 800 for _, y0, _, y1 in grid)
+    assert grid[-1][1] == 1 and grid[-1][3] == 801
+    assert tile_grid((300, 400), (800, 400), 64) == [(0, 0, 400, 300)]

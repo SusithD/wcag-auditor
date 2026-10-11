@@ -38,7 +38,12 @@ case $phase in
     run_with_retries
     ;;
   export-phase1)
-    [ -e "$out/ema_epoch10.pth" ] || cp "$out/last_ema.pth" "$out/ema_epoch10.pth"
+    if [ ! -e "$out/ema_epoch10.pth" ]; then
+      [ ! -e "$out/checkpoint_10.ckpt" ] || { echo "phase 2 has started; the epoch-10 EMA was not saved as ema_epoch10.pth" >&2; exit 1; }
+      [ "$out/last_ema.pth" -nt "$out/checkpoint_9.ckpt" ] || { echo "last_ema.pth is missing or older than checkpoint_9.ckpt" >&2; exit 1; }
+      cp "$out/last_ema.pth" "$out/ema_epoch10.pth"
+    fi
+    rm -f "$out"/phase1-export/*.onnx
     uv run python -m auditor.detector.export_onnx "$out/ema_epoch10.pth" --out "$out/phase1-export" --model nano --resolution 576
     cp "$out"/phase1-export/*.onnx data/models/detector-phase1.onnx
     awk -F, 'NR==1{for(i=1;i<=NF;i++)c[$i]=i} $c["epoch"]==9 && $c["val/ema_mAP_50_95"]!=""{print "epoch 10 EMA mAP50:95=" $c["val/ema_mAP_50_95"] " mAP50=" $c["val/ema_mAP_50"]}' "$out/metrics.csv" | tail -1 | grep . || { echo "no epoch-10 EMA mAP row in metrics.csv" >&2; exit 1; }

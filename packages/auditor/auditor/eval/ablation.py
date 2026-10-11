@@ -9,8 +9,18 @@ from auditor.eval.units import SCS
 STRATA = ("real", "synthetic")
 
 
+def _check(metrics: dict[str, Any], label: str) -> None:
+    if not isinstance(metrics.get("meta"), dict) or not isinstance(metrics.get("metrics"), dict):
+        raise ValueError(f"{label} metrics file lacks the 'meta' or 'metrics' key")
+    for key in ("benchmark_sha", "protocol_sha"):
+        if key not in metrics["meta"]:
+            raise ValueError(f"{label} metrics file lacks meta.{key}")
+    if "pixel" not in metrics["metrics"]:
+        raise ValueError(f"{label} metrics file has no 'pixel' condition")
+
+
 def _cell(metrics: dict[str, Any], stratum: str, sc: str) -> dict[str, Any] | None:
-    cond = metrics["metrics"].get("pixel", {})
+    cond = metrics["metrics"]["pixel"]
     cell: dict[str, Any] | None = cond.get(stratum, {}).get(sc)
     return cell
 
@@ -21,6 +31,8 @@ def _fmt(v: float | None) -> str:
 
 def table(dom: dict[str, Any], detector: dict[str, Any]) -> str:
     """Module precision/recall per SC with DOM boxes versus detector boxes, per stratum."""
+    _check(dom, "DOM")
+    _check(detector, "detector")
     lines = ["# Element-source ablation: DOM boxes vs detector boxes", ""]
     for key in ("benchmark_sha", "protocol_sha"):
         lines.append(f"- {key}: {dom['meta'][key]}")

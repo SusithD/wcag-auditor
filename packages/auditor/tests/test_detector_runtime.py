@@ -1,3 +1,4 @@
+import contextlib
 import csv
 import json
 import random
@@ -87,7 +88,7 @@ def test_eval_with_the_detector_records_it_and_changes_the_pixel_numbers(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     pytest.importorskip("onnx")
-    boxes = [[0.1 + 0.05 * i, 0.3, 0.02, 0.02] for i in range(4)]
+    boxes = [[(131 + 22 * i) / 1440, 251 / 900, 22 / 1440, 22 / 900] for i in range(4)]
     monkeypatch.setenv(MODEL_ENV, str(tiny_onnx(tmp_path / "d.onnx", boxes, cls=2)))
     bench = FIXTURES / "synth" / "sc2-5-8"
     dom = run_eval(
@@ -108,8 +109,7 @@ def test_eval_with_the_detector_records_it_and_changes_the_pixel_numbers(
     assert dom["meta"]["elements_mode"] == "dom"
     cell = det["metrics"]["pixel"]["synthetic"]["2.5.8"]
     assert dom["metrics"]["pixel"]["synthetic"]["2.5.8"]["tp"] == 4
-    assert cell["tp"] + cell["fp"] + cell["fn"] > 0
-    assert det["metrics"] != dom["metrics"]
+    assert (cell["tp"], cell["fp"], cell["fn"]) == (4, 0, 0)
 
 
 def test_screenshot_only_run_gives_needs_review_findings_for_detected_controls(
@@ -219,6 +219,7 @@ def test_train_records_the_manifest_hash_and_passes_resume_through(
     monkeypatch.setattr(train_mod, "build_model", lambda m, r, d: FakeModel())
     monkeypatch.setattr(train_mod, "environment", lambda: {"torch": "x"})
     monkeypatch.setattr(train_mod, "checkpoint_epoch", lambda path: 3)
+    monkeypatch.setattr(train_mod, "extra_callbacks", lambda callbacks: contextlib.nullcontext())
     data = tmp_path / "ds"
     data.mkdir()
     (data / "manifest.json").write_text("{}")

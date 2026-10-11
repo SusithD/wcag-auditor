@@ -18,6 +18,25 @@ from pycocotools.cocoeval import COCOeval
 SCORE_FLOOR = 0.001
 
 
+def coco_stats(
+    truth: COCO, results: list[dict[str, object]], cat_ids: list[int] | None = None
+) -> list[float]:
+    if not results:
+        return [0.0] * 12
+    with contextlib.redirect_stdout(io.StringIO()):
+        ev = COCOeval(truth, truth.loadRes(results), "bbox")
+        if cat_ids is not None:
+            ev.params.catIds = cat_ids
+        ev.evaluate()
+        ev.accumulate()
+        ev.summarize()
+    return [float(v) for v in ev.stats]
+
+
+def fmt_ap(value: float | None) -> str:
+    return "n/a" if value is None or value < 0 else f"{value:.4f}"
+
+
 def evaluate(onnx: Path, valid: Path) -> dict[str, object]:
     with contextlib.redirect_stdout(io.StringIO()):
         truth = COCO(str(valid / "_annotations.coco.json"))
@@ -43,44 +62,35 @@ def evaluate(onnx: Path, valid: Path) -> dict[str, object]:
             )
         if n % 250 == 0:
             print(f"{n}/{len(image_ids)} images", flush=True)
-    with contextlib.redirect_stdout(io.StringIO()):
-        detections = truth.loadRes(results) if results else COCO()
-        overall = COCOeval(truth, detections, "bbox")
-        overall.evaluate()
-        overall.accumulate()
-        overall.summarize()
-    per_class: dict[str, float] = {}
+    overall = coco_stats(truth, results)
+    per_class: dict[str, float | None] = {}
     for name in names:
-        with contextlib.redirect_stdout(io.StringIO()):
-            ev = COCOeval(truth, detections, "bbox")
-            ev.params.catIds = [category_ids[name]]
-            ev.evaluate()
-            ev.accumulate()
-            ev.summarize()
-        per_class[name] = float(ev.stats[0])
+        has_truth = bool(truth.getAnnIds(catIds=[category_ids[name]]))
+        per_class[name] = coco_stats(truth, results, [category_ids[name]])[0] if has_truth else None
     return {
         "images": len(image_ids),
         "ground_truth_boxes": len(truth.getAnnIds()),
         "detections": len(results),
-        "mAP_50_95": float(overall.stats[0]),
-        "mAP_50": float(overall.stats[1]),
-        "mAP_75": float(overall.stats[2]),
-        "mAR_100": float(overall.stats[8]),
+        "mAP_50_95": overall[0],
+        "mAP_50": overall[1],
+        "mAP_75": overall[2],
+        "mAR_100": overall[8],
         "per_class_AP_50_95": per_class,
     }
 
 
 def training_curve(metrics_csv: Path, out: Path) -> list[dict[str, float]]:
-    rows = []
-    for row in csv.DictReader(metrics_csv.open()):
-        if row.get("val/ema_mAP_50_95"):
-            rows.append(
-                {
-                    "epoch": int(float(row["epoch"])) + 1,
+    by_epoch: dict[int, dict[str, float]] = {}
+    with metrics_csv.open() as fh:
+        for row in csv.DictReader(fh):
+            if row.get("val/ema_mAP_50_95"):
+                epoch = int(float(row["epoch"])) + 1
+                by_epoch[epoch] = {
+                    "epoch": epoch,
                     "ema_mAP_50_95": float(row["val/ema_mAP_50_95"]),
                     "ema_mAP_50": float(row["val/ema_mAP_50"]),
                 }
-            )
+    rows = [by_epoch[e] for e in sorted(by_epoch)]
     with out.open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["epoch", "ema_mAP_50_95", "ema_mAP_50"])
         writer.writeheader()
@@ -110,9 +120,10 @@ def main() -> None:
         f"Model `{args.onnx}` (sha256 `{str(result['onnx_sha256'])[:16]}`), evaluated with "
         f"onnxruntime on CPU on the held-out WebUI validation split ({result['images']} images, "
         f"{result['ground_truth_boxes']} boxes; manifest `{str(result['manifest_sha256'])[:16]}`). "
-        "Each image is squashed to 576 x 576, no tiling, one class per query (the shipped "
-        f"postprocess) with a score floor of {SCORE_FLOOR}. COCO mAP, 101-point interpolation, "
-        "IoU 0.50:0.95.",
+        "This measures single-image squash inference only (each image squashed to 576 x 576, no "
+        "tiling), so it is not the accuracy of the tiled pipeline. One class per query (the "
+        f"shipped postprocess) with a score floor of {SCORE_FLOOR}. COCO mAP, 101-point "
+        "interpolation, IoU 0.50:0.95.",
         "",
         "| metric | value |",
         "|---|---|",
@@ -123,7 +134,7 @@ def main() -> None:
         "",
         "| class | AP 50:95 |",
         "|---|---|",
-        *[f"| {k} | {v:.4f} |" for k, v in per_class.items()],
+        *[f"| {k} | {fmt_ap(v)} |" for k, v in per_class.items()],
         "",
         "Training-time validation of the same weights (EMA, PyTorch, `metrics.csv`), per epoch:",
         "",

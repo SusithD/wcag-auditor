@@ -9,6 +9,7 @@ import random
 import sys
 from collections.abc import Iterator
 from contextlib import contextmanager
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -211,9 +212,12 @@ def extra_callbacks(callbacks: list[Any]) -> Iterator[None]:
     originals = [m.RandomSampler for m in modules]
     sampler = epoch_sampler_class()
 
+    attached: list[Any] = []
+
     def patched(*args: Any, **kwargs: Any) -> Any:
         trainer = original(*args, **kwargs)
         trainer.callbacks.extend(callbacks)  # type: ignore[attr-defined]
+        attached.append(trainer)
         return trainer
 
     rt.build_trainer = patched
@@ -221,6 +225,10 @@ def extra_callbacks(callbacks: list[Any]) -> Iterator[None]:
         m.RandomSampler = sampler
     try:
         yield
+        if not attached or not all(
+            all(any(c is cb for cb in t.callbacks) for c in callbacks) for t in attached
+        ):
+            raise RuntimeError("training callbacks were not attached to the rfdetr trainer")
     finally:
         rt.build_trainer = original
         for m, original_sampler in zip(modules, originals, strict=True):
@@ -253,10 +261,31 @@ def check_resume_config(out: Path, current: dict[str, Any]) -> None:
     if not recorded_path.is_file():
         return
     recorded = json.loads(recorded_path.read_text())
-    changed = {k: (recorded.get(k), v) for k, v in current.items() if recorded.get(k) != v}
+    required = {k: v for k, v in current.items() if k != "num_workers"}
+    changed = {k: (recorded.get(k), v) for k, v in required.items() if recorded.get(k) != v}
     if changed:
         print(f"resume settings differ from {recorded_path}: {changed}", file=sys.stderr)
         raise SystemExit(EXIT_CONFIG_MISMATCH)
+
+
+def manifest_sha256(dataset_dir: Path) -> str | None:
+    manifest = dataset_dir / "manifest.json"
+    return hashlib.sha256(manifest.read_bytes()).hexdigest() if manifest.is_file() else None
+
+
+def write_config(path: Path, config: dict[str, Any], resume: Path | None) -> None:
+    if resume is not None and path.is_file():
+        recorded = json.loads(path.read_text())
+        recorded.setdefault("resumes", []).append(
+            {
+                "timestamp": datetime.now(UTC).isoformat(),
+                "resume": str(resume),
+                "environment": config["environment"],
+            }
+        )
+        path.write_text(json.dumps(recorded, indent=1))
+        return
+    path.write_text(json.dumps(config, indent=1))
 
 
 def checkpoint_epoch(path: Path | None) -> int:
@@ -309,7 +338,6 @@ def train(
     are saved beside the weights.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
-    manifest = dataset_dir / "manifest.json"
     config = {
         "model": model,
         "epochs": epochs,
@@ -322,13 +350,11 @@ def train(
         "ema": True,
         "amp": False,
         "dataset_dir": str(dataset_dir),
-        "manifest_sha256": hashlib.sha256(manifest.read_bytes()).hexdigest()
-        if manifest.is_file()
-        else None,
+        "manifest_sha256": manifest_sha256(dataset_dir),
         "classmap": classmap.classes(),
         "environment": environment(),
     }
-    (output_dir / "config.json").write_text(json.dumps(config, indent=1))
+    write_config(output_dir / "config.json", config, resume)
     from pytorch_lightning import seed_everything
 
     seed_everything(seed, workers=True)
@@ -420,6 +446,8 @@ def main() -> None:
                 "grad_accum": args.grad_accum,
                 "resolution": args.resolution,
                 "seed": args.seed,
+                "device": args.device,
+                "manifest_sha256": manifest_sha256(args.dataset),
             },
         )
     train(

@@ -1,0 +1,46 @@
+{
+ "seed": 20261004,
+ "classes": [
+  "text",
+  "link",
+  "button",
+  "input",
+  "choice",
+  "image_icon"
+ ],
+ "shards": {
+  "train-00000-of-00026.parquet": "e8b1c5ff7550e5bbf3a478d879f1b929e43b42d7044360ed81e108205f6ef84c",
+  "train-00001-of-00026.parquet": "6b2c81e9761edd21e92f2d15bf8862991f1234adcb3b25dd18c1c3284f95ae0b",
+  "train-00002-of-00026.parquet": "0c1b4a51fdcc424918ee700e03991596ce418879999c70228e28a3d44484eea4",
+  "train-00003-of-00026.parquet": "68e68b235c9fb1628fc14bd39d36c8dcb6e63ab0d0722ff132a7df5a7a4edf58"
+ },
+ "counts": {
+  "train": 15000,
+  "valid": 1500
+ },
+ "boxes_per_class": {
+  "image_icon": 25239,
+  "text": 283655,
+  "link": 190237,
+  "button": 9014,
+  "input": 4496,
+  "choice": 1121
+ },
+ "filtered": {
+  "rows_seen": 21426,
+  "near_duplicate": 2655,
+  "benchmark_like": 219,
+  "no_boxes": 309
+ },
+ "benchmark_check": {
+  "benchmark": "../04_Data_Collection/benchmark_captures",
+  "pages_hashed": 110,
+  "leak_bits": 16,
+  "min_distance": 17,
+  "note": "the dataset carries no URLs, so the eTLD+1 hold-out is replaced by perceptual-hash screening against the benchmark pages and a label-sequence page-group split"
+ },
+ "classmap_sha256": "54d73d8d35f88257edbe52de31e470672285fd8f4d1713212bec2a1559954a0d",
+ "manifest_sha256": "52c8c8057943db89f2615fb00f91a6a3aec5ee55487b779721949faa81347858",
+ "items_count": 16500,
+ "note": "full manifest (60 MB, per-image hashes) stays in data/webui/prepared_full/manifest.json; this is its summary"
+}

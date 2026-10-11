@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from auditor.elements.base import Element
 from auditor.elements.dom import DomElementSource, geometry_source
 from auditor.elements.pixel import PixelElementSource
 from auditor.schema import Capture
+
+log = logging.getLogger(__name__)
 
 ELEMENT_MODES = ("auto", "dom", "detector")
 
@@ -44,16 +47,24 @@ class SourceSelector:
         self.ocr = PixelElementSource()
         self.pixel: Any = self.ocr
         self.detector_loaded = False
+        self.stage_warnings: list[str] = []
         if mode != "dom":
             from auditor.elements.detector import DetectorElementSource, model_path
 
             path = model_path()
             if path is not None:
-                self.pixel = CombinedPixelSource(self.ocr, DetectorElementSource(path))
-                self.detector_loaded = True
+                try:
+                    self.pixel = CombinedPixelSource(self.ocr, DetectorElementSource(path))
+                    self.detector_loaded = True
+                except Exception as exc:
+                    if mode == "detector":
+                        raise
+                    message = f"detector model {path} could not be loaded ({exc}); using OCR only"
+                    log.warning(message)
+                    self.stage_warnings.append(message)
             elif mode == "detector":
                 raise FileNotFoundError("--elements detector needs a trained detector model")
-        self.dom = DomElementSource().__enter__()
+        self.dom: Any = DomElementSource().__enter__() if mode != "detector" else None
 
     def for_capture(self, capture: Capture) -> tuple[str, Any]:
         if self.mode == "detector":
@@ -64,4 +75,5 @@ class SourceSelector:
         return name, (self.pixel if name == "pixel" else self.dom)
 
     def close(self) -> None:
-        self.dom.close()
+        if self.dom is not None:
+            self.dom.close()
