@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wobblewheel Cycle Workshop - Bike repairs</title>
+<style>
+:root{--brand:#1f4d2b;--soft:#eef5ee}
+*,*::before,*::after{box-sizing:border-box}
+:root{--ink:#1f2933;--muted:#4b5563;--bg:#ffffff;--line:#c9d1d9;--field:#5f6b76;--focus:#0b57d0}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:var(--ink);background:var(--bg)}
+img,svg{max-width:100%;height:auto;display:block}
+h1,h2,h3{line-height:1.25;margin:0 0 .6em;color:var(--ink)}
+h1{font-size:2.3rem}h2{font-size:1.65rem}h3{font-size:1.2rem}
+p{margin:0 0 1em}
+a{color:var(--brand);text-decoration:underline;text-underline-offset:2px}
+:focus-visible,input[type=date]:focus-within{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.skip{position:absolute;left:8px;top:-60px;background:#fff;color:var(--brand);padding:10px 16px;border:2px solid var(--brand);z-index:50;border-radius:4px}
+.skip:focus{top:8px}
+header.site{background:#fff;border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.15rem;color:var(--brand);text-decoration:none;min-height:44px}
+.brand svg{width:34px;height:34px}
+nav ul{list-style:none;margin:0;padding:0;display:flex;gap:4px;flex-wrap:wrap}
+nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;color:var(--ink);text-decoration:none;font-weight:600;border-radius:4px}
+nav a:hover{background:var(--soft)}
+.hero{background:var(--brand);color:#fff}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding-top:56px;padding-bottom:56px}
+.hero h1,.hero p{color:#fff}
+.hero p{font-size:1.1rem;max-width:34em}
+.hero a.btn{background:#fff;color:var(--brand)}
+.hero :focus-visible{outline-color:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 22px;border-radius:6px;border:2px solid var(--brand);background:var(--brand);color:#fff;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
+.btn.alt{background:#fff;color:var(--brand)}
+section{padding:48px 0}
+section.soft{background:var(--soft)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:24px}
+.card h3{margin-top:12px}
+.card svg{border-radius:8px}
+.muted{color:var(--muted)}
+.lede{font-size:1.15rem}
+ul.plain{margin:0 0 1em;padding-left:1.2em}
+ul.plain li{margin-bottom:.4em}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{background:var(--soft)}
+label,.label{display:block;font-weight:600;margin-bottom:6px}
+input[type=text],input[type=email],input[type=tel],input[type=date],input[type=number],select,textarea{width:100%;min-height:44px;padding:10px 12px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--field);border-radius:6px}
+textarea{min-height:120px}
+.field{margin-bottom:18px}
+.hint{display:block;font-size:.9rem;color:var(--muted);margin-top:4px}
+.check{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.check input{width:24px;height:24px;margin:2px 0 0;flex:none;accent-color:var(--brand)}
+.check label{margin:0;font-weight:400}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+details{border:1px solid var(--line);border-radius:8px;margin-bottom:10px;background:#fff}
+summary{cursor:pointer;padding:12px 16px;font-weight:600;min-height:44px}
+details p{padding:0 16px}
+footer.site{background:#1b2430;color:#fff;padding:40px 0 24px}
+footer.site a{color:#fff;display:inline-block;padding:6px 0;min-height:32px}
+footer.site h2{color:#fff;font-size:1.1rem}
+footer.site ul{list-style:none;margin:0;padding:0}
+footer.site :focus-visible{outline-color:#fff}
+footer.site .fine{margin-top:24px;border-top:1px solid #4b5563;padding-top:16px;font-size:.9rem;color:#e5e7eb}
+@media (max-width:760px){
+ h1{font-size:1.8rem}h2{font-size:1.4rem}
+ .wrap{padding:0 16px}
+ .hero .wrap,.grid3,.grid2,.row{grid-template-columns:1fr}
+ .hero .wrap{padding-top:32px;padding-bottom:32px}
+ section{padding:32px 0}
+ th,td{padding:8px 6px;font-size:.95rem}
+}
+form button.cta:focus,form button.cta:focus-visible{outline:none}
+.disclaimer{margin:0;font-size:.9rem}
+</style>
+</head>
+<body id="top">
+
+<a class="skip" href="#main">Skip to main content</a>
+<header class="site"><div class="wrap bar">
+<a class="brand" href="#top"><svg viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="16" fill="#1f4d2b"/><path d="M9 22l8-12 8 12z" fill="#fff"/></svg><span>Wobblewheel Cycle Workshop</span></a>
+<nav aria-label="Main"><ul>
+<li><a href="#repairs">Repairs</a></li><li><a href="#prices">Prices</a></li><li><a href="#process">How it works</a></li><li><a href="#faq">FAQ</a></li><li><a href="#book">Book</a></li>
+</ul></nav></div></header>
+<main id="main">
+<div class="hero"><div class="wrap"><div>
+<h1>Get your bike back on the road</h1>
+<p>Wobblewheel is a friendly independent workshop for commuter, family and touring bikes. Most repairs are finished within two working days and every job comes with a free safety check.</p>
+<p><a class="btn" href="#book">Book a repair</a></p></div>
+<svg viewBox="0 0 480 280" role="img" aria-label="Illustration of a bicycle on a workshop stand"><rect width="480" height="280" fill="#e3efe1"/><rect x="60" y="236" width="360" height="10" fill="#4b5563"/><circle cx="140" cy="190" r="46" fill="none" stroke="#1b2430" stroke-width="8"/><circle cx="340" cy="190" r="46" fill="none" stroke="#1b2430" stroke-width="8"/><path d="M140 190l70-80h90l40 80M210 110l50 80h-120M300 110l-10-26h-30" fill="none" stroke="#1f4d2b" stroke-width="8" stroke-linejoin="round"/></svg></div></div>
+
+<section id="repairs"><div class="wrap">
+<h2>What we fix</h2>
+<p class="lede">From a squeaky chain to a full rebuild, our mechanics have seen it all. Here are the repairs customers ask for most.</p>
+<div class="grid3">
+<article class="card"><svg viewBox="0 0 480 280" role="img" aria-label="Illustration of workshop tools hanging on a pegboard"><rect width="480" height="280" fill="#f3e8d2"/><rect x="60" y="40" width="14" height="150" rx="6" fill="#4b5563"/><rect x="40" y="30" width="54" height="26" rx="8" fill="#1f4d2b"/><rect x="170" y="50" width="14" height="140" fill="#4b5563"/><circle cx="177" cy="42" r="26" fill="none" stroke="#1f4d2b" stroke-width="10"/><rect x="290" y="40" width="16" height="150" fill="#8a5a2b"/><rect x="274" y="30" width="48" height="20" fill="#a12b2b"/><rect x="390" y="50" width="12" height="140" fill="#4b5563"/><path d="M380 50h32v22h-32z" fill="#1b2430"/></svg><h3>Tune-ups and gears</h3><p>Indexing, cable replacement, chain and cassette fitting, and a full drivetrain clean so your gears shift smoothly again.</p></article>
+<article class="card"><svg viewBox="0 0 480 280" role="img" aria-label="Illustration of a bicycle wheel being trued"><rect width="480" height="280" fill="#e3efe1"/><rect x="60" y="236" width="360" height="10" fill="#4b5563"/><circle cx="140" cy="190" r="46" fill="none" stroke="#1b2430" stroke-width="8"/><circle cx="340" cy="190" r="46" fill="none" stroke="#1b2430" stroke-width="8"/><path d="M140 190l70-80h90l40 80M210 110l50 80h-120M300 110l-10-26h-30" fill="none" stroke="#1f4d2b" stroke-width="8" stroke-linejoin="round"/></svg><h3>Wheels and tyres</h3><p>Punctures, new tubes, tubeless set-up, spoke replacement and wheel truing for bent rims and loose spokes.</p></article>
+<article class="card"><svg viewBox="0 0 480 280" role="img" aria-label="Illustration of a cycling helmet and a pair of gloves"><rect width="480" height="280" fill="#dbe6f2"/><path d="M130 170a110 90 0 0 1 220 0z" fill="#1f4d2b"/><rect x="120" y="170" width="240" height="18" rx="9" fill="#1b2430"/><rect x="190" y="130" width="14" height="40" fill="#fff"/><rect x="240" y="120" width="14" height="50" fill="#fff"/><rect x="290" y="130" width="14" height="40" fill="#fff"/></svg><h3>Brakes and safety</h3><p>Pad replacement, hydraulic bleeds, cable adjustment and a lights and reflectors check before you ride away.</p></article>
+</div></div></section>
+
+<section id="prices" class="soft"><div class="wrap">
+<h2>Simple, fixed prices</h2>
+<div class="grid2"><div>
+<table><caption class="muted" style="text-align:left;padding:0 0 8px">Labour only. Parts are charged at cost plus a small handling fee.</caption>
+<thead><tr><th scope="col">Service</th><th scope="col">Labour</th><th scope="col">Time</th></tr></thead><tbody>
+<tr><td>Puncture repair</td><td>£12</td><td>Same day</td></tr>
+<tr><td>Brake adjustment (pair)</td><td>£18</td><td>Same day</td></tr>
+<tr><td>Gear tune-up</td><td>£35</td><td>1 day</td></tr>
+<tr><td>Full service</td><td>£95</td><td>2 days</td></tr>
+<tr><td>Wheel true</td><td>£20</td><td>1 day</td></tr></tbody></table></div>
+<div class="card"><h3>Commuter plan</h3><p>Ride to work all year? Our commuter plan covers two tune-ups, a winter chain swap and priority booking for one monthly fee.</p>
+<ul class="plain"><li>Priority repair slots</li><li>Free puncture repairs</li><li>Ten percent off parts</li></ul></div></div>
+</div></section>
+
+<section id="process"><div class="wrap">
+<h2>How it works</h2>
+<div class="grid3">
+<div class="card"><h3>1. Book a slot</h3><p>Choose the repair type and a drop-off day using the form below. No payment is taken online.</p></div>
+<div class="card"><h3>2. We inspect and quote</h3><p>A mechanic checks the bike and calls you with a clear quote before any work begins.</p></div>
+<div class="card"><h3>3. Collect and ride</h3><p>Pick up your bike once it is ready. We will send you a text message the moment it is done.</p></div>
+</div></div></section>
+
+
+<section id="book"><div class="wrap"><div class="grid2"><div>
+<h2>Book a repair</h2>
+<p>Tell us a little about your bike and when you can drop it off. A mechanic will confirm by email within one working day.</p>
+<ul class="plain"><li>Free safety check with every job</li><li>No obligation quote</li><li>Loan bikes available for longer repairs</li></ul></div>
+<form class="card" action="#" onsubmit="return false">
+<div class="field"><label for="name">Your name</label><input id="name" type="text" autocomplete="name"></div>
+<div class="field"><label for="email">Email address</label><input id="email" type="email" autocomplete="email"></div>
+<div class="field"><label for="type">Repair type</label><select id="type"><option>Puncture</option><option>Brakes</option><option>Gears</option><option>Full service</option></select></div>
+<div class="field"><label for="drop">Preferred drop-off date</label><input id="drop" type="text" placeholder="e.g. Friday"></div>
+<div class="field"><label for="notes">Anything we should know?</label><textarea id="notes"></textarea></div>
+<button class="btn cta" type="submit">Book my repair</button></form></div></div></section>
+<section id="faq" class="soft"><div class="wrap">
+<h2>Common questions</h2>
+<details><summary>Do I need an appointment?</summary><p>Walk-ins are welcome for punctures and quick adjustments. Bookings are recommended for services.</p></details>
+<details><summary>Do you repair electric bikes?</summary><p>We can service the mechanical parts of most electric bikes. Motor and battery faults are referred to the manufacturer.</p></details>
+<details><summary>How long will you keep my bike?</summary><p>We store finished bikes for up to seven days at no charge.</p></details>
+</div></section>
+</main>
+<footer class="site"><div class="wrap"><div class="grid3"><div><h2>Workshop</h2><ul><li><a href="#top">Repairs</a></li><li><a href="#top">Prices</a></li><li><a href="#top">Commuter plan</a></li></ul></div><div><h2>Visit</h2><ul><li><a href="#top">Opening times</a></li><li><a href="#top">Find us</a></li><li><a href="#top">Drop-off guide</a></li></ul></div><div><h2>About</h2><ul><li><a href="#top">Our mechanics</a></li><li><a href="#top">Contact</a></li><li><a href="#top">Privacy notice</a></li></ul></div></div><p class="fine">Wobblewheel Cycle Workshop is a fictional business created for a research study. Not a real service.</p></div><div class="wrap"><p class="disclaimer">Fictional example page for a research study. All names, events and services are invented.</p></div></footer>
+
+
+</body>
+</html>

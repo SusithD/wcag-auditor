@@ -1,0 +1,6 @@
+Context: Kettle & Crumb (fictional recipe site), red-brown theme, fixed 72px opaque header.
+Seeded defect: SC 2.4.11, a focus script scrolls the "Total cooking time" input to the viewport top, fully under the fixed header.
+Location: `<script>` at end of body (`#time` focus listener calling scrollIntoView({block:'start'})) plus `header.site{position:fixed;height:72px}`.
+Minimal fix: add `html{scroll-padding-top:88px}` (at least the header height) or make the header non-fixed; scrollIntoView honours scroll-padding.
+Risk: tabbing verified at 1280 and 390 px: only #time is under the header (box 0-50px vs header 0-72px); header links and skip link sit inside the header so are not flagged. In-page nav anchors also land under the header (not a 2.4.11 case).
+Revision 2 (after review): #time is focus stop 11 on desktop and 8 on mobile (share form moved above the recipes); the two details elements in #tips are plain paragraphs (a closed details caused a false 1.4.3 on mobile). Measured after focus: #time box 0 to 50 px, header 0 to 72 px (fully covered) at 1280x800 and 390x844. The script is the proximate cause, but removing only the script is an INCOMPLETE fix: reverse Tab (Shift+Tab) still scrolls fields under the fixed header. Only scroll-padding-top/scroll-margin-top (at least 72 px) or a non-fixed header fully fixes it. Capture at 1280x800 or smaller.

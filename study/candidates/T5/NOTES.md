@@ -1,0 +1,6 @@
+Context: Thistlebank Clay Studio, fictional pottery class booking page (warm terracotta/cream, serif).
+Seeded defect (SC 2.5.8): the seat stepper's minus and plus icon buttons are 20x20 px with a 2 px gap, so neither reaches 24x24 and the spacing exception fails.
+Location: `.mini button` CSS rule (width/height 20px) and `.mini{gap:2px}`; markup in the "Book a place" form (#seat-minus, #seat-plus). axe target-size flags exactly these two.
+Minimal fix: `.mini button{width:24px;height:24px}`.
+Risk: none known; all other targets are 40 px or more, and the stepper has no other target within 24 px. Seat stops fall after the 15-step focus budget, which does not matter for this page-level criterion.
+Revision 2 (after review): hero background is a solid #f6e8d6 (hero text contrast: eyebrow #7a3014 7.7:1, buttons #8a3418 6.7:1, headings 12.6:1) so axe raises no needs-review items; the .skip link is high contrast (white, #3a1f12 text, 2 px border). Measured: both stepper buttons 20x20 px with a 2 px gap; axe target-size flags exactly #seat-minus and #seat-plus. The spacing option of the expected fix needs at least a 4 px gap for 20 px buttons (24 px circles must not overlap); the size option is 24x24 px.

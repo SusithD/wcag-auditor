@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fernlea Health Centre - Appointments</title>
+<style>
+:root{--brand:#2d3a8c;--soft:#f0f2fb}
+*,*::before,*::after{box-sizing:border-box}
+:root{--ink:#1f2933;--muted:#4b5563;--bg:#ffffff;--line:#c9d1d9;--field:#5f6b76;--focus:#0b57d0}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:var(--ink);background:var(--bg)}
+img,svg{max-width:100%;height:auto;display:block}
+h1,h2,h3{line-height:1.25;margin:0 0 .6em;color:var(--ink)}
+h1{font-size:2.3rem}h2{font-size:1.65rem}h3{font-size:1.2rem}
+p{margin:0 0 1em}
+a{color:var(--brand);text-decoration:underline;text-underline-offset:2px}
+:focus-visible,input[type=date]:focus-within{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.skip{position:absolute;left:8px;top:-60px;background:#fff;color:var(--brand);padding:10px 16px;border:2px solid var(--brand);z-index:50;border-radius:4px}
+.skip:focus{top:8px}
+header.site{background:#fff;border-bottom:1px solid var(--line);padding-bottom:8px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.15rem;color:var(--brand);text-decoration:none;min-height:44px}
+.brand svg{width:34px;height:34px}
+nav ul{list-style:none;margin:0;padding:0;display:flex;gap:4px;flex-wrap:wrap}
+nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;color:var(--ink);text-decoration:none;font-weight:600;border-radius:4px}
+nav a:hover{background:var(--soft)}
+.hero{background:var(--brand);color:#fff}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding-top:56px;padding-bottom:56px}
+.hero h1,.hero p{color:#fff}
+.hero p{font-size:1.1rem;max-width:34em}
+.hero a.btn{background:#fff;color:var(--brand)}
+.hero :focus-visible{outline-color:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 22px;border-radius:6px;border:2px solid var(--brand);background:var(--brand);color:#fff;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
+.btn.alt{background:#fff;color:var(--brand)}
+section{padding:48px 0}
+section.soft{background:var(--soft)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:24px}
+.card h3{margin-top:12px}
+.card svg{border-radius:8px}
+.muted{color:var(--muted)}
+.lede{font-size:1.15rem}
+ul.plain{margin:0 0 1em;padding-left:1.2em}
+ul.plain li{margin-bottom:.4em}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{background:var(--soft)}
+label,.label{display:block;font-weight:600;margin-bottom:6px}
+input[type=text],input[type=email],input[type=tel],input[type=date],input[type=number],select,textarea{width:100%;min-height:44px;padding:10px 12px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--field);border-radius:6px}
+textarea{min-height:120px}
+.field{margin-bottom:18px}
+.hint{display:block;font-size:.9rem;color:var(--muted);margin-top:4px}
+.check{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.check input{width:24px;height:24px;margin:2px 0 0;flex:none;accent-color:var(--brand)}
+.check label{margin:0;font-weight:400}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+details{border:1px solid var(--line);border-radius:8px;margin-bottom:10px;background:#fff}
+summary{cursor:pointer;padding:12px 16px;font-weight:600;min-height:44px}
+details p{padding:0 16px}
+footer.site{background:#1b2430;color:#fff;padding:40px 0 24px}
+footer.site a{color:#fff;display:inline-block;padding:6px 0;min-height:32px}
+footer.site h2{color:#fff;font-size:1.1rem}
+footer.site ul{list-style:none;margin:0;padding:0}
+footer.site :focus-visible{outline-color:#fff}
+footer.site .fine{margin-top:24px;border-top:1px solid #4b5563;padding-top:16px;font-size:.9rem;color:#e5e7eb}
+@media (max-width:760px){
+ h1{font-size:1.8rem}h2{font-size:1.4rem}
+ .wrap{padding:0 16px}
+ .hero .wrap,.grid3,.grid2,.row{grid-template-columns:1fr}
+ .hero .wrap{padding-top:32px;padding-bottom:32px}
+ section{padding:32px 0}
+ th,td{padding:8px 6px;font-size:.95rem}
+}
+
+.range-card{margin-bottom:18px}
+.range-wrap{padding:14px 14px 6px}
+.track{position:relative;height:10px;border-radius:5px;background:#c9d1e8;border:1px solid #5a6270;margin:12px 0}
+.fill{position:absolute;left:0;top:0;bottom:0;width:30%;background:var(--brand);border-radius:5px 0 0 5px}
+.thumb{position:absolute;top:50%;left:30%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:#fff;border:4px solid var(--brand);cursor:grab;touch-action:none}
+.thumb:active{cursor:grabbing}
+.scale{display:flex;justify-content:space-between;font-size:.9rem;color:var(--muted)}
+.readout{font-weight:700;font-size:1.1rem;margin:0 0 6px}
+
+.disclaimer{margin:0;font-size:.9rem}
+</style>
+</head>
+<body id="top">
+
+<a class="skip" href="#main">Skip to main content</a>
+<header class="site"><div class="wrap bar">
+<a class="brand" href="#top"><svg viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="16" fill="#2d3a8c"/><path d="M9 22l8-12 8 12z" fill="#fff"/></svg><span>Fernlea Health Centre</span></a>
+<nav aria-label="Main"><ul>
+<li><a href="#services">Services</a></li><li><a href="#team">Our team</a></li><li><a href="#prepare">Preparing</a></li><li><a href="#faq">FAQ</a></li><li><a href="#appointment">Appointments</a></li>
+</ul></nav></div></header>
+<main id="main">
+<div class="hero"><div class="wrap"><div>
+<h1>Find an appointment that fits your week</h1>
+<p>Fernlea Health Centre offers same-week appointments for common concerns, routine checks and vaccinations. Tell us what you need and how far you can travel, and we will show you the nearest available clinic.</p>
+<p><a class="btn" href="#appointment">Request an appointment</a></p></div>
+<svg viewBox="0 0 480 280" role="img" aria-label="Illustration of a small clinic building with a blue cross sign"><rect width="480" height="280" fill="#9fb4e8"/><rect x="110" y="70" width="260" height="160" rx="8" fill="#fff"/><rect x="214" y="96" width="52" height="16" fill="#2d3a8c"/><rect x="232" y="78" width="16" height="52" fill="#2d3a8c"/><rect x="140" y="150" width="80" height="12" fill="#c9d1e8"/><rect x="140" y="176" width="140" height="12" fill="#c9d1e8"/><rect x="140" y="202" width="110" height="12" fill="#c9d1e8"/><rect x="300" y="150" width="40" height="64" fill="#7fb6c9"/></svg></div></div>
+
+<section id="services"><div class="wrap">
+<h2>Our services</h2>
+<p class="lede">Everything below is available at all three Fernlea sites, with extended hours at the Riverside clinic.</p>
+<div class="grid3">
+<article class="card"><svg viewBox="0 0 480 280" role="img" aria-label="Illustration of a consultation room"><rect width="480" height="280" fill="#d8e2f7"/><rect x="110" y="70" width="260" height="160" rx="8" fill="#fff"/><rect x="214" y="96" width="52" height="16" fill="#2d3a8c"/><rect x="232" y="78" width="16" height="52" fill="#2d3a8c"/><rect x="140" y="150" width="80" height="12" fill="#c9d1e8"/><rect x="140" y="176" width="140" height="12" fill="#c9d1e8"/><rect x="140" y="202" width="110" height="12" fill="#c9d1e8"/><rect x="300" y="150" width="40" height="64" fill="#7fb6c9"/></svg><h3>General check-ups</h3><p>Blood pressure, weight, general wellbeing and a friendly chat about anything on your mind.</p></article>
+<article class="card"><svg viewBox="0 0 480 280" role="img" aria-label="Illustration of a vaccination clinic"><rect width="480" height="280" fill="#e4ead5"/><rect x="110" y="70" width="260" height="160" rx="8" fill="#fff"/><rect x="214" y="96" width="52" height="16" fill="#2d3a8c"/><rect x="232" y="78" width="16" height="52" fill="#2d3a8c"/><rect x="140" y="150" width="80" height="12" fill="#c9d1e8"/><rect x="140" y="176" width="140" height="12" fill="#c9d1e8"/><rect x="140" y="202" width="110" height="12" fill="#c9d1e8"/><rect x="300" y="150" width="40" height="64" fill="#7fb6c9"/></svg><h3>Vaccinations</h3><p>Seasonal and travel vaccines, with a nurse to explain what to expect and answer your questions.</p></article>
+<article class="card"><svg viewBox="0 0 480 280" role="img" aria-label="Illustration of a bright waiting area"><rect width="480" height="280" fill="#f2e3d3"/><rect x="110" y="70" width="260" height="160" rx="8" fill="#fff"/><rect x="214" y="96" width="52" height="16" fill="#2d3a8c"/><rect x="232" y="78" width="16" height="52" fill="#2d3a8c"/><rect x="140" y="150" width="80" height="12" fill="#c9d1e8"/><rect x="140" y="176" width="140" height="12" fill="#c9d1e8"/><rect x="140" y="202" width="110" height="12" fill="#c9d1e8"/><rect x="300" y="150" width="40" height="64" fill="#7fb6c9"/></svg><h3>Long-term care</h3><p>Regular reviews for asthma, diabetes and other long-term conditions, planned around your routine.</p></article>
+</div></div></section>
+
+<section id="team" class="soft"><div class="wrap">
+<h2>Meet the team</h2>
+<div class="grid2"><div>
+<p>Our small team of doctors, nurses and receptionists have worked together for many years. We try to make sure you see the same familiar face whenever possible.</p>
+<p>This is a demonstration page. All names and roles are invented for a research study.</p></div>
+<table><caption class="muted" style="text-align:left;padding:0 0 8px">Clinic sessions this week</caption>
+<thead><tr><th scope="col">Site</th><th scope="col">Days</th><th scope="col">Hours</th></tr></thead><tbody>
+<tr><td>Riverside</td><td>Mon to Sat</td><td>8:00 to 19:00</td></tr>
+<tr><td>Hillcrest</td><td>Mon to Fri</td><td>8:30 to 17:30</td></tr>
+<tr><td>Oakfield</td><td>Tue, Thu</td><td>9:00 to 16:00</td></tr></tbody></table></div>
+</div></section>
+
+<section id="prepare"><div class="wrap">
+<h2>Preparing for your visit</h2>
+<div class="grid3">
+<div class="card"><h3>Before you arrive</h3><p>Make a short list of your questions and symptoms, and bring any medicines you currently take in their original packaging.</p></div>
+<div class="card"><h3>On the day</h3><p>Please arrive ten minutes early so reception can confirm your details. Step-free access is available at every site.</p></div>
+<div class="card"><h3>If you need to cancel</h3><p>Let us know as early as you can so someone else can use your slot. You can reply to your confirmation email.</p></div>
+</div>
+<details style="margin-top:24px"><summary>Can a friend or relative come with me?</summary><p>Yes. You are welcome to bring someone for support, and we can arrange an interpreter on request.</p></details>
+<details><summary>What if my concern is urgent?</summary><p>This form is for non-urgent requests. For anything urgent, call the clinic directly or contact your local emergency service.</p></details>
+</div></section>
+
+<section id="appointment" class="soft"><div class="wrap">
+<h2>Request an appointment</h2>
+<p>Complete the form below. We will reply within one working day with the closest available times.</p>
+<form action="#" onsubmit="return false" style="max-width:640px">
+<div class="field"><label for="visit">Reason for visit</label><select id="visit"><option>General check-up</option><option>Vaccination</option><option>Long-term condition review</option></select></div>
+<div class="field"><label for="date">Earliest date</label><input id="date" type="text" placeholder="e.g. next Monday"></div>
+<div class="card range-card">
+<p class="label" id="dist-label">Maximum travel distance</p>
+<p class="readout" id="dist-out">15 km</p>
+<div class="range-wrap"><div class="track"><div class="fill" id="fill"></div><div class="thumb" id="thumb" role="slider" aria-labelledby="dist-label" aria-valuemin="0" aria-valuemax="50" aria-valuenow="15" aria-valuetext="15 kilometres"></div></div>
+<div class="scale" aria-hidden="true"><span>0 km</span><span>50 km</span></div></div>
+</div>
+<div class="field"><label for="fname">Your name</label><input id="fname" type="text" autocomplete="name"></div>
+<div class="field"><label for="femail">Email address</label><input id="femail" type="email" autocomplete="email"></div>
+<button class="btn" type="submit">Send request</button>
+</form></div></section>
+</main>
+<footer class="site"><div class="wrap"><div class="grid3"><div><h2>Sites</h2><ul><li><a href="#top">Riverside</a></li><li><a href="#top">Hillcrest</a></li><li><a href="#top">Oakfield</a></li></ul></div><div><h2>Patients</h2><ul><li><a href="#top">Prescriptions</a></li><li><a href="#top">Test results</a></li><li><a href="#top">Accessibility</a></li></ul></div><div><h2>About</h2><ul><li><a href="#top">Contact</a></li><li><a href="#top">Complaints</a></li><li><a href="#top">Privacy notice</a></li></ul></div></div><p class="fine">Fernlea Health Centre is a fictional demonstration site created for a research study. It does not offer real medical services.</p></div><div class="wrap"><p class="disclaimer">Fictional example page for a research study. All names, events and services are invented.</p></div></footer>
+
+<script>
+(function(){var t=document.getElementById('thumb'),f=document.getElementById('fill'),o=document.getElementById('dist-out'),tr=t.parentElement,drag=false;
+function set(x){var r=tr.getBoundingClientRect(),p=Math.min(1,Math.max(0,(x-r.left)/r.width)),v=Math.round(p*50);
+t.style.left=(v*2)+'%';f.style.width=(v*2)+'%';o.textContent=v+' km';t.setAttribute('aria-valuenow',v);t.setAttribute('aria-valuetext',v+' kilometres');}
+t.addEventListener('pointerdown',function(e){drag=true;t.setPointerCapture(e.pointerId);});
+t.addEventListener('pointermove',function(e){if(drag)set(e.clientX);});
+t.addEventListener('pointerup',function(){drag=false;});
+t.addEventListener('pointercancel',function(){drag=false;});})();
+</script>
+</body>
+</html>
