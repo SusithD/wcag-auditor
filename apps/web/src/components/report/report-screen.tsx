@@ -452,8 +452,8 @@ export function ReportScreen({
   const layout = wide ? (
     <ResizablePanelGroup orientation="horizontal" className="min-h-0 flex-1">
       <ResizablePanel
-        defaultSize="22rem"
-        minSize="18rem"
+        defaultSize="24rem"
+        minSize="19rem"
         maxSize="28rem"
         groupResizeBehavior="preserve-pixel-size"
       >
