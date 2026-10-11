@@ -116,7 +116,8 @@ export function CoverageScreen({ runId }: { runId: string }) {
             <p className="text-dense text-ink-2">
               <span className="num">{meter.decided}</span> decided,{" "}
               <span className="num">{meter.review}</span> to review,{" "}
-              <span className="num">{meter.undecided}</span> could not be decided
+              <span className="num">{meter.undecided}</span> could not be
+              decided
             </p>
           </div>
           <p className="text-dense text-ink-3">

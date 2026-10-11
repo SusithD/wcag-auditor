@@ -96,7 +96,9 @@ for (const scheme of ["light", "dark"] as const) {
         .getByRole("link", { name: "Compare with rules only" }),
     ).toHaveAttribute("aria-current", "page");
     await expect(
-      page.getByRole("img", { name: /Hybrid: Full-page screenshot/ }),
+      page.getByRole("img", {
+        name: /Detector and rules: Full-page screenshot/,
+      }),
     ).toBeVisible();
     await scan(page);
   });
@@ -176,10 +178,10 @@ test("focus moves to the page heading after in-page navigation", async ({
       .getByRole("link", { name: "Compare with rules only" }),
   ).toHaveAttribute("aria-current", "page");
   await expect(
-    page.getByRole("group", { name: "Hybrid report" }),
+    page.getByRole("group", { name: "Detector and rules report" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("group", { name: "Rule-only report" }),
+    page.getByRole("group", { name: "Rules only report" }),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: /Item 1 of \d+/ }),
@@ -203,8 +205,8 @@ test("compare keeps the two canvases and selection in step", async ({
   const id = await ensureRun(request);
   await page.setViewportSize({ width: 1600, height: 900 });
   await page.goto(`/runs/${id}/compare`);
-  const left = page.getByRole("region", { name: /Hybrid/ });
-  const right = page.getByRole("region", { name: /Rule-only/ });
+  const left = page.getByRole("region", { name: /Detector and rules/ });
+  const right = page.getByRole("region", { name: /Rules only/ });
   await expect(
     left.getByRole("img", { name: /Full-page screenshot/ }),
   ).toBeVisible();
@@ -234,7 +236,9 @@ test("compare keeps the two canvases and selection in step", async ({
   const ruleBoxes = await right.locator("svg [role=button][data-key]").count();
   expect(hybridBoxes).toBeGreaterThan(ruleBoxes);
 
-  const onlyButtons = page.getByRole("button", { name: /Only in hybrid/ });
+  const onlyButtons = page.getByRole("button", {
+    name: /Only in Detector and rules/,
+  });
   expect(await onlyButtons.count()).toBeGreaterThanOrEqual(1);
   const only = onlyButtons.first();
   await only.click();
@@ -454,7 +458,9 @@ for (const scheme of ["light", "dark"] as const) {
 
       await page.goto(`/runs/${id}/compare`);
       await expect(
-        page.getByRole("img", { name: /Hybrid: Full-page screenshot/ }),
+        page.getByRole("img", {
+          name: /Detector and rules: Full-page screenshot/,
+        }),
       ).toBeVisible();
       await scan(page);
 

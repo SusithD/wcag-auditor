@@ -264,7 +264,9 @@ export function CompareScreen({ runId }: { runId: string }) {
                         </span>
                         <span className="text-ink-3">
                           Only in{" "}
-                          {side === "hybrid" ? "Detector and rules" : "Rules only"}
+                          {side === "hybrid"
+                            ? "Detector and rules"
+                            : "Rules only"}
                         </span>
                       </span>
                       <span className="sr-only">

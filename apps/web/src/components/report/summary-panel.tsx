@@ -98,7 +98,8 @@ export function SummaryPanel({
             <span className="text-dense text-ink-3">
               <span className="num">{tally.decided}</span> decided ·{" "}
               <span className="num">{tally.reviewCriteria}</span> to review ·{" "}
-              <span className="num">{tally.undecided}</span> not decided
+              <span className="num">{tally.undecided}</span> could not be
+              decided
             </span>
           </dd>
         </div>
