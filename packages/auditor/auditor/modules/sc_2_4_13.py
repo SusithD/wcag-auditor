@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
+from auditor.modules import reasons
 from auditor.modules.color import score_from_margin
 from auditor.modules.context import ModuleContext
 from auditor.modules.focus_common import StopDiff, analyse, document_box, entirely_covered
@@ -138,6 +139,7 @@ def run(ctx: ModuleContext) -> list[Finding]:
                     "state_contrast_max": round(strongest, 2),
                     "png_scale": diff.scale,
                     "unsettled": diff.unsettled,
+                    **({reasons.KEY: reasons.FOCUS_UNSETTLED} if diff.unsettled else {}),
                     "selector": step.selector,
                     "method": "focus-pair-diff",
                 },

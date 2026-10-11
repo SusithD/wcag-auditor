@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from auditor.modules import reasons
 from auditor.modules.context import ModuleContext
 from auditor.modules.focus_common import analyse, coverage_fraction, document_box
 from auditor.schema import Finding
@@ -32,6 +33,7 @@ def _finding(
             "method": method,
             "rule": "R6",
             "selector": step.selector,
+            **({reasons.KEY: reasons.NO_PIXEL_CHANGE} if method == "no-pixel-change" else {}),
         },
         guidance_key=GUIDANCE_KEYS[sc],
     )

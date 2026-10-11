@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from auditor.modules import reasons
 from auditor.modules.color import score_from_margin
 from auditor.modules.context import ModuleContext
 from auditor.modules.focus_common import analyse, document_box, entirely_covered
@@ -40,6 +41,7 @@ def run(ctx: ModuleContext) -> list[Finding]:
                     "added_px": diff.added_px,
                     "png_scale": diff.scale,
                     "unsettled": diff.unsettled,
+                    **({reasons.KEY: reasons.FOCUS_UNSETTLED} if diff.unsettled else {}),
                     "rule": "R1",
                     "selector": step.selector,
                     "method": "focus-pair-diff",

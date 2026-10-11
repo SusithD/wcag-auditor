@@ -5,6 +5,7 @@ import math
 import numpy as np
 
 from auditor.elements.base import Element
+from auditor.modules import reasons
 from auditor.modules.color import (
     RGB,
     contrast_ratio,
@@ -151,6 +152,11 @@ def run(ctx: ModuleContext) -> list[Finding]:
                         threshold,
                         "needs-review" if el.style.get("source") == "detector" else "automated",
                         {
+                            **(
+                                {reasons.KEY: reasons.DETECTOR_BOX}
+                                if el.style.get("source") == "detector"
+                                else {}
+                            ),
                             "border_ratio": math.floor(border_ratio * 100) / 100,
                             "fill_ratio": math.floor(fill_ratio * 100) / 100,
                             "border": hex_of(edge),
@@ -170,7 +176,12 @@ def run(ctx: ModuleContext) -> list[Finding]:
                         ratio,
                         threshold,
                         "needs-review",
-                        {"icon": hex_of(fg), "background": hex_of(bg), "method": "icon-only (O2)"},
+                        {
+                            "icon": hex_of(fg),
+                            "background": hex_of(bg),
+                            "method": "icon-only (O2)",
+                            reasons.KEY: reasons.ICON_PIXELS,
+                        },
                     )
                 )
     return findings
