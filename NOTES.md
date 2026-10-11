@@ -292,3 +292,9 @@ State before M10: M0-M5, M1b and M10a merged and pushed. M10's full training run
 - **Phase 2:** `scripts/train_detector.sh phase2` resumes from the newest checkpoint (at least `checkpoint_9.ckpt`; copies the epoch-10 EMA to `ema_epoch10.pth` first) and runs epochs 11–20.
 - **Interrupted phase:** re-run the same phase command. `--resume-latest` continues from the newest `checkpoint_N.ckpt` in the output directory and refuses to start if the phase is already complete, so later checkpoints are never overwritten. Tested by `test_a_mid_phase_restart_resumes_from_the_latest_checkpoint` (4 epochs straight == 1 + restart to 2 + resume to 4, identical weights).
 - Limit: the equivalence proof is on CPU; MPS is not bit-reproducible (ADR-030).
+
+## M10 phase 1 result (2026-10-11)
+- Phase 1 ran epochs 1 to 10 on `data/webui/prepared_full` (15,000 train / 1,500 valid) with micro-batch 4 × accumulation 2, 2 workers, MPS allocator watermarks 0.7/0.55 (ADR-031). It was interrupted once during epoch 8 (process ended 2026-10-11 02:55, cause not found, probably a closed terminal) and resumed from `checkpoint_6.ckpt` with `--resume-latest`; about 40 minutes of work were lost. Epochs take about 40 minutes (about 6.7 images/s), so a phase is about 7 hours.
+- **Epoch-10 EMA validation mAP: 0.2258 (50:95), 0.3869 (50).** Per epoch (50:95): 0.130, 0.166, 0.184, 0.197, 0.204, 0.206, 0.213, 0.219, 0.225, 0.226. Train loss epochs 1 to 7: 6.25, 5.76, 5.59, 5.43, 5.34, 5.21, 5.13.
+- Interim model: `data/models/detector-phase1.onnx` (sha256 prefix 06a180fccbe1569e, 108.8 MB, input 1×3×576×576, outputs `dets` (1,300,4) and `labels` (1,300,7), loads in onnxruntime CPU and returns finite values on random input). Exported from `ema_epoch10.pth` (a copy of `last_ema.pth` at the end of epoch 10). Interim, development only; Chapter 5 uses the epoch-20 model.
+- Next: `scripts/train_detector.sh phase2` (epochs 11 to 20, resumes from `checkpoint_9.ckpt`).
