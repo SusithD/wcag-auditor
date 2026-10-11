@@ -11,7 +11,6 @@ import {
   Panel,
   SeverityCounts,
 } from "@/components/ds";
-import { useSettings } from "@/components/settings/use-settings";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Table,
@@ -37,7 +36,6 @@ export function deltaWords(delta: number | null): string {
 }
 
 export function SitesScreen() {
-  const [settings] = useSettings();
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: ["sites"],
     queryFn: async () => {
@@ -53,7 +51,6 @@ export function SitesScreen() {
         ? 2000
         : false,
   });
-  const rowHeight = settings.density === "compact" ? "h-10" : "h-14";
 
   return (
     <>
@@ -116,7 +113,7 @@ export function SitesScreen() {
                 const finished =
                   run.status === "done" || run.status === "partial";
                 return (
-                  <TableRow key={row.site} className={rowHeight}>
+                  <TableRow key={row.site} className="h-14">
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <span

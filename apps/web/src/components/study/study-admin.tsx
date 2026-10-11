@@ -151,7 +151,7 @@ export function StudyAdmin() {
             <Button variant="outline" onClick={prepare}>
               Prepare study pages
             </Button>
-            <span className="text-body" aria-live="polite">
+            <span className="text-body">
               {config.data
                 ? `${config.data.prepared} of ${config.data.total_runs} study pages ready`
                 : ""}

@@ -4,7 +4,7 @@ const STATUS: Record<string, { kind: ShapeKind; word: string }> = {
   queued: { kind: "running", word: "Queued" },
   running: { kind: "running", word: "Running" },
   done: { kind: "done", word: "Complete" },
-  partial: { kind: "alert", word: "Partly done" },
+  partial: { kind: "alert", word: "Partly complete" },
   failed: { kind: "failed", word: "Audit failed" },
   cancelled: { kind: "undecided", word: "Cancelled" },
 };

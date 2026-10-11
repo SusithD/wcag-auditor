@@ -12,7 +12,6 @@ import {
   SeverityCounts,
   Tag,
 } from "@/components/ds";
-import { useSettings } from "@/components/settings/use-settings";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Table,
@@ -28,11 +27,13 @@ import { age } from "@/lib/url";
 import { FilterSelect } from "./filter-select";
 import { RunStatus } from "./run-status";
 
+const RUN_LIMIT = 100;
+
 const STATUS_OPTIONS = [
   { value: "", label: "All" },
   { value: "running", label: "Running" },
   { value: "done", label: "Complete" },
-  { value: "partial", label: "Partly done" },
+  { value: "partial", label: "Partly complete" },
   { value: "failed", label: "Audit failed" },
   { value: "cancelled", label: "Cancelled" },
 ];
@@ -62,7 +63,6 @@ export function AuditsScreen() {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
-  const [settings] = useSettings();
   const status = params.get("status") ?? "";
   const vp = params.get("vp") ?? "";
   const siteFilter = params.get("site") ?? "";
@@ -75,7 +75,7 @@ export function AuditsScreen() {
     queryKey: ["runs", "all"],
     queryFn: async () => {
       const { data: runs, error } = await api.GET("/runs", {
-        params: { query: { limit: 100 } },
+        params: { query: { limit: RUN_LIMIT } },
       });
       if (error) throw new Error("Could not load audits");
       return runs;
@@ -98,7 +98,6 @@ export function AuditsScreen() {
 
   const rows = useMemo(() => filterRuns(data ?? [], filters), [data, filters]);
   const filtered = Boolean(filters.status || filters.vp || filters.site);
-  const rowHeight = settings.density === "compact" ? "h-10" : "h-12";
 
   function setFilter(key: "status" | "vp" | "site", value: string) {
     const next = new URLSearchParams(params.toString());
@@ -161,7 +160,11 @@ export function AuditsScreen() {
           aria-live="polite"
           className="m-0 ml-auto text-dense text-ink-3"
         >
-          {data ? `${rows.length} of ${data.length} audits` : ""}
+          {data
+            ? data.length >= RUN_LIMIT
+              ? `${rows.length} of the latest ${RUN_LIMIT} audits`
+              : `${rows.length} of ${data.length} audits`
+            : ""}
         </p>
       </div>
       <Panel aria-label="Audits">
@@ -222,7 +225,7 @@ export function AuditsScreen() {
             </TableHeader>
             <TableBody>
               {rows.map((run) => (
-                <TableRow key={run.id} className={rowHeight}>
+                <TableRow key={run.id}>
                   <TableCell>
                     <Link
                       href={`/runs/${run.id}`}
