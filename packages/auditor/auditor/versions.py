@@ -9,7 +9,6 @@ from typing import Any
 from auditor import protocol
 
 AXE_PATH = Path(__file__).parent / "rules" / "vendor" / "axe.min.js"
-MODEL_PATH = Path(__file__).parent / "detector" / "model.onnx"
 
 
 def _sha256(path: Path) -> str | None:
@@ -31,12 +30,15 @@ def _git_sha() -> str | None:
 
 
 def collect(capture_meta: dict[str, Any] | None = None) -> dict[str, str | None]:
+    from auditor.elements.detector import model_path
+
+    model = model_path()
     tools = (capture_meta or {}).get("tools", {})
     return {
         "chromium": tools.get("browser"),
         "playwright": importlib.metadata.version("playwright"),
         "axe": _sha256(AXE_PATH),
-        "model_sha": _sha256(MODEL_PATH),
+        "model_sha": _sha256(model) if model else None,
         "protocol_sha": protocol.sha256(),
         "git_sha": _git_sha(),
     }

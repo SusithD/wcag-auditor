@@ -1,0 +1,9 @@
+Reproduction of eval/2026-10-11 (2026-10-11, commit 7d4b937, detector sha256 2e3053dc6433b47c...):
+two independent runs of 'auditor ablate --benchmark ../04_Data_Collection/benchmark_captures --truth ../04_Data_Collection/annotation/benchmark_ground_truth.json --seed 20261004 --bootstrap 10000'
+
+26853ae7e2bae9b52a559b87cb242cde2aa6ba9eadec1760d0ca7f27d311f838  run1 dom/metrics.json
+26853ae7e2bae9b52a559b87cb242cde2aa6ba9eadec1760d0ca7f27d311f838  run2 dom/metrics.json
+b0628b37bc583ab97b2264072668891212991dc85aa4b99b48708ee67e2e714c  run1 detector/metrics.json
+b0628b37bc583ab97b2264072668891212991dc85aa4b99b48708ee67e2e714c  run2 detector/metrics.json
+3330e6bd05931ffd459a6cceed6d9662abf61ba1ba77669879455d6be1952243  run1 ablation.md
+3330e6bd05931ffd459a6cceed6d9662abf61ba1ba77669879455d6be1952243  run2 ablation.md

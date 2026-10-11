@@ -1,0 +1,30 @@
+{
+ "model": "nano",
+ "epochs": 20,
+ "batch_size": 4,
+ "grad_accum": 2,
+ "num_workers": 2,
+ "resolution": 576,
+ "seed": 20261004,
+ "device": "mps",
+ "ema": true,
+ "amp": false,
+ "dataset_dir": "data/webui/prepared_full",
+ "manifest_sha256": "52c8c8057943db89f2615fb00f91a6a3aec5ee55487b779721949faa81347858",
+ "classmap": [
+  "text",
+  "link",
+  "button",
+  "input",
+  "choice",
+  "image_icon"
+ ],
+ "environment": {
+  "platform": "macOS-26.7-arm64-arm-64bit",
+  "machine": "arm64",
+  "python": "3.12.13",
+  "torch": "2.14.1",
+  "mps_available": "True",
+  "pytorch_enable_mps_fallback": "1"
+ }
+}

@@ -149,7 +149,7 @@ def run(ctx: ModuleContext) -> list[Finding]:
                         el,
                         best,
                         threshold,
-                        "automated",
+                        "needs-review" if el.style.get("source") == "detector" else "automated",
                         {
                             "border_ratio": math.floor(border_ratio * 100) / 100,
                             "fill_ratio": math.floor(fill_ratio * 100) / 100,

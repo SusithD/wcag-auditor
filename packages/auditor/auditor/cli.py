@@ -17,12 +17,24 @@ console = Console()
 
 @app.command()
 def run(
-    folder: Annotated[Path, typer.Option(help="Capture folder to replay")],
+    folder: Annotated[Path | None, typer.Option(help="Capture folder to replay")] = None,
+    screenshots: Annotated[
+        list[Path] | None, typer.Option(help="Screenshot-only mode: one or more PNG files")
+    ] = None,
     out: Annotated[Path | None, typer.Option(help="Output directory")] = None,
     condition: Annotated[Condition, typer.Option()] = "hybrid",
 ) -> None:
-    """Run the pipeline on a capture folder (stub: writes an empty report)."""
-    if not (folder / "meta.json").is_file():
+    """Run the pipeline on a capture folder, or on screenshots alone."""
+    if screenshots:
+        missing = [p for p in screenshots if not p.is_file()]
+        if folder is not None or missing:
+            console.print("error: give either --folder or existing --screenshots files")
+            raise typer.Exit(code=1)
+        target = out or Path("data/runs") / screenshots[0].stem
+        shot_run = pipeline.run_screenshots(screenshots, target, condition)
+        console.print(f"run {shot_run.id} -> {target / 'report.json'}")
+        return
+    if folder is None or not (folder / "meta.json").is_file():
         console.print(f"error: {folder} is not a capture folder (no meta.json)")
         raise typer.Exit(code=1)
     target = out or Path("data/runs") / folder.name
@@ -142,6 +154,7 @@ def eval(
             help="Headline counts both tiers (ADR-028); --automated-only is the stricter table",
         ),
     ] = True,
+    elements: Annotated[str, typer.Option(help="auto | dom | detector")] = "auto",
     synthetic_truth: Annotated[str, typer.Option(help="from-folders")] = "from-folders",
     calibration: Annotated[
         bool, typer.Option("--calibration/--no-calibration", help="Also write calibration.*")
@@ -167,11 +180,12 @@ def eval(
         bootstrap=bootstrap,
         rule_findings=rule_findings,
         include_needs_review=include_needs_review,
+        elements=elements,
         calibration=calibration,
     )
     try:
         metrics = run_eval(cfg, _progress_writer(progress_file))
-    except NotImplementedError as exc:
+    except (NotImplementedError, FileNotFoundError, ValueError) as exc:
         console.print(f"error: {exc}")
         raise typer.Exit(code=2) from exc
     meta = metrics["meta"]
@@ -202,6 +216,33 @@ def eval(
                     )
             console.print(table)
     console.print(f"wrote {out / 'metrics.json'}")
+
+
+@app.command()
+def ablate(
+    benchmark: Annotated[Path, typer.Option(help="Folder tree of capture folders")],
+    truth: Annotated[Path | None, typer.Option(help="benchmark_ground_truth.json")] = None,
+    out: Annotated[Path, typer.Option()] = Path("eval"),
+    seed: Annotated[int, typer.Option()] = 20261004,
+    bootstrap: Annotated[int, typer.Option()] = 1000,
+) -> None:
+    """Run the pixel condition with DOM boxes and with detector boxes and write ablation.md."""
+    from auditor.eval import ablation
+    from auditor.eval.harness import EvalConfig, run_eval
+
+    for mode in ("dom", "detector"):
+        run_eval(
+            EvalConfig(
+                benchmark=benchmark,
+                out=out / mode,
+                truth=truth,
+                conditions=["pixel"],
+                seed=seed,
+                bootstrap=bootstrap,
+                elements=mode,
+            )
+        )
+    console.print(f"wrote {ablation.write(out / 'dom', out / 'detector', out)}")
 
 
 if __name__ == "__main__":

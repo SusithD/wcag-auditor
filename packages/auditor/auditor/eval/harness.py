@@ -43,6 +43,7 @@ class EvalConfig:
     bootstrap: int = 10000
     rule_findings: Path | None = None
     include_needs_review: bool = True
+    elements: str = "auto"
     calibration: bool = False
 
 
@@ -141,7 +142,7 @@ class PixelPredictor:
         from auditor.elements.select import SourceSelector
 
         self.cfg = cfg
-        self.sources = SourceSelector()
+        self.sources = SourceSelector(cfg.elements)
         self.source_counts = {"dom": 0, "pixel": 0}
         self.needs_review_excluded = 0
 
@@ -320,6 +321,8 @@ def run_eval(cfg: EvalConfig, progress: Callable[[int, int], None] | None = None
             "bootstrap_resamples": cfg.bootstrap,
             "conditions": cfg.conditions,
             "include_needs_review": cfg.include_needs_review,
+            "elements_mode": cfg.elements,
+            "detector_loaded": pixel.sources.detector_loaded if pixel else None,
             "match": {
                 "iou": match.iou,
                 "containment": match.containment,

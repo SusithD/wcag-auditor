@@ -1,0 +1,73 @@
+classes: [text, link, button, input, choice, image_icon]
+
+priority: [button, input, choice, link, image_icon, text]
+
+tokens:
+  button: [button, tab, treeitem, DisclosureTriangle]
+  input: [textbox, searchbox, combobox, spinbutton, slider]
+  choice: [checkbox, radio, option, switch, listbox]
+  link: [link, menuitem, doc-backlink, doc-noteref]
+  image_icon: [img, Canvas, PluginObject]
+  text: [StaticText, LabelText]
+
+ignored:
+  - listitem
+  - paragraph
+  - heading
+  - LineBreak
+  - generic
+  - gridcell
+  - LayoutTableCell
+  - separator
+  - Pre
+  - Iframe
+  - IframePresentational
+  - time
+  - list
+  - columnheader
+  - rowheader
+  - superscript
+  - subscript
+  - figure
+  - Figcaption
+  - HeaderAsNonLandmark
+  - FooterAsNonLandmark
+  - strong
+  - emphasis
+  - mark
+  - insertion
+  - deletion
+  - Abbr
+  - LayoutTableRow
+  - LayoutTable
+  - row
+  - code
+  - DescriptionList
+  - DescriptionListDetail
+  - DescriptionListTerm
+  - ListMarker
+  - Section
+  - region
+  - blockquote
+  - navigation
+  - banner
+  - article
+  - alert
+  - complementary
+  - status
+  - contentinfo
+  - Legend
+  - dialog
+  - caption
+  - menu
+  - search
+  - group
+  - main
+  - tooltip
+  - log
+  - timer
+  - application
+  - tablist
+  - tabpanel
+  - RootWebArea
+  - menubar
