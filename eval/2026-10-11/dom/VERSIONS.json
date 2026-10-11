@@ -1,7 +1,7 @@
 {
   "axe": "c24f097bd2f451d4f933e8bc7d8d539f8672a2ebcb5cc9f9f3eec8ca9470a0c1",
   "chromium": "chromium 153.0.8010.12",
-  "git_sha": "4245d377a4e44239d621a1ec8e50d2ac3af65f77",
+  "git_sha": "7d4b937e8d0cc5517a42720e11e194d6b3f69782",
   "model_sha": "2e3053dc6433b47c7793343e914a0d4b7cd5e27323cd54901805f515a237a148",
   "playwright": "1.63.0",
   "protocol_sha": "a46020528ec1dc1c4e6f5a1b167044dd56c9bb792be877818a54eb679ffc365e"

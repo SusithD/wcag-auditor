@@ -1,6 +1,6 @@
 # Detector validation report
 
-Model `data/models/detector.onnx` (sha256 `2e3053dc6433b47c`), evaluated with onnxruntime on CPU on the held-out WebUI validation split (1500 images, 47194 boxes; manifest `52c8c8057943db89`). Each image is squashed to 576 x 576, no tiling, one class per query (the shipped postprocess) with a score floor of 0.001. COCO mAP, 101-point interpolation, IoU 0.50:0.95.
+Model `data/models/detector.onnx` (sha256 `2e3053dc6433b47c`), evaluated with onnxruntime on CPU on the held-out WebUI validation split (1500 images, 47194 boxes; manifest `52c8c8057943db89`). This measures single-image squash inference only (each image squashed to 576 x 576, no tiling), so it is not the accuracy of the tiled pipeline. One class per query (the shipped postprocess) with a score floor of 0.001. COCO mAP, 101-point interpolation, IoU 0.50:0.95.
 
 | metric | value |
 |---|---|
