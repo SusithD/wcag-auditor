@@ -56,6 +56,12 @@ async function scan(page: Page) {
   expect(results.violations).toEqual([]);
 }
 
+async function showTables(page: Page) {
+  for (const group of await page.getByRole("group", { name: / view$/ }).all()) {
+    await group.getByRole("button", { name: "Table" }).click();
+  }
+}
+
 test.describe.configure({ mode: "serial" });
 
 for (const scheme of ["light", "dark"] as const) {
@@ -68,7 +74,7 @@ for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
     await page.goto(`/runs/${id}/coverage`);
     await expect(
-      page.getByRole("heading", { level: 1, name: "Coverage" }),
+      page.getByRole("heading", { level: 2, name: "Coverage" }),
     ).toBeVisible();
     await expect(page.getByRole("table")).toBeVisible();
     await page.getByText("1.4.3 Contrast (Minimum)").last().click();
@@ -85,8 +91,10 @@ for (const scheme of ["light", "dark"] as const) {
     await page.setViewportSize({ width: 1600, height: 900 });
     await page.goto(`/runs/${id}/compare`);
     await expect(
-      page.getByRole("heading", { level: 1, name: /Compare/ }),
-    ).toBeVisible();
+      page
+        .getByRole("navigation", { name: "Run views" })
+        .getByRole("link", { name: "Compare with rules only" }),
+    ).toHaveAttribute("aria-current", "page");
     await expect(
       page.getByRole("img", { name: /Hybrid: Full-page screenshot/ }),
     ).toBeVisible();
@@ -99,10 +107,16 @@ for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
     await page.goto("/eval");
     await expect(
-      page.getByRole("img", { name: /^Bar chart of precision/ }),
+      page.getByRole("img", { name: /^Recall by criterion/ }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("img", { name: /^Difference in precision/ }),
     ).toBeVisible();
     await scan(page);
-    await page.getByRole("button", { name: "View as table" }).click();
+    await showTables(page);
+    await expect(
+      page.getByRole("table", { name: /Recall by criterion/ }),
+    ).toBeVisible();
     await expect(
       page.getByRole("table", { name: /Per-criterion results/ }),
     ).toBeVisible();
@@ -116,9 +130,12 @@ test("coverage shows eight criteria, the reliable count per channel and the cata
 }) => {
   const id = await ensureRun(request);
   await page.goto(`/runs/${id}/coverage`);
+  await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
   await expect(
-    page.getByRole("heading", { level: 1, name: "Coverage" }),
-  ).toBeFocused();
+    page
+      .getByRole("navigation", { name: "Run views" })
+      .getByRole("link", { name: "Coverage" }),
+  ).toHaveAttribute("aria-current", "page");
   const grid = page.getByRole("region", {
     name: /Which channel returned a verdict/,
   });
@@ -137,9 +154,7 @@ test("coverage shows eight criteria, the reliable count per channel and the cata
   await expect(main).not.toContainText("(+DOM)");
   await expect(main).not.toContainText("needs-review");
   await expect(main.locator("p strong").first()).toHaveText(/\d of 8/);
-  await expect(grid.getByRole("cell").first()).toContainText(
-    /verdict, \d+ findings/,
-  );
+  await expect(grid.getByRole("cell").first()).toContainText(/\d+ findings?/);
   await expect(grid.locator("caption")).toHaveCount(0);
 });
 
@@ -154,9 +169,12 @@ test("focus moves to the page heading after in-page navigation", async ({
     .getByRole("navigation", { name: "Run views" })
     .getByRole("link", { name: "Compare" })
     .click();
+  await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
   await expect(
-    page.getByRole("heading", { level: 1, name: /Compare hybrid/ }),
-  ).toBeFocused();
+    page
+      .getByRole("navigation", { name: "Run views" })
+      .getByRole("link", { name: "Compare with rules only" }),
+  ).toHaveAttribute("aria-current", "page");
   await expect(
     page.getByRole("group", { name: "Hybrid report" }),
   ).toBeVisible();
@@ -170,9 +188,12 @@ test("focus moves to the page heading after in-page navigation", async ({
     .getByRole("navigation", { name: "Run views" })
     .getByRole("link", { name: "Coverage" })
     .click();
+  await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
   await expect(
-    page.getByRole("heading", { level: 1, name: "Coverage" }),
-  ).toBeFocused();
+    page
+      .getByRole("navigation", { name: "Run views" })
+      .getByRole("link", { name: "Coverage" }),
+  ).toHaveAttribute("aria-current", "page");
 });
 
 test("compare keeps the two canvases and selection in step", async ({
@@ -269,15 +290,20 @@ test("the evaluation page renders the committed results and exports them", async
   await expect(
     page.getByRole("heading", { level: 1, name: "Evaluation" }),
   ).toBeVisible();
-  const chart = page.getByRole("img", { name: /^Bar chart of precision/ });
-  await expect(chart).toHaveAttribute(
-    "aria-label",
-    /Hybrid condition on the real stratum/,
-  );
-  await page.getByRole("tab", { name: "Synthetic" }).click();
+  const chart = page.getByRole("img", { name: /^Recall by criterion/ });
+  await expect(chart).toHaveAttribute("aria-label", /on the real stratum/);
+  await page
+    .getByRole("group", { name: "Page set" })
+    .getByRole("button", { name: "Synthetic" })
+    .click();
   await expect(chart).toHaveAttribute("aria-label", /on the synthetic stratum/);
 
-  await page.getByRole("button", { name: "View as table" }).click();
+  await page
+    .getByRole("group", { name: /^Recall by criterion.* view$/ })
+    .getByRole("button", { name: "Table" })
+    .click();
+  const recall = page.getByRole("table", { name: /Recall by criterion/ });
+  await expect(recall.getByRole("row")).toHaveCount(9);
   const table = page.getByRole("table", { name: /Per-criterion results/ });
   await expect(table.getByRole("row")).toHaveCount(9);
   await expect(page.getByRole("table", { name: /McNemar/ })).toBeVisible();
@@ -318,7 +344,7 @@ test("an evaluation can be started and its progress followed to the end", async 
   });
   await expect(page.locator("#eval-pick option")).toHaveCount(before + 1);
   await expect(
-    page.getByRole("img", { name: /^Bar chart of precision/ }),
+    page.getByRole("img", { name: /^Recall by criterion/ }),
   ).toBeVisible();
 });
 
@@ -403,4 +429,60 @@ test("compare explains itself for a rule-only run and coverage scans before expa
   await page.goto(`/runs/${id}/coverage`);
   await expect(page.getByRole("table")).toBeVisible();
   await scan(page);
+});
+
+const SIZES = [
+  { name: "1440", width: 1440, height: 900 },
+  { name: "390", width: 390, height: 844 },
+] as const;
+
+for (const scheme of ["light", "dark"] as const) {
+  for (const size of SIZES) {
+    test(`coverage, compare and evaluation scan clean at ${size.name} px (${scheme})`, async ({
+      page,
+      request,
+    }) => {
+      test.setTimeout(150_000);
+      const id = await ensureRun(request);
+      await page.emulateMedia({ colorScheme: scheme });
+      await page.setViewportSize({ width: size.width, height: size.height });
+
+      await page.goto(`/runs/${id}/coverage`);
+      await expect(page.getByRole("table")).toBeVisible();
+      await page.getByText("1.4.3 Contrast (Minimum)").last().click();
+      await scan(page);
+
+      await page.goto(`/runs/${id}/compare`);
+      await expect(
+        page.getByRole("img", { name: /Hybrid: Full-page screenshot/ }),
+      ).toBeVisible();
+      await scan(page);
+
+      await page.goto("/eval");
+      await expect(
+        page.getByRole("img", { name: /^Recall by criterion/ }),
+      ).toBeVisible();
+      await scan(page);
+      await showTables(page);
+      await scan(page);
+    });
+  }
+}
+
+test("coverage and evaluation reflow at 320 px without page scroll", async ({
+  page,
+  request,
+}) => {
+  const id = await ensureRun(request);
+  await page.setViewportSize({ width: 320, height: 700 });
+  for (const path of [`/runs/${id}/coverage`, "/eval"]) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    const overflow = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
+  }
 });
