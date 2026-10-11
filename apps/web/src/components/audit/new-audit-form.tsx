@@ -16,6 +16,7 @@ import {
 } from "react";
 import type { Condition, Viewport } from "@/api/client";
 import { Kbd, Panel } from "@/components/ds";
+import { OPTION_CARD } from "@/components/settings/option-card";
 import { useSettings } from "@/components/settings/use-settings";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -63,9 +64,6 @@ const METHODS: { value: Condition; name: string; text: string }[] = [
     text: "Browser rules only; fewer criteria can be decided",
   },
 ];
-
-const CARD =
-  "relative flex min-h-16 cursor-pointer items-start gap-3 rounded-md border border-line-control bg-surface px-4 py-3 hover:bg-subtle has-[:checked]:border-accent has-[:checked]:bg-tint has-[:checked]:shadow-[0_0_0_1px_var(--accent)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60";
 
 const GROUP = "min-w-0 border-0 border-b border-line p-6 max-[720px]:px-4";
 
@@ -333,7 +331,7 @@ export function NewAuditForm() {
             </legend>
             <div className="grid grid-cols-2 gap-3 px-6 pb-6 max-[720px]:grid-cols-1 max-[720px]:px-4">
               {ALL_VIEWPORTS.map((vp) => (
-                <label key={vp} className={CARD}>
+                <label key={vp} className={OPTION_CARD}>
                   <input
                     type="checkbox"
                     name="viewport"
@@ -367,7 +365,7 @@ export function NewAuditForm() {
             </legend>
             <div className="grid grid-cols-2 gap-3 px-6 pb-6 max-[720px]:grid-cols-1 max-[720px]:px-4">
               {METHODS.map((m) => (
-                <label key={m.value} className={CARD}>
+                <label key={m.value} className={OPTION_CARD}>
                   <input
                     type="radio"
                     name="method"

@@ -3,7 +3,7 @@
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { PageHeader, Panel, PanelBody, PanelHeader } from "@/components/ds";
-import { OptionCard, OptionGroup } from "./option-card";
+import { OptionCard, OptionGroup, SegmentedRadio } from "./option-card";
 import { type DefaultViewport, useSettings } from "./use-settings";
 
 const THEMES = [
@@ -89,40 +89,47 @@ export function SettingsScreen() {
           <PanelHeader id="set-theme" title="Appearance" />
           <PanelBody className="grid gap-6">
             <OptionGroup radio legend="Theme" className="[&_legend]:text-body">
-              {THEMES.map((item) => (
-                <OptionCard
-                  key={item.value}
-                  name="theme"
-                  value={item.value}
-                  checked={activeTheme === item.value}
-                  onChange={() => {
-                    setTheme(item.value);
-                    saved("Theme");
-                  }}
-                  title={item.title}
-                  description={item.description}
-                />
-              ))}
+              <SegmentedRadio
+                name="theme"
+                value={activeTheme}
+                options={THEMES.map((t) => ({
+                  value: t.value,
+                  label: t.title,
+                }))}
+                onChange={(value) => {
+                  setTheme(value);
+                  saved("Theme");
+                }}
+              />
+              <p className="m-0 text-dense text-ink-3">
+                {THEMES.find((t) => t.value === activeTheme)?.description}
+              </p>
             </OptionGroup>
             <OptionGroup
               radio
               legend="Density"
               className="[&_legend]:text-body"
             >
-              {DENSITIES.map((item) => (
-                <OptionCard
-                  key={item.value}
-                  name="density"
-                  value={item.value}
-                  checked={settings.density === item.value}
-                  onChange={() => {
-                    update({ density: item.value });
-                    saved("Density");
-                  }}
-                  title={item.title}
-                  description={item.description}
-                />
-              ))}
+              <SegmentedRadio
+                name="density"
+                value={settings.density}
+                options={DENSITIES.map((d) => ({
+                  value: d.value,
+                  label: d.title,
+                }))}
+                onChange={(value) => {
+                  update({
+                    density: value as (typeof DENSITIES)[number]["value"],
+                  });
+                  saved("Density");
+                }}
+              />
+              <p className="m-0 text-dense text-ink-3">
+                {
+                  DENSITIES.find((d) => d.value === settings.density)
+                    ?.description
+                }
+              </p>
             </OptionGroup>
           </PanelBody>
         </Panel>
