@@ -54,7 +54,11 @@ import {
   findingsSoFar,
 } from "@/lib/stages";
 import { describeRunError } from "@/lib/url";
-import { startAudit } from "./audit-request";
+import {
+  DEFAULT_FOCUS_STEPS,
+  invalidateRunData,
+  startAudit,
+} from "./audit-request";
 
 const SPOKEN: Record<CondensedStep["status"], string> = {
   done: "done",
@@ -173,7 +177,11 @@ function RunAgain({
     mutationFn: () =>
       startAudit(
         { url: run.source },
-        { viewports: run.viewports, condition: run.condition, budget: 15 },
+        {
+          viewports: run.viewports,
+          condition: run.condition,
+          budget: DEFAULT_FOCUS_STEPS,
+        },
         queryClient,
       ),
     onSuccess: (runId) => router.push(`/runs/${runId}`),
@@ -198,6 +206,10 @@ function RunAgain({
         <RotateCw aria-hidden="true" />
         Run again
       </Button>
+      <p className="m-0 basis-full text-dense text-ink-3">
+        Uses the same viewports and method, and the default{" "}
+        {DEFAULT_FOCUS_STEPS} focus steps.
+      </p>
       {error ? (
         <p role="alert" className="basis-full text-body text-critical">
           {error}
@@ -452,16 +464,21 @@ export function RunView({ runId }: { runId: string }) {
                   <AlertDialogCancel>Keep auditing</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={async () => {
-                      const { error: failure } = await api.POST(
-                        "/runs/{run_id}/cancel",
-                        { params: { path: { run_id: runId } } },
-                      );
+                      const failed = await api
+                        .POST("/runs/{run_id}/cancel", {
+                          params: { path: { run_id: runId } },
+                        })
+                        .then(({ error: failure }) => Boolean(failure))
+                        .catch(() => true);
                       setCancelError(
-                        failure ? "The audit could not be cancelled" : null,
+                        failed ? "The audit could not be cancelled" : null,
                       );
-                      await queryClient.invalidateQueries({
-                        queryKey: ["run", runId],
-                      });
+                      await Promise.all([
+                        queryClient.invalidateQueries({
+                          queryKey: ["run", runId],
+                        }),
+                        invalidateRunData(queryClient),
+                      ]).catch(() => undefined);
                     }}
                   >
                     Cancel audit

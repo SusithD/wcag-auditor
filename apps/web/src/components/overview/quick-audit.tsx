@@ -4,12 +4,22 @@ import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
-import { startAudit } from "@/components/audit/audit-request";
+import {
+  DEFAULT_FOCUS_STEPS,
+  startAudit,
+} from "@/components/audit/audit-request";
 import { Kbd, Panel } from "@/components/ds";
+import { useSettings } from "@/components/settings/use-settings";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { normalizeUrl } from "@/lib/url";
+
+function viewportList(viewports: string[]): string {
+  const names = viewports.map((v) => (v === "mobile" ? "mobile" : "desktop"));
+  const text = names.join(" and ");
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
 
 export function QuickAudit() {
   const router = useRouter();
@@ -20,10 +30,12 @@ export function QuickAudit() {
   const [error, setError] = useState<string | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [settings] = useSettings();
+  const submitLock = useRef(false);
 
   async function submit(event?: FormEvent) {
     event?.preventDefault();
-    if (submitting) return;
+    if (submitting || submitLock.current) return;
     setFailure(null);
     const result = normalizeUrl(url);
     if (!result.ok) {
@@ -32,11 +44,16 @@ export function QuickAudit() {
       return;
     }
     setError(null);
+    submitLock.current = true;
     setSubmitting(true);
     try {
       const runId = await startAudit(
         { url: result.url },
-        { viewports: ["desktop", "mobile"], condition: "hybrid", budget: 15 },
+        {
+          viewports: settings.viewports,
+          condition: settings.method,
+          budget: DEFAULT_FOCUS_STEPS,
+        },
         queryClient,
       );
       router.push(`/runs/${runId}`);
@@ -44,6 +61,7 @@ export function QuickAudit() {
       setFailure(
         err instanceof Error ? err.message : "The audit could not be started",
       );
+      submitLock.current = false;
       setSubmitting(false);
     }
   }
@@ -89,7 +107,7 @@ export function QuickAudit() {
             {submitting ? "Starting audit" : "Run audit"}
             <Kbd
               aria-hidden="true"
-              className="border-white/30 bg-transparent text-on-accent"
+              className="border-on-accent/30 bg-transparent text-on-accent"
             >
               ⌘↵
             </Kbd>
@@ -102,7 +120,7 @@ export function QuickAudit() {
           }
         >
           {error ??
-            "Desktop and mobile, detector and rules. The page must be publicly reachable."}
+            `${viewportList(settings.viewports)}, ${settings.method === "hybrid" ? "detector and rules" : "rules only"}. The page must be publicly reachable.`}
         </p>
         {failure ? (
           <p role="alert" className="text-body text-critical">

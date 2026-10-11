@@ -1,6 +1,8 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { api, type Condition, type Viewport } from "@/api/client";
 
+export const DEFAULT_FOCUS_STEPS = 15;
+
 export type AuditSource = { url: string } | { upload_id: string };
 
 export type AuditOptions = {
@@ -42,6 +44,14 @@ export function uploadFiles(
   });
 }
 
+export async function invalidateRunData(queryClient: QueryClient) {
+  await Promise.all([
+    queryClient.invalidateQueries({ queryKey: ["runs"] }),
+    queryClient.invalidateQueries({ queryKey: ["sites"] }),
+    queryClient.invalidateQueries({ queryKey: ["summary"] }),
+  ]);
+}
+
 export async function startAudit(
   source: AuditSource,
   options: AuditOptions,
@@ -61,7 +71,6 @@ export async function startAudit(
       typeof detail === "string" ? detail : "The audit could not be started",
     );
   }
-  await queryClient.invalidateQueries({ queryKey: ["runs"] });
-  await queryClient.invalidateQueries({ queryKey: ["sites"] });
+  await invalidateRunData(queryClient);
   return data.run_id;
 }

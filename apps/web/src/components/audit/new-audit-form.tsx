@@ -16,6 +16,7 @@ import {
 } from "react";
 import type { Condition, Viewport } from "@/api/client";
 import { Kbd, Panel } from "@/components/ds";
+import { useSettings } from "@/components/settings/use-settings";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Collapsible,
@@ -96,8 +97,11 @@ export function NewAuditForm() {
   const budgetInput = useRef<HTMLInputElement>(null);
   const [tab, setTab] = useState<string>("url");
   const [url, setUrl] = useState("");
+  const [settings] = useSettings();
   const [viewports, setViewports] = useState<Viewport[]>(ALL_VIEWPORTS);
   const [condition, setCondition] = useState<Condition>("hybrid");
+  const touched = useRef(false);
+  const submitLock = useRef(false);
   const [budgetText, setBudgetText] = useState("15");
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
@@ -111,6 +115,11 @@ export function NewAuditForm() {
   const hasError = formError !== null;
 
   useEffect(() => setReady(true), []);
+  useEffect(() => {
+    if (touched.current) return;
+    setViewports(ALL_VIEWPORTS.filter((v) => settings.viewports.includes(v)));
+    setCondition(settings.method);
+  }, [settings.viewports, settings.method]);
   useEffect(() => {
     if (hasError) alertRef.current?.focus();
   }, [hasError]);
@@ -143,6 +152,7 @@ export function NewAuditForm() {
   }
 
   function toggleViewport(vp: Viewport, on: boolean) {
+    touched.current = true;
     setViewports(
       ALL_VIEWPORTS.filter((v) => (v === vp ? on : viewports.includes(v))),
     );
@@ -150,11 +160,17 @@ export function NewAuditForm() {
 
   async function submit(event?: FormEvent) {
     event?.preventDefault();
-    if (submitting) return;
+    if (submitting || submitLock.current) return;
+    submitLock.current = true;
+    const started = await attempt();
+    if (!started) submitLock.current = false;
+  }
+
+  async function attempt(): Promise<boolean> {
     setFormError(null);
     if (viewports.length === 0) {
       setFormError("Select at least one viewport");
-      return;
+      return false;
     }
     const budget = Number(budgetText);
     if (
@@ -168,7 +184,7 @@ export function NewAuditForm() {
       );
       setAdvancedOpen(true);
       requestAnimationFrame(() => budgetInput.current?.focus());
-      return;
+      return false;
     }
     setBudgetError(null);
     setSubmitting(true);
@@ -180,7 +196,7 @@ export function NewAuditForm() {
           setFieldError(result.error);
           setSubmitting(false);
           urlInput.current?.focus();
-          return;
+          return false;
         }
         setFieldError(null);
         source = { url: result.url };
@@ -189,7 +205,7 @@ export function NewAuditForm() {
           setFormError("Choose at least one screenshot");
           setSubmitting(false);
           fileInput.current?.focus();
-          return;
+          return false;
         }
         setProgress(0);
         source = await uploadFiles(files, setProgress);
@@ -200,11 +216,13 @@ export function NewAuditForm() {
         queryClient,
       );
       router.push(`/runs/${runId}`);
+      return true;
     } catch (err) {
       setFormError(
         err instanceof Error ? err.message : "The audit could not be started",
       );
       setSubmitting(false);
+      return false;
     }
   }
 
@@ -354,7 +372,10 @@ export function NewAuditForm() {
                     value={m.value}
                     checked={condition === m.value}
                     disabled={submitting}
-                    onChange={() => setCondition(m.value)}
+                    onChange={() => {
+                      touched.current = true;
+                      setCondition(m.value);
+                    }}
                     className={CARD_INPUT}
                   />
                   <Marker kind="radio" />
@@ -451,7 +472,7 @@ export function NewAuditForm() {
                 {submitting ? "Starting audit" : "Run audit"}
                 <Kbd
                   aria-hidden="true"
-                  className="border-white/30 bg-transparent text-on-accent"
+                  className="border-on-accent/30 bg-transparent text-on-accent"
                 >
                   ⌘↵
                 </Kbd>
