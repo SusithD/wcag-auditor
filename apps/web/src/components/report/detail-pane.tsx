@@ -31,7 +31,6 @@ import {
   type Finding,
   plainText,
   plainValue,
-  SC_TITLES,
   SEV_LABEL,
   sevKey,
   TIER_LABEL,
@@ -48,6 +47,7 @@ import {
   ratioPair,
   ruler,
   SC_LEVELS,
+  scTitle,
   sentence,
 } from "./logic";
 import { Seg } from "./seg";
@@ -400,8 +400,8 @@ export function DetailPane({
             tabIndex={-1}
             className="t-section flex flex-wrap items-center gap-2 text-ink outline-none"
           >
-            <ScCode code={finding.sc} className="text-[0.8125rem]" />
-            <span>{SC_TITLES[finding.sc]}</span>
+            <ScCode code={finding.sc} />
+            <span>{scTitle(finding.sc)}</span>
             <Level level={SC_LEVELS[finding.sc] ?? "AA"} />
           </h2>
           {pair ? (

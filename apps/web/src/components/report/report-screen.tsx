@@ -452,8 +452,8 @@ export function ReportScreen({
   const layout = wide ? (
     <ResizablePanelGroup orientation="horizontal" className="min-h-0 flex-1">
       <ResizablePanel
-        defaultSize="17rem"
-        minSize="15rem"
+        defaultSize="22rem"
+        minSize="18rem"
         maxSize="28rem"
         groupResizeBehavior="preserve-pixel-size"
       >
@@ -483,7 +483,7 @@ export function ReportScreen({
       </ResizablePanel>
     </ResizablePanelGroup>
   ) : medium ? (
-    <div className="grid min-h-0 flex-1 grid-cols-[18rem_1fr]">
+    <div className="grid min-h-0 flex-1 grid-cols-[21rem_1fr]">
       <div className="min-h-0 border-r border-line">{rail}</div>
       <section
         id="canvas-region"
