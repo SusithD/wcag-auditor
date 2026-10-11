@@ -1,63 +1,90 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { Check, ChevronDown, Monitor, Smartphone } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   type ClipboardEvent,
   type DragEvent,
   type FormEvent,
+  type ReactNode,
   useEffect,
   useId,
   useRef,
   useState,
 } from "react";
-import { api, type Condition, type Viewport } from "@/api/client";
-import { Button } from "@/components/ui/button";
+import type { Condition, Viewport } from "@/api/client";
+import { Kbd, Panel } from "@/components/ds";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
-import { Kbd } from "@/components/ui/kbd";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Toggle } from "@/components/ui/toggle";
 import { normalizeUrl } from "@/lib/url";
+import { cn } from "@/lib/utils";
+import { startAudit, uploadFiles } from "./audit-request";
 
 const ALL_VIEWPORTS: Viewport[] = ["desktop", "mobile"];
+const MIN_BUDGET = 5;
+const MAX_BUDGET = 30;
 
-function uploadFiles(files: File[], onProgress: (fraction: number) => void) {
-  return new Promise<{ upload_id: string }>((resolve, reject) => {
-    const form = new FormData();
-    for (const file of files) form.append("files", file);
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/uploads");
-    xhr.upload.onprogress = (e) =>
-      e.lengthComputable && onProgress(e.loaded / e.total);
-    xhr.onload = () => {
-      let body: { upload_id?: string; detail?: unknown } = {};
-      try {
-        body = JSON.parse(xhr.responseText);
-      } catch {
-        body = {};
-      }
-      if (xhr.status >= 200 && xhr.status < 300 && body.upload_id) {
-        resolve({ upload_id: body.upload_id });
-      } else {
-        reject(
-          new Error(
-            typeof body.detail === "string" ? body.detail : "The upload failed",
-          ),
-        );
-      }
-    };
-    xhr.onerror = () => reject(new Error("The audit service is not reachable"));
-    xhr.send(form);
-  });
+const VIEWPORT_CARDS: Record<
+  Viewport,
+  { name: string; size: string; icon: ReactNode }
+> = {
+  desktop: {
+    name: "Desktop",
+    size: "1280 × 800 px",
+    icon: <Monitor aria-hidden="true" className="size-4 text-ink-2" />,
+  },
+  mobile: {
+    name: "Mobile",
+    size: "390 × 844 px",
+    icon: <Smartphone aria-hidden="true" className="size-4 text-ink-2" />,
+  },
+};
+
+const METHODS: { value: Condition; name: string; text: string }[] = [
+  {
+    value: "hybrid",
+    name: "Detector and rules",
+    text: "Rules plus the element detector; some findings need review",
+  },
+  {
+    value: "rule_only",
+    name: "Rules only",
+    text: "Browser rules only; fewer criteria can be decided",
+  },
+];
+
+const CARD =
+  "relative flex min-h-16 cursor-pointer items-start gap-3 rounded-md border border-line-control bg-surface px-4 py-3 hover:bg-subtle has-[:checked]:border-accent has-[:checked]:bg-tint has-[:checked]:shadow-[0_0_0_1px_var(--accent)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60";
+
+const GROUP = "min-w-0 border-0 border-b border-line p-6 max-[720px]:px-4";
+
+const CARD_INPUT =
+  "peer absolute inset-0 m-0 size-full cursor-pointer opacity-0";
+
+function Marker({ kind }: { kind: "box" | "radio" }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        "mt-px grid size-5 shrink-0 place-items-center border border-line-strong bg-surface text-on-accent peer-checked:border-accent-fill peer-checked:bg-accent-fill",
+        kind === "box"
+          ? "rounded-sm [&_svg]:opacity-0 peer-checked:[&_svg]:opacity-100"
+          : "rounded-full after:size-2 after:rounded-full after:bg-on-accent after:opacity-0 after:content-[''] peer-checked:after:opacity-100",
+      )}
+    >
+      {kind === "box" ? <Check className="size-3" /> : null}
+    </span>
+  );
 }
 
 export function NewAuditForm() {
@@ -66,14 +93,17 @@ export function NewAuditForm() {
   const ids = useId();
   const urlInput = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const budgetInput = useRef<HTMLInputElement>(null);
   const [tab, setTab] = useState<string>("url");
   const [url, setUrl] = useState("");
   const [viewports, setViewports] = useState<Viewport[]>(ALL_VIEWPORTS);
   const [condition, setCondition] = useState<Condition>("hybrid");
-  const [budget, setBudget] = useState(15);
+  const [budgetText, setBudgetText] = useState("15");
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [progress, setProgress] = useState(0);
   const [fieldError, setFieldError] = useState<string | null>(null);
+  const [budgetError, setBudgetError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [ready, setReady] = useState(false);
@@ -86,6 +116,7 @@ export function NewAuditForm() {
   }, [hasError]);
 
   const errorId = `${ids}-url-error`;
+  const budgetErrorId = `${ids}-budget-error`;
 
   function onPaste(event: ClipboardEvent<HTMLInputElement>) {
     const text = event.clipboardData.getData("text").trim();
@@ -111,6 +142,12 @@ export function NewAuditForm() {
     addFiles(event.dataTransfer.files);
   }
 
+  function toggleViewport(vp: Viewport, on: boolean) {
+    setViewports(
+      ALL_VIEWPORTS.filter((v) => (v === vp ? on : viewports.includes(v))),
+    );
+  }
+
   async function submit(event?: FormEvent) {
     event?.preventDefault();
     if (submitting) return;
@@ -119,6 +156,21 @@ export function NewAuditForm() {
       setFormError("Select at least one viewport");
       return;
     }
+    const budget = Number(budgetText);
+    if (
+      budgetText.trim() === "" ||
+      !Number.isInteger(budget) ||
+      budget < MIN_BUDGET ||
+      budget > MAX_BUDGET
+    ) {
+      setBudgetError(
+        `Enter a whole number from ${MIN_BUDGET} to ${MAX_BUDGET}`,
+      );
+      setAdvancedOpen(true);
+      requestAnimationFrame(() => budgetInput.current?.focus());
+      return;
+    }
+    setBudgetError(null);
     setSubmitting(true);
     try {
       let source: { url: string } | { upload_id: string };
@@ -142,19 +194,12 @@ export function NewAuditForm() {
         setProgress(0);
         source = await uploadFiles(files, setProgress);
       }
-      const { data, error } = await api.POST("/runs", {
-        body: { ...source, viewports, condition, max_focus_steps: budget },
-      });
-      if (error || !data) {
-        const detail = (error as { detail?: unknown } | undefined)?.detail;
-        throw new Error(
-          typeof detail === "string"
-            ? detail
-            : "The audit could not be started",
-        );
-      }
-      await queryClient.invalidateQueries({ queryKey: ["runs"] });
-      router.push(`/runs/${data.run_id}`);
+      const runId = await startAudit(
+        source,
+        { viewports, condition, budget },
+        queryClient,
+      );
+      router.push(`/runs/${runId}`);
     } catch (err) {
       setFormError(
         err instanceof Error ? err.message : "The audit could not be started",
@@ -174,183 +219,247 @@ export function NewAuditForm() {
       aria-label="New audit"
     >
       <Tabs value={tab} onValueChange={(v) => setTab(String(v))}>
-        <TabsList>
-          <TabsTrigger value="url">URL</TabsTrigger>
+        <TabsList aria-label="Audit source">
+          <TabsTrigger value="url">Web address</TabsTrigger>
           <TabsTrigger value="screenshots">Screenshots</TabsTrigger>
         </TabsList>
-        <TabsContent value="url" className="mt-4 space-y-2">
-          <Label htmlFor={`${ids}-url`}>Web address</Label>
-          <Input
-            id={`${ids}-url`}
-            ref={urlInput}
-            type="text"
-            inputMode="url"
-            autoComplete="url"
-            placeholder="example.com"
-            value={url}
-            disabled={submitting}
-            aria-invalid={fieldError ? true : undefined}
-            aria-describedby={fieldError ? errorId : undefined}
-            onChange={(e) => {
-              setUrl(e.target.value);
-              if (fieldError) setFieldError(null);
-            }}
-            onPaste={onPaste}
-          />
-          {fieldError ? (
-            <p id={errorId} className="text-caption text-destructive">
-              {fieldError}
-            </p>
-          ) : null}
-        </TabsContent>
-        <TabsContent value="screenshots" className="mt-4 space-y-3">
+        <Panel as="div">
+          <TabsContent value="url" className={cn(GROUP, "space-y-2")}>
+            <Label htmlFor={`${ids}-url`}>Web address</Label>
+            <Input
+              id={`${ids}-url`}
+              ref={urlInput}
+              type="text"
+              inputMode="url"
+              autoComplete="url"
+              placeholder="https://example.com"
+              value={url}
+              disabled={submitting}
+              aria-invalid={fieldError ? true : undefined}
+              aria-describedby={fieldError ? `${errorId}` : `${ids}-url-hint`}
+              onChange={(e) => {
+                setUrl(e.target.value);
+                if (fieldError) setFieldError(null);
+              }}
+              onPaste={onPaste}
+            />
+            {fieldError ? (
+              <p id={errorId} className="text-label text-critical">
+                {fieldError}
+              </p>
+            ) : (
+              <p id={`${ids}-url-hint`} className="text-label text-ink-3">
+                The page must be publicly reachable.
+              </p>
+            )}
+          </TabsContent>
+          <TabsContent value="screenshots" className={cn(GROUP, "space-y-3")}>
+            <fieldset
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={onDrop}
+              className="min-w-0 rounded-md border border-dashed border-line-strong p-4"
+            >
+              <Label htmlFor={`${ids}-files`}>Page screenshots</Label>
+              <p className="mt-1 text-label text-ink-3">
+                One image per viewport (desktop wider than 600 px, mobile 600 px
+                or less). You can also drop files here.
+              </p>
+              <input
+                id={`${ids}-files`}
+                ref={fileInput}
+                type="file"
+                accept="image/*"
+                multiple
+                disabled={submitting}
+                onChange={(e) => e.target.files && addFiles(e.target.files)}
+                className="mt-3 block min-h-8 w-full text-body file:mr-3 file:min-h-8 file:rounded-md file:border file:border-line-control file:bg-surface file:px-2.5 file:text-body"
+              />
+            </fieldset>
+            {files.length > 0 ? (
+              <ul
+                className="space-y-1 text-body"
+                aria-label="Selected screenshots"
+              >
+                {files.map((f) => (
+                  <li
+                    key={`${f.name}-${f.size}-${f.lastModified}`}
+                    className="flex justify-between gap-3"
+                  >
+                    <span className="truncate">{f.name}</span>
+                    <span className="num text-label text-ink-3">
+                      {(f.size / 1024).toFixed(0)} KB
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            {submitting && tab === "screenshots" ? (
+              <Progress
+                value={Math.round(progress * 100)}
+                aria-label="Upload progress"
+              />
+            ) : null}
+          </TabsContent>
+
           <fieldset
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={onDrop}
-            className="rounded-lg border border-dashed p-4"
+            className="min-w-0 border-0 border-b border-line p-0"
+            disabled={submitting}
+            aria-describedby={
+              formError?.includes("viewport") ? `${ids}-form-error` : undefined
+            }
           >
-            <Label htmlFor={`${ids}-files`}>Page screenshots</Label>
-            <p className="mt-1 text-caption text-muted-foreground">
-              One image per viewport (desktop wider than 600 px, mobile 600 px
-              or less). You can also drop files here.
-            </p>
-            <input
-              id={`${ids}-files`}
-              ref={fileInput}
-              type="file"
-              accept="image/*"
-              multiple
-              disabled={submitting}
-              onChange={(e) => e.target.files && addFiles(e.target.files)}
-              className="mt-3 block min-h-8 w-full text-body file:mr-3 file:min-h-8 file:rounded-md file:border file:border-input file:bg-background file:px-2.5 file:text-body"
-            />
-          </fieldset>
-          {files.length > 0 ? (
-            <ul
-              className="space-y-1 text-body"
-              aria-label="Selected screenshots"
-            >
-              {files.map((f) => (
-                <li
-                  key={`${f.name}-${f.size}-${f.lastModified}`}
-                  className="flex justify-between gap-3"
-                >
-                  <span className="truncate">{f.name}</span>
-                  <span className="font-mono text-label text-muted-foreground">
-                    {(f.size / 1024).toFixed(0)} KB
+            <legend className="px-6 pb-3 pt-6 text-body font-medium text-ink max-[720px]:px-4">
+              Viewports
+            </legend>
+            <div className="grid grid-cols-2 gap-3 px-6 pb-6 max-[720px]:grid-cols-1 max-[720px]:px-4">
+              {ALL_VIEWPORTS.map((vp) => (
+                <label key={vp} className={CARD}>
+                  <input
+                    type="checkbox"
+                    name="viewport"
+                    value={vp}
+                    checked={viewports.includes(vp)}
+                    disabled={submitting}
+                    onChange={(e) => toggleViewport(vp, e.target.checked)}
+                    className={CARD_INPUT}
+                  />
+                  <Marker kind="box" />
+                  <span className="flex min-w-0 flex-col gap-0.5">
+                    <span className="flex items-center gap-2 font-semibold">
+                      {VIEWPORT_CARDS[vp].icon}
+                      {VIEWPORT_CARDS[vp].name}
+                    </span>
+                    <span className="num text-dense text-ink-2">
+                      {VIEWPORT_CARDS[vp].size}
+                    </span>
                   </span>
-                </li>
+                </label>
               ))}
-            </ul>
-          ) : null}
-          {submitting && tab === "screenshots" ? (
-            <Progress
-              value={Math.round(progress * 100)}
-              aria-label="Upload progress"
-            />
-          ) : null}
-        </TabsContent>
-      </Tabs>
-
-      <fieldset
-        className="mt-4"
-        disabled={submitting}
-        aria-describedby={
-          formError?.includes("viewport") ? `${ids}-form-error` : undefined
-        }
-      >
-        <legend className="mb-2 text-body font-medium">Viewports</legend>
-        <div className="flex gap-2">
-          {ALL_VIEWPORTS.map((vp) => (
-            <Toggle
-              key={vp}
-              variant="outline"
-              pressed={viewports.includes(vp)}
-              onPressedChange={(on) =>
-                setViewports(
-                  ALL_VIEWPORTS.filter((v) =>
-                    v === vp ? on : viewports.includes(v),
-                  ),
-                )
-              }
-            >
-              {vp === "desktop" ? "Desktop" : "Mobile"}
-            </Toggle>
-          ))}
-        </div>
-      </fieldset>
-
-      <Collapsible className="mt-4">
-        <CollapsibleTrigger className="group inline-flex min-h-8 items-center gap-1 text-body font-medium">
-          <ChevronRight
-            aria-hidden="true"
-            className="size-4 transition-transform group-data-[panel-open]:rotate-90"
-          />
-          Advanced
-        </CollapsibleTrigger>
-        <CollapsibleContent className="mt-3 space-y-4">
-          <fieldset disabled={submitting}>
-            <legend className="mb-2 text-body font-medium">Condition</legend>
-            <RadioGroup
-              value={condition}
-              onValueChange={(v) => setCondition(v as Condition)}
-              aria-label="Condition"
-            >
-              <Label className="min-h-8 gap-2">
-                <RadioGroupItem value="hybrid" />
-                Hybrid (rule and pixel channels)
-              </Label>
-              <Label className="min-h-8 gap-2">
-                <RadioGroupItem value="rule_only" />
-                Rule-only (axe-core)
-              </Label>
-            </RadioGroup>
+            </div>
           </fieldset>
-          <div>
-            <Label htmlFor={`${ids}-budget`}>
-              Focus budget: <span className="font-mono">{budget}</span> keyboard
-              stops
-            </Label>
-            <input
-              id={`${ids}-budget`}
-              type="range"
-              min={5}
-              max={30}
-              value={budget}
-              disabled={submitting}
-              onChange={(e) => setBudget(Number(e.target.value))}
-              className="mt-2 block min-h-8 w-full accent-primary"
-            />
+
+          <fieldset
+            className="min-w-0 border-0 border-b border-line p-0"
+            disabled={submitting}
+          >
+            <legend className="px-6 pb-3 pt-6 text-body font-medium text-ink max-[720px]:px-4">
+              Method
+            </legend>
+            <div className="grid grid-cols-2 gap-3 px-6 pb-6 max-[720px]:grid-cols-1 max-[720px]:px-4">
+              {METHODS.map((m) => (
+                <label key={m.value} className={CARD}>
+                  <input
+                    type="radio"
+                    name="method"
+                    value={m.value}
+                    checked={condition === m.value}
+                    disabled={submitting}
+                    onChange={() => setCondition(m.value)}
+                    className={CARD_INPUT}
+                  />
+                  <Marker kind="radio" />
+                  <span className="flex min-w-0 flex-col gap-0.5">
+                    <span className="font-semibold">{m.name}</span>
+                    <span className="text-dense text-ink-2">{m.text}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <Collapsible
+            open={advancedOpen}
+            onOpenChange={setAdvancedOpen}
+            className="border-b border-line"
+          >
+            <CollapsibleTrigger className="group flex min-h-12 w-full items-center gap-2 px-6 text-left font-semibold hover:bg-subtle max-[720px]:px-4">
+              Advanced
+              <ChevronDown
+                aria-hidden="true"
+                className="size-3.5 text-ink-3 group-data-[panel-open]:rotate-180"
+              />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 px-6 pb-6 pt-2 max-[720px]:px-4">
+              <fieldset disabled={submitting} className="min-w-0 space-y-1">
+                <Label htmlFor={`${ids}-budget`}>Focus steps</Label>
+                <Input
+                  id={`${ids}-budget`}
+                  ref={budgetInput}
+                  type="number"
+                  inputMode="numeric"
+                  min={MIN_BUDGET}
+                  max={MAX_BUDGET}
+                  value={budgetText}
+                  aria-invalid={budgetError ? true : undefined}
+                  aria-describedby={
+                    budgetError ? budgetErrorId : `${ids}-budget-hint`
+                  }
+                  onChange={(e) => {
+                    setBudgetText(e.target.value);
+                    if (budgetError) setBudgetError(null);
+                  }}
+                  className="num max-w-30"
+                />
+                {budgetError ? (
+                  <p id={budgetErrorId} className="text-label text-critical">
+                    {budgetError}
+                  </p>
+                ) : (
+                  <p
+                    id={`${ids}-budget-hint`}
+                    className="text-label text-ink-3"
+                  >
+                    How many Tab presses to record, from {MIN_BUDGET} to{" "}
+                    {MAX_BUDGET}
+                  </p>
+                )}
+              </fieldset>
+            </CollapsibleContent>
+          </Collapsible>
+
+          {formError ? (
+            <p
+              ref={alertRef}
+              id={`${ids}-form-error`}
+              role="alert"
+              tabIndex={-1}
+              className="mx-6 mt-4 text-body text-critical outline-none max-[720px]:mx-4"
+            >
+              {formError}
+            </p>
+          ) : null}
+
+          <div className="flex flex-wrap items-center justify-between gap-4 p-6 max-[720px]:flex-col max-[720px]:items-stretch max-[720px]:px-4">
+            <span className="text-dense text-ink-3">
+              The audit runs in the background. You can leave the progress page.
+            </span>
+            <div className="flex justify-end gap-2">
+              <Link
+                href="/"
+                className={buttonVariants({ variant: "default", size: "lg" })}
+              >
+                Cancel
+              </Link>
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                className="aria-disabled:pointer-events-none aria-disabled:opacity-60"
+                aria-disabled={submitting}
+                aria-keyshortcuts="Control+Enter Meta+Enter"
+              >
+                {submitting ? "Starting audit" : "Run audit"}
+                <Kbd
+                  aria-hidden="true"
+                  className="border-white/30 bg-transparent text-on-accent"
+                >
+                  ⌘↵
+                </Kbd>
+              </Button>
+            </div>
           </div>
-        </CollapsibleContent>
-      </Collapsible>
-
-      {formError ? (
-        <p
-          ref={alertRef}
-          id={`${ids}-form-error`}
-          role="alert"
-          tabIndex={-1}
-          className="mt-4 text-body text-destructive outline-none"
-        >
-          {formError}
-        </p>
-      ) : null}
-
-      <Button
-        type="submit"
-        variant="primary"
-        size="lg"
-        className="mt-6 aria-disabled:pointer-events-none aria-disabled:opacity-60"
-        aria-disabled={submitting}
-        aria-keyshortcuts="Control+Enter Meta+Enter"
-      >
-        {submitting ? (
-          <Loader2 aria-hidden="true" className="animate-spin" />
-        ) : null}
-        {submitting ? "Starting audit" : "Audit"}
-        <Kbd aria-hidden="true">⌘⏎</Kbd>
-      </Button>
+        </Panel>
+      </Tabs>
     </form>
   );
 }

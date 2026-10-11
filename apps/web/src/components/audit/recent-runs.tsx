@@ -1,125 +1,139 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { RotateCw } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { api, type RunSummary } from "@/api/client";
-import { SeverityTriplet } from "@/components/severity-triplet";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Panel, SeverityCounts } from "@/components/ds";
+import { Skeleton } from "@/components/ui/skeleton";
+import { siteParts } from "@/lib/overview";
 import { age } from "@/lib/url";
+import { startAudit } from "./audit-request";
 
-const STATUS_LABEL: Record<string, string> = {
-  queued: "Queued",
-  running: "Running",
-  done: "Done",
-  partial: "Partly done",
-  failed: "Failed",
-  cancelled: "Cancelled",
-};
-
-function label(run: RunSummary) {
-  if (run.source_kind === "url") return run.source.replace(/^https?:\/\//, "");
-  if (run.source_kind === "folder") return run.source.split("/").slice(-1)[0];
-  return "Uploaded screenshots";
-}
-
-function runName(run: RunSummary) {
-  const condition = run.condition === "hybrid" ? "hybrid" : "rule-only";
-  const status = (STATUS_LABEL[run.status] ?? run.status).toLowerCase();
-  return `${label(run)}, ${condition}, ${status}, ${age(run.created_at)}`;
+export function recentAddresses(runs: RunSummary[], limit = 3): RunSummary[] {
+  const seen = new Set<string>();
+  const out: RunSummary[] = [];
+  for (const run of runs) {
+    if (run.source_kind !== "url" || seen.has(run.source)) continue;
+    seen.add(run.source);
+    out.push(run);
+    if (out.length === limit) break;
+  }
+  return out;
 }
 
 export function RecentRuns() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [error, setError] = useState<string | null>(null);
   const { data, isPending, isError } = useQuery({
-    queryKey: ["runs"],
+    queryKey: ["runs", "recent-addresses"],
     queryFn: async () => {
-      const { data: runs, error } = await api.GET("/runs", {
-        params: { query: { limit: 10 } },
+      const { data: runs, error: failure } = await api.GET("/runs", {
+        params: { query: { limit: 30 } },
       });
-      if (error) throw new Error("Could not load recent runs");
-      return runs;
+      if (failure || !runs) throw new Error("Could not load recent runs");
+      return recentAddresses(runs);
     },
-    refetchInterval: (query) =>
-      query.state.data?.some(
-        (r) => r.status === "queued" || r.status === "running",
-      )
-        ? 2000
-        : false,
+  });
+
+  const again = useMutation({
+    mutationFn: (run: RunSummary) =>
+      startAudit(
+        { url: run.source },
+        {
+          viewports: run.viewports,
+          condition: run.condition,
+          budget: 15,
+        },
+        queryClient,
+      ),
+    onSuccess: (runId) => router.push(`/runs/${runId}`),
+    onError: (err) =>
+      setError(
+        err instanceof Error ? err.message : "The audit could not be started",
+      ),
   });
 
   return (
-    <section aria-labelledby="recent-h" className="mt-12">
-      <h2 id="recent-h" className="text-h3 font-semibold">
-        Recent runs
-      </h2>
-      {isPending ? (
-        <p className="mt-2 text-body text-muted-foreground" aria-busy="true">
-          Loading recent runs
-        </p>
-      ) : isError ? (
-        <p className="mt-2 text-body text-muted-foreground">
-          Recent runs are unavailable because the audit service did not answer.
-        </p>
-      ) : data.length === 0 ? (
-        <p className="mt-2 text-body text-muted-foreground">
-          No audits yet. Run your first one above.
-        </p>
-      ) : (
-        <Table className="mt-2" regionLabel="Recent runs, scrollable table">
-          <TableCaption className="sr-only">
-            The ten most recent audits
-          </TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Page</TableHead>
-              <TableHead className="hidden md:table-cell">Viewports</TableHead>
-              <TableHead>Condition</TableHead>
-              <TableHead>Findings</TableHead>
-              <TableHead>Age</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((run) => (
-              <TableRow key={run.id} className="h-9">
-                <TableCell>
-                  <Link
-                    href={`/runs/${run.id}`}
-                    className="inline-block min-h-8 max-w-40 truncate align-middle leading-8 underline underline-offset-4 md:max-w-56"
-                    title={label(run)}
-                    aria-label={runName(run)}
+    <section aria-labelledby="recent-h" className="mt-8">
+      <div className="mb-2 flex items-baseline justify-between gap-3">
+        <h2 id="recent-h" className="t-section text-ink">
+          Recent addresses
+        </h2>
+        <Link href="/audits" className="text-dense text-ink-2 underline">
+          All audits
+        </Link>
+      </div>
+      <Panel as="div">
+        {isPending ? (
+          <div className="space-y-2 p-4" aria-busy="true">
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full" />
+          </div>
+        ) : isError ? (
+          <p className="p-4 text-body text-ink-2">
+            Recent addresses are unavailable because the audit service did not
+            answer.
+          </p>
+        ) : data.length === 0 ? (
+          <p className="p-4 text-body text-ink-2">
+            No audits yet. Addresses you audit will appear here.
+          </p>
+        ) : (
+          <ul className="m-0 list-none p-0">
+            {data.map((run) => {
+              const { host, path } = siteParts(run);
+              return (
+                <li
+                  key={run.id}
+                  className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto_auto_auto] items-center gap-x-4 gap-y-1 border-b border-line px-4 py-2 last:border-b-0 max-[720px]:grid-cols-[minmax(0,1fr)_auto]"
+                >
+                  <span className="min-w-0 truncate font-medium">
+                    {host}
+                    <small className="block truncate text-label font-normal text-ink-3">
+                      {path}
+                    </small>
+                  </span>
+                  <time
+                    dateTime={run.created_at}
+                    className="num text-dense text-ink-3 max-[720px]:order-3"
                   >
-                    {label(run)}
-                  </Link>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {run.viewports.join(", ")}
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline">
-                    {run.condition === "hybrid" ? "Hybrid" : "Rule-only"}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <SeverityTriplet counts={run.counts} />
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {age(run.created_at)}
-                </TableCell>
-                <TableCell>{STATUS_LABEL[run.status] ?? run.status}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
+                    {age(run.created_at)}
+                  </time>
+                  <SeverityCounts
+                    critical={run.counts.critical}
+                    serious={run.counts.serious}
+                    minor={run.counts.minor}
+                    className="max-[720px]:order-2"
+                  />
+                  <button
+                    type="button"
+                    aria-disabled={again.isPending}
+                    aria-label={`Run again for ${host}`}
+                    onClick={() => {
+                      if (again.isPending) return;
+                      setError(null);
+                      again.mutate(run);
+                    }}
+                    className="inline-flex min-h-7 items-center gap-1 rounded-md px-2 text-dense font-medium text-ink-2 hover:bg-subtle hover:text-ink max-[720px]:order-4"
+                  >
+                    <RotateCw className="size-3.5" aria-hidden="true" />
+                    Run again
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </Panel>
+      {error ? (
+        <p role="alert" className="mt-2 text-body text-critical">
+          {error}
+        </p>
+      ) : null}
     </section>
   );
 }
