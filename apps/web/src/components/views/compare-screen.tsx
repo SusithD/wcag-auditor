@@ -3,23 +3,38 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 import { api, TERMINAL } from "@/api/client";
+import {
+  Panel,
+  PanelBody,
+  PanelHeader,
+  type ShapeKind,
+  StatusShape,
+} from "@/components/ds";
 import { Canvas } from "@/components/report/canvas";
 import type { PairMode } from "@/components/report/focus-pair";
+import { WideContent } from "@/components/shell";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useOverview } from "@/hooks/use-report-data";
 import { useCompare } from "@/hooks/use-run-views";
 import { counterpart, diffRowLabel, SyncBus } from "@/lib/compare";
 import {
   type Finding,
   SC_TITLES,
-  SEV_GLYPH,
   SEV_LABEL,
+  type SevKey,
   sevKey,
   type Viewport,
 } from "@/lib/report";
-import { RunNav } from "./run-nav";
-import { focusOnMount, useViewportParam } from "./viewport-state";
+import { RunHeader } from "./run-header";
+import { ViewMessage } from "./view-message";
+import { useViewportParam } from "./viewport-state";
+
+const SEV_SHAPE: Record<SevKey, ShapeKind> = {
+  critical: "critical",
+  serious: "serious",
+  minor: "minor",
+  "needs-review": "review",
+};
 
 export function CompareScreen({ runId }: { runId: string }) {
   const run = useQuery({
@@ -50,17 +65,34 @@ export function CompareScreen({ runId }: { runId: string }) {
     return <Message title="The audit is still running" />;
   if (run.data && available.length === 0)
     return <Message title="This run has no report" />;
-  if (compare.isError) {
+  if (compare.isError && run.data && viewport) {
     return (
-      <Message
-        title="Compare is not available for this run"
-        detail="Compare needs a hybrid run: it shows the same capture with and without the pixel channel."
-      />
+      <div className="w-full">
+        <RunHeader
+          runId={runId}
+          run={run.data}
+          viewport={viewport}
+          available={available}
+          current="compare"
+          onViewport={setViewport}
+        />
+        <Panel className="mt-6" aria-labelledby="unavailable-h">
+          <PanelBody>
+            <h2 id="unavailable-h" className="t-section text-ink">
+              Compare is not available for this run
+            </h2>
+            <p className="mt-1 text-ink-2">
+              Compare needs a hybrid run: it shows the same capture with and
+              without the pixel channel.
+            </p>
+          </PanelBody>
+        </Panel>
+      </div>
     );
   }
-  if (!run.data || !viewport || overview.isPending || compare.isPending) {
+  if (!run.data || !viewport || overview.isPending || !compare.data) {
     return (
-      <div className="p-6" aria-busy="true">
+      <div aria-busy="true">
         <title>Compare - WCAG Auditor</title>
         <Skeleton className="h-96 w-full" />
       </div>
@@ -92,27 +124,20 @@ export function CompareScreen({ runId }: { runId: string }) {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-[1800px] px-4 py-4">
-      <title>{`Compare - ${overview.data.url}`}</title>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1
-            ref={focusOnMount}
-            tabIndex={-1}
-            className="text-h2 font-semibold outline-none"
-          >
-            Compare hybrid and rule-only
-          </h1>
-          <p className="font-mono text-label text-muted-foreground">
-            {overview.data.url}
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <RunNav runId={runId} current="compare" query={`?vp=${viewport}`} />
-          <label className="inline-flex min-h-7 items-center gap-2 text-body">
+    <div className="w-full">
+      <WideContent />
+      <RunHeader
+        runId={runId}
+        run={run.data}
+        viewport={viewport}
+        available={available}
+        current="compare"
+        onViewport={setViewport}
+        actions={
+          <label className="inline-flex min-h-8 items-center gap-2 text-dense text-ink">
             <input
               type="checkbox"
-              className="size-4"
+              className="size-4 accent-accent"
               checked={linked}
               onChange={(e) => {
                 bus.current.enabled = e.target.checked;
@@ -121,36 +146,21 @@ export function CompareScreen({ runId }: { runId: string }) {
             />
             Sync views
           </label>
-          {available.length > 1 ? (
-            <ToggleGroup
-              variant="outline"
-              size="sm"
-              value={[viewport]}
-              onValueChange={(v) => v[0] && setViewport(v[0] as Viewport)}
-              aria-label="Viewport"
-            >
-              {available.map((vp) => (
-                <ToggleGroupItem key={vp} value={vp}>
-                  {vp === "desktop" ? "Desktop" : "Mobile"}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          ) : null}
-        </div>
-      </div>
+        }
+      />
+      <h2 className="sr-only">Compare hybrid and rule-only</h2>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
-        <section aria-labelledby="left-h" className="min-w-0">
-          <h2 id="left-h" className="mb-1 text-h3 font-semibold">
-            Hybrid{" "}
-            <span className="font-mono text-label text-muted-foreground">
-              {data.hybrid.length} findings
-            </span>
-          </h2>
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <Panel aria-labelledby="left-h" className="overflow-hidden">
+          <PanelHeader
+            id="left-h"
+            title="Hybrid"
+            right={<span className="num">{data.hybrid.length} findings</span>}
+          />
           <div
             role="group"
             aria-label="Hybrid report"
-            className="h-[70dvh] overflow-hidden rounded-lg border"
+            className="h-[70dvh] overflow-hidden"
           >
             <Canvas
               runId={runId}
@@ -167,18 +177,19 @@ export function CompareScreen({ runId }: { runId: string }) {
               sync={syncA}
             />
           </div>
-        </section>
-        <section aria-labelledby="right-h" className="min-w-0">
-          <h2 id="right-h" className="mb-1 text-h3 font-semibold">
-            Rule-only{" "}
-            <span className="font-mono text-label text-muted-foreground">
-              {data.rule_only.length} findings
-            </span>
-          </h2>
+        </Panel>
+        <Panel aria-labelledby="right-h" className="overflow-hidden">
+          <PanelHeader
+            id="right-h"
+            title="Rule-only"
+            right={
+              <span className="num">{data.rule_only.length} findings</span>
+            }
+          />
           <div
             role="group"
             aria-label="Rule-only report"
-            className="h-[70dvh] overflow-hidden rounded-lg border"
+            className="h-[70dvh] overflow-hidden"
           >
             <Canvas
               runId={runId}
@@ -195,25 +206,32 @@ export function CompareScreen({ runId }: { runId: string }) {
               sync={syncB}
             />
           </div>
-        </section>
+        </Panel>
       </div>
 
-      <section aria-labelledby="diff-h" className="mt-6">
-        <h2 id="diff-h" className="text-h3 font-semibold">
-          Findings in one view only
-        </h2>
+      <Panel aria-labelledby="diff-h" className="mt-6">
+        <PanelHeader
+          id="diff-h"
+          title="Findings in one view only"
+          right={
+            diff.length > 0 ? (
+              <span className="num">
+                {data.only_hybrid.length} only in hybrid,{" "}
+                {data.only_rule_only.length} only in rule-only
+              </span>
+            ) : null
+          }
+        />
         {diff.length === 0 ? (
-          <p className="mt-2 text-body text-muted-foreground">
+          <p className="p-4 text-ink-2">
             Both views report the same findings for this page.
           </p>
         ) : (
           <>
-            <p className="mt-1 text-caption text-muted-foreground">
-              {data.only_hybrid.length} only in hybrid,{" "}
-              {data.only_rule_only.length} only in rule-only. Selecting a row
-              selects it on its canvas.
+            <p className="px-4 pt-3 text-dense text-ink-3">
+              Selecting a row selects it on its canvas.
             </p>
-            <ul className="mt-2 divide-y rounded-lg border bg-card">
+            <ul className="mt-2 divide-y divide-line">
               {diff.map(({ side, finding }, index) => {
                 const k = sevKey(finding);
                 const selected =
@@ -228,25 +246,23 @@ export function CompareScreen({ runId }: { runId: string }) {
                           ? selectHybrid(finding.key)
                           : selectRule(finding.key)
                       }
-                      className="grid min-h-9 w-full grid-cols-[8rem_1fr_auto] items-center gap-3 px-3 py-1 text-left text-body hover:bg-muted aria-pressed:bg-muted"
+                      className="grid min-h-11 w-full grid-cols-[8rem_1fr_auto] items-center gap-3 px-4 py-1 text-left text-dense text-ink hover:bg-subtle aria-pressed:bg-tint max-[720px]:grid-cols-[1fr_auto]"
                     >
                       <span className="font-mono text-label">
                         {finding.sc} {SC_TITLES[finding.sc]?.split(" ")[0]}
                       </span>
                       <span
-                        className="truncate font-mono text-label"
+                        className="truncate font-mono text-label max-[720px]:hidden"
                         title={finding.element}
                       >
                         {finding.element}
                       </span>
-                      <span className="flex items-center gap-3 text-caption">
-                        <span
-                          className={`text-sev-${k === "needs-review" ? "review" : k}`}
-                        >
-                          <span aria-hidden="true">{SEV_GLYPH[k]}</span>{" "}
+                      <span className="flex items-center gap-3 text-xs">
+                        <span className="inline-flex items-center gap-1.5 text-ink">
+                          <StatusShape kind={SEV_SHAPE[k]} />
                           {SEV_LABEL[k]}
                         </span>
-                        <span>
+                        <span className="text-ink-3">
                           Only in {side === "hybrid" ? "hybrid" : "rule-only"}
                         </span>
                       </span>
@@ -260,25 +276,11 @@ export function CompareScreen({ runId }: { runId: string }) {
             </ul>
           </>
         )}
-      </section>
+      </Panel>
     </div>
   );
 }
 
-function Message({ title, detail }: { title: string; detail?: string }) {
-  return (
-    <div className="mx-auto max-w-160 px-6 py-12">
-      <title>{`${title} - Compare`}</title>
-      <h1
-        ref={focusOnMount}
-        tabIndex={-1}
-        className="text-h2 font-semibold outline-none"
-      >
-        {title}
-      </h1>
-      {detail ? (
-        <p className="mt-2 text-body text-muted-foreground">{detail}</p>
-      ) : null}
-    </div>
-  );
+function Message({ title }: { title: string }) {
+  return <ViewMessage title={title} view="Compare" />;
 }
