@@ -130,7 +130,13 @@ export function EvalScreen() {
       <PageCrumbs items={[{ label: "Research" }, { label: "Evaluation" }]} />
       <PageHeader
         title="Evaluation"
-        description="How well each criterion is detected on the frozen benchmark, and whether the detector helps."
+        className="[&>div:last-child]:ml-auto"
+        description={
+          <span className="block max-w-md">
+            How well each criterion is detected on the frozen benchmark, and
+            whether the detector helps.
+          </span>
+        }
         actions={
           <>
             {view ? (

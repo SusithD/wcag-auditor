@@ -1,25 +1,25 @@
 import Link from "next/link";
-import { EmptyState } from "@/components/ds";
 import { PageTitle } from "@/components/page-title";
+import { PageCrumbs } from "@/components/shell";
 import { buttonVariants } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
     <>
       <PageTitle title="Page not found - WCAG Auditor" />
-      <EmptyState
-        as="h1"
-        className="py-16"
-        title="Page not found"
-        action={
+      <PageCrumbs items={[{ label: "Page not found" }]} />
+      <div className="mx-auto flex max-w-md flex-col items-center gap-2 px-4 py-16 text-center">
+        <h1 className="t-page text-ink">Page not found</h1>
+        <p className="text-ink-2">
+          That address does not match a page in this app. The address may be
+          incomplete. Go back to the start.
+        </p>
+        <div className="mt-2">
           <Link href="/" className={buttonVariants({ variant: "primary" })}>
             Back to overview
           </Link>
-        }
-      >
-        That address does not match a page in this app. The address may be
-        incomplete. Go back to the start.
-      </EmptyState>
+        </div>
+      </div>
     </>
   );
 }

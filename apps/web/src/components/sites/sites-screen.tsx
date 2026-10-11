@@ -25,6 +25,9 @@ import { age } from "@/lib/url";
 import { cn } from "@/lib/utils";
 import { siteLabel } from "./site-label";
 
+const CELL =
+  "max-[720px]:block max-[720px]:px-4 max-[720px]:py-1 max-[720px]:whitespace-normal";
+
 export function deltaWords(delta: number | null): string {
   if (delta === null) return "No earlier audit to compare with";
   if (delta === 0) return "No change since last audit";
@@ -58,10 +61,7 @@ export function SitesScreen() {
         title="Sites"
         description="One row per site, with its latest audit and what changed since the one before."
         actions={
-          <Link
-            href="/audit/new"
-            className={buttonVariants({ variant: "primary" })}
-          >
+          <Link href="/audit/new" className={buttonVariants()}>
             New audit
           </Link>
         }
@@ -98,23 +98,30 @@ export function SitesScreen() {
             <TableCaption className="sr-only">
               Sites with their latest audit
             </TableCaption>
-            <TableHeader>
+            <TableHeader className="max-[720px]:hidden">
               <TableRow>
                 <TableHead scope="col">Site</TableHead>
-                <TableHead scope="col">Failures</TableHead>
-                <TableHead scope="col">To review</TableHead>
+                <TableHead scope="col" className="min-w-56">
+                  Failures
+                </TableHead>
+                <TableHead scope="col" className="whitespace-nowrap">
+                  To review
+                </TableHead>
                 <TableHead scope="col">Criteria decided</TableHead>
                 <TableHead scope="col">Latest audit</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="max-[720px]:block">
               {data.map((row) => {
                 const run = row.latest_run;
                 const finished =
                   run.status === "done" || run.status === "partial";
                 return (
-                  <TableRow key={row.site} className="h-14">
-                    <TableCell>
+                  <TableRow
+                    key={row.site}
+                    className="h-14 max-[720px]:block max-[720px]:h-auto max-[720px]:py-2"
+                  >
+                    <TableCell className={CELL}>
                       <div className="flex items-center gap-3">
                         <span
                           aria-hidden="true"
@@ -135,10 +142,11 @@ export function SitesScreen() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className={CELL}>
                       {finished ? (
                         <div>
                           <SeverityCounts
+                            className="whitespace-nowrap"
                             critical={run.counts.critical}
                             serious={run.counts.serious}
                             minor={run.counts.minor}
@@ -151,10 +159,13 @@ export function SitesScreen() {
                         <span className="text-ink-3">Not available yet</span>
                       )}
                     </TableCell>
-                    <TableCell className="num">
+                    <TableCell className={`${CELL} num`}>
+                      <span className="hidden text-ink-3 max-[720px]:inline">
+                        To review{" "}
+                      </span>
                       {finished ? row.to_review : "-"}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className={CELL}>
                       {finished ? (
                         <div className="grid w-36 gap-1">
                           <Meter
@@ -169,7 +180,7 @@ export function SitesScreen() {
                         <span className="text-ink-3">-</span>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className={CELL}>
                       <div className="grid gap-0.5">
                         <RunStatus status={run.status} />
                         <span className={cn("text-xs text-ink-3")}>

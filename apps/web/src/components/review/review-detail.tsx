@@ -74,7 +74,7 @@ export function ReviewDetail({
     },
     {
       label: "Found by",
-      value: <Tag>{PROVENANCE[f.provenance]}</Tag>,
+      value: PROVENANCE[f.provenance],
     },
     {
       label: "Severity if confirmed",

@@ -84,7 +84,7 @@ function Row({ row }: { row: Site }) {
       <td className={TD}>
         {finished ? (
           <>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-3 whitespace-nowrap">
               <span className="num font-semibold">{row.failures}</span>
               <SeverityCounts
                 critical={run.counts.critical}
@@ -185,10 +185,13 @@ export function SitesTable({ rows }: { rows: Site[] }) {
             <th scope="col" className="px-3 first:pl-4 font-medium">
               Site
             </th>
-            <th scope="col" className="px-3 font-medium">
+            <th scope="col" className="min-w-56 px-3 font-medium">
               Failures
             </th>
-            <th scope="col" className="px-3 text-right font-medium">
+            <th
+              scope="col"
+              className="px-3 text-right font-medium whitespace-nowrap"
+            >
               To review
             </th>
             <th scope="col" className="px-3 font-medium">

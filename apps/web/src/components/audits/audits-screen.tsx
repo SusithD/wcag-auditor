@@ -5,13 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import { api, type RunSummary } from "@/api/client";
-import {
-  EmptyState,
-  PageHeader,
-  Panel,
-  SeverityCounts,
-  Tag,
-} from "@/components/ds";
+import { EmptyState, PageHeader, Panel, SeverityCounts } from "@/components/ds";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Table,
@@ -28,6 +22,9 @@ import { FilterSelect } from "./filter-select";
 import { RunStatus } from "./run-status";
 
 const RUN_LIMIT = 100;
+const CELL =
+  "max-[720px]:block max-[720px]:px-4 max-[720px]:py-1 max-[720px]:whitespace-normal";
+const MOBILE_LABEL = "hidden text-ink-3 max-[720px]:inline";
 
 const STATUS_OPTIONS = [
   { value: "", label: "All" },
@@ -115,10 +112,7 @@ export function AuditsScreen() {
         title="Audits"
         description="Every audit you have run, with filters by status, viewport and site."
         actions={
-          <Link
-            href="/audit/new"
-            className={buttonVariants({ variant: "primary" })}
-          >
+          <Link href="/audit/new" className={buttonVariants()}>
             New audit
           </Link>
         }
@@ -212,7 +206,7 @@ export function AuditsScreen() {
             <TableCaption className="sr-only">
               Audits, newest first
             </TableCaption>
-            <TableHeader>
+            <TableHeader className="max-[720px]:hidden">
               <TableRow>
                 <TableHead scope="col">Site</TableHead>
                 <TableHead scope="col">Viewports</TableHead>
@@ -223,42 +217,44 @@ export function AuditsScreen() {
                 <TableHead scope="col">Status</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="max-[720px]:block">
               {rows.map((run) => (
-                <TableRow key={run.id}>
-                  <TableCell>
+                <TableRow
+                  key={run.id}
+                  className="max-[720px]:block max-[720px]:h-auto max-[720px]:py-2"
+                >
+                  <TableCell className={CELL}>
                     <Link
                       href={`/runs/${run.id}`}
-                      className="inline-flex min-h-6 max-w-72 items-center truncate font-medium text-ink underline-offset-4 hover:underline"
+                      className="inline-flex min-h-6 max-w-72 items-center truncate font-medium text-ink underline-offset-4 hover:underline max-[720px]:max-w-full"
                       title={runLabel(run)}
                     >
                       {runLabel(run)}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-ink-2">
+                  <TableCell className={`${CELL} text-ink-2`}>
                     {run.viewports.join(" and ")}
                   </TableCell>
-                  <TableCell>
-                    <Tag>
-                      {run.condition === "hybrid"
-                        ? "Detector and rules"
-                        : "Rules only"}
-                    </Tag>
+                  <TableCell className={`${CELL} text-ink-3`}>
+                    {run.condition === "hybrid"
+                      ? "Detector and rules"
+                      : "Rules only"}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={CELL}>
                     <SeverityCounts
                       critical={run.counts.critical}
                       serious={run.counts.serious}
                       minor={run.counts.minor}
                     />
                   </TableCell>
-                  <TableCell className="num">
+                  <TableCell className={`${CELL} num`}>
+                    <span className={MOBILE_LABEL}>To review </span>
                     {run.counts.needs_review ?? 0}
                   </TableCell>
-                  <TableCell className="text-ink-3">
+                  <TableCell className={`${CELL} text-ink-3`}>
                     {age(run.created_at)}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={CELL}>
                     <RunStatus status={run.status} />
                   </TableCell>
                 </TableRow>
