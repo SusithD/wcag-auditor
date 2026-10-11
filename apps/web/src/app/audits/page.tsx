@@ -1,10 +1,14 @@
-import { PlaceholderPage } from "@/components/shell/placeholder-page";
+import { Suspense } from "react";
+import { AuditsScreen } from "@/components/audits/audits-screen";
+import { PageTitle } from "@/components/page-title";
 
 export default function Page() {
   return (
-    <PlaceholderPage
-      title="Audits"
-      description="Every audit you have run, with filters by status, viewport and site."
-    />
+    <>
+      <PageTitle title="Audits - WCAG Auditor" />
+      <Suspense fallback={null}>
+        <AuditsScreen />
+      </Suspense>
+    </>
   );
 }

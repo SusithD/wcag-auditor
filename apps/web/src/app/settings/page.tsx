@@ -1,10 +1,11 @@
-import { PlaceholderPage } from "@/components/shell/placeholder-page";
+import { PageTitle } from "@/components/page-title";
+import { SettingsScreen } from "@/components/settings/settings-screen";
 
 export default function Page() {
   return (
-    <PlaceholderPage
-      title="Settings"
-      description="Theme, density, keyboard shortcuts and default audit options."
-    />
+    <>
+      <PageTitle title="Settings - WCAG Auditor" />
+      <SettingsScreen />
+    </>
   );
 }

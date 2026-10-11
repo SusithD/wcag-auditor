@@ -1,10 +1,14 @@
-import { PlaceholderPage } from "@/components/shell/placeholder-page";
+import { Suspense } from "react";
+import { PageTitle } from "@/components/page-title";
+import { ReviewScreen } from "@/components/review/review-screen";
 
 export default function Page() {
   return (
-    <PlaceholderPage
-      title="Review queue"
-      description="Findings the tool could not decide on its own, waiting for a person."
-    />
+    <>
+      <PageTitle title="Review queue - WCAG Auditor" />
+      <Suspense fallback={null}>
+        <ReviewScreen />
+      </Suspense>
+    </>
   );
 }

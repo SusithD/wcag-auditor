@@ -3,6 +3,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import type { components } from "@/api/types";
+import { StatusShape } from "@/components/ds";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -96,8 +97,8 @@ export function StudyAdmin() {
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-6">
       <title>Study administration</title>
-      <h1 className="text-h2 font-semibold">Study administration</h1>
-      <p className="mt-1 text-body text-muted-foreground">
+      <h1 className="t-page text-ink">Study administration</h1>
+      <p className="mt-1 text-body text-ink-2">
         Researcher view: prepare the task pages, rate fixes against the rubric
         and export the data.
         {config.data && !config.data.ethics_approved
@@ -130,7 +131,11 @@ export function StudyAdmin() {
         <Button type="submit">Unlock</Button>
       </form>
       {tasks.isError ? (
-        <p role="alert" className="mt-3 text-body text-destructive">
+        <p
+          role="alert"
+          className="mt-3 flex items-start gap-2 text-body text-ink"
+        >
+          <StatusShape kind="critical" className="mt-1" />
           {tasks.error.message}
         </p>
       ) : null}
@@ -253,7 +258,7 @@ function RatingRow({
               notes,
             )
           }
-          className="min-h-8 rounded-md border border-input bg-background px-2 text-body"
+          className="min-h-8 rounded-md border border-line-strong bg-surface px-2 text-body"
         >
           <option value="">Not rated</option>
           <option value="yes">Success</option>
