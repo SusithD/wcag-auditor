@@ -1,0 +1,201 @@
+id,file,class,bbox,geometry,geometry_sure,class_ok,class_sure,strict,strict_sure,correct_geometry_and_class,notes
+0,valid/001532.png,link,"[1173.09, 672.25, 20.0, 15.0]",1,0,0,0,0,0,0,geom: tiny icon; class: small icon image; strict: tiny ambiguous icon
+1,valid/006837.png,image_icon,"[669.75, 377.84, 30.0, 26.0]",1,1,1,1,1,1,1,
+2,valid/016475.png,link,"[544.0, 172.38, 288.0, 37.0]",1,0,1,1,0,1,1,geom: loose around heading; strict: box wider than text
+3,valid/005752.png,link,"[318.0, 336.0, 261.0, 48.0]",0,1,1,1,0,1,0,geom: spans multiple columns and cut off; strict: box spans partial list
+4,valid/001513.png,link,"[383.0, 199.0, 249.81, 42.0]",1,1,1,1,1,1,1,
+5,valid/005530.png,link,"[372.0, 53.0, 371.0, 79.0]",1,1,0,0,1,1,0,class: logo image
+6,valid/007747.png,link,"[133.0, 521.0, 228.5, 42.0]",1,1,1,1,1,1,1,
+7,valid/008768.png,image_icon,"[0.0, 82.34, 119.5, 550.0]",0,1,0,1,0,1,0,geom: empty background; class: empty background; strict: empty box
+8,valid/016445.png,text,"[306.0, 1493.91, 198.0, 32.0]",1,0,1,1,0,1,1,geom: partial text fragment; strict: mid-sentence fragment
+9,valid/012401.png,text,"[586.5, 702.69, 219.0, 51.0]",1,0,1,1,0,1,1,geom: text fragment; strict: mid-sentence fragment
+10,valid/004429.png,text,"[639.0, 1236.0, 531.0, 48.0]",1,0,1,1,0,1,1,geom: text fragment; strict: mid-sentence fragment
+11,valid/008449.png,text,"[794.0, 526.5, 116.0, 19.0]",1,1,0,1,1,1,0,class: back link with chevron
+12,valid/012509.png,text,"[836.0, 759.5, 80.0, 14.0]",1,1,0,0,1,1,0,class: name link
+13,valid/002277.png,text,"[150.0, 2218.03, 876.0, 72.0]",1,1,1,1,0,0,1,strict: box much wider than text
+14,valid/011242.png,text,"[945.0, 106.0, 36.0, 33.41]",1,1,0,1,0,1,0,class: search icon; strict: search icon labelled text
+15,valid/012430.png,link,"[386.84, 0.0, 128.0, 76.0]",1,0,1,1,0,0,1,geom: loose bottom slack; strict: box wider than text
+16,valid/002086.png,link,"[1009.0, 382.0, 240.0, 16.0]",1,1,1,0,0,0,1,class: bold banner heading maybe link; strict: box wider than text
+17,valid/005749.png,link,"[15.0, 499.0, 270.0, 17.0]",1,1,1,1,0,0,1,strict: box wider than text
+18,valid/012921.png,text,"[108.0, 1104.69, 84.0, 34.0]",1,1,1,1,0,0,1,strict: word fragment of line
+19,valid/012918.png,link,"[683.0, 759.94, 295.0, 8.06]",0,1,1,0,0,1,0,geom: cut off at crop bottom; class: obscured; strict: obscured box
+20,valid/015856.png,text,"[59.0, 589.0, 48.0, 15.0]",1,0,1,1,1,0,1,geom: tag fragment tight; strict: code tag fragment
+21,valid/009371.png,link,"[968.0, 325.81, 277.0, 38.69]",1,1,1,1,1,1,1,
+22,valid/005365.png,link,"[144.0, 1066.78, 882.0, 90.0]",1,1,1,0,0,1,1,class: link or tab; strict: box much wider than text
+23,valid/000245.png,text,"[558.0, 702.45, 316.0, 14.0]",1,1,1,1,1,1,1,
+24,valid/004479.png,text,"[61.47, 561.19, 204.0, 28.0]",1,1,0,0,0,1,0,class: likely link; strict: link continues on next line
+25,valid/001268.png,text,"[317.98, 549.36, 141.0, 17.0]",1,1,1,1,1,1,1,
+26,valid/004929.png,link,"[188.0, 109.0, 188.0, 21.0]",1,1,1,1,0,1,1,strict: box wider than text
+27,valid/002912.png,link,"[454.25, 68.97, 55.0, 16.0]",1,1,1,1,1,1,1,
+28,valid/002446.png,link,"[1304.55, 656.34, 195.44, 23.8]",1,1,1,1,0,1,1,strict: box wider than text
+29,valid/006836.png,text,"[751.03, 64.0, 222.16, 15.0]",1,0,1,1,0,1,1,geom: text fragment; strict: mid-sentence fragment
+30,valid/015366.png,link,"[484.0, 16.0, 70.0, 48.0]",1,1,1,1,1,0,1,strict: padding around text
+31,valid/004395.png,link,"[90.0, 436.0, 300.0, 44.0]",1,1,1,1,0,0,1,strict: box inside wider pill
+32,valid/011644.png,text,"[489.77, 527.48, 8.0, 16.0]",0,1,1,0,0,1,0,geom: tiny box on a period; class: tiny fragment; strict: tiny empty box
+33,valid/007023.png,text,"[1252.5, 65.19, 47.0, 19.0]",1,1,0,0,1,0,0,class: nav link likely; strict: class text vs link
+34,valid/005071.png,link,"[1561.16, 2306.56, 282.0, 142.78]",1,1,1,0,1,1,1,class: title maybe link
+35,valid/015741.png,link,"[18.0, 489.0, 28.0, 19.0]",1,1,1,1,1,1,1,
+36,valid/001269.png,link,"[16.0, 945.0, 217.0, 12.0]",1,1,1,1,0,1,1,strict: box wider than text
+37,valid/002913.png,text,"[195.39, 123.66, 128.0, 20.0]",1,0,1,1,1,0,1,geom: text fragment; strict: includes slash separator
+38,valid/004850.png,link,"[713.94, 1850.25, 304.97, 304.97]",1,1,0,1,0,1,0,class: poster image; strict: image labelled link
+39,valid/006478.png,text,"[173.0, 422.0, 1020.0, 33.0]",1,0,1,1,0,1,1,geom: wide box around short word; strict: box wider than text
+40,valid/011337.png,link,"[1526.0, 1364.0, 380.0, 32.0]",0,1,0,1,0,1,0,geom: empty background; class: empty background; strict: empty box
+41,valid/012078.png,text,"[90.0, 2548.0, 478.0, 32.0]",1,0,1,1,0,1,1,geom: line fragment; strict: mid-sentence fragment
+42,valid/003912.png,link,"[205.0, 268.81, 48.0, 19.0]",1,1,1,1,1,1,1,
+43,valid/007769.png,text,"[1328.0, 788.53, 36.0, 18.0]",1,0,1,1,1,0,1,geom: faint text; strict: faint text
+44,valid/014995.png,text,"[534.0, 234.75, 108.0, 45.0]",0,1,0,1,0,1,0,geom: empty background; class: empty background; strict: empty box
+45,valid/012093.png,text,"[1062.66, 29.0, 63.0, 15.0]",1,1,0,0,1,1,0,class: language dropdown button
+46,valid/004436.png,text,"[297.0, 574.39, 8.0, 24.0]",0,1,0,0,0,1,0,geom: lone parenthesis fragment; class: punctuation fragment; strict: stray paren fragment
+47,valid/001949.png,link,"[964.0, 198.0, 179.0, 14.0]",1,1,1,1,1,1,1,
+48,valid/011246.png,link,"[407.31, 1203.59, 280.0, 40.0]",1,1,1,1,1,0,1,strict: orange text class doubtful
+49,valid/008390.png,text,"[186.33, 297.39, 47.0, 14.0]",1,1,0,0,1,1,0,class: sign-up link
+50,valid/014929.png,link,"[265.0, 694.0, 52.0, 15.0]",1,1,1,1,1,1,1,
+51,valid/012401.png,link,"[1004.77, 5.59, 129.0, 48.81]",1,1,1,1,1,0,1,strict: button cell box clipped
+52,valid/006837.png,image_icon,"[547.22, 608.33, 30.0, 26.0]",1,1,1,1,1,1,1,
+53,valid/005313.png,text,"[8.0, 216.78, 1520.0, 30.0]",1,1,1,1,1,1,1,
+54,valid/006066.png,text,"[0.0, 1728.28, 1170.0, 187.17]",1,1,1,1,1,1,1,
+55,valid/009597.png,text,"[176.0, 50.0, 6.0, 40.0]",0,1,1,0,0,1,0,geom: thin sliver on separator; class: tiny fragment; strict: tiny fragment
+56,valid/002912.png,link,"[368.39, 458.89, 117.0, 16.0]",1,1,1,1,1,1,1,
+57,valid/016488.png,link,"[450.0, 609.0, 142.0, 14.0]",1,1,1,1,1,1,1,
+58,valid/005530.png,image_icon,"[1269.5, 321.34, 13.0, 13.0]",1,0,1,0,0,0,1,geom: tiny icon; class: tiny icon; strict: too small
+59,valid/016478.png,text,"[531.0, 675.64, 64.0, 18.0]",1,1,1,1,1,1,1,
+60,valid/003837.png,link,"[279.5, 29.0, 71.0, 15.0]",1,1,1,1,1,1,1,
+61,valid/003524.png,image_icon,"[690.0, 1014.0, 255.0, 66.0]",1,1,1,1,1,0,1,strict: image possibly cropped
+62,valid/001534.png,text,"[331.5, 411.19, 390.0, 14.0]",1,1,1,1,0,0,1,strict: starts mid-line with semicolon
+63,valid/000771.png,input,"[117.0, 555.89, 936.0, 72.0]",1,0,1,0,0,0,1,geom: empty box maybe input field; class: empty field maybe; strict: no visible input
+64,valid/012326.png,text,"[415.0, 1016.47, 87.0, 24.0]",1,1,1,1,1,1,1,
+65,valid/002123.png,text,"[208.0, 537.31, 1120.0, 17.25]",1,1,1,1,0,1,1,strict: box much wider than text
+66,valid/014981.png,link,"[213.0, 379.0, 46.0, 14.0]",1,1,1,1,1,0,1,strict: includes count
+67,valid/013077.png,text,"[249.0, 2199.0, 279.0, 42.0]",0,1,0,1,0,1,0,geom: empty background; class: empty background; strict: empty box
+68,valid/001722.png,text,"[361.27, 375.64, 193.0, 27.0]",1,1,1,0,1,1,1,class: heading or link
+69,valid/007732.png,link,"[430.25, 965.97, 1126.0, 96.97]",1,0,0,0,1,1,0,geom: multi-line paragraph with link; class: paragraph with inline link
+70,valid/004927.png,text,"[991.0, 601.0, 5.0, 20.0]",0,1,1,0,0,1,0,geom: thin sliver on text edge; class: tiny fragment; strict: tiny fragment
+71,valid/000570.png,text,"[1045.56, 530.23, 188.94, 35.98]",0,0,1,1,0,1,0,geom: half empty box on cell; strict: box wider than text
+72,valid/002123.png,text,"[208.0, 638.95, 1120.0, 17.25]",1,0,1,1,0,1,1,geom: wide box around short label; strict: box much wider than text
+73,valid/001363.png,link,"[0.0, 255.88, 300.0, 29.62]",1,1,1,1,0,1,1,strict: full-row box
+74,valid/005529.png,text,"[180.0, 771.8, 804.0, 29.12]",1,0,1,1,0,1,1,geom: wide slack to the right; strict: box much wider than text
+75,valid/016464.png,text,"[742.0, 990.25, 73.0, 14.0]",1,1,0,0,1,1,0,class: link-looking text
+76,valid/005285.png,link,"[425.0, 403.19, 249.0, 51.69]",0,1,0,1,0,1,0,geom: empty background; class: empty background; strict: empty box
+77,valid/010603.png,text,"[211.0, 652.09, 567.66, 14.0]",1,1,1,0,0,1,1,class: code identifier maybe link; strict: box wider than text
+78,valid/011247.png,link,"[114.0, 1501.55, 630.0, 57.0]",1,1,1,1,1,1,1,
+79,valid/004799.png,text,"[930.53, 354.11, 158.83, 44.78]",1,1,1,0,0,1,1,class: table cell text; strict: box wider than text
+80,valid/003913.png,text,"[97.0, 268.81, 108.0, 19.0]",1,0,1,1,1,0,1,geom: text fragment; strict: inline fragment
+81,valid/004260.png,choice,"[231.0, 171.0, 13.0, 13.0]",1,1,1,1,1,0,1,strict: small checkbox
+82,valid/016026.png,text,"[368.0, 394.0, 381.0, 56.0]",0,1,1,1,1,1,0,geom: cuts off last line of paragraph
+83,valid/013416.png,text,"[1075.25, 754.31, 19.0, 22.84]",1,1,1,0,1,0,1,class: pagination item maybe; strict: small ambiguous class
+84,valid/005314.png,text,"[8.0, 156.78, 1306.0, 19.0]",1,0,1,1,0,0,1,geom: single line of two; strict: cuts through lines
+85,valid/014193.png,button,"[680.0, 559.0, 9.0, 21.0]",0,1,0,1,0,0,0,geom: empty background; class: empty background; strict: tiny unclear button
+86,valid/001888.png,link,"[759.91, 502.3, 61.98, 50.38]",1,1,0,0,1,0,0,class: plain table text; strict: text-like link
+87,valid/016258.png,link,"[299.33, 145.69, 94.0, 16.0]",1,1,1,1,1,1,1,
+88,valid/009148.png,text,"[125.0, 609.45, 1116.0, 33.59]",1,1,1,1,0,1,1,strict: box much wider than text
+89,valid/001268.png,link,"[1191.5, 236.39, 86.0, 19.98]",1,1,1,1,1,1,1,
+90,valid/008683.png,text,"[75.0, 1820.3, 510.0, 66.0]",1,1,1,0,0,1,1,class: heading maybe link; strict: box wider than text
+91,valid/008247.png,link,"[580.0, 217.31, 92.0, 17.0]",1,1,1,1,1,1,1,
+92,valid/010467.png,text,"[869.5, 34.0, 86.0, 55.0]",1,0,1,0,0,1,1,geom: loose box with empty space above; class: text or link; strict: box larger than text
+93,valid/001935.png,link,"[576.5, 611.05, 20.0, 36.0]",0,1,0,1,0,1,0,geom: empty background beside text; class: empty background; strict: tiny box
+94,valid/005739.png,image_icon,"[437.5, 477.71, 405.0, 33.48]",1,1,1,1,0,1,1,strict: box exceeds logo
+95,valid/013416.png,text,"[682.5, 666.78, 847.5, 68.53]",1,1,1,1,1,1,1,
+96,valid/012077.png,text,"[955.0, 398.0, 43.0, 15.0]",1,1,0,0,0,1,0,class: dropdown menu button; strict: box covers only top
+97,valid/009149.png,text,"[1003.39, 712.78, 8.0, 15.0]",0,0,0,0,0,1,0,geom: single character fragment; class: punctuation fragment; strict: stray paren fragment
+98,valid/012791.png,link,"[456.0, 108.0, 60.0, 18.0]",1,0,0,1,0,1,0,geom: too dark to judge; class: empty background; strict: empty box
+99,valid/015856.png,text,"[59.0, 634.0, 40.0, 15.0]",1,1,1,1,0,0,1,strict: tag fragment
+100,valid/005751.png,link,"[1564.0, 284.0, 210.0, 32.0]",1,1,1,1,1,1,1,
+101,valid/005454.png,text,"[1083.0, 1458.0, 87.0, 891.0]",0,1,0,1,0,1,0,geom: mostly empty background; class: empty black area or graphic; strict: empty black region
+102,valid/008093.png,input,"[74.3, 693.56, 444.05, 30.0]",1,0,0,1,0,1,0,geom: banner text overlaps; class: cookie banner text; strict: cookie banner not input
+103,valid/010956.png,link,"[24.22, 511.27, 63.0, 14.0]",1,0,1,1,1,0,1,geom: tiny link line; strict: tiny link text
+104,valid/015854.png,text,"[59.0, 229.0, 40.0, 15.0]",1,1,1,1,1,1,1,
+105,valid/004093.png,link,"[892.53, 762.0, 125.0, 17.0]",1,1,1,1,1,1,1,
+106,valid/007931.png,text,"[48.0, 421.78, 972.0, 129.0]",0,0,1,1,0,0,0,geom: right edge clips text; strict: clips last word
+107,valid/014195.png,text,"[943.0, 607.0, 54.0, 21.0]",0,1,0,1,0,1,0,geom: empty background; class: empty background; strict: empty box
+108,valid/013035.png,text,"[1073.0, 12.0, 44.0, 14.0]",1,1,0,0,0,0,0,class: language link probably; strict: likely link not text
+109,valid/011145.png,text,"[1314.0, 1009.62, 270.0, 26.0]",1,1,1,1,1,0,1,strict: maybe link
+110,valid/007678.png,text,"[686.25, 42.0, 85.0, 17.0]",1,1,0,0,0,0,0,class: likely nav link; strict: nav item labelled text
+111,valid/006262.png,text,"[644.31, 809.25, 8.2, 15.0]",0,0,0,1,0,1,0,geom: tiny box on nothing; class: empty space; strict: empty tiny box
+112,valid/003020.png,link,"[909.0, 102.42, 156.0, 48.0]",1,1,1,1,1,1,1,
+113,valid/001620.png,link,"[183.0, 1969.88, 558.0, 48.0]",1,1,1,1,1,1,1,
+114,valid/012402.png,text,"[635.0, 618.38, 650.0, 60.8]",1,1,1,0,1,1,1,class: heading or logo text
+115,valid/006812.png,image_icon,"[856.06, 768.83, 106.55, 36.0]",1,0,1,1,0,1,1,geom: right edge near crop; strict: clips logo wordmark
+116,valid/000110.png,text,"[90.0, 1281.66, 180.0, 54.0]",1,1,1,0,1,1,1,class: heading text maybe nav link
+117,valid/006544.png,image_icon,"[1026.0, 880.0, 16.0, 16.0]",1,1,1,0,1,0,1,class: small icon maybe button; strict: tiny icon
+118,valid/010956.png,link,"[193.67, 580.97, 191.0, 15.0]",1,1,1,1,1,1,1,
+119,valid/009150.png,text,"[1227.39, 712.78, 40.0, 15.0]",1,1,1,1,1,1,1,
+120,valid/012608.png,link,"[1637.19, 58.0, 206.0, 86.0]",0,1,1,0,0,1,0,geom: large empty slack below text; class: heading-like footer link; strict: box taller than text
+121,valid/005747.png,link,"[574.09, 380.0, 59.0, 15.0]",1,1,1,1,1,1,1,
+122,valid/012922.png,link,"[900.0, 2339.81, 270.0, 60.0]",0,1,0,1,0,1,0,geom: empty background; class: empty background; strict: empty box
+123,valid/001937.png,link,"[921.69, 174.83, 82.0, 16.0]",1,1,1,1,1,1,1,
+124,valid/009885.png,link,"[231.02, 321.0, 83.0, 15.0]",1,1,1,1,1,1,1,
+125,valid/006264.png,text,"[521.44, 1969.12, 182.0, 36.0]",1,0,1,1,0,1,1,geom: sentence fragment; strict: sentence fragment
+126,valid/007769.png,image_icon,"[556.0, 746.53, 808.0, 34.0]",1,1,1,1,1,0,1,strict: status bar graphic
+127,valid/016450.png,text,"[1141.33, 856.94, 298.66, 48.0]",1,1,1,1,1,0,1,strict: box slightly loose
+128,valid/016490.png,text,"[687.0, 324.0, 155.0, 25.0]",1,1,1,1,1,1,1,
+129,valid/014442.png,link,"[840.0, 105.75, 140.0, 24.75]",1,1,1,1,1,0,1,strict: padded nav box
+130,valid/016396.png,link,"[60.0, 1404.0, 600.0, 48.0]",1,1,0,0,0,1,0,class: heading text not link; strict: box far wider than text
+131,valid/004425.png,text,"[195.0, 493.0, 258.0, 16.0]",0,0,1,1,0,1,0,geom: box ends mid-link; strict: sentence fragment
+132,valid/015484.png,text,"[56.0, 445.84, 587.0, 19.0]",1,1,1,1,1,1,1,
+133,valid/012351.png,link,"[1050.47, 93.0, 220.0, 35.0]",1,1,1,1,1,0,1,strict: styled text link
+134,valid/016498.png,text,"[406.0, 10.0, 12.0, 19.0]",0,1,0,1,0,1,0,geom: empty gap between icons; class: empty gap between icons; strict: empty gap between icons
+135,valid/014958.png,link,"[975.0, 210.0, 150.0, 132.0]",1,1,0,1,0,1,0,class: hamburger menu button; strict: hamburger button not link
+136,valid/001392.png,image_icon,"[138.0, 654.0, 109.0, 21.0]",1,1,1,1,1,0,1,strict: logo ok
+137,valid/006481.png,text,"[236.0, 1833.12, 942.0, 72.84]",1,1,1,1,0,1,1,"strict: includes icons, two lines"
+138,valid/016028.png,text,"[1041.0, 960.0, 782.97, 40.0]",1,1,1,1,0,1,1,strict: box far wider than text
+139,valid/016449.png,text,"[288.0, 794.14, 629.33, 27.98]",1,1,1,1,0,1,1,strict: box far wider than text
+140,valid/015856.png,text,"[155.0, 259.0, 8.0, 15.0]",0,0,1,1,0,1,0,geom: tiny box on code fragment; strict: tiny glyph fragment
+141,valid/006544.png,image_icon,"[1026.0, 736.0, 16.0, 16.0]",1,0,1,0,1,0,1,geom: tiny icon; class: tiny icon; strict: tiny icon
+142,valid/012918.png,text,"[978.0, 712.34, 295.0, 17.59]",1,1,1,1,0,1,1,strict: box wider than text
+143,valid/002914.png,text,"[195.39, 282.62, 25.0, 16.0]",0,1,0,1,0,1,0,geom: empty box beside text; class: empty space; strict: empty box
+144,valid/000881.png,link,"[375.0, 228.0, 60.0, 39.5]",1,1,1,1,1,1,1,
+145,valid/010955.png,link,"[24.22, 493.08, 112.0, 14.0]",1,1,1,1,1,1,1,
+146,valid/012558.png,text,"[110.0, 611.0, 326.66, 17.0]",1,1,1,0,0,1,1,class: heading text; strict: box wider than text
+147,valid/007924.png,text,"[436.0, 850.53, 1254.0, 23.19]",1,1,1,1,0,1,1,strict: box far wider than text
+148,valid/002220.png,text,"[1111.16, 344.0, 180.39, 36.0]",1,1,1,1,1,0,1,strict: tight enough
+149,valid/003910.png,text,"[424.09, 451.31, 10.0, 19.0]",0,0,0,1,0,1,0,geom: tiny box on empty space; class: empty space; strict: empty box
+150,valid/016345.png,link,"[17.33, 0.0, 270.75, 52.0]",1,1,0,0,1,0,0,class: logo image; strict: logo as link
+151,valid/003911.png,link,"[395.97, 513.31, 28.0, 19.0]",1,1,1,1,1,1,1,
+152,valid/002799.png,link,"[225.5, 114.8, 86.0, 16.0]",1,1,1,1,1,1,1,
+153,valid/012069.png,link,"[1032.0, 468.44, 119.0, 15.0]",1,1,1,1,1,1,1,
+154,valid/005747.png,text,"[307.0, 693.0, 89.09, 13.0]",1,1,0,0,0,1,0,class: likely link list item; strict: box wider than text
+155,valid/005747.png,text,"[558.09, 452.0, 16.0, 15.0]",1,0,1,0,0,1,1,geom: separator dot; class: separator bullet; strict: bullet separator
+156,valid/014194.png,text,"[723.0, 538.0, 18.0, 21.0]",0,1,0,1,0,1,0,geom: empty background; class: empty background; strict: empty box
+157,valid/000884.png,link,"[612.0, 1535.25, 330.0, 48.0]",1,1,1,1,1,1,1,
+158,valid/016405.png,text,"[677.0, 428.0, 34.0, 26.0]",1,0,1,1,1,0,1,geom: small glyph; strict: separator glyph
+159,valid/013384.png,link,"[1291.0, 0.0, 72.0, 48.0]",1,1,1,1,1,0,1,strict: padded nav box
+160,valid/000415.png,link,"[434.0, 340.0, 76.0, 16.0]",1,1,1,1,1,1,1,
+161,valid/004848.png,link,"[198.0, 50.0, 250.0, 148.11]",1,1,0,0,0,1,0,class: graphic image; strict: loose box around logo
+162,valid/006480.png,text,"[558.0, 966.83, 207.0, 16.0]",1,1,1,1,1,1,1,
+163,valid/015534.png,link,"[817.0, 231.0, 54.0, 25.0]",1,1,1,1,1,0,1,strict: padded nav box
+164,valid/005562.png,text,"[915.19, 173.08, 186.0, 20.0]",0,0,1,1,0,1,0,geom: mid-sentence fragment; strict: sentence fragment
+165,valid/010958.png,link,"[988.08, 520.03, 92.0, 15.0]",1,1,1,1,1,1,1,
+166,valid/004849.png,text,"[1037.0, 114.06, 103.0, 19.0]",1,1,0,0,0,0,0,class: likely nav link; strict: likely link not text
+167,valid/006835.png,image_icon,"[405.34, 589.69, 30.0, 26.0]",1,0,1,1,1,1,1,geom: tiny logo
+168,valid/014931.png,link,"[265.0, 390.0, 86.0, 15.0]",1,1,1,1,1,1,1,
+169,valid/015466.png,link,"[522.8, 119.94, 134.0, 10.0]",1,1,1,1,1,0,1,strict: box tight on italics
+170,valid/013748.png,link,"[202.92, 48.0, 769.08, 82.78]",1,1,0,0,0,1,0,class: likely heading text; strict: box far larger than text
+171,valid/009176.png,link,"[1115.0, 120.0, 199.0, 30.0]",1,1,1,1,1,0,1,strict: padded nav box
+172,valid/010585.png,text,"[417.0, 905.86, 18.0, 63.0]",0,1,1,0,0,1,0,geom: box on period only; class: period character; strict: lone period fragment
+173,valid/004742.png,link,"[726.0, 339.0, 294.0, 45.0]",0,1,1,0,0,1,0,geom: cuts through two text lines; class: plain paragraph text; strict: box misaligned with text
+174,valid/008246.png,text,"[533.0, 489.98, 323.0, 30.0]",0,1,1,1,0,1,0,geom: cuts through paragraph lines; strict: partial sentence fragment
+175,valid/005561.png,text,"[476.16, 696.25, 949.0, 59.16]",0,1,1,1,0,1,0,geom: paragraph cut off; strict: incomplete paragraph
+176,valid/016488.png,text,"[450.0, 443.0, 92.0, 14.0]",1,1,1,1,1,1,1,
+177,valid/013415.png,link,"[996.0, 30.0, 46.0, 20.0]",1,1,1,0,1,0,1,"class: menu dropdown item; strict: dropdown, link vs button"
+178,valid/015466.png,link,"[76.8, 332.84, 359.98, 75.7]",1,1,1,0,1,1,1,class: post title link
+179,valid/000343.png,link,"[383.3, 658.38, 42.75, 28.8]",1,1,0,0,0,0,0,"class: file icon; strict: icon in link, class unclear"
+180,valid/004800.png,link,"[177.0, 40.0, 47.0, 40.0]",1,1,0,0,0,0,0,class: tab button; strict: tab with loose box
+181,valid/001393.png,link,"[543.0, 213.0, 86.0, 59.0]",1,0,1,1,0,1,1,geom: large slack; strict: box far larger than text
+182,valid/002689.png,link,"[1170.06, 219.27, 98.0, 12.0]",1,1,1,1,1,1,1,
+183,valid/000571.png,text,"[1130.56, 382.3, 188.94, 35.98]",1,1,1,1,0,1,1,strict: box wider than text
+184,valid/000405.png,link,"[1106.0, 660.5, 430.0, 38.0]",1,1,1,1,1,1,1,
+185,valid/004476.png,text,"[1068.58, 587.44, 52.0, 12.0]",1,1,1,1,1,1,1,
+186,valid/014194.png,button,"[1270.0, 84.5, 30.0, 28.0]",1,1,1,0,1,0,1,class: key icon maybe image_icon; strict: icon button padded
+187,valid/014692.png,link,"[270.0, 345.61, 740.0, 61.09]",1,1,0,0,0,1,0,class: heading text; strict: box wider than text
+188,valid/012096.png,link,"[853.98, 0.0, 113.0, 80.0]",1,1,0,0,1,0,0,class: button; strict: padded box
+189,valid/002299.png,link,"[283.0, 0.0, 72.0, 51.5]",1,1,1,0,1,0,1,class: login link or button; strict: padded box
+190,valid/005730.png,text,"[1481.5, 309.19, 43.0, 11.0]",0,1,0,1,0,1,0,geom: odd L-shaped fragment; class: empty area; strict: empty box
+191,valid/009886.png,text,"[426.05, 745.91, 282.12, 22.09]",0,0,0,1,0,1,0,geom: empty dark strip; class: empty black area; strict: empty box
+192,valid/001180.png,text,"[1075.5, 434.77, 78.0, 36.25]",1,1,0,0,1,1,0,class: category tile link
+193,valid/016381.png,text,"[548.0, 935.0, 11.0, 19.0]",0,1,1,0,0,1,0,geom: narrow box on parenthesis; class: bracket character; strict: paren fragment
+194,valid/011246.png,link,"[410.0, 200.0, 136.0, 100.0]",1,1,1,1,0,1,1,strict: box far larger than text
+195,valid/007769.png,text,"[962.0, 916.27, 60.0, 18.0]",0,0,1,1,0,1,0,geom: partial of one text line; strict: partial of uptime text
+196,valid/016389.png,image_icon,"[0.0, 603.89, 507.98, 260.11]",1,0,1,1,0,1,1,geom: large card; strict: box larger than icon
+197,valid/010660.png,text,"[690.44, 1187.19, 1142.0, 134.0]",1,1,1,1,1,1,1,
+198,valid/005748.png,text,"[594.69, 692.0, 16.0, 15.0]",1,0,1,0,0,1,1,geom: separator dot; class: separator bullet; strict: bullet separator
+199,valid/006823.png,link,"[1112.55, 407.17, 195.44, 23.8]",1,1,1,0,0,1,1,class: list title maybe link; strict: box wider than text
