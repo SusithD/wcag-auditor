@@ -55,7 +55,7 @@ export function ConsentStep({
         Before we start
       </StepHeading>
       <section aria-labelledby="opening-h" className="mb-6 space-y-2 text-body">
-        <h2 id="opening-h" className="text-h3 font-semibold">
+        <h2 id="opening-h" className="t-section text-ink">
           About this session
         </h2>
         {materials.opening.map((p) => (
@@ -63,7 +63,7 @@ export function ConsentStep({
         ))}
       </section>
       <fieldset className="space-y-2">
-        <legend className="mb-2 text-h3 font-semibold">Required</legend>
+        <legend className="mb-2 t-section text-ink">Required</legend>
         {materials.consent_statements.map((text, i) => (
           <Label key={text} className="min-h-6 items-start gap-2">
             <input
@@ -87,7 +87,7 @@ export function ConsentStep({
         ))}
       </fieldset>
       <fieldset className="mt-6 space-y-2">
-        <legend className="mb-2 text-h3 font-semibold">Optional</legend>
+        <legend className="mb-2 t-section text-ink">Optional</legend>
         {Object.entries(materials.optional_consents).map(([key, text]) => (
           <Label key={key} className="min-h-6 items-start gap-2">
             <input
@@ -158,9 +158,7 @@ export function DemographicsStep({
           <div key={key}>
             <Label htmlFor={`demo-${key}`}>
               {LABELS[key] ?? key}{" "}
-              <span className="font-normal text-muted-foreground">
-                (required)
-              </span>
+              <span className="font-normal text-ink-2">(required)</span>
             </Label>
             <select
               id={`demo-${key}`}
@@ -173,7 +171,7 @@ export function DemographicsStep({
               onChange={(e) =>
                 setAnswers({ ...answers, [key]: e.target.value })
               }
-              className="mt-1 block min-h-8 w-full max-w-sm rounded-md border border-input bg-background px-2 text-body"
+              className="mt-1 block min-h-8 w-full max-w-sm rounded-md border border-line-strong bg-surface px-2 text-body"
             >
               <option value="">Choose</option>
               {options.map((o) => (
@@ -258,7 +256,7 @@ export function DebriefStep({
                   answers.map((a, j) => (j === i ? e.target.value : a)),
                 )
               }
-              className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-body"
+              className="mt-1 block w-full rounded-md border border-line-strong bg-surface p-2 text-body"
             />
           </div>
         ))}
@@ -286,7 +284,7 @@ export function DoneStep({
           <p key={p}>{p}</p>
         ))}
         {state.synthetic ? (
-          <p className="text-muted-foreground">
+          <p className="text-ink-2">
             This was a synthetic session: no real participant data was
             collected.
           </p>

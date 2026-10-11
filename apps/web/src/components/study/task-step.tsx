@@ -61,7 +61,7 @@ export function TaskStep({ code, index }: { code: string; index: number }) {
         <h1
           ref={heading}
           tabIndex={-1}
-          className="text-h2 font-semibold outline-none"
+          className="t-page text-ink outline-none"
         >
           This task could not be opened
         </h1>
@@ -101,14 +101,14 @@ export function TaskStep({ code, index }: { code: string; index: number }) {
         <h1
           ref={heading}
           tabIndex={-1}
-          className="text-h2 font-semibold outline-none"
+          className="t-page text-ink outline-none"
         >
           Task {t.position_in_block} of {t.block_size}
         </h1>
-        <p className="text-body text-muted-foreground">{t.brief}</p>
+        <p className="text-body text-ink-2">{t.brief}</p>
         <a
           href="#fix-text"
-          className="sr-only focus-visible:not-sr-only focus-visible:mt-2 focus-visible:inline-block focus-visible:rounded-md focus-visible:bg-background focus-visible:px-3 focus-visible:py-2 focus-visible:text-body"
+          className="sr-only focus-visible:not-sr-only focus-visible:mt-2 focus-visible:inline-block focus-visible:rounded-md focus-visible:bg-surface focus-visible:px-3 focus-visible:py-2 focus-visible:text-body"
         >
           Skip to your fix
         </a>
@@ -139,7 +139,7 @@ export function TaskStep({ code, index }: { code: string; index: number }) {
           aria-label="Your proposed fix"
         >
           <Label htmlFor="fix-text">Your proposed fix</Label>
-          <p id="fix-help" className="text-caption text-muted-foreground">
+          <p id="fix-help" className="text-caption text-ink-2">
             Write the code, or describe in words what you would change. Select
             Done when you have finished.
           </p>
@@ -150,7 +150,7 @@ export function TaskStep({ code, index }: { code: string; index: number }) {
             rows={10}
             value={fix}
             onChange={(e) => setFix(e.target.value)}
-            className="block w-full rounded-md border border-input bg-background p-2 font-mono text-body"
+            className="block w-full rounded-md border border-line-strong bg-surface p-2 font-mono text-body"
           />
           <FormError message={error} id="fix-error" />
           <Button

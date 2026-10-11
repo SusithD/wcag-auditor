@@ -1,10 +1,11 @@
-import { PlaceholderPage } from "@/components/shell/placeholder-page";
+import { HelpScreen } from "@/components/help/help-screen";
+import { PageTitle } from "@/components/page-title";
 
 export default function Page() {
   return (
-    <PlaceholderPage
-      title="Help and method"
-      description="The criteria this tool checks, how it decides, and what its results do not mean."
-    />
+    <>
+      <PageTitle title="Help and method - WCAG Auditor" />
+      <HelpScreen />
+    </>
   );
 }

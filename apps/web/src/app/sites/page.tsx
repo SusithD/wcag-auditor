@@ -1,10 +1,11 @@
-import { PlaceholderPage } from "@/components/shell/placeholder-page";
+import { PageTitle } from "@/components/page-title";
+import { SitesScreen } from "@/components/sites/sites-screen";
 
 export default function Page() {
   return (
-    <PlaceholderPage
-      title="Sites"
-      description="One row per site, with its latest audit and what changed since the one before."
-    />
+    <>
+      <PageTitle title="Sites - WCAG Auditor" />
+      <SitesScreen />
+    </>
   );
 }

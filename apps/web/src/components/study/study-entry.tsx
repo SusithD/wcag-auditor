@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api } from "@/api/client";
+import { StatusShape } from "@/components/ds";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,10 +43,8 @@ export function StudyEntry() {
   return (
     <div className="mx-auto mt-[12vh] w-full max-w-lg px-6">
       <title>Accessibility report study</title>
-      <h1 className="text-h1 font-semibold tracking-tight">
-        Accessibility report study
-      </h1>
-      <p className="mb-6 mt-1 text-body text-muted-foreground">
+      <h1 className="t-page text-ink">Accessibility report study</h1>
+      <p className="mb-6 mt-1 text-body text-ink-2">
         Enter the participant code the researcher gave you to begin.
       </p>
       <form onSubmit={submit} noValidate>
@@ -65,12 +64,19 @@ export function StudyEntry() {
         {error ? (
           <p
             id="study-code-error"
-            className="mt-1 text-caption text-destructive"
+            className="mt-1 flex items-start gap-2 text-caption text-ink"
           >
+            <StatusShape kind="critical" className="mt-0.5" />
             {error}
           </p>
         ) : null}
-        <Button type="submit" size="lg" className="mt-4" aria-disabled={busy}>
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          className="mt-4"
+          aria-disabled={busy}
+        >
           Start
         </Button>
       </form>

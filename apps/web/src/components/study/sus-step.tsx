@@ -81,8 +81,7 @@ export function SusStep({
                     }
                   />
                   <span>
-                    {k + 1}{" "}
-                    <span className="text-muted-foreground">{label}</span>
+                    {k + 1} <span className="text-ink-2">{label}</span>
                   </span>
                 </label>
               ))}
