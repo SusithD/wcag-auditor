@@ -29,3 +29,4 @@ test-results/
 
 # design-system preview captures (webp versions are committed)
 docs/design-system/previews/**/*.png
+eval/**/rule_cache/
