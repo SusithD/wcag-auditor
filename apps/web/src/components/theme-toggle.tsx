@@ -26,8 +26,16 @@ export function ThemeToggle() {
       aria-pressed={dark}
       onClick={() => setTheme(dark ? "light" : "dark")}
     >
-      <Sun className="size-4 dark:hidden" aria-hidden="true" />
-      <Moon className="hidden size-4 dark:block" aria-hidden="true" />
+      <Moon
+        className="size-4 dark:hidden"
+        strokeWidth={1.5}
+        aria-hidden="true"
+      />
+      <Sun
+        className="hidden size-4 dark:block"
+        strokeWidth={1.5}
+        aria-hidden="true"
+      />
     </Button>
   );
 }

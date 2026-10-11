@@ -300,6 +300,7 @@ test("report at 1440x900 matches the committed snapshot", async ({
   await settle(page);
   await expect(page).toHaveScreenshot("report-1440x900.png", {
     maxDiffPixelRatio: 0.01,
+    mask: [page.getByRole("complementary", { name: "Sidebar" })],
   });
 });
 

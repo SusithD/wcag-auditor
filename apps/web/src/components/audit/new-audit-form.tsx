@@ -339,6 +339,7 @@ export function NewAuditForm() {
 
       <Button
         type="submit"
+        variant="primary"
         size="lg"
         className="mt-6 aria-disabled:pointer-events-none aria-disabled:opacity-60"
         aria-disabled={submitting}

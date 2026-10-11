@@ -75,7 +75,7 @@ export function ReportScreen({
   run,
   headingRef,
   embedded = false,
-  className = "h-[calc(100dvh-3rem)]",
+  className = "h-[calc(100dvh-6.5rem)]",
 }: {
   run: RunSummary;
   headingRef: React.RefObject<HTMLHeadingElement | null>;

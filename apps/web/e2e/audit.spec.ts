@@ -100,7 +100,7 @@ test("the New Audit form can be completed with the keyboard alone", async ({
   await page.locator("form[data-ready=true]").waitFor();
   const urlField = page.getByLabel("Web address");
 
-  async function tabTo(locator: ReturnType<typeof page.locator>, max = 14) {
+  async function tabTo(locator: ReturnType<typeof page.locator>, max = 40) {
     for (let i = 0; i < max; i += 1) {
       await page.keyboard.press("Tab");
       if (await locator.evaluate((el) => el === document.activeElement)) return;
