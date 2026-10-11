@@ -53,14 +53,11 @@ def postprocess(
         if s < score_threshold or k >= len(names):
             continue
         x0, y0 = (cx - w / 2) * width, (cy - h / 2) * height
-        box = BBox(
-            x=float(max(0.0, x0)),
-            y=float(max(0.0, y0)),
-            w=float(min(width, x0 + w * width) - max(0.0, x0)),
-            h=float(min(height, y0 + h * height) - max(0.0, y0)),
-        )
-        if box.w > 0 and box.h > 0:
-            out.append(Detection(names[int(k)], float(s), box))
+        left, top = max(0.0, float(x0)), max(0.0, float(y0))
+        box_w = min(float(width), float(x0 + w * width)) - left
+        box_h = min(float(height), float(y0 + h * height)) - top
+        if box_w > 0 and box_h > 0:
+            out.append(Detection(names[int(k)], float(s), BBox(x=left, y=top, w=box_w, h=box_h)))
     return out
 
 

@@ -41,6 +41,12 @@ def test_postprocess_converts_normalised_boxes_and_applies_the_score_threshold()
     assert clipped.w == pytest.approx(60) and clipped.h == pytest.approx(30)
 
 
+def test_postprocess_drops_boxes_that_lie_outside_the_tile() -> None:
+    boxes = np.array([[0.5, 1.4, 0.2, 0.1], [-0.3, 0.5, 0.2, 0.1], [1.2, 0.5, 0.2, 0.1]])
+    logits = np.full((3, 6), 4.0)
+    assert postprocess(boxes, logits, (200, 400), NAMES, 0.3) == []
+
+
 def test_nms_merges_same_class_duplicates_but_not_other_classes() -> None:
     a = Detection("link", 0.9, box(10, 10, 100, 20))
     b = Detection("link", 0.6, box(12, 11, 100, 20))
