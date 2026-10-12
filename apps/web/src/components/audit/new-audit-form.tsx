@@ -110,8 +110,26 @@ export function NewAuditForm() {
   const [submitting, setSubmitting] = useState(false);
   const [ready, setReady] = useState(false);
   const alertRef = useRef<HTMLParagraphElement>(null);
+  const [notice, setNotice] = useState("");
   const hasError = formError !== null;
+  const screenshots = tab === "screenshots";
+  const effectiveCondition: Condition =
+    screenshots && condition === "rule_only" ? "hybrid" : condition;
 
+  const submitRef = useRef(submit);
+  submitRef.current = submit;
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== "Enter" || !(e.metaKey || e.ctrlKey)) return;
+      if (e.defaultPrevented || e.isComposing) return;
+      if (document.querySelector('[role="dialog"],[role="alertdialog"]'))
+        return;
+      e.preventDefault();
+      void submitRef.current();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
   useEffect(() => setReady(true), []);
   useEffect(() => {
     if (touched.current) return;
@@ -210,7 +228,7 @@ export function NewAuditForm() {
       }
       const runId = await startAudit(
         source,
-        { viewports, condition, budget },
+        { viewports, condition: effectiveCondition, budget },
         queryClient,
       );
       router.push(`/runs/${runId}`);
@@ -231,12 +249,20 @@ export function NewAuditForm() {
       noValidate
       data-ready={ready}
       onSubmit={submit}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) void submit();
-      }}
       aria-label="New audit"
     >
-      <Tabs value={tab} onValueChange={(v) => setTab(String(v))}>
+      <Tabs
+        value={tab}
+        onValueChange={(v) => {
+          const next = String(v);
+          setTab(next);
+          setNotice(
+            next === "screenshots" && condition === "rule_only"
+              ? "Method changed to Detector and rules. Rules only needs a web address, because screenshots have no page to read."
+              : "",
+          );
+        }}
+      >
         <TabsList aria-label="Audit source">
           <TabsTrigger value="url">Web address</TabsTrigger>
           <TabsTrigger value="screenshots">Screenshots</TabsTrigger>
@@ -364,28 +390,56 @@ export function NewAuditForm() {
               Method
             </legend>
             <div className="grid grid-cols-2 gap-3 px-6 pb-6 max-[720px]:grid-cols-1 max-[720px]:px-4">
-              {METHODS.map((m) => (
-                <label key={m.value} className={OPTION_CARD}>
-                  <input
-                    type="radio"
-                    name="method"
-                    value={m.value}
-                    checked={condition === m.value}
-                    disabled={submitting}
-                    onChange={() => {
-                      touched.current = true;
-                      setCondition(m.value);
-                    }}
-                    className={CARD_INPUT}
-                  />
-                  <Marker kind="radio" />
-                  <span className="flex min-w-0 flex-col gap-0.5">
-                    <span className="font-semibold">{m.name}</span>
-                    <span className="text-dense text-ink-2">{m.text}</span>
-                  </span>
-                </label>
-              ))}
+              {METHODS.map((m) => {
+                const unavailable = screenshots && m.value === "rule_only";
+                return (
+                  <label
+                    key={m.value}
+                    className={cn(OPTION_CARD, unavailable && "opacity-60")}
+                  >
+                    <input
+                      type="radio"
+                      name="method"
+                      value={m.value}
+                      checked={effectiveCondition === m.value}
+                      disabled={submitting || unavailable}
+                      aria-describedby={
+                        unavailable ? `${ids}-rules-hint` : undefined
+                      }
+                      onChange={() => {
+                        touched.current = true;
+                        setCondition(m.value);
+                        setNotice("");
+                      }}
+                      className={CARD_INPUT}
+                    />
+                    <Marker kind="radio" />
+                    <span className="flex min-w-0 flex-col gap-0.5">
+                      <span className="font-semibold">{m.name}</span>
+                      <span className="text-dense text-ink-2">{m.text}</span>
+                      {unavailable ? (
+                        <span
+                          id={`${ids}-rules-hint`}
+                          className="text-dense text-ink-2"
+                        >
+                          Not available for screenshots: they have no page to
+                          read. Use a web address.
+                        </span>
+                      ) : null}
+                    </span>
+                  </label>
+                );
+              })}
             </div>
+            <output className="sr-only">{notice}</output>
+            {notice ? (
+              <p
+                aria-hidden="true"
+                className="px-6 pb-4 text-dense text-ink-2 max-[720px]:px-4"
+              >
+                {notice}
+              </p>
+            ) : null}
           </fieldset>
 
           <Collapsible
