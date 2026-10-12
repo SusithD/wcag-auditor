@@ -17,6 +17,7 @@ services:
       STUDY_ADMIN_TOKEN: ${STUDY_ADMIN_TOKEN:-}
       STUDY_ETHICS_APPROVED: ${STUDY_ETHICS_APPROVED:-0}
       JOB_TIMEOUT_S: ${JOB_TIMEOUT_S:-900}
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-172.16.0.0/12}
       DECIDED_BY_NAME: ${DECIDED_BY_NAME:-Reviewer}
     volumes:
       - auditor_data:/data

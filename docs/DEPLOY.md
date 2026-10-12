@@ -91,6 +91,7 @@ In `.env` set `DOMAIN`, `ADMIN_USER`, and paste the hash into `ADMIN_HASH` insid
 | `STUDY_ETHICS_APPROVED` | `1` enables real (non-synthetic) participants |
 | `AUDIT_PDF` | `1` writes a PDF report per audit (slower), `0` skips it |
 | `JOB_TIMEOUT_S` | per-audit time limit, default 900 |
+| `TRUSTED_PROXIES` | IPs or CIDRs whose `X-Forwarded-For` the api trusts for per-visitor rate limits, default `172.16.0.0/12` (Docker networks); the api sees the web container as its peer |
 | `DECIDED_BY_NAME` | name stored on review decisions |
 | `TUNNEL_TOKEN` | Cloudflare tunnel token (option B only) |
 | `HTTP_PORT`, `HTTPS_PORT` | host ports, default 80 and 443 |

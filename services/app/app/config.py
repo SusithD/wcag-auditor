@@ -4,6 +4,8 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from app.ratelimit import IPNetwork, parse_trusted_proxies
+
 
 def _path(value: str | None) -> Path | None:
     return Path(value).resolve() if value else None
@@ -35,6 +37,7 @@ class Settings:
     runs_per_minute: float = 10
     max_queued_runs: int = 20
     study_per_minute: float = 300
+    trusted_proxies: tuple[IPNetwork, ...] = ()
 
     @property
     def production(self) -> bool:
@@ -120,6 +123,7 @@ class Settings:
             runs_per_minute=float(os.environ.get("RUNS_PER_MINUTE", "10")),
             max_queued_runs=int(os.environ.get("MAX_QUEUED_RUNS", "20")),
             study_per_minute=float(os.environ.get("STUDY_PER_MINUTE", "300")),
+            trusted_proxies=parse_trusted_proxies(os.environ.get("TRUSTED_PROXIES")),
         )
         _ = settings.extra_header_names
         return settings

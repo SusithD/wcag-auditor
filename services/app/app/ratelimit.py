@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ipaddress
 import time
 from collections.abc import Callable
 from threading import Lock
@@ -32,13 +33,59 @@ class TokenBucket:
             return allowed
 
 
-def client_key(request: Request) -> str:
-    return request.client.host if request.client else "unknown"
+IPNetwork = ipaddress.IPv4Network | ipaddress.IPv6Network
+IPAddress = ipaddress.IPv4Address | ipaddress.IPv6Address
 
 
-def limiter(bucket: TokenBucket, message: str) -> Callable[[Request], None]:
+def parse_trusted_proxies(raw: str | None) -> tuple[IPNetwork, ...]:
+    networks: list[IPNetwork] = []
+    for item in (raw or "").split(","):
+        entry = item.strip()
+        if not entry:
+            continue
+        try:
+            networks.append(ipaddress.ip_network(entry, strict=False))
+        except ValueError as exc:
+            raise ValueError(f"TRUSTED_PROXIES entry {entry!r} is not an IP or CIDR") from exc
+    return tuple(networks)
+
+
+def _parse_ip(value: str) -> IPAddress | None:
+    try:
+        return ipaddress.ip_address(value.strip())
+    except ValueError:
+        return None
+
+
+def _is_trusted(address: IPAddress, trusted: tuple[IPNetwork, ...]) -> bool:
+    return any(address.version == net.version and address in net for net in trusted)
+
+
+def client_key(request: Request, trusted: tuple[IPNetwork, ...] = ()) -> str:
+    peer = request.client.host if request.client else "unknown"
+    peer_ip = _parse_ip(peer)
+    if not trusted or peer_ip is None or not _is_trusted(peer_ip, trusted):
+        return peer
+    hops = [
+        hop
+        for line in request.headers.getlist("x-forwarded-for")
+        for hop in line.split(",")
+        if hop.strip()
+    ]
+    for hop in reversed(hops):
+        address = _parse_ip(hop)
+        if address is None:
+            return peer
+        if not _is_trusted(address, trusted):
+            return str(address)
+    return peer
+
+
+def limiter(
+    bucket: TokenBucket, message: str, trusted: tuple[IPNetwork, ...] = ()
+) -> Callable[[Request], None]:
     def check(request: Request) -> None:
-        if bucket.rate > 0 and not bucket.allow(client_key(request)):
+        if bucket.rate > 0 and not bucket.allow(client_key(request, trusted)):
             raise HTTPException(429, message, headers={"Retry-After": "60"})
 
     return check

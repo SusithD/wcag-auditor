@@ -297,3 +297,68 @@ def test_docs_are_hidden_in_production(tmp_path: Path) -> None:
         assert c.get("/openapi.json").status_code == 404
     with client(tmp_path / "dev") as c:
         assert c.get("/openapi.json").status_code == 200
+
+
+def _request(peer: str, *forwarded: str) -> Any:
+    from starlette.requests import Request
+
+    scope = {
+        "type": "http",
+        "client": (peer, 40000),
+        "headers": [(b"x-forwarded-for", value.encode()) for value in forwarded],
+    }
+    return Request(scope)
+
+
+def test_spoofed_forwarded_for_from_an_untrusted_peer_is_ignored() -> None:
+    from app.ratelimit import client_key, parse_trusted_proxies
+
+    trusted = parse_trusted_proxies("172.16.0.0/12")
+    assert client_key(_request("203.0.113.9", "1.2.3.4"), trusted) == "203.0.113.9"
+    assert client_key(_request("203.0.113.9", "1.2.3.4")) == "203.0.113.9"
+
+
+def test_trusted_peer_uses_the_right_most_untrusted_hop() -> None:
+    from app.ratelimit import client_key, parse_trusted_proxies
+
+    trusted = parse_trusted_proxies("172.16.0.0/12, fd00::/8")
+    peer = "172.18.0.4"
+    assert client_key(_request(peer, "198.51.100.7"), trusted) == "198.51.100.7"
+    assert client_key(_request(peer, "6.6.6.6, 198.51.100.7, 172.18.0.3"), trusted) == (
+        "198.51.100.7"
+    )
+    assert client_key(_request(peer, "6.6.6.6", "198.51.100.7"), trusted) == "198.51.100.7"
+    assert client_key(_request(peer), trusted) == peer
+    assert client_key(_request(peer, "garbage"), trusted) == peer
+    assert client_key(_request("fd00::5", "2001:db8::1"), trusted) == "2001:db8::1"
+
+
+def test_invalid_trusted_proxies_entry_fails_at_startup(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("TRUSTED_PROXIES", "172.16.0.0/12,not-an-ip")
+    with pytest.raises(ValueError, match="TRUSTED_PROXIES"):
+        Settings.from_env()
+    monkeypatch.setenv("TRUSTED_PROXIES", "")
+    assert Settings.from_env().trusted_proxies == ()
+
+
+def test_clients_behind_the_proxy_get_separate_buckets(tmp_path: Path) -> None:
+    from app.ratelimit import parse_trusted_proxies
+
+    study = Path(__file__).resolve().parents[3] / "study"
+    settings = Settings(
+        data_dir=tmp_path,
+        db_url=f"sqlite:///{tmp_path / 'app.db'}",
+        pdf=False,
+        study_per_minute=2,
+        study_dir=study,
+        trusted_proxies=parse_trusted_proxies("172.16.0.0/12"),
+    )
+    with TestClient(
+        create_app(settings), client=("172.18.0.4", 50000), raise_server_exceptions=False
+    ) as c:
+
+        def hit(ip: str) -> int:
+            return c.get("/study/sessions/P01", headers={"x-forwarded-for": ip}).status_code
+
+        assert [hit("198.51.100.1") for _ in range(3)][-1] == 429
+        assert hit("198.51.100.2") != 429

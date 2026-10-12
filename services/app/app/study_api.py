@@ -158,6 +158,7 @@ def build_study_router(settings: Settings) -> APIRouter:
                 limiter(
                     TokenBucket(settings.study_per_minute),
                     "Too many requests in a short time. Wait a minute and try again.",
+                    settings.trusted_proxies,
                 )
             )
         ],

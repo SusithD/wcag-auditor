@@ -180,10 +180,12 @@ def build_router(settings: Settings) -> APIRouter:
     run_limit = limiter(
         TokenBucket(settings.runs_per_minute),
         "Too many audits were started in a short time. Wait a minute and try again.",
+        settings.trusted_proxies,
     )
     upload_limit = limiter(
         TokenBucket(settings.runs_per_minute),
         "Too many uploads in a short time. Wait a minute and try again.",
+        settings.trusted_proxies,
     )
 
     def run_dir(run_id: str) -> Path:
