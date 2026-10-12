@@ -18,7 +18,9 @@ eval/20*
 eval/fixtures
 eval/**/rule_cache
 docs
-deploy
+deploy/*
+!deploy/hf
+!deploy/caddy
 apps/web/e2e
 apps/web/playwright-report
 apps/web/test-results

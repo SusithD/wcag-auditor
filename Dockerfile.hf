@@ -1,0 +1,82 @@
+FROM node:24-bookworm-slim AS web-deps
+ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH
+RUN corepack enable
+WORKDIR /web
+COPY apps/web/package.json apps/web/pnpm-lock.yaml apps/web/pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
+
+FROM web-deps AS web-build
+COPY apps/web ./
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN pnpm build
+
+FROM caddy:2 AS caddy
+
+FROM mcr.microsoft.com/playwright/python:v1.63.0-noble
+
+COPY --from=ghcr.io/astral-sh/uv:0.9 /uv /usr/local/bin/uv
+COPY --from=caddy /usr/bin/caddy /usr/local/bin/caddy
+COPY --from=web-deps /usr/local/bin/node /usr/local/bin/node
+
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
+    UV_PYTHON_DOWNLOADS=never \
+    UV_PYTHON=/usr/bin/python3 \
+    UV_LINK_MODE=copy \
+    UV_NO_CACHE=1 \
+    PATH=/opt/venv/bin:$PATH \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+COPY pyproject.toml uv.lock ./
+COPY packages/auditor/pyproject.toml packages/auditor/pyproject.toml
+COPY services/app/pyproject.toml services/app/pyproject.toml
+RUN mkdir -p packages/auditor/auditor services/app/app \
+    && uv sync --frozen --no-dev --no-install-workspace
+
+COPY packages/auditor packages/auditor
+COPY services/app services/app
+COPY fixtures fixtures
+COPY study study
+COPY eval/detector eval/detector
+COPY CHECK_CATALOGUE.md ./
+RUN uv sync --frozen --no-dev \
+    && python -c "import importlib.metadata as m; assert m.version('playwright') == '1.63.0'" \
+    && ! python -c "import torch" 2>/dev/null
+
+COPY --from=web-build /web/.next/standalone /srv
+COPY --from=web-build /web/.next/static /srv/.next/static
+
+COPY deploy/caddy/app.caddy /etc/caddy/app.caddy
+COPY deploy/hf/Caddyfile /etc/caddy/Caddyfile
+COPY deploy/hf/start.sh /usr/local/bin/start.sh
+RUN sed -i -e 's/web:3000/127.0.0.1:3000/g' \
+        -e "s#frame-ancestors 'none'#frame-ancestors https://huggingface.co#" \
+        -e '/X-Frame-Options/d' /etc/caddy/app.caddy \
+    && grep -q 'frame-ancestors https://huggingface.co' /etc/caddy/app.caddy \
+    && chmod +x /usr/local/bin/start.sh \
+    && (id 1000 >/dev/null 2>&1 && userdel -r "$(id -nu 1000)" || true) \
+    && useradd --uid 1000 --create-home --home-dir /home/user --shell /usr/sbin/nologin user \
+    && mkdir -p /data/models \
+    && chown -R user:user /data /srv
+
+ENV HOME=/home/user \
+    DATA_DIR=/data \
+    AUDITOR_DETECTOR=/data/models/detector.onnx \
+    PLAYWRIGHT_BROWSERS_PATH=/ms-playwright \
+    PYTHONPATH=/app/services/app \
+    APP_ENV=production \
+    ALLOW_PRIVATE_TARGETS=0 \
+    AUDIT_PDF=1 \
+    API_URL=http://127.0.0.1:8000 \
+    HOSTNAME=0.0.0.0 \
+    NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    XDG_DATA_HOME=/home/user/.local/share \
+    XDG_CONFIG_HOME=/home/user/.config
+
+USER 1000
+WORKDIR /app
+EXPOSE 7860
+
+CMD ["/usr/local/bin/start.sh"]
