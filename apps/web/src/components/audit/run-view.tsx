@@ -17,6 +17,7 @@ import {
   StatusShape,
 } from "@/components/ds";
 import { PageTitle } from "@/components/page-title";
+import { focusStepsFor } from "@/components/report/logic";
 import { ReportScreen } from "@/components/report/report-screen";
 import { PageCrumbs, WideContent } from "@/components/shell/shell-context";
 import {
@@ -168,6 +169,7 @@ function RunAgain({
     source: string;
     viewports: Viewport[];
     condition: "hybrid" | "rule_only";
+    max_focus_steps?: number | null;
   };
 }) {
   const router = useRouter();
@@ -180,7 +182,7 @@ function RunAgain({
         {
           viewports: run.viewports,
           condition: run.condition,
-          budget: DEFAULT_FOCUS_STEPS,
+          budget: focusStepsFor(run),
         },
         queryClient,
       ),
@@ -209,8 +211,9 @@ function RunAgain({
         Run again
       </Button>
       <p className="m-0 basis-full text-dense text-ink-3">
-        Uses the same viewports and method, and the default{" "}
-        {DEFAULT_FOCUS_STEPS} focus steps.
+        {run.max_focus_steps == null
+          ? `Uses the same viewports and method, and the default ${DEFAULT_FOCUS_STEPS} focus steps.`
+          : `Uses the same viewports, method and ${run.max_focus_steps} focus steps.`}
       </p>
       {error ? (
         <p role="alert" className="basis-full text-body text-critical">

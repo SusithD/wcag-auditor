@@ -29,6 +29,7 @@ class Run(Base):
     versions: Mapped[dict[str, Any]] = mapped_column(default=dict)
     protocol_sha: Mapped[str | None] = mapped_column(String)
     error: Mapped[str | None] = mapped_column(Text)
+    max_focus_steps: Mapped[int | None] = mapped_column(Integer)
 
 
 class CaptureRow(Base):

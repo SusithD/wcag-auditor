@@ -30,6 +30,14 @@ def _counts(report_path: Path) -> dict[str, int]:
     return out
 
 
+def _criteria_counts(report_path: Path) -> dict[str, int]:
+    findings = json.loads(report_path.read_text())["findings"]
+    out: dict[str, int] = {}
+    for f in findings:
+        out[f["sc"]] = out.get(f["sc"], 0) + 1
+    return dict(sorted(out.items()))
+
+
 def _progress(log: EventLog, viewport: str) -> Callable[[str], None]:
     def emit(stage: str) -> None:
         log.emit(stage, viewport)
@@ -93,8 +101,9 @@ def audit(
                     progress=_progress(log, vp),
                 )
                 counts = _counts(out / "report.json")
-                viewport_summary[vp] = {"counts": counts}
-                log.emit(f"counts:{vp}", vp, json.dumps(counts))
+                criteria = _criteria_counts(out / "report.json")
+                viewport_summary[vp] = {"counts": counts, "criteria": criteria}
+                log.emit(f"counts:{vp}", vp, json.dumps({**counts, "criteria": criteria}))
             except Exception as exc:
                 errors[vp] = f"{type(exc).__name__}: {exc}"
                 log.emit(f"failed:{vp}", vp, errors[vp])

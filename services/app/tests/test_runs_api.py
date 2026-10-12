@@ -218,3 +218,34 @@ def test_runs_left_queued_by_a_previous_process_are_failed_on_startup(tmp_path: 
     with client(tmp_path) as c:
         body = c.get(f"/runs/{'b' * 32}").json()
         assert body["status"] == "failed" and "restart" in body["error"]
+
+
+def test_a_run_stores_and_returns_its_focus_step_budget(tmp_path: Path) -> None:
+    with client(tmp_path) as c:
+        custom = c.post("/runs", json={"folder": str(REAL), "max_focus_steps": 22}).json()["run_id"]
+        default = c.post("/runs", json={"folder": str(REAL)}).json()["run_id"]
+        assert c.get(f"/runs/{custom}").json()["max_focus_steps"] == 22
+        assert c.get(f"/runs/{default}").json()["max_focus_steps"] == 15
+        listed = {r["id"]: r["max_focus_steps"] for r in c.get("/runs").json()}
+        assert listed == {custom: 22, default: 15}
+        wait_for_terminal(c, custom)
+        wait_for_terminal(c, default)
+
+
+def test_a_finished_run_reports_per_criterion_counts_per_viewport(tmp_path: Path) -> None:
+    with client(tmp_path) as c:
+        run_id = c.post("/runs", json={"folder": str(REAL)}).json()["run_id"]
+        with c.stream("GET", f"/runs/{run_id}/events") as stream:
+            text = "".join(stream.iter_text())
+        events = [json.loads(x[6:]) for x in text.splitlines() if x.startswith("data: ")]
+        counted = [e for e in events if e["stage"] == "counts:mobile"]
+        assert len(counted) == 1
+        detail = json.loads(counted[0]["detail"])
+        assert {"critical", "serious", "minor", "needs_review", "criteria"} <= detail.keys()
+        body = wait_for_terminal(c, run_id)
+        rows = body["criteria_counts"]
+        assert {r["viewport"] for r in rows} <= {"mobile"}
+        assert {r["sc"]: r["count"] for r in rows} == detail["criteria"]
+        total = sum(detail[k] for k in ("critical", "serious", "minor", "needs_review"))
+        assert sum(r["count"] for r in rows) == total
+        assert body["counts"] == {k: detail[k] for k in body["counts"]}

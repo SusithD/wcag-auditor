@@ -6,6 +6,7 @@ import {
   deltaCounts,
   deltaText,
   fixDiff,
+  focusStepsFor,
   foundBy,
   groupFindings,
   hasPlaceholder,
@@ -461,6 +462,45 @@ describe("run again body", () => {
       upload_id: "abc",
       viewports: ["desktop"],
     });
+  });
+});
+
+describe("run again focus steps", () => {
+  const base = {
+    condition: "hybrid" as const,
+    viewports: ["desktop" as const],
+  };
+  it("reuses the stored focus steps for every source kind", () => {
+    for (const [kind, source] of [
+      ["url", "https://a.test/"],
+      ["upload", "abc"],
+      ["folder", "/cap/a"],
+    ] as const)
+      expect(
+        runAgainBody({
+          ...base,
+          source_kind: kind,
+          source,
+          max_focus_steps: 22,
+        }),
+      ).toMatchObject({ max_focus_steps: 22 });
+  });
+
+  it("falls back to 15 when the run has no stored value", () => {
+    for (const stored of [null, undefined])
+      expect(
+        runAgainBody({
+          ...base,
+          source_kind: "url",
+          source: "https://a.test/",
+          max_focus_steps: stored,
+        }),
+      ).toMatchObject({ max_focus_steps: 15 });
+  });
+
+  it("names the stored value only when it is known", () => {
+    expect(focusStepsFor({ max_focus_steps: 8 })).toBe(8);
+    expect(focusStepsFor({ max_focus_steps: null })).toBe(15);
   });
 });
 
