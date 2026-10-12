@@ -41,8 +41,14 @@ plugins = ["pydantic.mypy"]
 exclude = ["apps/", "fixtures/", "services/app/alembic/"]
 
 [[tool.mypy.overrides]]
-module = ["statsmodels.*", "scipy.*", "rapidocr_onnxruntime.*", "pyarrow.*", "rfdetr.*", "torch.*", "onnx.*", "onnxruntime.*", "psutil.*", "albumentations.*"]
+module = ["statsmodels.*", "scipy.*", "rapidocr_onnxruntime.*", "pyarrow.*", "rfdetr.*", "torch.*", "onnx.*", "onnxruntime.*", "psutil.*", "albumentations.*", "pytorch_lightning.*"]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["auditor.detector.train"]
+disallow_subclassing_any = false
+warn_return_any = false
+warn_unused_ignores = false
 
 [tool.pytest.ini_options]
 testpaths = ["packages/auditor", "services/app"]
