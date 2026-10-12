@@ -7,11 +7,13 @@ from pathlib import Path
 
 from alembic import command
 from alembic.config import Config
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 from sqlalchemy import select
 
 from app.api import build_router, status_from_result
+from app.auth import authenticate, current_user
 from app.config import Settings
 from app.db import make_engine, make_session_factory
 from app.detector_api import build_detector_router
@@ -22,6 +24,12 @@ from app.models import EvalRun, Run
 from app.report_api import build_report_router
 from app.study_api import build_study_router
 from app.workflow_api import build_workflow_router
+
+
+class Me(BaseModel):
+    email: str
+    name: str | None = None
+
 
 ALEMBIC_INI = Path(__file__).resolve().parents[1] / "alembic.ini"
 
@@ -106,7 +114,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             engine.dispose()
 
     hidden = {"docs_url": None, "redoc_url": None, "openapi_url": None} if cfg.production else {}
-    app = FastAPI(title="wcag-auditor", lifespan=lifespan, debug=False, **hidden)  # type: ignore[arg-type]
+    app = FastAPI(
+        title="wcag-auditor",
+        lifespan=lifespan,
+        debug=False,
+        dependencies=[Depends(authenticate(cfg))],
+        **hidden,  # type: ignore[arg-type]
+    )
 
     @app.exception_handler(Exception)
     async def unhandled(request: Request, exc: Exception) -> JSONResponse:
@@ -116,6 +130,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @app.get("/me", response_model=Me)
+    def me(request: Request) -> Me:
+        user = current_user(request)
+        if user is None:
+            raise HTTPException(401, "Sign in required")
+        return Me(email=user.email, name=user.name)
 
     app.include_router(build_report_router(cfg))
     app.include_router(build_detector_router(cfg))

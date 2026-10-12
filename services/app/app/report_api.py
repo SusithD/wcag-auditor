@@ -14,6 +14,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api import HEX, Viewport, _capture_folders
+from app.auth import current_user
 from app.config import Settings
 from app.ingest import capture_for, ingest_run
 from app.models import CaptureRow, FindingRow
@@ -474,7 +475,8 @@ def build_report_router(settings: Settings) -> APIRouter:
                 row.decision_reason = reason or None
                 row.decision_note = (body.note or "").strip() or None
                 row.decided_at = datetime.now(UTC)
-                row.decided_by = settings.decided_by_name
+                user = current_user(request)
+                row.decided_by = user.display_name if user else settings.decided_by_name
             session.commit()
             return to_out(row, capture.viewport, report)
 

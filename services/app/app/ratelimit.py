@@ -81,11 +81,18 @@ def client_key(request: Request, trusted: tuple[IPNetwork, ...] = ()) -> str:
     return peer
 
 
+def rate_key(request: Request, trusted: tuple[IPNetwork, ...] = ()) -> str:
+    user = getattr(request.state, "user", None)
+    if user is not None:
+        return f"user:{user.email.lower()}"
+    return client_key(request, trusted)
+
+
 def limiter(
     bucket: TokenBucket, message: str, trusted: tuple[IPNetwork, ...] = ()
 ) -> Callable[[Request], None]:
     def check(request: Request) -> None:
-        if bucket.rate > 0 and not bucket.allow(client_key(request, trusted)):
+        if bucket.rate > 0 and not bucket.allow(rate_key(request, trusted)):
             raise HTTPException(429, message, headers={"Retry-After": "60"})
 
     return check

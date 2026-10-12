@@ -38,10 +38,18 @@ class Settings:
     max_queued_runs: int = 20
     study_per_minute: float = 300
     trusted_proxies: tuple[IPNetwork, ...] = ()
+    internal_api_token: str | None = field(default=None, repr=False)
+    require_internal_token_override: bool | None = None
 
     @property
     def production(self) -> bool:
         return self.app_env == "production"
+
+    @property
+    def require_internal_token(self) -> bool:
+        if self.require_internal_token_override is not None:
+            return self.require_internal_token_override
+        return self.production
 
     @property
     def allow_private_targets(self) -> bool:
@@ -92,6 +100,7 @@ class Settings:
             raise ValueError("APP_ENV must be 'production' or 'development'")
         roots = os.environ.get("FOLDER_ROOTS")
         private = os.environ.get("ALLOW_PRIVATE_TARGETS", "").strip()
+        require = os.environ.get("REQUIRE_INTERNAL_TOKEN", "").strip().lower()
         settings = cls(
             data_dir=data_dir,
             db_url=os.environ.get("DATABASE_URL", f"sqlite:///{data_dir / 'app.db'}"),
@@ -124,6 +133,10 @@ class Settings:
             max_queued_runs=int(os.environ.get("MAX_QUEUED_RUNS", "20")),
             study_per_minute=float(os.environ.get("STUDY_PER_MINUTE", "300")),
             trusted_proxies=parse_trusted_proxies(os.environ.get("TRUSTED_PROXIES")),
+            internal_api_token=(os.environ.get("INTERNAL_API_TOKEN") or "").strip() or None,
+            require_internal_token_override=None if not require else require in {"1", "true"},
         )
+        if settings.require_internal_token and not settings.internal_api_token:
+            raise ValueError("INTERNAL_API_TOKEN must be set when REQUIRE_INTERNAL_TOKEN is on")
         _ = settings.extra_header_names
         return settings

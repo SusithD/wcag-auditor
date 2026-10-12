@@ -159,3 +159,34 @@ def test_decisions_record_who_when_and_dismissal_needs_a_reason(tmp_path: Path) 
             "decided_by": None,
         }
         assert first["needs_review_reason"] is None or isinstance(first["needs_review_reason"], str)
+
+
+def test_decided_by_comes_from_the_signed_in_user(tmp_path: Path) -> None:
+    token = "tok"
+    with client(tmp_path, internal_api_token=token, decided_by_name="Fallback") as c:
+        run_id = finished_run(c)
+        findings = c.get(f"/runs/{run_id}/findings", params={"viewport": "mobile"}).json()
+        ids = [f["id"] for f in findings[:3]]
+        base = {"X-Wcag-Internal-Token": token}
+        named = {**base, "X-Wcag-User-Email": "ada@example.com", "X-Wcag-User-Name": "Ada"}
+        email_only = {**base, "X-Wcag-User-Email": "bob@example.com"}
+        spoofed = {"X-Wcag-User-Email": "eve@example.com", "X-Wcag-User-Name": "Eve"}
+        body = {"status": "fixed"}
+        assert (
+            c.patch(f"/findings/{ids[0]}", json=body, headers=named).json()["decision"][
+                "decided_by"
+            ]
+            == "Ada"
+        )
+        assert (
+            c.patch(f"/findings/{ids[1]}", json=body, headers=email_only).json()["decision"][
+                "decided_by"
+            ]
+            == "bob@example.com"
+        )
+        assert (
+            c.patch(f"/findings/{ids[2]}", json=body, headers=spoofed).json()["decision"][
+                "decided_by"
+            ]
+            == "Fallback"
+        )

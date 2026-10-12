@@ -115,6 +115,7 @@ def test_settings_defaults_follow_app_env(monkeypatch: pytest.MonkeyPatch) -> No
     for name in ("FOLDER_ROOTS", "ALLOW_PRIVATE_TARGETS", "STUDY_ADMIN_TOKEN"):
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setenv("INTERNAL_API_TOKEN", "t")
     prod = Settings.from_env()
     assert prod.production
     assert prod.folder_roots == ()
@@ -267,7 +268,13 @@ def test_study_endpoints_are_rate_limited(tmp_path: Path) -> None:
 
 def test_study_admin_is_closed_without_a_token_and_constant_time(tmp_path: Path) -> None:
     study = Path(__file__).resolve().parents[3] / "study"
-    with client(tmp_path, study_dir=study, study_admin_token=None, app_env="production") as c:
+    with client(
+        tmp_path,
+        study_dir=study,
+        study_admin_token=None,
+        app_env="production",
+        require_internal_token_override=False,
+    ) as c:
         assert c.get("/study/admin/tasks", headers={"x-study-token": ""}).status_code == 403
         assert c.get("/study/admin/tasks").status_code == 403
     with client(tmp_path / "b", study_dir=study, study_admin_token="secret") as c:
@@ -276,7 +283,7 @@ def test_study_admin_is_closed_without_a_token_and_constant_time(tmp_path: Path)
 
 
 def test_unhandled_errors_return_a_generic_500(tmp_path: Path) -> None:
-    with client(tmp_path, app_env="production") as c:
+    with client(tmp_path, app_env="production", require_internal_token_override=False) as c:
         boom = APIRouter()
 
         @boom.get("/boom")
@@ -292,7 +299,7 @@ def test_unhandled_errors_return_a_generic_500(tmp_path: Path) -> None:
 
 
 def test_docs_are_hidden_in_production(tmp_path: Path) -> None:
-    with client(tmp_path, app_env="production") as c:
+    with client(tmp_path, app_env="production", require_internal_token_override=False) as c:
         assert c.get("/docs").status_code == 404
         assert c.get("/openapi.json").status_code == 404
     with client(tmp_path / "dev") as c:
