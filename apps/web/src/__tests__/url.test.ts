@@ -119,6 +119,10 @@ describe("describeRunError", () => {
       "Page.goto: net::ERR_CERT_AUTHORITY_INVALID",
       "The site's security certificate could not be verified, so the page could not be opened.",
     ],
+    [
+      "The site showed a bot check (Cloudflare) instead of the page, so the audit was stopped. Audit a page without bot protection, or upload screenshots instead.",
+      "The site showed a bot check instead of the page, so the audit was stopped. Audit a page without bot protection, or upload screenshots instead.",
+    ],
   ])("maps %j", (raw, expected) => {
     expect(describeRunError(raw)).toBe(expected);
   });

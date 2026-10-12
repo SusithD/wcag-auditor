@@ -9,6 +9,7 @@ export type AuditOptions = {
   viewports: Viewport[];
   condition: Condition;
   budget: number;
+  verifyInBrowser?: boolean;
 };
 
 export function uploadFiles(
@@ -70,6 +71,7 @@ export async function startAudit(
       viewports: options.viewports,
       condition: options.condition,
       max_focus_steps: options.budget,
+      verify_in_browser: options.verifyInBrowser ?? false,
     },
   });
   if (error || !data) {

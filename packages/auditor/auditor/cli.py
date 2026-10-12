@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from collections.abc import Callable
 from pathlib import Path
 from typing import Annotated
@@ -42,6 +43,10 @@ def run(
     console.print(f"run {result.id} -> {target / 'report.json'}")
 
 
+def _profile(given: Path | None) -> Path:
+    return given or Path(os.environ.get("DATA_DIR", "./data")).resolve() / "browser-profile"
+
+
 @app.command()
 def audit(
     out: Annotated[Path, typer.Option(help="Run directory")],
@@ -51,6 +56,11 @@ def audit(
     condition: Annotated[Condition, typer.Option()] = "hybrid",
     max_focus_steps: Annotated[int, typer.Option()] = 15,
     pdf: Annotated[bool, typer.Option("--pdf/--no-pdf")] = True,
+    verify_in_browser: Annotated[
+        bool, typer.Option(help="Open a browser window so a person can pass a bot check")
+    ] = False,
+    verify_timeout_s: Annotated[float, typer.Option(min=10)] = 300,
+    profile_dir: Annotated[Path | None, typer.Option(help="Browser profile for --verify")] = None,
 ) -> None:
     """Capture a URL or replay folders, run each viewport; writes events.jsonl, summary.json."""
     from auditor.audit import audit as run_audit
@@ -67,6 +77,8 @@ def audit(
         condition=condition,
         max_focus_steps=max_focus_steps,
         pdf=pdf,
+        profile_dir=_profile(profile_dir) if verify_in_browser else None,
+        verify_timeout_s=verify_timeout_s,
     )
     raise typer.Exit(code=code)
 
@@ -77,6 +89,11 @@ def capture(
     out: Annotated[Path, typer.Option()] = Path("data/captures"),
     viewports: Annotated[str, typer.Option()] = "desktop,mobile",
     max_focus_steps: Annotated[int, typer.Option()] = 15,
+    verify_in_browser: Annotated[
+        bool, typer.Option(help="Open a browser window so a person can pass a bot check")
+    ] = False,
+    verify_timeout_s: Annotated[float, typer.Option(min=10)] = 300,
+    profile_dir: Annotated[Path | None, typer.Option(help="Browser profile for --verify")] = None,
 ) -> None:
     """Capture a URL into benchmark-layout folders (one per viewport)."""
     from auditor.capture import VIEWPORTS, PlaywrightBrowser, capture_url
@@ -91,7 +108,11 @@ def capture(
         console.print(f"error: bad viewports {unknown or viewports!r}; use {sorted(VIEWPORTS)}")
         raise typer.Exit(code=1)
     errors: list[str] = []
-    with PlaywrightBrowser() as browser:
+    with PlaywrightBrowser(
+        profile_dir=_profile(profile_dir) if verify_in_browser else None,
+        verify_timeout_s=verify_timeout_s,
+        on_wait=lambda left: console.print(f"waiting for the bot check ({left}s left)"),
+    ) as browser:
         folders = capture_url(browser, url, out, names, max_focus_steps, errors=errors)
     for folder in folders:
         console.print(f"captured {folder}")

@@ -443,6 +443,7 @@ describe("run again body", () => {
     ).toEqual({
       condition: "hybrid",
       max_focus_steps: 15,
+      verify_in_browser: false,
       folder: "/cap/a",
     });
   });
@@ -453,6 +454,7 @@ describe("run again body", () => {
     ).toEqual({
       condition: "hybrid",
       max_focus_steps: 15,
+      verify_in_browser: false,
       url: "https://a.test/",
       viewports: ["desktop"],
     });

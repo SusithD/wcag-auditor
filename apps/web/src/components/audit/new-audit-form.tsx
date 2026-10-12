@@ -86,14 +86,18 @@ function Marker({ kind }: { kind: "box" | "radio" }) {
   );
 }
 
-export function NewAuditForm() {
+export function NewAuditForm({
+  initialTab = "url",
+}: {
+  initialTab?: "url" | "screenshots";
+}) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const ids = useId();
   const urlInput = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const budgetInput = useRef<HTMLInputElement>(null);
-  const [tab, setTab] = useState<string>("url");
+  const [tab, setTab] = useState<string>(initialTab);
   const [url, setUrl] = useState("");
   const [settings] = useSettings();
   const [viewports, setViewports] = useState<Viewport[]>(ALL_VIEWPORTS);
@@ -102,6 +106,7 @@ export function NewAuditForm() {
   const submitLock = useRef(false);
   const [budgetText, setBudgetText] = useState("15");
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [verifyInBrowser, setVerifyInBrowser] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [progress, setProgress] = useState(0);
   const [fieldError, setFieldError] = useState<string | null>(null);
@@ -228,7 +233,12 @@ export function NewAuditForm() {
       }
       const runId = await startAudit(
         source,
-        { viewports, condition: effectiveCondition, budget },
+        {
+          viewports,
+          condition: effectiveCondition,
+          budget,
+          verifyInBrowser: tab === "url" && verifyInBrowser,
+        },
         queryClient,
       );
       router.push(`/runs/${runId}`);
@@ -489,6 +499,32 @@ export function NewAuditForm() {
                   </p>
                 )}
               </fieldset>
+              {tab === "url" ? (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <input
+                      id={`${ids}-verify`}
+                      type="checkbox"
+                      checked={verifyInBrowser}
+                      disabled={submitting}
+                      aria-describedby={`${ids}-verify-hint`}
+                      onChange={(e) => setVerifyInBrowser(e.target.checked)}
+                      className="size-4"
+                    />
+                    <Label htmlFor={`${ids}-verify`}>
+                      Open a browser window so I can pass a bot check or sign in
+                    </Label>
+                  </div>
+                  <p
+                    id={`${ids}-verify-hint`}
+                    className="text-label text-ink-3"
+                  >
+                    The window opens on the computer that runs the audit
+                    service, so this only works when that is your own computer.
+                    The audit waits up to 5 minutes for you, then continues.
+                  </p>
+                </div>
+              ) : null}
             </CollapsibleContent>
           </Collapsible>
 

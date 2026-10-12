@@ -1385,6 +1385,11 @@ export interface components {
        * @default 15
        */
       max_focus_steps: number;
+      /**
+       * Verify In Browser
+       * @default false
+       */
+      verify_in_browser: boolean;
     };
     /** RunCreated */
     RunCreated: {

@@ -7,7 +7,7 @@ import os
 import signal
 import sys
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 log = logging.getLogger(__name__)
 
@@ -17,6 +17,7 @@ class Job:
     run_id: str
     argv: list[str]
     timeout_s: float | None = None
+    env: dict[str, str] | None = field(default=None, repr=False)
 
 
 @dataclass(frozen=True)
@@ -110,6 +111,7 @@ class JobRunner:
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
             start_new_session=True,
+            env={**os.environ, **job.env} if job.env else None,
         )
         self._proc = proc
         if job.run_id in self._cancelled:

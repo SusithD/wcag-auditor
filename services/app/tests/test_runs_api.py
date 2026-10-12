@@ -250,3 +250,19 @@ def test_a_finished_run_reports_per_criterion_counts_per_viewport(tmp_path: Path
         total = sum(detail[k] for k in ("critical", "serious", "minor", "needs_review"))
         assert sum(r["count"] for r in rows) == total
         assert body["counts"] == {k: detail[k] for k in body["counts"]}
+
+
+def test_a_bot_check_failure_reaches_the_run_error_as_one_sentence(tmp_path: Path) -> None:
+    from app.api import status_from_result
+    from app.jobs import JobResult
+
+    sentence = (
+        "The site showed a bot check (Cloudflare) instead of the page, so the audit was "
+        "stopped. Audit a page without bot protection, or upload screenshots instead."
+    )
+    errors = {"desktop": sentence, "mobile": sentence}
+    (tmp_path / "summary.json").write_text(
+        json.dumps({"status": "failed", "viewports": {}, "errors": errors})
+    )
+    status, error = status_from_result(JobResult("r", 1, "Traceback ..."), tmp_path)
+    assert (status, error) == ("failed", sentence)

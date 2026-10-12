@@ -62,6 +62,7 @@ export function reasonLabel(reason: string | null): string {
 
 export function failureShort(error: string | null): string {
   const text = error ?? "";
+  if (/^The site showed a bot check/i.test(text)) return "bot check";
   if (/timeout|timed out/i.test(text)) return "timed out";
   if (/ERR_CERT|ERR_SSL|certificate/i.test(text)) return "certificate problem";
   if (

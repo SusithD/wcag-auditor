@@ -55,6 +55,10 @@ export function age(iso: string, now = Date.now()): string {
 
 const ERROR_PATTERNS: [RegExp, string][] = [
   [
+    /^The site showed a bot check/i,
+    "The site showed a bot check instead of the page, so the audit was stopped. Audit a page without bot protection, or upload screenshots instead.",
+  ],
+  [
     /ERR_INVALID_URL|invalid url|cannot navigate to invalid|ERR_UNKNOWN_URL_SCHEME|protocol error.*url/i,
     "That address is not valid. Enter a full address such as https://example.com.",
   ],
@@ -78,4 +82,8 @@ export function describeRunError(raw: string | null | undefined): string {
     if (pattern.test(text)) return message;
   }
   return "The audit stopped before it finished. Try again, or start a new audit.";
+}
+
+export function isBotCheckError(raw: string | null | undefined): boolean {
+  return /^The site showed a bot check/i.test(raw ?? "");
 }

@@ -93,6 +93,8 @@ export function progressSentence(
   let what = "Waiting to start";
   if (stage) {
     if (stage.startsWith("capture:")) what = `Capturing the page${on}`;
+    else if (stage === "waiting:verify")
+      what = `Waiting for you to pass the bot check${on}`;
     else if (stage === "rules") what = `Running the browser rules${on}`;
     else if (stage === "elements") what = `Finding page elements${on}`;
     else if (stage.startsWith("module:"))
