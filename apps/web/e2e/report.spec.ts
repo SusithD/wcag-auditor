@@ -1041,3 +1041,96 @@ test("group by is kept in the URL and survives a reload, and a criterion link ke
   await expect(page).toHaveURL(/sc=2\.4\.13/);
   await expect(page).toHaveURL(/vp=mobile/);
 });
+
+async function canvasScale(page: Page) {
+  const text = await page
+    .getByRole("toolbar", { name: /canvas controls/ })
+    .getByText(/\d+%/)
+    .first()
+    .innerText();
+  return Number(/(\d+)%/.exec(text)?.[1]);
+}
+
+async function contentPointAt(page: Page, cx: number, cy: number) {
+  return page
+    .locator("[data-testid=canvas] .react-transform-component")
+    .evaluate(
+      (el, [x, y]) => {
+        const rect = el.getBoundingClientRect();
+        const scale = rect.width / (el as HTMLElement).offsetWidth;
+        return { x: (x - rect.left) / scale, y: (y - rect.top) / scale };
+      },
+      [cx, cy],
+    );
+}
+
+test("ctrl+wheel and a pinch-style wheel zoom the canvas around the cursor, not the page", async ({
+  page,
+  request,
+}) => {
+  const id = await ensureRun(request, "mobile");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openReport(page, id);
+  const box = await page.getByTestId("canvas").boundingBox();
+  if (!box) throw new Error("no canvas");
+  const cx = box.x + box.width / 2;
+  const cy = box.y + box.height / 3;
+  await page.mouse.move(cx, cy);
+  const visualScale = () => page.evaluate(() => window.visualViewport?.scale);
+  const base = await visualScale();
+  const start = await canvasScale(page);
+  const anchor = await contentPointAt(page, cx, cy);
+
+  await page.keyboard.down("Control");
+  await page.mouse.wheel(0, -100);
+  await page.keyboard.up("Control");
+  await expect.poll(() => canvasScale(page)).toBeGreaterThan(start);
+  const afterMouse = await canvasScale(page);
+  const p1 = await contentPointAt(page, cx, cy);
+  expect(Math.abs(p1.x - anchor.x)).toBeLessThan(3);
+  expect(Math.abs(p1.y - anchor.y)).toBeLessThan(3);
+
+  await page.getByTestId("canvas").evaluate(
+    (el, [x, y]) => {
+      const target = el.querySelector(".react-transform-wrapper") ?? el;
+      for (let i = 0; i < 5; i++)
+        target.dispatchEvent(
+          new WheelEvent("wheel", {
+            deltaY: -8,
+            ctrlKey: true,
+            clientX: x,
+            clientY: y,
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
+    },
+    [cx, cy],
+  );
+  await expect.poll(() => canvasScale(page)).toBeGreaterThan(afterMouse);
+  const p2 = await contentPointAt(page, cx, cy);
+  expect(Math.abs(p2.x - anchor.x)).toBeLessThan(3);
+  expect(Math.abs(p2.y - anchor.y)).toBeLessThan(3);
+  expect(await visualScale()).toBe(base);
+});
+
+test("a plain wheel pans the canvas and does not zoom", async ({
+  page,
+  request,
+}) => {
+  const id = await ensureRun(request, "mobile");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openReport(page, id);
+  const box = await page.getByTestId("canvas").boundingBox();
+  if (!box) throw new Error("no canvas");
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 3);
+  const transform = () =>
+    page
+      .locator("[data-testid=canvas] .react-transform-component")
+      .evaluate((el) => (el as HTMLElement).style.transform);
+  const before = await transform();
+  const scale = await canvasScale(page);
+  await page.mouse.wheel(0, 120);
+  await expect.poll(transform).not.toBe(before);
+  expect(await canvasScale(page)).toBe(scale);
+});

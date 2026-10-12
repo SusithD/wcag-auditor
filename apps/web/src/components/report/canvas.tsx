@@ -46,7 +46,10 @@ import { focusWhenReady } from "./focus-when-ready";
 import { kindOf, SvgGlyph } from "./glyph";
 import { isEstimated } from "./logic";
 import { Seg } from "./seg";
+import { wheelPixels, wheelZoomFactor, zoomAround } from "./zoom";
 
+const MIN_SCALE = 0.05;
+const MAX_SCALE = 6;
 const PAD_L = 24;
 const PAD_R = 40;
 const PAD_T = 32;
@@ -226,11 +229,84 @@ export function Canvas({
     w.setTransform(c.w / 2 - cx, c.h / 2 - cy, 1, animation);
   }
 
-  function onWheel(event: React.WheelEvent<HTMLDivElement>) {
-    autoFit.current = false;
-    if (event.ctrlKey || event.metaKey) return;
-    wrapper.current?.panBy(-event.deltaX, -event.deltaY);
-  }
+  const pairModeRef = useRef(pairMode);
+  pairModeRef.current = pairMode;
+
+  useEffect(() => {
+    const el = well.current;
+    if (!el) return;
+
+    function zoomAtClient(factor: number, clientX: number, clientY: number) {
+      const w = wrapper.current;
+      if (!w || !el) return;
+      const rect = el.getBoundingClientRect();
+      const { scale, positionX, positionY } = w.state;
+      const next = zoomAround(
+        { x: positionX, y: positionY, scale },
+        factor,
+        clientX - rect.left,
+        clientY - rect.top,
+        MIN_SCALE,
+        MAX_SCALE,
+      );
+      autoFit.current = false;
+      w.setTransform(next.x, next.y, next.scale, 0);
+    }
+
+    function onWheel(event: WheelEvent) {
+      if (pairModeRef.current !== "page") {
+        if (event.ctrlKey || event.metaKey) event.preventDefault();
+        return;
+      }
+      event.preventDefault();
+      if (event.ctrlKey || event.metaKey) {
+        zoomAtClient(
+          wheelZoomFactor(event.deltaY, event.deltaMode),
+          event.clientX,
+          event.clientY,
+        );
+        return;
+      }
+      autoFit.current = false;
+      wrapper.current?.panBy(
+        -wheelPixels(event.deltaX, event.deltaMode),
+        -wheelPixels(event.deltaY, event.deltaMode),
+      );
+    }
+
+    let lastGesture = 1;
+    function onGestureStart(event: Event) {
+      event.preventDefault();
+      lastGesture = 1;
+    }
+    function onGestureChange(event: Event) {
+      event.preventDefault();
+      const g = event as Event & {
+        scale: number;
+        clientX: number;
+        clientY: number;
+      };
+      if (pairModeRef.current !== "page" || !g.scale) return;
+      const factor = g.scale / lastGesture;
+      lastGesture = g.scale;
+      zoomAtClient(factor, g.clientX, g.clientY);
+    }
+    function onGestureEnd(event: Event) {
+      event.preventDefault();
+      lastGesture = 1;
+    }
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener("gesturestart", onGestureStart, { passive: false });
+    el.addEventListener("gesturechange", onGestureChange, { passive: false });
+    el.addEventListener("gestureend", onGestureEnd, { passive: false });
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("gesturestart", onGestureStart);
+      el.removeEventListener("gesturechange", onGestureChange);
+      el.removeEventListener("gestureend", onGestureEnd);
+    };
+  }, []);
 
   const onTransform = useCallback(
     (
@@ -368,7 +444,6 @@ export function Canvas({
           <div
             ref={frame}
             onKeyDown={onFrameKey}
-            onWheel={onWheel}
             data-testid="canvas"
             role="group"
             aria-label={`${label ? `${label} ` : ""}screenshot canvas`}
@@ -381,7 +456,7 @@ export function Canvas({
           ref={well}
           style={{ ["--fit-h" as string]: `${fitHeight}px` }}
           className={cn(
-            "relative min-h-0 flex-1 overflow-hidden max-lg:flex-none",
+            "relative min-h-0 flex-1 touch-none overflow-hidden max-lg:flex-none",
             view.fit && pairMode === "page"
               ? "max-lg:h-[min(var(--fit-h),75dvh)]"
               : "max-lg:h-[max(var(--fit-h),70dvh)]",
@@ -402,10 +477,11 @@ export function Canvas({
             <div className="absolute inset-0">
               <TransformWrapper
                 ref={wrapper}
-                minScale={0.05}
-                maxScale={6}
+                minScale={MIN_SCALE}
+                maxScale={MAX_SCALE}
                 limitToBounds={false}
-                wheel={{ activationKeys: ["Control", "Meta"] }}
+                wheel={{ disabled: true }}
+                pinch={{ disabled: false }}
                 doubleClick={{ disabled: true }}
                 onTransform={onTransform}
                 onPanningStart={() => {
