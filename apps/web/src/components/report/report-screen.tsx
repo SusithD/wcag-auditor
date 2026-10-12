@@ -497,7 +497,7 @@ export function ReportScreen({
         groupResizeBehavior="preserve-pixel-size"
       >
         <aside aria-label="Finding detail" className="h-full">
-          {detail}
+          {detailCollapsed ? null : detail}
         </aside>
       </ResizablePanel>
     </ResizablePanelGroup>
