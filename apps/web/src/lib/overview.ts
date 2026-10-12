@@ -21,7 +21,11 @@ export function filterSites<T extends SiteLike>(
   return rows;
 }
 
-export function siteParts(run: { source_kind: string; source: string }): {
+export function siteParts(run: {
+  source_kind: string;
+  source: string;
+  created_at?: string;
+}): {
   host: string;
   path: string;
 } {
