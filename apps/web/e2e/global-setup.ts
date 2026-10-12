@@ -1,6 +1,11 @@
 import { writeFileSync } from "node:fs";
 import { type FullConfig, request } from "@playwright/test";
-import { ADMIN, AUTH_STATE } from "./auth-constants";
+import {
+  ADMIN,
+  AUTH_STATE,
+  createInviteViaScript,
+  inviteToken,
+} from "./auth-constants";
 
 export default async function globalSetup(config: FullConfig) {
   const baseURL = config.projects[0].use.baseURL as string;
@@ -9,7 +14,15 @@ export default async function globalSetup(config: FullConfig) {
     baseURL,
     extraHTTPHeaders: { Origin: baseURL },
   });
-  const signUp = await context.post("/api/auth/sign-up/email", { data: ADMIN });
+  const link = createInviteViaScript(
+    ADMIN.email,
+    process.env.E2E_AUTH_DB as string,
+    baseURL,
+  );
+  const signUp = await context.post("/api/auth/sign-up/email", {
+    data: ADMIN,
+    headers: { "X-Invite-Token": inviteToken(link) },
+  });
   if (!signUp.ok()) {
     const signIn = await context.post("/api/auth/sign-in/email", {
       data: { email: ADMIN.email, password: ADMIN.password },

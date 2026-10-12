@@ -26,6 +26,7 @@ async function LoginLoader({
       resetEnabled={resetByEmailEnabled(process.env)}
       next={next}
       error={first(query.error) ?? ""}
+      invite={first(query.invite) ?? ""}
     />
   );
 }

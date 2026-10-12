@@ -1,3 +1,4 @@
+import { inviteTtlDays, issueInvite } from "../../../scripts/invite-store.mjs";
 import { getAuthDb } from "./auth";
 import { isAdminEmail, normaliseEmail } from "./policy";
 
@@ -10,11 +11,30 @@ export type Member = {
   isAdmin: boolean;
 };
 
+export type InvitationStatus = "pending" | "used" | "expired" | "legacy";
+
 export type Invitation = {
   email: string;
   invitedBy: string;
   createdAt: string;
+  expiresAt: string | null;
+  status: InvitationStatus;
 };
+
+type InvitationRow = {
+  email: string;
+  invitedBy: string;
+  createdAt: string;
+  expiresAt: string | null;
+  usedAt: string | null;
+  tokenHash: string | null;
+};
+
+function invitationStatus(row: InvitationRow, now: Date): InvitationStatus {
+  if (row.usedAt) return "used";
+  if (!row.tokenHash || !row.expiresAt) return "legacy";
+  return row.expiresAt > now.toISOString() ? "pending" : "expired";
+}
 
 type UserRow = {
   id: string;
@@ -51,11 +71,24 @@ export async function listMembers(): Promise<{
        FROM user u ORDER BY u.createdAt ASC`,
     )
     .all() as UserRow[];
-  const invitations = db
-    .prepare(
-      "SELECT email, invited_by AS invitedBy, created_at AS createdAt FROM invitation ORDER BY created_at DESC",
-    )
-    .all() as Invitation[];
+  const now = new Date();
+  const invitations = (
+    db
+      .prepare(
+        `SELECT email, invited_by AS invitedBy, created_at AS createdAt,
+          expires_at AS expiresAt, used_at AS usedAt, token_hash AS tokenHash
+         FROM invitation ORDER BY created_at DESC`,
+      )
+      .all() as InvitationRow[]
+  ).map(
+    (row): Invitation => ({
+      email: row.email,
+      invitedBy: row.invitedBy,
+      createdAt: row.createdAt,
+      expiresAt: row.expiresAt,
+      status: invitationStatus(row, now),
+    }),
+  );
   return {
     users: users.map((row) => ({
       id: row.id,
@@ -72,14 +105,13 @@ export async function listMembers(): Promise<{
 export async function addInvitation(
   email: string,
   invitedBy: string,
-): Promise<"created" | "exists"> {
+): Promise<{ token: string; expiresAt: string }> {
   const db = await getAuthDb();
-  const result = db
-    .prepare(
-      "INSERT OR IGNORE INTO invitation (email, invited_by) VALUES (?, ?)",
-    )
-    .run(normaliseEmail(email), invitedBy);
-  return Number(result.changes) > 0 ? "created" : "exists";
+  return issueInvite(db, {
+    email: normaliseEmail(email),
+    invitedBy,
+    ttlDays: inviteTtlDays(),
+  });
 }
 
 export async function revokeInvitation(email: string): Promise<boolean> {

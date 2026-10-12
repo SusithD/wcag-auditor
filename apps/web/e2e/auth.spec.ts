@@ -1,6 +1,14 @@
 import AxeBuilder from "@axe-core/playwright";
 import { type Browser, expect, type Page, test } from "@playwright/test";
-import { ADMIN, AUTH_STATE, GUEST_PASSWORD } from "./auth-constants";
+import {
+  ADMIN,
+  AUTH_STATE,
+  expireInvite,
+  GUEST_PASSWORD,
+  INVITE_REQUIRED,
+  inviteToken,
+  SECOND_ADMIN_EMAIL,
+} from "./auth-constants";
 
 const TAGS = [
   "wcag2a",
@@ -12,14 +20,14 @@ const TAGS = [
   "wcag21aaa",
   "wcag22aaa",
 ];
-const NOT_INVITED =
-  "This email has not been invited. Ask the researcher for an invite.";
 const ANONYMOUS = { cookies: [], origins: [] };
 
 test.describe.configure({ mode: "serial" });
 
 const stamp = Date.now();
 const guest = (label: string) => `${label}-${stamp}@guest.test`;
+
+const authDb = () => process.env.E2E_AUTH_DB as string;
 
 async function inviteViaApi(browser: Browser, email: string) {
   const context = await browser.newContext({ storageState: AUTH_STATE });
@@ -30,12 +38,15 @@ async function inviteViaApi(browser: Browser, email: string) {
     },
   });
   expect(response.status()).toBe(201);
+  const body = (await response.json()) as { link: string };
   await context.close();
+  return { link: body.link, token: inviteToken(body.link) };
 }
 
-async function signUp(page: Page, name: string, email: string) {
-  await page.goto("/login");
-  await page.getByRole("button", { name: "Create account" }).click();
+async function signUp(page: Page, name: string, email: string, token?: string) {
+  await page.goto(token ? `/login?invite=${token}` : "/login");
+  if (!token)
+    await page.getByRole("button", { name: "Create account" }).click();
   await page.getByLabel("Name").fill(name);
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(GUEST_PASSWORD);
@@ -88,10 +99,33 @@ test.describe("signed out", () => {
     expect((await request.get("/api/admin/members")).status()).toBe(401);
   });
 
-  test("an email that was not invited cannot sign up", async ({ page }) => {
+  test("sign-up without an invite link is rejected", async ({ page }) => {
     await signUp(page, "Stranger", guest("stranger"));
-    await expect(page.getByTestId("auth-status")).toHaveText(NOT_INVITED);
+    await expect(page.getByTestId("auth-status")).toHaveText(INVITE_REQUIRED);
     await expect(page).toHaveURL(/\/login/);
+  });
+
+  test("sign-up without a token is rejected for an admin address and over the API", async ({
+    page,
+    request,
+  }) => {
+    await signUp(page, "Squatter", SECOND_ADMIN_EMAIL);
+    await expect(page.getByTestId("auth-status")).toHaveText(INVITE_REQUIRED);
+    const origin = new URL(test.info().project.use.baseURL as string).origin;
+    for (const email of [SECOND_ADMIN_EMAIL, guest("direct")]) {
+      const variants: Record<string, string>[] = [
+        { Origin: origin },
+        { Origin: origin, "X-Invite-Token": "made-up-token" },
+      ];
+      for (const headers of variants) {
+        const response = await request.post("/api/auth/sign-up/email", {
+          data: { name: "Direct", email, password: GUEST_PASSWORD },
+          headers,
+        });
+        expect(response.status()).toBe(403);
+        expect((await response.json()).code).toBe("INVITE_REQUIRED");
+      }
+    }
   });
 
   test("the wrong password shows an inline error", async ({ page }) => {
@@ -130,8 +164,8 @@ test.describe("invited member", () => {
     browser,
   }) => {
     const email = guest("member");
-    await inviteViaApi(browser, email.toUpperCase());
-    await signUp(page, "Mia Member", email);
+    const { token } = await inviteViaApi(browser, email.toUpperCase());
+    await signUp(page, "Mia Member", email, token);
     await expect(page).toHaveURL(/\/$/);
     await expect(page.getByTestId("user-menu")).toContainText("Mia Member");
     await expect(page.getByTestId("user-menu")).toContainText(email);
@@ -151,6 +185,68 @@ test.describe("invited member", () => {
     await signIn(page, email, GUEST_PASSWORD);
     await expect(page).toHaveURL(/\/$/);
     await expect(page.getByTestId("user-menu")).toContainText("Mia Member");
+
+    const again = await page.request.post("/api/auth/sign-up/email", {
+      data: {
+        name: "Mia",
+        email: guest("member-again"),
+        password: GUEST_PASSWORD,
+      },
+      headers: {
+        "X-Invite-Token": token,
+        Origin: new URL(test.info().project.use.baseURL as string).origin,
+      },
+    });
+    expect(again.status()).toBe(403);
+  });
+
+  test("a used invite link cannot be used again", async ({ page, browser }) => {
+    const email = guest("once");
+    const { token } = await inviteViaApi(browser, email);
+    await signUp(page, "First", email, token);
+    await expect(page).toHaveURL(/\/$/);
+
+    const other = await browser.newContext({ storageState: ANONYMOUS });
+    const page2 = await other.newPage();
+    await signUp(page2, "Second", email, token);
+    await expect(page2.getByTestId("auth-status")).not.toHaveText("");
+    await expect(page2).toHaveURL(/\/login/);
+    await other.close();
+  });
+
+  test("an expired invite link is rejected", async ({ page, browser }) => {
+    const email = guest("expired");
+    const { token } = await inviteViaApi(browser, email);
+    expireInvite(authDb(), email);
+    await signUp(page, "Late", email, token);
+    await expect(page.getByTestId("auth-status")).toHaveText(INVITE_REQUIRED);
+  });
+
+  test("an invite link only works for its own email", async ({
+    page,
+    browser,
+  }) => {
+    const owner = guest("owner");
+    const { token } = await inviteViaApi(browser, owner);
+    await signUp(page, "Thief", guest("thief"), token);
+    await expect(page.getByTestId("auth-status")).toHaveText(INVITE_REQUIRED);
+
+    const rightful = await browser.newContext({ storageState: ANONYMOUS });
+    const page2 = await rightful.newPage();
+    await signUp(page2, "Owner", owner.toUpperCase(), token);
+    await expect(page2).toHaveURL(/\/$/);
+    await rightful.close();
+  });
+
+  test("a re-issued link replaces the old one", async ({ page, browser }) => {
+    const email = guest("reissue");
+    const first = await inviteViaApi(browser, email);
+    const second = await inviteViaApi(browser, email);
+    expect(second.token).not.toBe(first.token);
+    await signUp(page, "Old", email, first.token);
+    await expect(page.getByTestId("auth-status")).toHaveText(INVITE_REQUIRED);
+    await signUp(page, "New", email, second.token);
+    await expect(page).toHaveURL(/\/$/);
   });
 });
 
@@ -176,10 +272,28 @@ test.describe("admin", () => {
     await expect(
       page.getByRole("cell", { name: email, exact: true }),
     ).toBeVisible();
+    const panel = page.getByTestId("invite-link-panel");
+    const linkField = panel.getByLabel(`Invite link for ${email}`);
+    const firstLink = await linkField.inputValue();
+    expect(firstLink).toContain("/login?invite=");
+    await expect(
+      panel.getByRole("button", { name: "Copy link" }),
+    ).toBeVisible();
+
+    await page.reload();
+    await expect(
+      page.getByRole("cell", { name: email, exact: true }),
+    ).toBeVisible();
+    await expect(page.getByTestId("invite-link-panel")).toHaveCount(0);
+    expect(await page.content()).not.toContain(inviteToken(firstLink));
 
     await page.getByLabel("Email address").fill(email);
     await page.getByRole("button", { name: "Add invite" }).click();
-    await expect(page.getByText("That email is already invited")).toBeVisible();
+    const secondLink = await page
+      .getByTestId("invite-link-panel")
+      .getByLabel(`Invite link for ${email}`)
+      .inputValue();
+    expect(secondLink).not.toBe(firstLink);
 
     await page
       .getByRole("button", { name: `Revoke invite for ${email}` })
@@ -190,8 +304,8 @@ test.describe("admin", () => {
 
     const stranger = await browser.newContext({ storageState: ANONYMOUS });
     const page2 = await stranger.newPage();
-    await signUp(page2, "Late", email);
-    await expect(page2.getByTestId("auth-status")).toHaveText(NOT_INVITED);
+    await signUp(page2, "Late", email, inviteToken(secondLink));
+    await expect(page2.getByTestId("auth-status")).toHaveText(INVITE_REQUIRED);
     await stranger.close();
 
     const removable = guest("removable");
@@ -200,9 +314,15 @@ test.describe("admin", () => {
     await expect(
       page.getByRole("cell", { name: removable, exact: true }),
     ).toBeVisible();
+    const removableToken = inviteToken(
+      await page
+        .getByTestId("invite-link-panel")
+        .getByLabel(`Invite link for ${removable}`)
+        .inputValue(),
+    );
     const joiner = await browser.newContext({ storageState: ANONYMOUS });
     const page3 = await joiner.newPage();
-    await signUp(page3, "Rae Removable", removable);
+    await signUp(page3, "Rae Removable", removable, removableToken);
     await expect(page3).toHaveURL(/\/$/);
     await page.reload();
     const row = page.getByRole("row", { name: /Rae Removable/ });

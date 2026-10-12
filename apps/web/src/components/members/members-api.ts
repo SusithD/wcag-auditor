@@ -11,6 +11,14 @@ export type Invitation = {
   email: string;
   invitedBy: string;
   createdAt: string;
+  expiresAt: string | null;
+  status: "pending" | "used" | "expired" | "legacy";
+};
+
+export type IssuedInvite = {
+  email: string;
+  link: string;
+  expiresAt: string;
 };
 
 export const MEMBERS_KEY = ["admin", "members"] as const;
@@ -31,14 +39,14 @@ export async function fetchMembers(): Promise<{
   return response.json();
 }
 
-export async function sendInvite(email: string): Promise<string> {
+export async function sendInvite(email: string): Promise<IssuedInvite> {
   const response = await fetch("/api/admin/invitations", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
   });
   if (!response.ok) throw await failure(response);
-  return ((await response.json()) as { email: string }).email;
+  return (await response.json()) as IssuedInvite;
 }
 
 export async function revokeInvite(email: string): Promise<string> {

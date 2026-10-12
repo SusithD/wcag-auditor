@@ -2,12 +2,13 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { defineConfig } from "@playwright/test";
-import { ADMIN, AUTH_STATE } from "./e2e/auth-constants";
+import { ADMIN_EMAILS, AUTH_STATE } from "./e2e/auth-constants";
 
 const port = Number(process.env.WEB_PORT ?? 3000);
 const apiPort = Number(process.env.API_PORT ?? 8100);
 const root = resolve(__dirname, "../..");
 const dataDir = mkdtempSync(join(tmpdir(), `wcag-auditor-e2e-${apiPort}-`));
+process.env.E2E_AUTH_DB ??= join(dataDir, "auth.db");
 
 export default defineConfig({
   testDir: "./e2e",
@@ -48,9 +49,9 @@ export default defineConfig({
         INTERNAL_API_TOKEN: "e2e-internal-token",
         BETTER_AUTH_SECRET: "e2e-secret-0123456789abcdef0123456789abcdef",
         BETTER_AUTH_URL: `http://localhost:${port}`,
-        AUTH_DB_PATH: join(dataDir, "auth.db"),
+        AUTH_DB_PATH: process.env.E2E_AUTH_DB,
         AUTH_RATE_LIMIT: "0",
-        ADMIN_EMAILS: ADMIN.email,
+        ADMIN_EMAILS,
       },
     },
   ],

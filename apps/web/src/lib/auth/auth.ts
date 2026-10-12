@@ -5,19 +5,18 @@ import { betterAuth } from "better-auth";
 import { APIError } from "better-auth/api";
 import { getMigrations } from "better-auth/db/migration";
 import {
-  isInviteAllowed,
-  NOT_INVITED_MESSAGE,
+  consumeInvite,
+  ensureInvitationSchema,
+  hasSocialInvite,
+} from "../../../scripts/invite-store.mjs";
+import {
+  authorizeUserCreation,
+  INVITE_TOKEN_HEADER,
   normaliseEmail,
   parseAdminEmails,
   resetByEmailEnabled,
   socialProviderConfig,
 } from "./policy";
-
-const INVITATION_DDL = `CREATE TABLE IF NOT EXISTS invitation (
-  email TEXT PRIMARY KEY NOT NULL,
-  invited_by TEXT NOT NULL,
-  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
-)`;
 
 export function authDbPath(env: NodeJS.ProcessEnv = process.env): string {
   if (env.AUTH_DB_PATH) return env.AUTH_DB_PATH;
@@ -47,9 +46,6 @@ async function sendResetEmail(to: string, url: string) {
 
 function build(db: DatabaseSync) {
   const admins = parseAdminEmails(process.env.ADMIN_EMAILS);
-  const isInvited = (email: string) =>
-    db.prepare("SELECT 1 FROM invitation WHERE email = ?").get(email) !==
-    undefined;
   return betterAuth({
     database: db,
     secret: process.env.BETTER_AUTH_SECRET,
@@ -75,16 +71,39 @@ function build(db: DatabaseSync) {
         : {}),
     },
     socialProviders: socialProviderConfig(process.env),
+    account: {
+      accountLinking: {
+        enabled: true,
+        trustedProviders: [],
+        requireLocalEmailVerified: true,
+      },
+    },
     databaseHooks: {
       user: {
         create: {
-          before: async (user) => {
-            if (!isInviteAllowed(user.email, admins, isInvited)) {
+          before: async (user, context) => {
+            const decision = authorizeUserCreation(
+              {
+                email: user.email,
+                emailVerified: user.emailVerified === true,
+                path: context?.path ?? null,
+                inviteToken:
+                  context?.headers?.get(INVITE_TOKEN_HEADER) ??
+                  context?.request?.headers.get(INVITE_TOKEN_HEADER) ??
+                  null,
+              },
+              {
+                admins,
+                consumeInvite: (email, token) =>
+                  consumeInvite(db, { email, token }),
+                hasSocialInvite: (email) => hasSocialInvite(db, email),
+              },
+            );
+            if (!decision.ok)
               throw new APIError("FORBIDDEN", {
-                message: NOT_INVITED_MESSAGE,
-                code: "NOT_INVITED",
+                message: decision.message,
+                code: decision.code,
               });
-            }
             return { data: { ...user, email: normaliseEmail(user.email) } };
           },
         },
@@ -103,7 +122,7 @@ async function init(): Promise<Ready> {
   const auth = build(db);
   const { runMigrations } = await getMigrations(auth.options);
   await runMigrations();
-  db.exec(INVITATION_DDL);
+  ensureInvitationSchema(db);
   return { auth, db };
 }
 

@@ -1,6 +1,7 @@
 import { addInvitation, revokeInvitation } from "@/lib/auth/members";
 import { isValidEmail, normaliseEmail } from "@/lib/auth/policy";
 import { requireAdmin } from "@/lib/auth/session";
+import { inviteLink } from "../../../../../scripts/invite-store.mjs";
 
 export async function POST(request: Request) {
   const admin = await requireAdmin(request);
@@ -14,13 +15,13 @@ export async function POST(request: Request) {
       { detail: "Enter a valid email address" },
       { status: 400 },
     );
-  const outcome = await addInvitation(normaliseEmail(email), admin.email);
-  if (outcome === "exists")
-    return Response.json(
-      { detail: "That email is already invited" },
-      { status: 409 },
-    );
-  return Response.json({ email: normaliseEmail(email) }, { status: 201 });
+  const address = normaliseEmail(email);
+  const { token, expiresAt } = await addInvitation(address, admin.email);
+  const base = process.env.BETTER_AUTH_URL ?? new URL(request.url).origin;
+  return Response.json(
+    { email: address, link: inviteLink(base, token), expiresAt },
+    { status: 201, headers: { "Cache-Control": "no-store" } },
+  );
 }
 
 export async function DELETE(request: Request) {

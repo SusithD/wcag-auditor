@@ -35,6 +35,8 @@ import { isValidEmail } from "@/lib/auth/policy";
 import { useSessionUser } from "@/lib/auth/user-context";
 import {
   fetchMembers,
+  type Invitation,
+  type IssuedInvite,
   MEMBERS_KEY,
   type Member,
   removeUserRequest,
@@ -52,6 +54,13 @@ function formatWhen(value: string | null): string {
   });
 }
 
+function statusLabel(row: Invitation): string {
+  if (row.status === "pending") return `Expires ${formatWhen(row.expiresAt)}`;
+  if (row.status === "used") return "Used";
+  if (row.status === "expired") return "Expired";
+  return "Needs a new link";
+}
+
 export function MembersScreen() {
   const client = useQueryClient();
   const me = useSessionUser();
@@ -60,15 +69,18 @@ export function MembersScreen() {
   const [fieldError, setFieldError] = useState("");
   const [message, setMessage] = useState("");
   const [pending, setPending] = useState<Member | null>(null);
+  const [issued, setIssued] = useState<IssuedInvite | null>(null);
+  const linkId = useId();
 
   const members = useQuery({ queryKey: MEMBERS_KEY, queryFn: fetchMembers });
   const refresh = () => client.invalidateQueries({ queryKey: MEMBERS_KEY });
 
   const invite = useMutation({
     mutationFn: sendInvite,
-    onSuccess: (address) => {
+    onSuccess: (result) => {
       setEmail("");
-      setMessage(`${address} can now create an account.`);
+      setIssued(result);
+      setMessage(`Invite link created for ${result.email}.`);
       refresh();
     },
     onError: (error: Error) => setFieldError(error.message),
@@ -76,6 +88,7 @@ export function MembersScreen() {
   const revoke = useMutation({
     mutationFn: revokeInvite,
     onSuccess: (address) => {
+      setIssued((current) => (current?.email === address ? null : current));
       setMessage(`Invite for ${address} revoked.`);
       refresh();
     },
@@ -102,6 +115,17 @@ export function MembersScreen() {
     invite.mutate(email.trim());
   }
 
+  async function copyLink() {
+    if (!issued) return;
+    try {
+      await navigator.clipboard.writeText(issued.link);
+      setMessage("Invite link copied.");
+    } catch {
+      document.getElementById(linkId)?.focus();
+      setMessage("Could not copy. Select the link and copy it manually.");
+    }
+  }
+
   const users = members.data?.users ?? [];
   const invitations = members.data?.invitations ?? [];
 
@@ -109,7 +133,7 @@ export function MembersScreen() {
     <div className="max-w-5xl">
       <PageHeader
         title="Members"
-        description="Everyone who can open this workspace. Sign-up is limited to invited email addresses."
+        description="Everyone who can open this workspace. Accounts are created from single-use invite links."
       />
       <output aria-live="polite" className="sr-only block">
         {message}
@@ -153,6 +177,38 @@ export function MembersScreen() {
                 Add invite
               </Button>
             </form>
+            {issued ? (
+              <div
+                className="mt-4 grid gap-2 rounded-md border border-line bg-subtle p-3"
+                data-testid="invite-link-panel"
+              >
+                <Label htmlFor={linkId}>Invite link for {issued.email}</Label>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Input
+                    id={linkId}
+                    readOnly
+                    value={issued.link}
+                    className="min-w-[16rem] flex-1 font-mono"
+                    onFocus={(e) => e.currentTarget.select()}
+                  />
+                  <Button type="button" onClick={copyLink}>
+                    Copy link
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setIssued(null)}
+                  >
+                    Dismiss
+                  </Button>
+                </div>
+                <p className="m-0 text-dense text-ink-2">
+                  Shown once. It works once, for this email only, and expires{" "}
+                  {formatWhen(issued.expiresAt)}. Inviting the email again
+                  replaces it.
+                </p>
+              </div>
+            ) : null}
           </PanelBody>
         </Panel>
 
@@ -160,11 +216,11 @@ export function MembersScreen() {
           <PanelHeader
             id="mem-invitations"
             title="Invitations"
-            right={`${invitations.length} pending`}
+            right={`${invitations.filter((row) => row.status === "pending").length} pending`}
           />
           {invitations.length === 0 ? (
             <EmptyState title="No pending invitations" as="h3">
-              Add an email address above to let someone create an account.
+              Add an email address above to create a single-use invite link.
             </EmptyState>
           ) : (
             <Table regionLabel="Invitations">
@@ -173,6 +229,7 @@ export function MembersScreen() {
                   <TableHead>Email</TableHead>
                   <TableHead>Invited by</TableHead>
                   <TableHead>Invited</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -182,7 +239,17 @@ export function MembersScreen() {
                     <TableCell>{row.email}</TableCell>
                     <TableCell>{row.invitedBy}</TableCell>
                     <TableCell>{formatWhen(row.createdAt)}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell>{statusLabel(row)}</TableCell>
+                    <TableCell className="space-x-2 text-right">
+                      <Button
+                        type="button"
+                        size="sm"
+                        aria-label={`New link for ${row.email}`}
+                        disabled={invite.isPending}
+                        onClick={() => invite.mutate(row.email)}
+                      >
+                        New link
+                      </Button>
                       <Button
                         type="button"
                         size="sm"

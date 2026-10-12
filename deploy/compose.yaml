@@ -42,6 +42,7 @@ services:
       BETTER_AUTH_URL: https://${DOMAIN:?set DOMAIN in deploy/.env}
       AUTH_DB_PATH: /data/auth.db
       ADMIN_EMAILS: ${ADMIN_EMAILS:?set ADMIN_EMAILS in deploy/.env}
+      INVITE_TTL_DAYS: ${INVITE_TTL_DAYS:-7}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}

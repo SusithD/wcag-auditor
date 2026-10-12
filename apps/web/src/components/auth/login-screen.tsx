@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth/client";
-import type { ProviderId } from "@/lib/auth/policy";
+import { INVITE_TOKEN_HEADER, type ProviderId } from "@/lib/auth/policy";
 import { GitHubIcon, GoogleIcon } from "./brand-icons";
 import {
   describeAuthError,
@@ -22,6 +22,7 @@ type Props = {
   resetEnabled: boolean;
   next: string;
   error: string;
+  invite: string;
 };
 
 const PROVIDER_BUTTONS: {
@@ -48,9 +49,15 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   );
 }
 
-export function LoginScreen({ providers, resetEnabled, next, error }: Props) {
+export function LoginScreen({
+  providers,
+  resetEnabled,
+  next,
+  error,
+  invite,
+}: Props) {
   const ids = useId();
-  const [mode, setMode] = useState<Mode>("signin");
+  const [mode, setMode] = useState<Mode>(invite ? "signup" : "signin");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -137,6 +144,9 @@ export function LoginScreen({ providers, resetEnabled, next, error }: Props) {
             name: name.trim(),
             email: email.trim(),
             password,
+            fetchOptions: invite
+              ? { headers: { [INVITE_TOKEN_HEADER]: invite } }
+              : undefined,
           })
         : await authClient.signIn.email({ email: email.trim(), password });
     if (result.error) {
@@ -157,7 +167,9 @@ export function LoginScreen({ providers, resetEnabled, next, error }: Props) {
             <h1 className="t-page text-ink">{TITLES[mode]}</h1>
             <p className="mt-1 text-ink-2">
               {mode === "signup"
-                ? "Sign-up is by invitation. Use the email address you were invited with."
+                ? invite
+                  ? "Use the email address this invite was sent to."
+                  : "Sign-up is by invitation. Use the invite link you were sent."
                 : mode === "forgot"
                   ? "Enter your email and we will send a link to choose a new password."
                   : "Use your invited account to open WCAG Auditor."}

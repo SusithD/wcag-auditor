@@ -1,4 +1,8 @@
-import { NOT_INVITED_MESSAGE } from "@/lib/auth/policy";
+import {
+  INVITE_REQUIRED_MESSAGE,
+  NOT_INVITED_MESSAGE,
+  PROVIDER_UNVERIFIED_MESSAGE,
+} from "@/lib/auth/policy";
 
 export const MIN_PASSWORD = 10;
 
@@ -10,6 +14,9 @@ export function describeAuthError(
 ): string {
   const code = error?.code ?? "";
   const message = error?.message ?? "";
+  if (code === "INVITE_REQUIRED" || /invite link/i.test(message))
+    return INVITE_REQUIRED_MESSAGE;
+  if (code === "PROVIDER_EMAIL_UNVERIFIED") return PROVIDER_UNVERIFIED_MESSAGE;
   if (code === "NOT_INVITED" || /not been invited/i.test(message))
     return NOT_INVITED_MESSAGE;
   if (code === "INVALID_EMAIL_OR_PASSWORD")
@@ -27,8 +34,12 @@ export function describeAuthError(
 
 export function describeQueryError(value: string | null | undefined): string {
   if (!value) return "";
+  if (value === "INVITE_REQUIRED") return INVITE_REQUIRED_MESSAGE;
+  if (value === "PROVIDER_EMAIL_UNVERIFIED") return PROVIDER_UNVERIFIED_MESSAGE;
   if (/invit/i.test(value) || value === "NOT_INVITED")
     return NOT_INVITED_MESSAGE;
+  if (value === "account_not_linked")
+    return "That email already has an account that this provider cannot sign in to. Use your password.";
   return "Could not sign you in with that provider. Try again.";
 }
 

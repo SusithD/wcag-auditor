@@ -5,8 +5,10 @@ The app has real user accounts (Better Auth, running inside the web container). 
 ## How sign-in works
 
 - Sign-up is invite-only. Nobody can create an account without an invitation.
-- The people listed in `ADMIN_EMAILS` (comma separated, in `deploy/.env`) are admins. An admin signs up or signs in with one of those addresses and is allowed in without an invitation.
-- Admins invite everyone else from Settings, Members: enter the email address, and the invited person can then register with email and password, Google or GitHub using that same address.
+- Email and password sign-up needs an invite link: a single-use token tied to one email, valid for `INVITE_TTL_DAYS` (default 7). The server stores only its SHA-256 hash. This applies to admins too; `ADMIN_EMAILS` does not bypass it.
+- Google and GitHub sign-in work for an invited email or an `ADMIN_EMAILS` address without a link, but only when the provider reports that email as verified (GitHub: the primary email, verified). A social login never attaches to an existing password account.
+- The people listed in `ADMIN_EMAILS` (comma separated, in `deploy/.env`) are admins.
+- Admins invite everyone else from Settings, Members: enter the email address and copy the link shown once. Inviting the same email again replaces the link.
 - Sign-in methods: email and password, Google, GitHub. Google and GitHub are shown only when their client id and secret are set.
 - The study participant pages (`/study`, `/study/<code>`) stay public.
 - Caddy no longer asks for a password. All access control is in the app.
@@ -17,7 +19,9 @@ The app has real user accounts (Better Auth, running inside the web container). 
    - `openssl rand -base64 32` for `BETTER_AUTH_SECRET`
    - `openssl rand -hex 32` for `INTERNAL_API_TOKEN`
    - Changing `BETTER_AUTH_SECRET` later signs everyone out. Keep it stable.
-2. `docker compose up -d --build`, open `https://<domain>/`, and register with an address from `ADMIN_EMAILS`.
+2. `docker compose up -d --build`, then create the first admin invite from the server (run from `deploy/`):
+   `docker compose exec web node scripts/create-invite.mjs <admin email>`
+   It prints a link; open it, enter that same email and choose a password. Or sign in with Google or GitHub using an `ADMIN_EMAILS` address. Add `--ttl-days=N` to change the lifetime.
 3. Invite colleagues from Settings, Members.
 
 ## Google OAuth client

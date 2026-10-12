@@ -63,7 +63,13 @@ describe("optional providers and mail", () => {
         GITHUB_CLIENT_ID: "gid",
         GITHUB_CLIENT_SECRET: "gs",
       }),
-    ).toEqual({ github: { clientId: "gid", clientSecret: "gs" } });
+    ).toEqual({
+      github: {
+        clientId: "gid",
+        clientSecret: "gs",
+        getUserInfo: expect.any(Function),
+      },
+    });
   });
 
   it("enables reset by email only with SMTP_URL and MAIL_FROM", () => {
