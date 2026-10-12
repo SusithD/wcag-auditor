@@ -1,0 +1,44 @@
+name: wcag-auditor
+
+services:
+  api:
+    extends:
+      file: compose.yaml
+      service: api
+
+  web:
+    extends:
+      file: compose.yaml
+      service: web
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    mem_limit: 256m
+    security_opt:
+      - no-new-privileges:true
+    command: caddy run --config /etc/caddy/Caddyfile.tunnel --adapter caddyfile
+    environment:
+      ADMIN_USER: ${ADMIN_USER:?set ADMIN_USER in deploy/.env}
+      ADMIN_HASH: ${ADMIN_HASH:?set ADMIN_HASH in deploy/.env}
+    volumes:
+      - ./caddy:/etc/caddy:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    mem_limit: 256m
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?set TUNNEL_TOKEN in deploy/.env}
+    depends_on:
+      - caddy
+
+volumes:
+  auditor_data:
+  caddy_data:
+  caddy_config:

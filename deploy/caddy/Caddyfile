@@ -1,0 +1,3 @@
+{$DOMAIN} {
+	import /etc/caddy/app.caddy
+}

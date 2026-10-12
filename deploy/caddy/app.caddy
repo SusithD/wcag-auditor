@@ -1,0 +1,51 @@
+encode zstd gzip
+
+request_body {
+	max_size 60MB
+}
+
+header {
+	Strict-Transport-Security "max-age=31536000"
+	X-Content-Type-Options "nosniff"
+	X-Frame-Options "DENY"
+	Referrer-Policy "strict-origin-when-cross-origin"
+	Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+	-Server
+}
+
+@dotdot path_regexp (^|/)\.\.(/|$)
+respond @dotdot 400
+
+@participant {
+	not path /study/admin /study/admin/*
+	path /study /study/* /_next/* /favicon.ico
+}
+
+@participant_api {
+	path_regexp ^/api/study/(materials|config|sessions)(/[^/]+)*$
+}
+
+@participant_run {
+	method GET HEAD
+	path_regexp ^/api/runs/[0-9a-f]{32}(/.*)?$
+}
+
+handle @participant {
+	reverse_proxy web:3000
+}
+
+handle @participant_api {
+	reverse_proxy web:3000
+}
+
+handle @participant_run {
+	reverse_proxy web:3000
+}
+
+handle {
+	basic_auth {
+		{$ADMIN_USER} {$ADMIN_HASH}
+	}
+	reverse_proxy web:3000
+}
