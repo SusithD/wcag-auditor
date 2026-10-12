@@ -16,6 +16,7 @@ import {
   ruler,
   rulerLabel,
   rulerPosition,
+  runAgainBody,
   sentence,
   sourceParts,
   tally,
@@ -426,5 +427,35 @@ describe("placeholder guard", () => {
         "This target is 18 x 18 px. It needs ? px. Make it larger.",
       ),
     ).toBe("This target is 18 x 18 px. Make it larger.");
+  });
+});
+
+describe("run again body", () => {
+  const run = { condition: "hybrid", viewports: ["desktop"] } as const;
+  it("repeats a folder run with its stored condition and no viewports", () => {
+    expect(
+      runAgainBody({ ...run, source_kind: "folder", source: "/cap/a" }),
+    ).toEqual({
+      condition: "hybrid",
+      max_focus_steps: 15,
+      folder: "/cap/a",
+    });
+  });
+
+  it("repeats a url or upload run with its viewports", () => {
+    expect(
+      runAgainBody({ ...run, source_kind: "url", source: "https://a.test/" }),
+    ).toEqual({
+      condition: "hybrid",
+      max_focus_steps: 15,
+      url: "https://a.test/",
+      viewports: ["desktop"],
+    });
+    expect(
+      runAgainBody({ ...run, source_kind: "upload", source: "abc" }),
+    ).toMatchObject({
+      upload_id: "abc",
+      viewports: ["desktop"],
+    });
   });
 });

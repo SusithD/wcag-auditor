@@ -1,3 +1,4 @@
+import type { RunSummary } from "@/api/client";
 import {
   type CoverageCell,
   type Finding,
@@ -461,6 +462,21 @@ export function sourceParts(
   }
   const label = source.split("/").filter(Boolean).pop() ?? source;
   return { host: label, path: null };
+}
+
+type RerunSource = Pick<
+  RunSummary,
+  "source_kind" | "source" | "condition" | "viewports"
+>;
+
+export function runAgainBody(run: RerunSource) {
+  const base = { condition: run.condition, max_focus_steps: 15 };
+  if (run.source_kind === "url")
+    return { ...base, url: run.source, viewports: run.viewports };
+  if (run.source_kind === "upload")
+    return { ...base, upload_id: run.source, viewports: run.viewports };
+  if (run.source_kind === "folder") return { ...base, folder: run.source };
+  return null;
 }
 
 const PLACEHOLDER = /(^|[\s(])\?(?=[\s:).,;]|px|$)/;
