@@ -22,6 +22,7 @@ from app import study as st
 from app.config import Settings
 from app.jobs import Job, auditor_argv
 from app.models import Run, StudyRun, StudySession, StudyTask, SusResponse
+from app.ratelimit import TokenBucket, limiter
 
 _prepare_lock = threading.Lock()
 CODE = re.compile(r"^[A-Za-z0-9_-]{2,24}$")
@@ -150,7 +151,17 @@ def _seconds(t: StudyTask) -> float | None:
 
 
 def build_study_router(settings: Settings) -> APIRouter:
-    router = APIRouter(prefix="/study")
+    router = APIRouter(
+        prefix="/study",
+        dependencies=[
+            Depends(
+                limiter(
+                    TokenBucket(settings.study_per_minute),
+                    "Too many requests in a short time. Wait a minute and try again.",
+                )
+            )
+        ],
+    )
     study = st.Study(settings.study_path)
     sequence = st.steps()
 

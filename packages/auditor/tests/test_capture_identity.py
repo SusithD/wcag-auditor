@@ -261,3 +261,52 @@ def test_extra_headers_and_user_agent_are_sent_but_the_secret_is_never_recorded(
     for path in folders[0].rglob("*"):
         if path.is_file() and path.suffix in {".json", ".html", ".jsonl"}:
             assert SECRET not in path.read_text(errors="ignore"), path
+
+
+class _Mixed(http.server.BaseHTTPRequestHandler):
+    seen: list[tuple[str, dict[str, str]]] = []
+
+    def do_GET(self) -> None:
+        type(self).seen.append((self.path, {k.lower(): v for k, v in self.headers.items()}))
+        port = self.headers["Host"].rsplit(":", 1)[1]
+        body = (
+            "<html><head><title>Home</title></head><body><a href='#'>x</a><script>"
+            "fetch('/asset', {mode: 'no-cors'});"
+            f"fetch('http://localhost:{port}/private', {{mode: 'no-cors'}}).catch(() => {{}});"
+            "</script></body></html>"
+        ).encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def log_message(self, *_: Any) -> None:
+        pass
+
+
+@pytest.mark.browser
+def test_guard_aborts_private_hosts_while_same_site_requests_still_carry_the_headers(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from auditor import netguard
+
+    monkeypatch.setenv("ALLOW_PRIVATE_TARGETS", "0")
+    monkeypatch.setattr(
+        netguard,
+        "system_resolver",
+        lambda host: ["10.0.0.9"] if host == "localhost" else ["93.184.216.34"],
+    )
+    _Mixed.seen = []
+    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), _Mixed)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    try:
+        url = f"http://127.0.0.1:{httpd.server_address[1]}/"
+        with PlaywrightBrowser(extra_headers={"X-Audit-Key": SECRET}) as browser:
+            capture_url(browser, url, tmp_path, ["desktop"], max_focus_steps=1)
+    finally:
+        httpd.shutdown()
+    by_path = dict(_Mixed.seen)
+    assert by_path["/"]["x-audit-key"] == SECRET
+    assert by_path["/asset"]["x-audit-key"] == SECRET
+    assert "/private" not in by_path

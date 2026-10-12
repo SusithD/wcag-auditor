@@ -25,6 +25,10 @@ export default defineConfig({
       env: {
         DATA_DIR: dataDir,
         AUDIT_PDF: "0",
+        APP_ENV: "development",
+        ALLOW_PRIVATE_TARGETS: "1",
+        STUDY_PER_MINUTE: "0",
+        RUNS_PER_MINUTE: "0",
         FOLDER_ROOTS: join(root, "fixtures"),
         EVAL_IMPORT_DIRS: join(root, "eval", "fixtures"),
         STUDY_ADMIN_TOKEN: "e2e-token",

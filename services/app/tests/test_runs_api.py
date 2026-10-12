@@ -150,15 +150,10 @@ def test_a_run_whose_capture_cannot_be_read_ends_failed_with_a_reason(tmp_path: 
         assert body["status"] == "failed" and body["error"]
 
 
-def test_uploads_over_the_size_limit_and_fake_images_are_rejected(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    import app.api as api
-
-    with client(tmp_path) as c:
+def test_uploads_over_the_size_limit_and_fake_images_are_rejected(tmp_path: Path) -> None:
+    with client(tmp_path, max_upload_bytes=1000) as c:
         fake = c.post("/uploads", files=[("files", ("x.png", b"GIF89a-not-really", "image/png"))])
         assert fake.status_code == 422
-        monkeypatch.setattr(api, "MAX_UPLOAD_BYTES", 1000)
         big = c.post("/uploads", files=[("files", ("x.png", png(800, 800), "image/png"))])
         assert big.status_code == 413
         assert c.post("/uploads", files=[]).status_code == 422

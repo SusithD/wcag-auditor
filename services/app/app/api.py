@@ -12,20 +12,22 @@ from pathlib import Path
 from typing import Annotated, Any, Literal
 from urllib.parse import urlsplit
 
+from auditor import netguard
 from fastapi import APIRouter, File, HTTPException, Query, Request, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from PIL import Image
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app.config import Settings
 from app.jobs import CANCELLED, TIMED_OUT, Job, JobResult, auditor_argv
 from app.models import Run, StudyRun
+from app.ratelimit import TokenBucket, limiter
 
 Viewport = Literal["desktop", "mobile"]
 Condition = Literal["hybrid", "rule_only"]
 HEX = re.compile(r"^[0-9a-f]{32}$")
-MAX_UPLOAD_BYTES = 25 * 1024 * 1024
+IMAGE_MAGIC = (b"\x89PNG\r\n\x1a\n", b"\xff\xd8\xff")
 MAX_UPLOAD_PIXELS = 60_000_000
 MOBILE_MAX_WIDTH = 600
 TERMINAL = {"done", "failed", "cancelled", "partial"}
@@ -101,6 +103,10 @@ def normalise_url(raw: str) -> str:
     return text
 
 
+def _is_image_bytes(raw: bytes) -> bool:
+    return raw.startswith(IMAGE_MAGIC) or (raw[:4] == b"RIFF" and raw[8:12] == b"WEBP")
+
+
 def _folder_allowed(folder: Path, roots: tuple[Path, ...]) -> bool:
     resolved = folder.resolve()
     return any(resolved == root or root in resolved.parents for root in roots)
@@ -171,6 +177,14 @@ def summarise_run(settings: Settings, row: Run) -> RunSummary:
 
 def build_router(settings: Settings) -> APIRouter:
     router = APIRouter()
+    run_limit = limiter(
+        TokenBucket(settings.runs_per_minute),
+        "Too many audits were started in a short time. Wait a minute and try again.",
+    )
+    upload_limit = limiter(
+        TokenBucket(settings.runs_per_minute),
+        "Too many uploads in a short time. Wait a minute and try again.",
+    )
 
     def run_dir(run_id: str) -> Path:
         if not HEX.match(run_id):
@@ -181,6 +195,8 @@ def build_router(settings: Settings) -> APIRouter:
         return summarise_run(settings, row)
 
     def _store_upload(raw: bytes, name: str | None, base: Path, seen: list[Viewport]) -> Viewport:
+        if not _is_image_bytes(raw):
+            raise HTTPException(422, f"{name} is not a PNG, JPEG or WebP image")
         try:
             with Image.open(io.BytesIO(raw)) as image:
                 width, height = image.size
@@ -218,17 +234,30 @@ def build_router(settings: Settings) -> APIRouter:
         return vp
 
     @router.post("/uploads", response_model=UploadResult)
-    async def create_upload(files: Annotated[list[UploadFile], File()]) -> UploadResult:
+    async def create_upload(
+        request: Request, files: Annotated[list[UploadFile], File()]
+    ) -> UploadResult:
+        upload_limit(request)
+        limit = settings.max_upload_bytes
+        declared = request.headers.get("content-length", "")
+        if declared.isdigit() and int(declared) > limit * settings.max_upload_files + 1024 * 1024:
+            raise HTTPException(413, "The upload is too large")
         if not files:
             raise HTTPException(422, "Choose at least one screenshot")
+        if len(files) > settings.max_upload_files:
+            raise HTTPException(
+                422, f"Upload at most {settings.max_upload_files} screenshots at a time"
+            )
         upload_id = uuid.uuid4().hex
         base = settings.uploads_dir / upload_id
         seen: list[Viewport] = []
         try:
             for item in files:
-                raw = await item.read(MAX_UPLOAD_BYTES + 1)
-                if len(raw) > MAX_UPLOAD_BYTES:
-                    raise HTTPException(413, f"{item.filename} is larger than 25 MB")
+                raw = await item.read(limit + 1)
+                if len(raw) > limit:
+                    raise HTTPException(
+                        413, f"{item.filename} is larger than {limit // (1024 * 1024)} MB"
+                    )
                 seen.append(await asyncio.to_thread(_store_upload, raw, item.filename, base, seen))
         except HTTPException:
             shutil.rmtree(base, ignore_errors=True)
@@ -237,6 +266,7 @@ def build_router(settings: Settings) -> APIRouter:
 
     @router.post("/runs", response_model=RunCreated, status_code=201)
     async def create_run(body: RunCreate, request: Request) -> RunCreated:
+        run_limit(request)
         given = [x for x in (body.url, body.upload_id, body.folder) if x]
         if len(given) != 1:
             raise HTTPException(422, "Give exactly one of url, upload_id or folder")
@@ -260,6 +290,10 @@ def build_router(settings: Settings) -> APIRouter:
                 url = normalise_url(body.url)
             except ValueError as exc:
                 raise HTTPException(422, str(exc)) from exc
+            if not settings.allow_private_targets:
+                problem = await asyncio.to_thread(netguard.target_problem, url)
+                if problem:
+                    raise HTTPException(422, problem)
             kind, source = "url", url
             argv += ["--url", url, "--viewports", ",".join(viewports)]
             if body.verify_in_browser:
@@ -303,6 +337,15 @@ def build_router(settings: Settings) -> APIRouter:
                 raise HTTPException(422, "The capture folder has an unknown viewport")
         out.mkdir(parents=True)
         with request.app.state.sessions() as session:
+            waiting = session.scalar(
+                select(func.count()).select_from(Run).where(Run.status.in_(["queued", "running"]))
+            )
+            if (waiting or 0) >= settings.max_queued_runs:
+                shutil.rmtree(out, ignore_errors=True)
+                raise HTTPException(
+                    429,
+                    "The audit queue is full. Wait for a running audit to finish and try again.",
+                )
             session.add(
                 Run(
                     id=run_id,

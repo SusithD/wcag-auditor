@@ -6,7 +6,7 @@ import logging
 import os
 import signal
 import sys
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass, field
 
 log = logging.getLogger(__name__)
@@ -42,7 +42,9 @@ class JobRunner:
         on_finish: OnFinish | None = None,
         on_start: OnStart | None = None,
         timeout_s: float = 900,
+        env: dict[str, str] | None = None,
     ) -> None:
+        self._env = {**os.environ, **env} if env else None
         self._queue: asyncio.Queue[Job] = asyncio.Queue()
         self._on_finish = on_finish
         self._on_start = on_start
@@ -105,13 +107,19 @@ class JobRunner:
                 self._running, self._proc = None, None
                 self._queue.task_done()
 
+    def _subprocess_env(self, job: Job) -> dict[str, str] | None:
+        if not self._env and not job.env:
+            return None
+        base: Mapping[str, str] = self._env if self._env is not None else os.environ
+        return {**base, **(job.env or {})}
+
     async def _execute(self, job: Job) -> JobResult:
         proc = await asyncio.create_subprocess_exec(
             *job.argv,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
             start_new_session=True,
-            env={**os.environ, **job.env} if job.env else None,
+            env=self._subprocess_env(job),
         )
         self._proc = proc
         if job.run_id in self._cancelled:
