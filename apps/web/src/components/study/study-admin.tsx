@@ -51,6 +51,10 @@ export function StudyAdmin() {
     },
   });
 
+  useEffect(() => {
+    if (tasks.isSuccess) setToken("");
+  }, [tasks.isSuccess]);
+
   async function prepare() {
     const res = await fetch("/api/study/prepare", {
       method: "POST",

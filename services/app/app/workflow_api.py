@@ -127,6 +127,7 @@ class ReviewOut(BaseModel):
 class SiteRow(BaseModel):
     site: str
     latest_run: RunSummary
+    newer_run: RunSummary | None = None
     previous_run_id: str | None
     failures: int
     failures_delta: int | None
@@ -307,9 +308,14 @@ def build_workflow_router(settings: Settings) -> APIRouter:
             rows: list[SiteRow] = []
             for name, runs in all_runs.items():
                 finished = [r for r in runs if r.status in FINISHED]
-                latest = runs[0]
+                newest = runs[0]
+                latest = finished[0] if finished else newest
                 summary = summarise_run(settings, latest)
                 summary.created_at = _aware(summary.created_at)  # type: ignore[assignment]
+                newer: RunSummary | None = None
+                if newest is not latest:
+                    newer = summarise_run(settings, newest)
+                    newer.created_at = _aware(newer.created_at)  # type: ignore[assignment]
                 if latest.status in FINISHED:
                     found = [f for _, f in _run_findings(session, latest.id)]
                     failures = sum(1 for f in found if f.tier == "automated")
@@ -320,8 +326,6 @@ def build_workflow_router(settings: Settings) -> APIRouter:
                 else:
                     failures = to_review = decided = 0
                 before = next((r for r in finished if r.created_at < latest.created_at), None)
-                if latest.status not in FINISHED:
-                    before = finished[0] if finished else None
                 delta: int | None = None
                 if before is not None and latest.status in FINISHED:
                     delta = failures - sum(
@@ -331,6 +335,7 @@ def build_workflow_router(settings: Settings) -> APIRouter:
                     SiteRow(
                         site=name,
                         latest_run=summary,
+                        newer_run=newer,
                         previous_run_id=before.id if before else None,
                         failures=failures,
                         failures_delta=delta,
@@ -338,7 +343,7 @@ def build_workflow_router(settings: Settings) -> APIRouter:
                         criteria_decided=decided,
                     )
                 )
-            rows.sort(key=lambda r: r.latest_run.created_at, reverse=True)
+            rows.sort(key=lambda r: (r.newer_run or r.latest_run).created_at, reverse=True)
             return rows
 
     @router.get("/summary/week", response_model=WeekSummary)

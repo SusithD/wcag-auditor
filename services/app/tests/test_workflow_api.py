@@ -263,6 +263,7 @@ def test_sites_rows_counts_delta_and_criteria(tmp_path: Path) -> None:
         assert f["failures_delta"] is None
         n = rows[0]
         assert n["latest_run"]["status"] == "running" and n["failures"] == 0
+        assert n["newer_run"] is None
 
 
 def test_week_summary(tmp_path: Path) -> None:

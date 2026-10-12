@@ -5,6 +5,7 @@ export type SiteFilter = "all" | "failures" | "running";
 export type SiteLike = {
   failures: number;
   latest_run: { status: string };
+  newer_run?: { status: string } | null;
 };
 
 export function isActive(status: string): boolean {
@@ -17,11 +18,17 @@ export function filterSites<T extends SiteLike>(
 ): T[] {
   if (filter === "failures") return rows.filter((row) => row.failures > 0);
   if (filter === "running")
-    return rows.filter((row) => isActive(row.latest_run.status));
+    return rows.filter((row) =>
+      isActive((row.newer_run ?? row.latest_run).status),
+    );
   return rows;
 }
 
-export function siteParts(run: { source_kind: string; source: string }): {
+export function siteParts(run: {
+  source_kind: string;
+  source: string;
+  created_at?: string;
+}): {
   host: string;
   path: string;
 } {

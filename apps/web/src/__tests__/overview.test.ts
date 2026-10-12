@@ -157,3 +157,17 @@ describe("progress helpers", () => {
     );
   });
 });
+
+describe("filterSites with a newer unfinished run", () => {
+  it("treats a newer running run as running", () => {
+    const rows = [
+      {
+        failures: 2,
+        latest_run: { status: "done" },
+        newer_run: { status: "running" },
+      },
+      { failures: 0, latest_run: { status: "done" }, newer_run: null },
+    ];
+    expect(filterSites(rows, "running")).toHaveLength(1);
+  });
+});

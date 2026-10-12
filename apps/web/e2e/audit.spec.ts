@@ -246,3 +246,96 @@ test("client navigation updates the title and moves focus to the heading", async
   await page.getByRole("link", { name: "New audit" }).click();
   await expect(page).toHaveTitle("New audit - WCAG Auditor");
 });
+
+const PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==",
+  "base64",
+);
+
+async function mockUpload(page: import("@playwright/test").Page) {
+  await page.route("**/api/uploads", (r) =>
+    r.fulfill({ json: { upload_id: "u".repeat(32) } }),
+  );
+}
+
+test("Rules only is unavailable on the Screenshots tab and the form says why", async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    window.localStorage.setItem(
+      "wcag-auditor.settings",
+      JSON.stringify({ method: "rule_only" }),
+    ),
+  );
+  await page.goto("/audit/new");
+  await page.locator("form[data-ready=true]").waitFor();
+  const rules = page.getByRole("radio", { name: /Rules only/ });
+  await expect(rules).toBeChecked();
+  await page.getByRole("tab", { name: "Screenshots" }).click();
+  await expect(rules).toBeDisabled();
+  await expect(rules).not.toBeChecked();
+  await expect(
+    page.getByRole("radio", { name: /Detector and rules/ }),
+  ).toBeChecked();
+  await expect(page.locator("form output")).toContainText(
+    "Method changed to Detector and rules",
+  );
+  await expect(page.getByText(/Not available for screenshots/)).toBeVisible();
+  await page.getByRole("tab", { name: "Web address" }).click();
+  await expect(rules).toBeEnabled();
+});
+
+test("an API error from starting an audit shows inline as an alert", async ({
+  page,
+}) => {
+  await mockUpload(page);
+  await page.route("**/api/runs", (r) =>
+    r.request().method() === "POST"
+      ? r.fulfill({ status: 422, json: { detail: "Page could not be opened" } })
+      : r.fallback(),
+  );
+  await page.goto("/audit/new");
+  await page.locator("form[data-ready=true]").waitFor();
+  await page.getByRole("textbox", { name: "Web address" }).fill("example.com");
+  await page.getByRole("button", { name: /^Run audit/ }).click();
+  await expect(page.locator("form [role=alert]")).toHaveText(
+    "Page could not be opened",
+  );
+  await page.getByRole("tab", { name: "Screenshots" }).click();
+  await page
+    .locator("input[type=file]")
+    .setInputFiles({ name: "a.png", mimeType: "image/png", buffer: PNG });
+  await page.getByRole("button", { name: /^Run audit/ }).click();
+  await expect(page.locator("form [role=alert]")).toHaveText(
+    "Page could not be opened",
+  );
+  await expect(page).toHaveURL(/\/audit\/new$/);
+});
+
+test("Ctrl or Cmd+Enter submits from anywhere on New audit, but not over a dialog", async ({
+  page,
+}) => {
+  await mockUpload(page);
+  let posts = 0;
+  await page.route("**/api/runs", (r) => {
+    if (r.request().method() !== "POST") return r.fallback();
+    posts += 1;
+    return r.fulfill({ status: 422, json: { detail: "stop here" } });
+  });
+  await page.goto("/audit/new");
+  await page.locator("form[data-ready=true]").waitFor();
+  await page.getByRole("tab", { name: "Screenshots" }).click();
+  await page
+    .locator("input[type=file]")
+    .setInputFiles({ name: "a.png", mimeType: "image/png", buffer: PNG });
+  await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
+  await page.keyboard.press("ControlOrMeta+Enter");
+  await expect(page.locator("form [role=alert]")).toHaveText("stop here");
+  expect(posts).toBe(1);
+
+  await page.keyboard.press("ControlOrMeta+k");
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.keyboard.press("ControlOrMeta+Enter");
+  await page.waitForTimeout(300);
+  expect(posts).toBe(1);
+});

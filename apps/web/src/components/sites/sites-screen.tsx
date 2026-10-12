@@ -47,10 +47,10 @@ export function SitesScreen() {
       return rows;
     },
     refetchInterval: (query) =>
-      query.state.data?.some(
-        (r) =>
-          r.latest_run.status === "queued" || r.latest_run.status === "running",
-      )
+      query.state.data?.some((r) => {
+        const status = (r.newer_run ?? r.latest_run).status;
+        return status === "queued" || status === "running";
+      })
         ? 2000
         : false,
   });
@@ -114,6 +114,7 @@ export function SitesScreen() {
             <TableBody className="max-[720px]:block">
               {data.map((row) => {
                 const run = row.latest_run;
+                const shown = row.newer_run ?? run;
                 const finished =
                   run.status === "done" || run.status === "partial";
                 return (
@@ -182,9 +183,12 @@ export function SitesScreen() {
                     </TableCell>
                     <TableCell className={CELL}>
                       <div className="grid gap-0.5">
-                        <RunStatus status={run.status} />
+                        <RunStatus status={shown.status} />
                         <span className={cn("text-xs text-ink-3")}>
-                          {age(run.created_at)}
+                          {age(shown.created_at)}
+                          {row.newer_run
+                            ? ` (report from ${age(run.created_at)})`
+                            : ""}
                         </span>
                       </div>
                     </TableCell>
