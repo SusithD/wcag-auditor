@@ -316,6 +316,31 @@ def test_sites_single_run_has_no_previous_and_no_delta(tmp_path: Path) -> None:
         assert row["failures"] == 2
 
 
+def test_sites_show_the_finished_run_behind_a_newer_unfinished_one(tmp_path: Path) -> None:
+    with client(tmp_path) as c:
+        add_run(c, tmp_path, "a" * 32, "https://x.com", [{"key": "p1"}], age_days=3)
+        add_run(
+            c, tmp_path, "b" * 32, "https://x.com", [{"key": "p1"}, {"key": "p2"}], age_days=2
+        )
+        add_run(c, tmp_path, "c" * 32, "https://x.com", [], status="cancelled", age_days=1)
+        add_run(c, tmp_path, "d" * 32, "https://y.com", [], status="failed", age_days=1)
+        rows = {r["site"]: r for r in c.get("/sites").json()}
+        x = rows["x.com"]
+        assert x["latest_run"]["id"] == "b" * 32 and x["latest_run"]["status"] == "done"
+        assert x["newer_run"]["id"] == "c" * 32 and x["newer_run"]["status"] == "cancelled"
+        assert x["failures"] == 2 and x["failures_delta"] == 1
+        assert x["previous_run_id"] == "a" * 32
+        y = rows["y.com"]
+        assert y["latest_run"]["status"] == "failed" and y["newer_run"] is None
+        assert y["failures"] == 0
+
+
+def test_sites_newer_run_is_null_when_latest_is_finished(tmp_path: Path) -> None:
+    with client(tmp_path) as c:
+        add_run(c, tmp_path, "a" * 32, "https://x.com", [{"key": "p1"}])
+        assert c.get("/sites").json()[0]["newer_run"] is None
+
+
 def test_review_state_reason_and_latest_finished_run_only(tmp_path: Path) -> None:
     with client(tmp_path) as c:
         add_run(c, tmp_path, "a" * 32, "https://x.com", [nr("old", "r1")], age_days=3)

@@ -1399,6 +1399,7 @@ export interface components {
       /** Site */
       site: string;
       latest_run: components["schemas"]["RunSummary"];
+      newer_run?: components["schemas"]["RunSummary"] | null;
       /** Previous Run Id */
       previous_run_id: string | null;
       /** Failures */

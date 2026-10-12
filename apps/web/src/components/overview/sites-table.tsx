@@ -75,7 +75,8 @@ function SiteCell({ row }: { row: Site }) {
 function Row({ row }: { row: Site }) {
   const run = row.latest_run;
   const finished = run.status === "done" || run.status === "partial";
-  const status = runStatusView(run.status, run.error);
+  const shown = row.newer_run ?? run;
+  const status = runStatusView(shown.status, shown.error);
   return (
     <tr className="border-b border-line last:border-b-0 hover:bg-subtle @max-[760px]:block @max-[760px]:py-2">
       <td className={`${TD} @min-[761px]:max-w-0`}>
@@ -138,9 +139,21 @@ function Row({ row }: { row: Site }) {
       <td className={TD}>
         <Status kind={status.kind}>{status.label}</Status>
         <div className="mt-0.5 pl-[18px] text-label text-ink-3">
-          <time dateTime={run.created_at} title={run.created_at}>
-            {age(run.created_at)}
+          <time dateTime={shown.created_at} title={shown.created_at}>
+            {age(shown.created_at)}
           </time>
+          {row.newer_run ? (
+            <>
+              {" "}
+              <span>
+                (report from{" "}
+                <time dateTime={run.created_at} title={run.created_at}>
+                  {age(run.created_at)}
+                </time>
+                )
+              </span>
+            </>
+          ) : null}
         </div>
       </td>
     </tr>
