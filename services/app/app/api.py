@@ -404,6 +404,9 @@ def _sse(payload: dict[str, Any]) -> str:
     return f"event: stage\ndata: {json.dumps(payload)}\n\n"
 
 
+BOT_CHECK_PREFIX = "The site showed a bot check"
+
+
 def status_from_result(result: JobResult, run_dir: Path) -> tuple[str, str | None]:
     if result.returncode == CANCELLED:
         return "cancelled", None
@@ -412,7 +415,8 @@ def status_from_result(result: JobResult, run_dir: Path) -> tuple[str, str | Non
     summary = _read_summary(run_dir)
     status = str(summary.get("status") or ("done" if result.returncode == 0 else "failed"))
     errors = summary.get("errors") or {}
-    detail = "; ".join(f"{k}: {v}" for k, v in errors.items()) or None
+    bot_check = next((v for v in errors.values() if v.startswith(BOT_CHECK_PREFIX)), None)
+    detail = bot_check or "; ".join(f"{k}: {v}" for k, v in errors.items()) or None
     if status == "failed" and detail is None:
         detail = result.output[-500:] or "The audit failed"
     return status, detail

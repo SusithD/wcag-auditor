@@ -56,7 +56,7 @@ import {
   currentStage,
   findingsSoFar,
 } from "@/lib/stages";
-import { describeRunError } from "@/lib/url";
+import { describeRunError, isBotCheckError } from "@/lib/url";
 import {
   DEFAULT_FOCUS_STEPS,
   invalidateRunData,
@@ -388,6 +388,14 @@ export function RunView({ runId }: { runId: string }) {
         ) : null}
         <div className="mt-6 flex flex-wrap items-center gap-2">
           <RunAgain run={run} />
+          {isBotCheckError(run.error) ? (
+            <Link
+              href="/audit/new?tab=screenshots"
+              className={buttonVariants()}
+            >
+              Audit screenshots instead
+            </Link>
+          ) : null}
           <Link href="/audit/new" className={buttonVariants()}>
             Start a new audit
           </Link>

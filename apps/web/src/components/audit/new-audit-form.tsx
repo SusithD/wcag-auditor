@@ -86,14 +86,18 @@ function Marker({ kind }: { kind: "box" | "radio" }) {
   );
 }
 
-export function NewAuditForm() {
+export function NewAuditForm({
+  initialTab = "url",
+}: {
+  initialTab?: "url" | "screenshots";
+}) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const ids = useId();
   const urlInput = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const budgetInput = useRef<HTMLInputElement>(null);
-  const [tab, setTab] = useState<string>("url");
+  const [tab, setTab] = useState<string>(initialTab);
   const [url, setUrl] = useState("");
   const [settings] = useSettings();
   const [viewports, setViewports] = useState<Viewport[]>(ALL_VIEWPORTS);

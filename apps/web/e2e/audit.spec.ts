@@ -216,6 +216,47 @@ test("a failed run explains the problem in plain words and offers a way forward"
   await expect(page).toHaveURL(/\/audit\/new$/);
 });
 
+test("a bot-checked run says so and offers to audit screenshots instead", async ({
+  page,
+}) => {
+  const id = "c".repeat(32);
+  const message =
+    "The site showed a bot check (Cloudflare) instead of the page, so the audit was stopped. Audit a page without bot protection, or upload screenshots instead.";
+  await page.route(`**/api/runs/${id}`, (r) =>
+    r.fulfill({
+      json: {
+        id,
+        created_at: "2026-10-10T12:00:00",
+        source_kind: "url",
+        source: "https://buy.example.com",
+        viewports: ["desktop"],
+        condition: "hybrid",
+        status: "failed",
+        stage_status: {},
+        error: message,
+        counts: { critical: 0, serious: 0, minor: 0, needs_review: 0 },
+        available_viewports: [],
+      },
+    }),
+  );
+  await page.route(`**/api/runs/${id}/events`, (r) =>
+    r.fulfill({ contentType: "text/event-stream", body: "" }),
+  );
+  await page.goto(`/runs/${id}`);
+  await expect(page.locator("main").getByRole("alert")).toContainText(
+    "The site showed a bot check instead of the page, so the audit was stopped.",
+  );
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Audit failed" }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Audit screenshots instead" }).click();
+  await expect(page).toHaveURL(/\/audit\/new\?tab=screenshots$/);
+  await expect(page.getByRole("tab", { name: "Screenshots" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+});
+
 test("an unknown run and an unknown page have their own titles and a way back", async ({
   page,
 }) => {

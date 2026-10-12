@@ -13,6 +13,7 @@ from urllib.parse import urlparse
 
 from auditor import __version__ as auditor_version
 from auditor import versions
+from auditor.capture.botcheck import BotCheckError, detect_bot_check
 from auditor.capture.focus import FOCUS_INFO_JS, FOCUS_START_JS, step_focus
 from auditor.elements.extract_js import EXTRACT_JS, extract_args, write_elements
 
@@ -104,11 +105,29 @@ class PlaywrightBrowser:
         page = ctx.new_page()
         page.set_default_timeout(self.timeout_ms)
         page.on("dialog", lambda d: d.dismiss())
+        document_headers: dict[str, str] = {}
+
+        def note_document(response: Any) -> None:
+            with contextlib.suppress(Exception):
+                if response.request.is_navigation_request() and response.frame == page.main_frame:
+                    document_headers.clear()
+                    document_headers.update(response.headers)
+
+        page.on("response", note_document)
         resp = page.goto(url, wait_until="domcontentloaded", timeout=self.timeout_ms)
         with contextlib.suppress(Exception):
             page.wait_for_load_state("networkidle", timeout=4000)
         page.wait_for_timeout(self.settle_ms)
+        self._refuse_bot_check(page, document_headers or (resp.headers if resp else {}))
         return page, (resp.status if resp else None)
+
+    def _refuse_bot_check(self, page: Any, headers: dict[str, str]) -> None:
+        text = ""
+        with contextlib.suppress(Exception):
+            text = page.inner_text("body", timeout=3000)
+        found = detect_bot_check(headers, page.title(), page.content(), text)
+        if found is not None:
+            raise BotCheckError(found)
 
     def _checks(self, page: Any) -> dict[str, Any]:
         for attempt in range(2):
@@ -230,7 +249,8 @@ def capture_url(
             shutil.rmtree(tmp, ignore_errors=True)
             if errors is None:
                 raise
-            errors.append(f"{vp}: {type(exc).__name__}: {exc}")
+            reason = str(exc) if isinstance(exc, BotCheckError) else f"{type(exc).__name__}: {exc}"
+            errors.append(f"{vp}: {reason}")
             continue
         meta: dict[str, Any] = {
             **dict.fromkeys(BENCHMARK_ONLY_KEYS),

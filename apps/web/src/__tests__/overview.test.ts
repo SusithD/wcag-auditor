@@ -94,6 +94,12 @@ describe("overview helpers", () => {
     );
     expect(runStatusView("partial", null).kind).toBe("alert");
     expect(failureShort("weird")).toBe("audit stopped");
+    expect(
+      runStatusView(
+        "failed",
+        "The site showed a bot check (Cloudflare) instead of the page.",
+      ).label,
+    ).toBe("Audit failed: bot check");
   });
 
   it("formats the week", () => {
