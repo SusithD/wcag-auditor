@@ -195,6 +195,7 @@ def test_hash_index_matches_the_python_distance() -> None:
 
 
 def test_prepare_fails_closed_without_benchmark_pages(tmp_path: Path) -> None:
+    pytest.importorskip("pyarrow")
     with pytest.raises(ValueError, match="no benchmark pages"):
         pw.prepare([], tmp_path / "o", 1, 1, 1, None)
     with pytest.raises(ValueError, match="no benchmark pages"):
@@ -208,6 +209,7 @@ def test_prepare_fails_closed_without_benchmark_pages(tmp_path: Path) -> None:
 def test_train_records_the_manifest_hash_and_passes_resume_through(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    pytest.importorskip("pytorch_lightning")
     import hashlib
 
     calls: dict[str, Any] = {}

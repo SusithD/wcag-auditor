@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 def load_report() -> Any:
+    pytest.importorskip("pycocotools")
     spec = importlib.util.spec_from_file_location(
         "detector_report", ROOT / "scripts/detector_report.py"
     )
