@@ -463,3 +463,16 @@ describe("run again body", () => {
     });
   });
 });
+
+describe("upload source label", () => {
+  it("names an uploaded run by its date instead of the hash", () => {
+    expect(
+      sourceParts(
+        "upload",
+        "8ea5f76e95dd4f7c",
+        undefined,
+        "2026-10-11T10:00:00Z",
+      ),
+    ).toEqual({ host: "Uploaded screenshots, 11 Oct", path: null });
+  });
+});

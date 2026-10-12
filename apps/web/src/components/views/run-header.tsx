@@ -60,7 +60,12 @@ export function RunHeader({
   onViewport: (vp: Viewport) => void;
   actions?: ReactNode;
 }) {
-  const parts = sourceParts(run.source_kind, run.source, pageUrl);
+  const parts = sourceParts(
+    run.source_kind,
+    run.source,
+    pageUrl,
+    run.created_at,
+  );
   const host = parts.host;
   const path = parts.path ?? "";
   const ViewportIcon = viewport === "desktop" ? Monitor : Smartphone;

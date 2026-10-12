@@ -266,11 +266,14 @@ export function ReportScreen({
     return () => window.removeEventListener("keydown", onKey);
   }, [step, shortcuts]);
 
-  const source = sourceParts(run.source_kind, run.source, overview.data?.url);
+  const source = sourceParts(
+    run.source_kind,
+    run.source,
+    overview.data?.url,
+    run.created_at,
+  );
   const subject =
-    run.source_kind === "url"
-      ? run.source
-      : overview.data?.url || run.source.split("/").slice(-1)[0];
+    run.source_kind === "url" ? run.source : overview.data?.url || source.host;
 
   if (!vp || findingsQuery.isError || overview.isError) {
     return (

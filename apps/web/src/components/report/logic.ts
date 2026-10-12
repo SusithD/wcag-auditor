@@ -9,6 +9,7 @@ import {
   sevKey,
   shortElement,
 } from "@/lib/report";
+import { uploadLabel } from "@/lib/shell";
 
 export function scTitle(sc: string): string {
   const title = SC_TITLES[sc];
@@ -445,6 +446,7 @@ export function sourceParts(
   kind: string,
   source: string,
   overviewUrl: string | undefined,
+  createdAt?: string,
 ): SourceParts {
   const tryUrl = (value: string | undefined) => {
     if (!value) return null;
@@ -460,6 +462,7 @@ export function sourceParts(
     const path = `${url.pathname}${url.search}`;
     return { host: url.host, path: path === "/" ? null : path };
   }
+  if (kind === "upload") return { host: uploadLabel(createdAt), path: null };
   const label = source.split("/").filter(Boolean).pop() ?? source;
   return { host: label, path: null };
 }
