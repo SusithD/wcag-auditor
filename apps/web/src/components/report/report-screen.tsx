@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePanelRef } from "react-resizable-panels";
 import type { RunSummary } from "@/api/client";
 import { Panel, StatusShape } from "@/components/ds";
 import { useSettings } from "@/components/settings/use-settings";
@@ -99,7 +100,16 @@ export function ReportScreen({
   className?: string;
 }) {
   const router = useRouter();
-  const { state, update } = useReportState();
+  const { state, update: updateState } = useReportState();
+  const available = run.available_viewports as Viewport[];
+  const vp = (
+    state.vp && available.includes(state.vp) ? state.vp : available[0]
+  ) as Viewport | undefined;
+  const update = useCallback(
+    (patch: Partial<ReportState>) =>
+      updateState({ vp: state.vp ?? vp ?? null, ...patch }),
+    [updateState, state.vp, vp],
+  );
   const wide = useMediaQuery(
     embedded ? "(min-width: 1760px)" : "(min-width: 1440px)",
     true,
@@ -108,11 +118,12 @@ export function ReportScreen({
   const [{ shortcuts }] = useSettings();
   const [pairMode, setPairMode] = useState<PairMode>("page");
   const [tab, setTab] = useState("canvas");
-  const [groupBy, setGroupBy] = useState<GroupBy>("criterion");
+  const groupBy: GroupBy = state.group;
   const [query, setQuery] = useState(state.q);
   const [message, setMessage] = useState("");
   const [focusRequest, setFocusRequest] = useState<FocusRequest | null>(null);
   const workspace = useRef<HTMLDivElement>(null);
+  const detailPanel = usePanelRef();
   const originKey = useRef<string | null>(null);
   const announceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
@@ -137,10 +148,6 @@ export function ReportScreen({
     return () => clearTimeout(timer);
   }, [query]);
 
-  const available = run.available_viewports as Viewport[];
-  const vp = (
-    state.vp && available.includes(state.vp) ? state.vp : available[0]
-  ) as Viewport | undefined;
   const overview = useOverview(run.id, vp);
   const findingsQuery = useFindings(run.id, vp);
   const decide = useDecideFinding(run.id, vp);
@@ -152,6 +159,15 @@ export function ReportScreen({
   const visible = useMemo(() => readingOrder(filtered), [filtered]);
   const selected = visible.find((f) => f.key === state.f) ?? null;
   const selectedIndex = selected ? visible.indexOf(selected) : -1;
+  const detailCollapsed = state.view === "table" && !selected;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the panel handle is a stable ref
+  useEffect(() => {
+    const panel = detailPanel.current;
+    if (!panel) return;
+    if (detailCollapsed) panel.collapse();
+    else if (panel.isCollapsed()) panel.expand();
+  }, [detailCollapsed, wide]);
+
   const selectedKeyNow = selected?.key;
   const counts = useMemo(() => {
     const out: Record<string, ReturnType<typeof countBySev>> = {};
@@ -316,7 +332,7 @@ export function ReportScreen({
       groupBy={groupBy}
       total={visible.length}
       onQuery={setQuery}
-      onGroupBy={setGroupBy}
+      onGroupBy={(group) => update({ group })}
       onSelectCriterion={(sc) => {
         onFilter({ sc: sc ? [sc] : [], f: null });
         if (!medium) setTab("canvas");
@@ -472,9 +488,12 @@ export function ReportScreen({
       </ResizablePanel>
       <ResizableHandle withHandle aria-label="Resize detail pane" />
       <ResizablePanel
+        panelRef={detailPanel}
         defaultSize="23rem"
         minSize="20rem"
         maxSize="40rem"
+        collapsible
+        collapsedSize="0rem"
         groupResizeBehavior="preserve-pixel-size"
       >
         <aside aria-label="Finding detail" className="h-full">

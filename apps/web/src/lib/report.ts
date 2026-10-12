@@ -88,6 +88,7 @@ export function readingOrder(findings: Finding[]): Finding[] {
 }
 
 export type ReportView = "canvas" | "table";
+export type ReportGroup = "criterion" | "element" | "severity";
 export type ReportState = {
   vp: Viewport | null;
   sc: string[];
@@ -97,6 +98,7 @@ export type ReportState = {
   f: string | null;
   view: ReportView;
   q: string;
+  group: ReportGroup;
 };
 
 export const EMPTY_STATE: ReportState = {
@@ -108,6 +110,7 @@ export const EMPTY_STATE: ReportState = {
   f: null,
   view: "canvas",
   q: "",
+  group: "criterion",
 };
 
 const list = (v: string | null) => (v ? v.split(",").filter(Boolean) : []);
@@ -115,6 +118,7 @@ const list = (v: string | null) => (v ? v.split(",").filter(Boolean) : []);
 export function parseState(params: URLSearchParams): ReportState {
   const vp = params.get("vp");
   const view = params.get("view");
+  const group = params.get("group");
   return {
     vp: vp === "desktop" || vp === "mobile" ? vp : null,
     sc: list(params.get("sc")).filter((s) => s in SC_TITLES),
@@ -126,6 +130,7 @@ export function parseState(params: URLSearchParams): ReportState {
     f: params.get("f"),
     view: view === "table" ? "table" : "canvas",
     q: params.get("q") ?? "",
+    group: group === "element" || group === "severity" ? group : "criterion",
   };
 }
 
@@ -139,6 +144,7 @@ export function serialiseState(state: ReportState): string {
   if (state.f) p.set("f", state.f);
   if (state.view !== "canvas") p.set("view", state.view);
   if (state.q) p.set("q", state.q);
+  if (state.group !== "criterion") p.set("group", state.group);
   return p.toString();
 }
 

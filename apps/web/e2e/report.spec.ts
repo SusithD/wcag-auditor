@@ -1018,3 +1018,26 @@ test("with a finding selected the sidebar stays at the viewport bottom after scr
     Math.ceil(geometry.shellBottom) + 1,
   );
 });
+
+test("group by is kept in the URL and survives a reload, and a criterion link keeps the viewport", async ({
+  page,
+  request,
+}) => {
+  const id = await ensureRun(request, "mobile");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openReport(page, id);
+  const rail = page.getByRole("navigation", { name: "Criteria" });
+  const group = rail.getByRole("group", { name: "Group by" });
+  await group.getByRole("button", { name: "Severity" }).click();
+  await expect(page).toHaveURL(/group=severity/);
+  await page.reload();
+  await expect(group.getByRole("button", { name: "Severity" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await group.getByRole("button", { name: "Criterion" }).click();
+  await expect(page).not.toHaveURL(/group=/);
+  await rail.getByRole("button", { name: /2\.4\.13/ }).click();
+  await expect(page).toHaveURL(/sc=2\.4\.13/);
+  await expect(page).toHaveURL(/vp=mobile/);
+});

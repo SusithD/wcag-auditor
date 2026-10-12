@@ -254,10 +254,12 @@ export function CriteriaRail({
                             </span>
                             <Level level={SC_LEVELS[sc] ?? "AA"} />
                             <span className="num text-right text-xs text-ink-2">
-                              {n > 0 ? n : ""}
+                              {n > 0 || bucket === "review" ? n : ""}
                               <span className="sr-only">
-                                {n > 0 ? " findings" : ""},{" "}
-                                {BUCKET_TITLES[bucket]}
+                                {n > 0 || bucket === "review"
+                                  ? ` ${n === 1 ? "finding" : "findings"}`
+                                  : ""}
+                                , {BUCKET_TITLES[bucket]}
                               </span>
                             </span>
                           </button>

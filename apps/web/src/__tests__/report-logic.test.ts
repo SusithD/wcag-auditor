@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { RunSummary } from "@/api/client";
 import {
   bucketCriteria,
   contrastRatio,
@@ -431,7 +432,10 @@ describe("placeholder guard", () => {
 });
 
 describe("run again body", () => {
-  const run = { condition: "hybrid", viewports: ["desktop"] } as const;
+  const run: Pick<RunSummary, "condition" | "viewports"> = {
+    condition: "hybrid",
+    viewports: ["desktop"],
+  };
   it("repeats a folder run with its stored condition and no viewports", () => {
     expect(
       runAgainBody({ ...run, source_kind: "folder", source: "/cap/a" }),

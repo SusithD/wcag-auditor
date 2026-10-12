@@ -72,6 +72,7 @@ export function CompareScreen({ runId }: { runId: string }) {
         <RunHeader
           runId={runId}
           run={run.data}
+          pageUrl={overview.data?.url}
           viewport={viewport}
           available={available}
           current="compare"
@@ -130,6 +131,7 @@ export function CompareScreen({ runId }: { runId: string }) {
       <RunHeader
         runId={runId}
         run={run.data}
+        pageUrl={overview.data?.url}
         viewport={viewport}
         available={available}
         current="compare"
