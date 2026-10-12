@@ -463,6 +463,17 @@ export function sourceParts(
   return { host: label, path: null };
 }
 
+const PLACEHOLDER = /(^|[\s(])\?(?=[\s:).,;]|px|$)/;
+
+export const hasPlaceholder = (text: string): boolean => PLACEHOLDER.test(text);
+
+export function withoutPlaceholders(text: string): string {
+  return text
+    .split(/(?<=\.) /)
+    .filter((sentence) => !hasPlaceholder(sentence))
+    .join(" ");
+}
+
 export const VIEWPORT_SIZE = {
   desktop: "Desktop, 1440 × 900 px",
   mobile: "Mobile, 390 × 844 px",

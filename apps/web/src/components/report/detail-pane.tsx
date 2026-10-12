@@ -42,6 +42,7 @@ import {
   type FixDiff,
   fixDiff,
   foundBy,
+  hasPlaceholder,
   parseRatio,
   provenanceWords,
   ratioPair,
@@ -49,6 +50,7 @@ import {
   SC_LEVELS,
   scTitle,
   sentence,
+  withoutPlaceholders,
 } from "./logic";
 import { Seg } from "./seg";
 import type { DecisionVars } from "./use-report-queries";
@@ -174,7 +176,8 @@ function FixSection({
     g?.fix_css || !g?.fix_html ? "css" : "html",
   );
   if (!g) return null;
-  const code = format === "css" ? g.fix_css : g.fix_html;
+  const rawCode = format === "css" ? g.fix_css : g.fix_html;
+  const code = hasPlaceholder(rawCode) ? "" : rawCode;
   const upper = format === "css" ? "CSS" : "HTML";
   const diff = fixDiff(format, code, finding.evidence_rows);
   return (
@@ -199,7 +202,9 @@ function FixSection({
           />
         ) : null}
       </div>
-      <p className="text-dense text-ink-2">{plainText(g.nearest_passing)}</p>
+      <p className="text-dense text-ink-2">
+        {withoutPlaceholders(plainText(g.nearest_passing))}
+      </p>
       {code ? (
         <>
           <DiffView diff={diff} label={`${upper} fix`} />
@@ -432,7 +437,9 @@ export function DetailPane({
             </>
           ) : null}
           {g ? (
-            <p className="text-dense text-ink-2">{plainText(g.what_failed)}</p>
+            <p className="text-dense text-ink-2">
+              {withoutPlaceholders(plainText(g.what_failed))}
+            </p>
           ) : null}
           {reason ? (
             <div className="flex items-start gap-2.5 rounded-md bg-review-bg p-2.5 text-dense text-ink">

@@ -7,6 +7,7 @@ import {
   fixDiff,
   foundBy,
   groupFindings,
+  hasPlaceholder,
   isEstimated,
   parseRatio,
   provenanceWords,
@@ -20,6 +21,7 @@ import {
   tally,
   verdictSentence,
   verdictText,
+  withoutPlaceholders,
 } from "@/components/report/logic";
 import type { CoverageCell, Finding } from "@/lib/report";
 
@@ -407,5 +409,22 @@ describe("header facts", () => {
     expect(relativeTime("2026-10-12T09:00:00Z", now)).toBe("3 h ago");
     expect(relativeTime("2026-10-10T12:00:00Z", now)).toBe("2 days ago");
     expect(relativeTime("not a date", now)).toBe("");
+  });
+});
+
+describe("placeholder guard", () => {
+  it("detects a lone question mark token but not prose", () => {
+    expect(hasPlaceholder("at least ? x ? CSS px")).toBe(true);
+    expect(hasPlaceholder("min-width: ?px;")).toBe(true);
+    expect(hasPlaceholder("a ratio of ?:1")).toBe(true);
+    expect(hasPlaceholder("Is this readable?")).toBe(false);
+  });
+
+  it("drops only the sentences that contain a placeholder", () => {
+    expect(
+      withoutPlaceholders(
+        "This target is 18 x 18 px. It needs ? px. Make it larger.",
+      ),
+    ).toBe("This target is 18 x 18 px. Make it larger.");
   });
 });
