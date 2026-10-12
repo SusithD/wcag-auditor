@@ -129,10 +129,22 @@ const MONTHS = [
   "Dec",
 ];
 
-export function weekRange(now: Date = new Date()): string {
-  const day = (now.getUTCDay() + 6) % 7;
+export function tzOffsetMinutes(now: Date = new Date()): number {
+  return -now.getTimezoneOffset() || 0;
+}
+
+export function weekRange(
+  now: Date = new Date(),
+  offsetMinutes: number = tzOffsetMinutes(now),
+): string {
+  const local = new Date(now.getTime() + offsetMinutes * 60_000);
+  const day = (local.getUTCDay() + 6) % 7;
   const start = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - day),
+    Date.UTC(
+      local.getUTCFullYear(),
+      local.getUTCMonth(),
+      local.getUTCDate() - day,
+    ),
   );
   const end = new Date(start.getTime() + 6 * 86_400_000);
   const month = (d: Date) => MONTHS[d.getUTCMonth()];

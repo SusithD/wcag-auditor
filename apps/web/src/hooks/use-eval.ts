@@ -3,7 +3,22 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { api } from "@/api/client";
+import type { DetectorEval } from "@/lib/detector";
 import type { EvalSummary } from "@/lib/eval";
+
+export function useDetectorEval() {
+  return useQuery({
+    queryKey: ["eval", "detector"],
+    staleTime: 5 * 60_000,
+    queryFn: async (): Promise<DetectorEval | null> => {
+      const { data, error, response } = await api.GET("/eval/detector");
+      if (response.status === 404) return null;
+      if (error || !data)
+        throw new Error("The detector evaluation could not be loaded");
+      return data;
+    },
+  });
+}
 
 export function useEvalList() {
   return useQuery({

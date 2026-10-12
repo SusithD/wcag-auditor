@@ -108,7 +108,7 @@ const REVIEW = {
 
 async function mock(page: Page, sites: unknown[]) {
   await page.route("**/api/sites", (r) => r.fulfill({ json: sites }));
-  await page.route("**/api/summary/week", (r) => r.fulfill({ json: WEEK }));
+  await page.route("**/api/summary/week*", (r) => r.fulfill({ json: WEEK }));
   await page.route("**/api/review**", (r) => r.fulfill({ json: REVIEW }));
   await page.route("**/api/runs?**", (r) => r.fulfill({ json: [] }));
 }
@@ -212,7 +212,7 @@ test("with no audits the overview offers a composer and no metrics", async ({
 
 test("an unreachable service shows an error with a retry", async ({ page }) => {
   await page.route("**/api/sites", (r) => r.fulfill({ status: 500, json: {} }));
-  await page.route("**/api/summary/week", (r) =>
+  await page.route("**/api/summary/week*", (r) =>
     r.fulfill({ status: 500, json: {} }),
   );
   await page.route("**/api/review**", (r) =>

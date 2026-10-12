@@ -1,6 +1,7 @@
 import type { components } from "@/api/types";
 import { Panel, PanelHeader, QuietLink, StatusShape } from "@/components/ds";
-import { DETECTOR_VAL_MAP } from "@/lib/detector";
+import { useDetectorEval } from "@/hooks/use-eval";
+import { score } from "@/lib/detector";
 import { plural, weekComparison, weekRange } from "@/lib/overview";
 
 type Week = components["schemas"]["WeekSummary"];
@@ -57,6 +58,7 @@ export function WeekPanel({ week }: { week: Week }) {
 }
 
 export function MethodPanel() {
+  const detector = useDetectorEval().data;
   const items = [
     {
       kind: "undecided" as const,
@@ -72,9 +74,15 @@ export function MethodPanel() {
       text: (
         <>
           Findings that depend on the element detector are marked{" "}
-          <b className="font-semibold text-ink">Needs review</b>. The element
-          detector scores <span className="num">{DETECTOR_VAL_MAP}</span> mAP
-          (50:95) on the WebUI validation set.
+          <b className="font-semibold text-ink">Needs review</b>.
+          {detector ? (
+            <>
+              {" "}
+              The element detector scores{" "}
+              <span className="num">{score(detector.map_50_95)}</span> mAP
+              (50:95) on the WebUI validation set.
+            </>
+          ) : null}
         </>
       ),
     },

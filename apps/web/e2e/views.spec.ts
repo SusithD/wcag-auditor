@@ -327,6 +327,49 @@ test("the evaluation page renders the committed results and exports them", async
   expect(readFileSync(await tex.path(), "utf-8")).toContain("\\begin{tabular}");
 });
 
+test("the evaluation page shows the detector section from the API", async ({
+  page,
+}) => {
+  const detector = page.waitForResponse(
+    (r) => r.url().endsWith("/api/eval/detector") && r.status() === 200,
+  );
+  await page.goto("/eval");
+  const body = await (await detector).json();
+  await expect(
+    page.getByRole("heading", {
+      level: 2,
+      name: "How well does the element detector find elements?",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(body.map_50_95.toFixed(3), { exact: true }).first(),
+  ).toBeVisible();
+  const chart = page.getByRole("img", { name: /^Average precision at IoU/ });
+  await expect(chart).toBeVisible();
+  await page
+    .getByRole("group", { name: "Average precision by class view" })
+    .getByRole("button", { name: "Table" })
+    .click();
+  await expect(
+    page
+      .getByRole("table", { name: /Average precision by class/ })
+      .getByRole("row"),
+  ).toHaveCount(body.per_class.length + 1);
+  await expect(
+    page.getByRole("table", { name: /Share of 200 sampled/ }),
+  ).toBeVisible();
+});
+
+test("the detector section shows an empty state when the report is absent", async ({
+  page,
+}) => {
+  await page.route("**/api/eval/detector", (r) =>
+    r.fulfill({ status: 404, json: { detail: "none" } }),
+  );
+  await page.goto("/eval");
+  await expect(page.getByText("No detector evaluation to show")).toBeVisible();
+});
+
 test("an evaluation can be started and its progress followed to the end", async ({
   page,
 }) => {
@@ -398,6 +441,7 @@ for (const scheme of ["light", "dark"] as const) {
         await expect(
           page.getByText(/No evaluation has been run/),
         ).toBeVisible();
+      await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
       await scan(page);
       await page.unrouteAll({ behavior: "ignoreErrors" });
     }
