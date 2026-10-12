@@ -53,6 +53,10 @@ export const FOOTER_NAV: NavEntry[] = [
   },
 ];
 
+export function isAuthRoute(pathname: string): boolean {
+  return pathname === "/login" || pathname === "/reset-password";
+}
+
 export function isParticipantRoute(pathname: string): boolean {
   if (pathname === "/study") return true;
   if (!pathname.startsWith("/study/")) return false;

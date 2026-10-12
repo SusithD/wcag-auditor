@@ -1,8 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { PageHeader, Panel, PanelBody, PanelHeader } from "@/components/ds";
+import { buttonVariants } from "@/components/ui/button";
+import { useSessionUser } from "@/lib/auth/user-context";
 import { OptionCard, OptionGroup, SegmentedRadio } from "./option-card";
 import { type DefaultViewport, useSettings } from "./use-settings";
 
@@ -50,6 +53,7 @@ const VIEWPORTS: { value: DefaultViewport; title: string; note: string }[] = [
 export function SettingsScreen() {
   const [settings, update] = useSettings();
   const { theme, setTheme } = useTheme();
+  const user = useSessionUser();
   const [mounted, setMounted] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -133,6 +137,23 @@ export function SettingsScreen() {
             </OptionGroup>
           </PanelBody>
         </Panel>
+
+        {user?.isAdmin ? (
+          <Panel aria-labelledby="set-members">
+            <PanelHeader id="set-members" title="Workspace" />
+            <PanelBody className="flex flex-wrap items-center justify-between gap-3">
+              <p className="m-0 text-ink-2">
+                Invite people to the shared workspace and manage who has access.
+              </p>
+              <Link
+                href="/settings/members"
+                className={buttonVariants({ variant: "default" })}
+              >
+                Manage members
+              </Link>
+            </PanelBody>
+          </Panel>
+        ) : null}
 
         <Panel aria-labelledby="set-keys">
           <PanelHeader id="set-keys" title="Keyboard" />

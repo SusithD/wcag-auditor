@@ -31,6 +31,7 @@ import {
 } from "@/lib/shell";
 import { cn } from "@/lib/utils";
 import { BrandMark } from "./brand-mark";
+import { UserMenu } from "./user-menu";
 
 const ICONS: Record<string, LucideIcon> = {
   overview: LayoutDashboard,
@@ -224,23 +225,7 @@ export function Sidebar({
           ))}
         </nav>
       </div>
-      <div
-        className={cn(
-          "flex flex-none items-center gap-3 border-t border-line px-5 py-3",
-          side && "max-[1100px]:justify-center max-[1100px]:px-0",
-        )}
-      >
-        <span
-          aria-hidden="true"
-          className="grid size-7 shrink-0 place-items-center rounded-full border border-line bg-subtle text-[0.6875rem] font-semibold text-ink-2"
-        >
-          LU
-        </span>
-        <div className={cn("min-w-0", side && "max-[1100px]:sr-only")}>
-          <div className="font-medium text-ink">Local user</div>
-          <div className="text-xs text-ink-3">On this computer</div>
-        </div>
-      </div>
+      <UserMenu side={side} />
     </div>
   );
 }

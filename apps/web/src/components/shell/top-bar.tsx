@@ -78,7 +78,7 @@ export function TopBar({
   const { setActionsEl } = useShell();
   const mac = useIsMac();
   return (
-    <header className="sticky top-0 z-10 flex h-[56px] flex-none items-center gap-3 border-b border-line bg-surface px-6 max-[720px]:px-4">
+    <header className="sticky top-0 z-10 flex h-[56px] flex-none items-center gap-3 border-b border-line bg-surface px-[max(24px,calc((100%-1920px)/2+24px))] max-[720px]:px-4">
       <div className="hidden items-center gap-2 max-[720px]:flex">
         <Button
           variant="ghost"

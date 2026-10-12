@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import "./globals.css";
+import { AuthGate } from "@/components/auth/auth-gate";
 import { RouteFocus } from "@/components/route-focus";
 import { AppShell } from "@/components/shell";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -33,7 +34,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 <RouteFocus />
               </Suspense>
               <Suspense fallback={<div className="min-h-screen" />}>
-                <AppShell>{children}</AppShell>
+                <AuthGate>
+                  <AppShell>{children}</AppShell>
+                </AuthGate>
               </Suspense>
             </TooltipProvider>
           </QueryProvider>

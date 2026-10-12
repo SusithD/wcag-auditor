@@ -426,6 +426,7 @@ test.describe("lists, settings and help", () => {
     await expect(page.getByRole("row")).toHaveCount(2);
     await expect(page.getByRole("status")).toContainText("1 of 3 audits");
     await page.getByLabel("Status").selectOption("");
+    await expect(page).not.toHaveURL(/status=/);
     await page.getByLabel("Viewport").selectOption("mobile");
     await expect(page).toHaveURL(/vp=mobile/);
     await expect(page.getByRole("row")).toHaveCount(3);

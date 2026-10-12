@@ -7,10 +7,10 @@ import { useSettings } from "@/components/settings/use-settings";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { isParticipantRoute } from "@/lib/shell";
-import { cn } from "@/lib/utils";
+import { isAuthRoute, isParticipantRoute } from "@/lib/shell";
+import { BrandMark } from "./brand-mark";
 import { CommandPalette } from "./command-palette";
-import { ShellProvider, useShell } from "./shell-context";
+import { ShellProvider } from "./shell-context";
 import { Sidebar } from "./sidebar";
 import { TopBar } from "./top-bar";
 
@@ -33,8 +33,24 @@ function FocusedShell({ children }: { children: ReactNode }) {
   );
 }
 
+function AuthShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex min-h-screen flex-col">
+      <header className="flex h-[56px] flex-none items-center justify-between px-6 max-[720px]:px-4">
+        <span className="inline-flex min-h-[32px] items-center gap-2.5 text-[0.9375rem] font-semibold text-ink">
+          <BrandMark />
+          WCAG Auditor
+        </span>
+        <ThemeToggle />
+      </header>
+      <main id="main" tabIndex={-1} className="flex-1 outline-none">
+        {children}
+      </main>
+    </div>
+  );
+}
+
 function FullShell({ children }: { children: ReactNode }) {
-  const { wide } = useShell();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const mobile = useMediaQuery("(max-width: 720px)");
@@ -67,10 +83,7 @@ function FullShell({ children }: { children: ReactNode }) {
         <main
           id="main"
           tabIndex={-1}
-          className={cn(
-            "w-full flex-1 p-6 outline-none max-[720px]:p-4",
-            !wide && "max-w-[1360px]",
-          )}
+          className="mx-auto w-full max-w-[1920px] flex-1 p-6 outline-none max-[720px]:p-4"
         >
           {children}
         </main>
@@ -99,6 +112,7 @@ function useApplyDensity() {
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   useApplyDensity();
+  if (isAuthRoute(pathname)) return <AuthShell>{children}</AuthShell>;
   if (isParticipantRoute(pathname))
     return <FocusedShell>{children}</FocusedShell>;
   return (

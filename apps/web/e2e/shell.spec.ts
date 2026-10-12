@@ -250,7 +250,11 @@ for (const [width, height] of [
       }
       await page.goto("/audits");
       await page.getByRole("button", { name: "Search" }).click();
-      await expect(page.getByRole("dialog", { name: "Search" })).toBeVisible();
+      const palette = page.getByRole("dialog", { name: "Search" });
+      await expect(palette).toBeVisible();
+      await palette.evaluate((el) =>
+        Promise.all(el.getAnimations({ subtree: true }).map((a) => a.finished)),
+      );
       await scan(page, "palette");
       await page.keyboard.press("Escape");
       if (width < 720) {
