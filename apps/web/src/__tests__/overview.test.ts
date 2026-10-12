@@ -97,8 +97,17 @@ describe("overview helpers", () => {
   });
 
   it("formats the week", () => {
-    expect(weekRange(new Date("2026-10-11T12:00:00Z"))).toBe("5 to 11 Oct");
-    expect(weekRange(new Date("2026-10-01T12:00:00Z"))).toBe("28 Sep to 4 Oct");
+    expect(weekRange(new Date("2026-10-11T12:00:00Z"), 0)).toBe("5 to 11 Oct");
+    expect(weekRange(new Date("2026-10-01T12:00:00Z"), 0)).toBe(
+      "28 Sep to 4 Oct",
+    );
+    expect(weekRange(new Date("2026-10-11T23:30:00Z"), 120)).toBe(
+      "12 to 18 Oct",
+    );
+    expect(weekRange(new Date("2026-10-12T02:00:00Z"), -300)).toBe(
+      "5 to 11 Oct",
+    );
+    expect(weekRange(new Date("2026-10-11T23:30:00Z"), 0)).toBe("5 to 11 Oct");
     expect(weekComparison(6, 4)).toBe("2 more than last week");
     expect(weekComparison(1, 4)).toBe("3 fewer than last week");
     expect(weekComparison(4, 4)).toBe("Same as last week");

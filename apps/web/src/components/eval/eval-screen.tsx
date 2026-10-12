@@ -43,6 +43,7 @@ import {
 } from "@/lib/eval";
 import { SC_LIST, SC_TITLES } from "@/lib/report";
 import { cn } from "@/lib/utils";
+import { DetectorSection } from "./detector-section";
 import { ChartPanel, PrecisionChart, RecallChart } from "./eval-chart";
 import {
   interval,
@@ -276,6 +277,7 @@ export function EvalScreen() {
           ) : null}
         </>
       )}
+      {view && activeCondition ? null : <DetectorSection />}
     </div>
   );
 }
@@ -808,6 +810,8 @@ function Results({
           </p>
         </Panel>
       </Section>
+
+      <DetectorSection />
 
       <section aria-labelledby="lim-h" className="mt-8">
         <h2 id="lim-h" className="t-section mb-3 text-ink">

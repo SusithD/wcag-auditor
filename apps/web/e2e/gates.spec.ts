@@ -269,7 +269,7 @@ async function mockLists(page: Page) {
 
 async function mockEmpty(page: Page) {
   await page.route("**/api/sites", (r) => r.fulfill({ json: [] }));
-  await page.route("**/api/summary/week", (r) =>
+  await page.route("**/api/summary/week*", (r) =>
     r.fulfill({
       json: {
         audits_this_week: 0,

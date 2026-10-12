@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import statistics
 from collections import Counter
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Annotated, Any, Literal
 from urllib.parse import urlsplit
@@ -157,8 +157,13 @@ class WeekSummary(BaseModel):
     fixes_to_verify: FixesToVerify
 
 
-def _week_start(now: datetime) -> datetime:
-    day = now.astimezone(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+def _utcnow() -> datetime:
+    return datetime.now(UTC)
+
+
+def _week_start(now: datetime, offset_minutes: int = 0) -> datetime:
+    local = now.astimezone(timezone(timedelta(minutes=offset_minutes)))
+    day = local.replace(hour=0, minute=0, second=0, microsecond=0)
     return day - timedelta(days=day.weekday())
 
 
@@ -347,9 +352,22 @@ def build_workflow_router(settings: Settings) -> APIRouter:
             return rows
 
     @router.get("/summary/week", response_model=WeekSummary)
-    def week(request: Request) -> WeekSummary:
-        now = datetime.now(UTC)
-        start = _week_start(now)
+    def week(
+        request: Request,
+        tz_offset_minutes: Annotated[
+            int,
+            Query(
+                ge=-840,
+                le=840,
+                description=(
+                    "Minutes the viewer's local time is ahead of UTC, the same sign as "
+                    "-new Date().getTimezoneOffset() in JavaScript. Weeks start on Monday "
+                    "at local midnight. Defaults to UTC."
+                ),
+            ),
+        ] = 0,
+    ) -> WeekSummary:
+        start = _week_start(_utcnow(), tz_offset_minutes)
         last_start = start - timedelta(days=7)
         iou_min = protocol.load().thresholds.match.iou
         with request.app.state.sessions() as session:
