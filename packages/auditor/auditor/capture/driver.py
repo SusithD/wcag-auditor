@@ -12,7 +12,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 from auditor import __version__ as auditor_version
-from auditor import versions
+from auditor import netguard, versions
 from auditor.capture.focus import FOCUS_INFO_JS, FOCUS_START_JS, step_focus
 from auditor.elements.extract_js import EXTRACT_JS, extract_args, write_elements
 
@@ -89,7 +89,7 @@ class PlaywrightBrowser:
 
     def _context(self, viewport: str) -> Any:
         vp = VIEWPORTS[viewport]
-        return self._browser.new_context(
+        ctx = self._browser.new_context(
             viewport={"width": vp["width"], "height": vp["height"]},
             device_scale_factor=1,
             is_mobile=vp["is_mobile"],
@@ -99,6 +99,9 @@ class PlaywrightBrowser:
             timezone_id="UTC",
             ignore_https_errors=True,
         )
+        if not netguard.env_allows_private_targets():
+            netguard.install_route_guard(ctx)
+        return ctx
 
     def _open(self, ctx: Any, url: str) -> tuple[Any, int | None]:
         page = ctx.new_page()

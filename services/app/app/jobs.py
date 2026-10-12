@@ -41,7 +41,9 @@ class JobRunner:
         on_finish: OnFinish | None = None,
         on_start: OnStart | None = None,
         timeout_s: float = 900,
+        env: dict[str, str] | None = None,
     ) -> None:
+        self._env = {**os.environ, **env} if env else None
         self._queue: asyncio.Queue[Job] = asyncio.Queue()
         self._on_finish = on_finish
         self._on_start = on_start
@@ -110,6 +112,7 @@ class JobRunner:
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
             start_new_session=True,
+            env=self._env,
         )
         self._proc = proc
         if job.run_id in self._cancelled:
