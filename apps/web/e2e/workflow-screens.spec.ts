@@ -195,6 +195,20 @@ async function scan(page: Page, label: string) {
 }
 
 test.describe("review queue", () => {
+  test("the decision controls are visible without scrolling at 1440 x 900", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await mockReview(page);
+    await page.goto("/review");
+    const group = page.getByRole("radiogroup", { name: "Your decision" });
+    const last = page.getByRole("radio", { name: /Could not decide/ });
+    await expect(last).toBeAttached();
+    const box = await group.boundingBox();
+    expect(box).not.toBeNull();
+    expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(900);
+  });
+
   test("groups by reason and shows the selected finding", async ({ page }) => {
     await mockReview(page);
     await page.goto("/review");
@@ -367,6 +381,40 @@ test.describe("lists, settings and help", () => {
       page.getByText("2 fewer failures since last audit"),
     ).toBeVisible();
     await expect(page.getByText("5 of 8")).toHaveCount(2);
+  });
+
+  test("audits shows No report, not zero counts, for a failed run", async ({
+    page,
+  }) => {
+    await mockLists(page);
+    await page.goto("/audits");
+    const failed = page.getByRole("row", { name: /kettleandcrumb/ });
+    await expect(failed).toContainText("No report");
+    await expect(failed).not.toContainText("0 critical");
+  });
+
+  test("study admin clears the token field after a successful unlock", async ({
+    page,
+  }) => {
+    await page.goto("/study/admin");
+    const field = page.getByLabel("Administration token");
+    await field.fill("e2e-token");
+    await page.getByRole("button", { name: "Unlock" }).click();
+    await expect(
+      page.getByRole("button", { name: /Export/ }).first(),
+    ).toBeVisible();
+    await expect(field).toHaveValue("");
+  });
+
+  test("the first click on Light right after a reload applies the theme", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.goto("/settings");
+    await page.reload();
+    await page.getByText("Light", { exact: true }).click();
+    await expect(page.locator("html")).not.toHaveClass(/dark/);
+    await expect(page.getByRole("radio", { name: "Light" })).toBeChecked();
   });
 
   test("audits filters live in the URL", async ({ page }) => {

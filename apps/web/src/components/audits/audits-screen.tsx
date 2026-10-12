@@ -241,11 +241,19 @@ export function AuditsScreen() {
                       : "Rules only"}
                   </TableCell>
                   <TableCell className={CELL}>
-                    <SeverityCounts
-                      critical={run.counts.critical}
-                      serious={run.counts.serious}
-                      minor={run.counts.minor}
-                    />
+                    {run.status === "done" || run.status === "partial" ? (
+                      <SeverityCounts
+                        critical={run.counts.critical}
+                        serious={run.counts.serious}
+                        minor={run.counts.minor}
+                      />
+                    ) : (
+                      <span className="text-ink-3">
+                        {run.status === "queued" || run.status === "running"
+                          ? "No report yet"
+                          : "No report"}
+                      </span>
+                    )}
                   </TableCell>
                   <TableCell className={`${CELL} num`}>
                     <span className={MOBILE_LABEL}>To review </span>

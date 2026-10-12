@@ -105,8 +105,29 @@ export function hostOf(source: string): string | null {
 
 export type RecentSite = { host: string; runId: string };
 
+export const UPLOAD_LABEL = "Uploaded screenshots";
+
+export function isUploadId(value: string): boolean {
+  return /^[0-9a-f]{32}$/.test(value);
+}
+
+export function uploadLabel(createdAt?: string | null): string {
+  const date = createdAt ? new Date(createdAt) : null;
+  if (!date || Number.isNaN(date.getTime())) return UPLOAD_LABEL;
+  const day = date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+  });
+  return `${UPLOAD_LABEL}, ${day}`;
+}
+
 export function recentSites(
-  runs: { id: string; source_kind: string; source: string }[],
+  runs: {
+    id: string;
+    source_kind: string;
+    source: string;
+    created_at?: string;
+  }[],
   limit = 3,
 ): RecentSite[] {
   const seen = new Set<string>();
@@ -116,6 +137,7 @@ export function recentSites(
     if (run.source_kind === "url") host = hostOf(run.source);
     else if (run.source_kind === "folder")
       host = run.source.split("/").filter(Boolean).slice(-1)[0] ?? null;
+    else host = uploadLabel(run.created_at);
     if (!host || seen.has(host)) continue;
     seen.add(host);
     out.push({ host, runId: run.id });
@@ -124,11 +146,15 @@ export function recentSites(
   return out;
 }
 
-export function runLabel(run: { source_kind: string; source: string }): string {
+export function runLabel(run: {
+  source_kind: string;
+  source: string;
+  created_at?: string;
+}): string {
   if (run.source_kind === "url") return run.source.replace(/^https?:\/\//, "");
   if (run.source_kind === "folder")
     return run.source.split("/").filter(Boolean).slice(-1)[0] ?? run.source;
-  return "Uploaded screenshots";
+  return uploadLabel(run.created_at);
 }
 
 export type PaletteItem = {

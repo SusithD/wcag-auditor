@@ -33,7 +33,7 @@ const FILTERS: { value: SiteFilter; label: string }[] = [
 ];
 
 const TD =
-  "px-3 py-3 align-middle first:pl-4 last:pr-4 max-[720px]:block max-[720px]:px-4 max-[720px]:py-1";
+  "px-3 py-3 align-middle first:pl-4 last:pr-4 @max-[760px]:block @max-[760px]:px-4 @max-[760px]:py-1";
 
 function SiteCell({ row }: { row: Site }) {
   const { host, path } = siteParts(row.latest_run);
@@ -75,16 +75,17 @@ function SiteCell({ row }: { row: Site }) {
 function Row({ row }: { row: Site }) {
   const run = row.latest_run;
   const finished = run.status === "done" || run.status === "partial";
-  const status = runStatusView(run.status, run.error);
+  const shown = row.newer_run ?? run;
+  const status = runStatusView(shown.status, shown.error);
   return (
-    <tr className="border-b border-line last:border-b-0 hover:bg-subtle max-[720px]:block max-[720px]:py-2">
-      <td className={TD}>
+    <tr className="border-b border-line last:border-b-0 hover:bg-subtle @max-[760px]:block @max-[760px]:py-2">
+      <td className={`${TD} @min-[761px]:max-w-0`}>
         <SiteCell row={row} />
       </td>
       <td className={TD}>
         {finished ? (
           <>
-            <div className="flex items-center gap-3 whitespace-nowrap">
+            <div className="flex flex-wrap items-center gap-x-3">
               <span className="num font-semibold">{row.failures}</span>
               <SeverityCounts
                 critical={run.counts.critical}
@@ -104,10 +105,10 @@ function Row({ row }: { row: Site }) {
           </span>
         )}
       </td>
-      <td className={`${TD} text-right max-[720px]:text-left`}>
+      <td className={`${TD} text-right @max-[760px]:text-left`}>
         {finished ? (
           <span className="num">
-            <span className="hidden max-[720px]:inline text-ink-3">
+            <span className="hidden @max-[760px]:inline text-ink-3">
               To review{" "}
             </span>
             {row.to_review}
@@ -138,9 +139,21 @@ function Row({ row }: { row: Site }) {
       <td className={TD}>
         <Status kind={status.kind}>{status.label}</Status>
         <div className="mt-0.5 pl-[18px] text-label text-ink-3">
-          <time dateTime={run.created_at} title={run.created_at}>
-            {age(run.created_at)}
+          <time dateTime={shown.created_at} title={shown.created_at}>
+            {age(shown.created_at)}
           </time>
+          {row.newer_run ? (
+            <>
+              {" "}
+              <span>
+                (report from{" "}
+                <time dateTime={run.created_at} title={run.created_at}>
+                  {age(run.created_at)}
+                </time>
+                )
+              </span>
+            </>
+          ) : null}
         </div>
       </td>
     </tr>
@@ -178,36 +191,38 @@ export function SitesTable({ rows }: { rows: Site[] }) {
           </>
         }
       />
-      <table className="w-full text-dense">
-        <caption className="sr-only">Sites and their latest audit</caption>
-        <thead className="max-[720px]:hidden">
-          <tr className="h-9 border-b border-line text-left text-xs font-medium text-ink-3">
-            <th scope="col" className="px-3 first:pl-4 font-medium">
-              Site
-            </th>
-            <th scope="col" className="min-w-56 px-3 font-medium">
-              Failures
-            </th>
-            <th
-              scope="col"
-              className="px-3 text-right font-medium whitespace-nowrap"
-            >
-              To review
-            </th>
-            <th scope="col" className="px-3 font-medium">
-              Criteria decided
-            </th>
-            <th scope="col" className="px-3 last:pr-4 font-medium">
-              Latest audit
-            </th>
-          </tr>
-        </thead>
-        <tbody className="max-[720px]:block">
-          {shown.map((row) => (
-            <Row key={row.site} row={row} />
-          ))}
-        </tbody>
-      </table>
+      <div className="@container min-w-0">
+        <table className="w-full text-dense @max-[760px]:block">
+          <caption className="sr-only">Sites and their latest audit</caption>
+          <thead className="@max-[760px]:hidden">
+            <tr className="h-9 border-b border-line text-left text-xs font-medium text-ink-3">
+              <th scope="col" className="w-[34%] px-3 first:pl-4 font-medium">
+                Site
+              </th>
+              <th scope="col" className="px-3 font-medium">
+                Failures
+              </th>
+              <th
+                scope="col"
+                className="px-3 text-right font-medium whitespace-nowrap"
+              >
+                To review
+              </th>
+              <th scope="col" className="px-3 font-medium">
+                Criteria decided
+              </th>
+              <th scope="col" className="px-3 last:pr-4 font-medium">
+                Latest audit
+              </th>
+            </tr>
+          </thead>
+          <tbody className="@max-[760px]:block">
+            {shown.map((row) => (
+              <Row key={row.site} row={row} />
+            ))}
+          </tbody>
+        </table>
+      </div>
       {shown.length === 0 ? (
         <p className="m-0 px-4 py-6 text-center text-body text-ink-2">
           No sites match this filter.

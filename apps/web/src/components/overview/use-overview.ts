@@ -13,7 +13,9 @@ export function useSites() {
       return data;
     },
     refetchInterval: (query) =>
-      query.state.data?.some((row) => isActive(row.latest_run.status))
+      query.state.data?.some((row) =>
+        isActive((row.newer_run ?? row.latest_run).status),
+      )
         ? 3000
         : false,
   });

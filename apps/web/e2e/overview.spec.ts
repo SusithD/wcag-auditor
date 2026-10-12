@@ -358,3 +358,44 @@ test("a partly failed capture shows an alert on the progress screen, not a toast
   await expect(page.locator("[role=status], output")).toHaveCount(1);
   await expect(page.getByText("Found so far")).toBeVisible();
 });
+
+const LONG_SITE = {
+  site: "real_com_003_desktop_20261004T054402Z",
+  latest_run: run({
+    id: "f".repeat(32),
+    source_kind: "folder",
+    source: "/fixtures/real/real_com_003_desktop_20261004T054402Z",
+    viewports: ["desktop", "mobile"],
+    counts: { critical: 12, serious: 34, minor: 56, needs_review: 7 },
+  }),
+  previous_run_id: "c".repeat(32),
+  failures: 102,
+  failures_delta: 12,
+  to_review: 7,
+  criteria_decided: 8,
+};
+
+for (const width of [1440, 1024, 320]) {
+  test(`the sites table keeps the page from scrolling sideways at ${width}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await mock(page, [...SITES, LONG_SITE]);
+    await page.goto("/");
+    const panel = page.getByRole("region", { name: "Sites" });
+    await expect(panel).toBeVisible();
+    const overflow = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
+    const fits = await panel.evaluate((el) => {
+      const box = el.getBoundingClientRect();
+      return Array.from(el.querySelectorAll("table, td, th")).every(
+        (cell) => cell.getBoundingClientRect().right <= box.right + 1,
+      );
+    });
+    expect(fits).toBe(true);
+  });
+}

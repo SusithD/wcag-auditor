@@ -165,46 +165,8 @@ export function ReviewDetail({
             </p>
           </div>
 
-          {f.has_crop ? (
-            <figure className="m-0">
-              {/* biome-ignore lint/performance/noImgElement: crop is a served file from the audit service */}
-              <img
-                src={`/api/runs/${item.run_id}/assets/${item.viewport}/crop/${f.key}`}
-                alt={`Crop of the element: ${f.element}`}
-                className="max-h-48 max-w-full rounded-md border border-line bg-surface"
-              />
-              <figcaption className="mt-1.5 text-xs text-ink-3">
-                Element crop
-              </figcaption>
-            </figure>
-          ) : (
-            <p className="m-0 text-dense text-ink-3">
-              No crop of this element was saved. Open it in the report to see it
-              on the page.
-            </p>
-          )}
-
-          <section className="mt-5" aria-labelledby="rv-evidence">
-            <h3
-              id="rv-evidence"
-              className="mb-2 text-dense font-semibold text-ink"
-            >
-              Evidence
-            </h3>
-            <DefinitionRows rows={evidence} className="border-t border-line" />
-          </section>
-
-          {f.guidance?.what_failed ? (
-            <div className="mt-5 flex gap-3 rounded-md border border-line bg-subtle p-3">
-              <p className="m-0">
-                <b className="font-semibold">What the tool found.</b>{" "}
-                {f.guidance.what_failed}
-              </p>
-            </div>
-          ) : null}
-
           {decision.decided_at ? (
-            <p className="mt-5 mb-0 text-dense text-ink-3">
+            <p className="mt-0 mb-3 text-dense text-ink-3">
               {choiceWord(f.status)}
               {decision.reason ? ` (${decision.reason})` : ""} by{" "}
               {decision.decided_by ?? "unknown"},{" "}
@@ -213,7 +175,7 @@ export function ReviewDetail({
             </p>
           ) : null}
 
-          <OptionGroup radio legend="Your decision" className="mt-5">
+          <OptionGroup radio legend="Your decision">
             {options.map((option) => (
               <OptionCard
                 key={option.value}
@@ -283,6 +245,44 @@ export function ReviewDetail({
                 <span className="text-ink">{error}</span>
               </Status>
             </p>
+          ) : null}
+
+          {f.has_crop ? (
+            <figure className="m-0 mt-6">
+              {/* biome-ignore lint/performance/noImgElement: crop is a served file from the audit service */}
+              <img
+                src={`/api/runs/${item.run_id}/assets/${item.viewport}/crop/${f.key}`}
+                alt={`Crop of the element: ${f.element}`}
+                className="max-h-48 max-w-full rounded-md border border-line bg-surface"
+              />
+              <figcaption className="mt-1.5 text-xs text-ink-3">
+                Element crop
+              </figcaption>
+            </figure>
+          ) : (
+            <p className="m-0 mt-6 text-dense text-ink-3">
+              No crop of this element was saved. Open it in the report to see it
+              on the page.
+            </p>
+          )}
+
+          <section className="mt-5" aria-labelledby="rv-evidence">
+            <h3
+              id="rv-evidence"
+              className="mb-2 text-dense font-semibold text-ink"
+            >
+              Evidence
+            </h3>
+            <DefinitionRows rows={evidence} className="border-t border-line" />
+          </section>
+
+          {f.guidance?.what_failed ? (
+            <div className="mt-5 flex gap-3 rounded-md border border-line bg-subtle p-3">
+              <p className="m-0">
+                <b className="font-semibold">What the tool found.</b>{" "}
+                {f.guidance.what_failed}
+              </p>
+            </div>
           ) : null}
         </div>
       </div>

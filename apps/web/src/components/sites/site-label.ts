@@ -1,4 +1,7 @@
+import { isUploadId, UPLOAD_LABEL } from "@/lib/shell";
+
 export function splitSite(site: string): { host: string; path: string } {
+  if (isUploadId(site)) return { host: UPLOAD_LABEL, path: "" };
   if (site.startsWith("/")) {
     const last = site.split("/").filter(Boolean).slice(-1)[0] ?? site;
     return { host: last, path: "" };

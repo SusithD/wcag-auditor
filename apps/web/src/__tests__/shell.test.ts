@@ -56,9 +56,20 @@ describe("recentSites", () => {
     ];
     expect(recentSites(runs)).toEqual([
       { host: "a.example", runId: "1" },
+      { host: "Uploaded screenshots", runId: "3" },
       { host: "b.example", runId: "4" },
-      { host: "c_capture", runId: "5" },
     ]);
+  });
+
+  it("labels an upload with its date, never its hash", () => {
+    const hash = "8ea5f76e95dd4f7cacf72cad4a6edaf1";
+    const label = runLabel({
+      source_kind: "upload",
+      source: hash,
+      created_at: "2026-10-11T21:40:00",
+    });
+    expect(label).toMatch(/^Uploaded screenshots, \d{1,2} Oct$/);
+    expect(label).not.toContain(hash);
   });
 });
 
@@ -82,6 +93,15 @@ describe("palette helpers", () => {
       "x.io/p",
     );
     expect(runLabel({ source_kind: "upload", source: "" })).toBe(
+      "Uploaded screenshots",
+    );
+  });
+});
+
+describe("siteLabel", () => {
+  it("shows a readable label for an upload id", async () => {
+    const { siteLabel } = await import("@/components/sites/site-label");
+    expect(siteLabel("8ea5f76e95dd4f7cacf72cad4a6edaf1")).toBe(
       "Uploaded screenshots",
     );
   });
