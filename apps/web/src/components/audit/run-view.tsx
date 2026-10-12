@@ -52,9 +52,11 @@ import {
 import {
   buildSteps,
   capturedViewports,
+  clock,
   criteriaSoFar,
   currentStage,
   findingsSoFar,
+  verifyWait,
 } from "@/lib/stages";
 import { describeRunError, isBotCheckError } from "@/lib/url";
 import {
@@ -396,6 +398,11 @@ export function RunView({ runId }: { runId: string }) {
               Audit screenshots instead
             </Link>
           ) : null}
+          {isBotCheckError(run.error) ? (
+            <Link href="/help#bot-checks" className={buttonVariants()}>
+              How to allow the audit
+            </Link>
+          ) : null}
           <Link href="/audit/new" className={buttonVariants()}>
             Start a new audit
           </Link>
@@ -410,6 +417,7 @@ export function RunView({ runId }: { runId: string }) {
   ) as Viewport[];
   const previewViewport = (available[0] ?? captured[0]) as Viewport | undefined;
   const current = currentStage(events);
+  const waiting = verifyWait(events);
   const raw = buildSteps(
     run.viewports,
     run.source_kind === "url",
@@ -525,6 +533,13 @@ export function RunView({ runId }: { runId: string }) {
             total,
           )}
         </output>
+        {waiting ? (
+          <output className="m-0 block border-l-[3px] border-l-serious bg-subtle p-3 text-body text-ink">
+            A browser window opened. Complete the check there; the audit
+            continues automatically.{" "}
+            <span className="num">{clock(waiting.seconds)} left.</span>
+          </output>
+        ) : null}
         <Meter
           decided={done}
           total={total}

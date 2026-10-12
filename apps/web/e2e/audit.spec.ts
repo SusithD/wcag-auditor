@@ -257,6 +257,71 @@ test("a bot-checked run says so and offers to audit screenshots instead", async 
   );
 });
 
+test("a run waiting for the person to pass a bot check says so with the time left", async ({
+  page,
+}) => {
+  const id = "d".repeat(32);
+  await page.route(`**/api/runs/${id}`, (r) =>
+    r.fulfill({
+      json: {
+        id,
+        created_at: "2026-10-10T12:00:00",
+        source_kind: "url",
+        source: "https://buy.example.com",
+        viewports: ["desktop", "mobile"],
+        condition: "hybrid",
+        status: "running",
+        stage_status: {},
+        error: null,
+        counts: { critical: 0, serious: 0, minor: 0, needs_review: 0 },
+        available_viewports: [],
+      },
+    }),
+  );
+  const sse = (stage: string, viewport: string | null, detail: string | null) =>
+    `event: stage\ndata: ${JSON.stringify({ stage, viewport, detail })}\n\n`;
+  await page.route(`**/api/runs/${id}/events`, (r) =>
+    r.fulfill({
+      contentType: "text/event-stream",
+      body:
+        sse("queued", null, null) +
+        sse("capture:desktop", "desktop", null) +
+        sse("waiting:verify", "desktop", "237"),
+    }),
+  );
+  await page.goto(`/runs/${id}`);
+  await expect(
+    page.getByRole("status").filter({ hasText: "A browser window opened" }),
+  ).toContainText(
+    "Complete the check there; the audit continues automatically. 3:57 left.",
+  );
+});
+
+test("the Advanced section offers to open a browser window and sends it with the run", async ({
+  page,
+}) => {
+  let sent: Record<string, unknown> | null = null;
+  await page.route("**/api/runs", (r) => {
+    if (r.request().method() !== "POST") return r.fallback();
+    sent = r.request().postDataJSON();
+    return r.fulfill({ status: 201, json: { run_id: "e".repeat(32) } });
+  });
+  await page.goto("/audit/new");
+  await page.locator("form[data-ready=true]").waitFor();
+  await page.getByRole("button", { name: "Advanced" }).click();
+  const box = page.getByRole("checkbox", {
+    name: /Open a browser window so I can pass a bot check or sign in/,
+  });
+  await expect(box).not.toBeChecked();
+  await expect(
+    page.getByText(/only works when that is your own computer/),
+  ).toBeVisible();
+  await box.check();
+  await page.getByRole("textbox", { name: "Web address" }).fill("example.com");
+  await page.getByRole("button", { name: /^Run audit/ }).click();
+  await expect.poll(() => sent?.verify_in_browser).toBe(true);
+});
+
 test("an unknown run and an unknown page have their own titles and a way back", async ({
   page,
 }) => {

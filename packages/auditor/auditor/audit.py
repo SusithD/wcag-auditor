@@ -54,6 +54,8 @@ def audit(
     condition: Condition = "hybrid",
     max_focus_steps: int = 15,
     pdf: bool = True,
+    profile_dir: Path | None = None,
+    verify_timeout_s: float = 0,
 ) -> int:
     """Capture (for a URL) or replay capture folders, then run the pipeline per viewport.
     Progress goes to run_dir/events.jsonl and the outcome to run_dir/summary.json."""
@@ -68,8 +70,16 @@ def audit(
         if url is not None:
             from auditor.capture import PlaywrightBrowser, capture_url
 
-            with PlaywrightBrowser() as browser:
+            current: list[str] = [""]
+
+            def waiting(remaining: int) -> None:
+                log.emit("waiting:verify", current[0], str(remaining))
+
+            with PlaywrightBrowser(
+                profile_dir=profile_dir, verify_timeout_s=verify_timeout_s, on_wait=waiting
+            ) as browser:
                 for vp in viewports:
+                    current[0] = vp
                     log.emit(f"capture:{vp}", vp)
                     failures: list[str] = []
                     made = capture_url(

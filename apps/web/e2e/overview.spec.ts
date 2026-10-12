@@ -314,6 +314,7 @@ test("the new audit form posts the chosen options and keeps validation inline", 
     viewports: ["desktop"],
     condition: "rule_only",
     max_focus_steps: 12,
+    verify_in_browser: false,
   });
 });
 

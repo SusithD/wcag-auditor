@@ -5,6 +5,7 @@ import hashlib
 import json
 import re
 import shutil
+from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from importlib.metadata import version as pkg_version
 from pathlib import Path
@@ -13,8 +14,15 @@ from urllib.parse import urlparse
 
 from auditor import __version__ as auditor_version
 from auditor import versions
-from auditor.capture.botcheck import BotCheckError, detect_bot_check
+from auditor.capture.botcheck import BotCheck, BotCheckError, detect_bot_check, wait_until_clear
 from auditor.capture.focus import FOCUS_INFO_JS, FOCUS_START_JS, step_focus
+from auditor.capture.identity import (
+    USER_AGENT_SUFFIX,
+    extra_headers_from_env,
+    header_names,
+    identified_user_agent,
+    same_site,
+)
 from auditor.elements.extract_js import EXTRACT_JS, extract_args, write_elements
 
 GENERATOR_VERSION = f"auditor-{auditor_version}"
@@ -47,23 +55,50 @@ COORDINATES_NOTE = (
 
 class PlaywrightBrowser:
     def __init__(
-        self, headless: bool = True, timeout_ms: int = 20000, settle_ms: int = 1500
+        self,
+        headless: bool = True,
+        timeout_ms: int = 20000,
+        settle_ms: int = 1500,
+        *,
+        profile_dir: Path | None = None,
+        verify_timeout_s: float = 0,
+        extra_headers: Mapping[str, str] | None = None,
+        on_wait: Callable[[int], None] | None = None,
     ) -> None:
         from auditor import browser as shared
 
         self.timeout_ms = timeout_ms
         self.settle_ms = settle_ms
+        self.profile_dir = profile_dir
+        self.verify_timeout_s = verify_timeout_s if profile_dir is not None else 0
+        self.on_wait = on_wait
+        self._extra_headers = dict(
+            extra_headers if extra_headers is not None else extra_headers_from_env()
+        )
+        self.extra_header_names = header_names(self._extra_headers)
         self._closed = False
         self._pw = shared.acquire()
         try:
-            self._browser = self._pw.chromium.launch(headless=headless)
+            self._browser: Any = self._pw.chromium.launch(headless=headless)
             try:
+                probe = self._browser.new_context()
+                try:
+                    probe_page = probe.new_page()
+                    self.user_agent = identified_user_agent(
+                        probe_page.evaluate("() => navigator.userAgent")
+                    )
+                finally:
+                    probe.close()
                 js = PROXY_JS.read_text(encoding="utf-8")
                 self._checks_fn = "() => {\n" + js + "\nreturn runAllProxyChecks();\n}"
                 self.versions = {
                     "browser": f"chromium {self._browser.version}",
                     "playwright": pkg_version("playwright"),
                 }
+                if profile_dir is not None:
+                    profile_dir.mkdir(parents=True, exist_ok=True)
+                    self._browser.close()
+                    self._browser = None
             except Exception:
                 self._browser.close()
                 raise
@@ -82,7 +117,8 @@ class PlaywrightBrowser:
             return
         self._closed = True
         try:
-            self._browser.close()
+            if self._browser is not None:
+                self._browser.close()
         finally:
             from auditor import browser as shared
 
@@ -90,19 +126,38 @@ class PlaywrightBrowser:
 
     def _context(self, viewport: str) -> Any:
         vp = VIEWPORTS[viewport]
-        return self._browser.new_context(
-            viewport={"width": vp["width"], "height": vp["height"]},
-            device_scale_factor=1,
-            is_mobile=vp["is_mobile"],
-            has_touch=vp["has_touch"],
-            bypass_csp=True,
-            locale="en-US",
-            timezone_id="UTC",
-            ignore_https_errors=True,
-        )
+        options: dict[str, Any] = {
+            "viewport": {"width": vp["width"], "height": vp["height"]},
+            "device_scale_factor": 1,
+            "is_mobile": vp["is_mobile"],
+            "has_touch": vp["has_touch"],
+            "bypass_csp": True,
+            "locale": "en-US",
+            "timezone_id": "UTC",
+            "ignore_https_errors": True,
+            "user_agent": self.user_agent,
+        }
+        if self.profile_dir is not None:
+            return self._pw.chromium.launch_persistent_context(
+                str(self.profile_dir), headless=False, **options
+            )
+        return self._browser.new_context(**options)
+
+    def _send_extra_headers(self, ctx: Any, url: str) -> None:
+        extra = self._extra_headers
+
+        def handle(route: Any) -> None:
+            if same_site(route.request.url, url):
+                route.continue_(headers={**route.request.headers, **extra})
+            else:
+                route.continue_()
+
+        ctx.route("**/*", handle)
 
     def _open(self, ctx: Any, url: str) -> tuple[Any, int | None]:
-        page = ctx.new_page()
+        if self._extra_headers:
+            self._send_extra_headers(ctx, url)
+        page = ctx.pages[0] if self.profile_dir is not None and ctx.pages else ctx.new_page()
         page.set_default_timeout(self.timeout_ms)
         page.on("dialog", lambda d: d.dismiss())
         document_headers: dict[str, str] = {}
@@ -118,16 +173,34 @@ class PlaywrightBrowser:
         with contextlib.suppress(Exception):
             page.wait_for_load_state("networkidle", timeout=4000)
         page.wait_for_timeout(self.settle_ms)
-        self._refuse_bot_check(page, document_headers or (resp.headers if resp else {}))
+        first_headers: Mapping[str, str] = resp.headers if resp else {}
+
+        def check() -> BotCheck | None:
+            return self._detect(page, document_headers or first_headers)
+
+        found = check()
+        if found is not None and self.verify_timeout_s > 0:
+            found = wait_until_clear(
+                check,
+                found,
+                timeout_s=self.verify_timeout_s,
+                poll_s=3,
+                sleep=lambda s: page.wait_for_timeout(int(s * 1000)),
+                on_wait=self.on_wait,
+            )
+            if found is None:
+                with contextlib.suppress(Exception):
+                    page.wait_for_load_state("networkidle", timeout=4000)
+                page.wait_for_timeout(self.settle_ms)
+        if found is not None:
+            raise BotCheckError(found)
         return page, (resp.status if resp else None)
 
-    def _refuse_bot_check(self, page: Any, headers: dict[str, str]) -> None:
+    def _detect(self, page: Any, headers: Mapping[str, str]) -> BotCheck | None:
         text = ""
         with contextlib.suppress(Exception):
             text = page.inner_text("body", timeout=3000)
-        found = detect_bot_check(headers, page.title(), page.content(), text)
-        if found is not None:
-            raise BotCheckError(found)
+        return detect_bot_check(headers, page.title(), page.content(), text)
 
     def _checks(self, page: Any) -> dict[str, Any]:
         for attempt in range(2):
@@ -276,6 +349,9 @@ def capture_url(
             "generator_version": GENERATOR_VERSION,
             "protocol_version": PROTOCOL_VERSION,
             "tools": browser.versions,
+            "user_agent_suffix": USER_AGENT_SUFFIX,
+            "request_header_names": list(getattr(browser, "extra_header_names", [])),
+            "headed_session": getattr(browser, "profile_dir", None) is not None,
         }
         if res["geometry"] is not None:
             write_elements(

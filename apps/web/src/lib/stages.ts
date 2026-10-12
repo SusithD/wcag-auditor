@@ -53,6 +53,29 @@ export function stepOrder(viewports: string[], captures: boolean): string[] {
   ];
 }
 
+export function verifyWait(
+  events: StageEvent[],
+): { viewport: string | null; seconds: number } | null {
+  for (let i = events.length - 1; i >= 0; i -= 1) {
+    const ev = events[i];
+    if (ev.stage === "waiting:verify")
+      return { viewport: ev.viewport, seconds: Number(ev.detail) || 0 };
+    if (
+      ev.stage.startsWith("capture") ||
+      ev.stage.startsWith("failed") ||
+      ev.stage === "done"
+    )
+      return null;
+  }
+  return null;
+}
+
+export function clock(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
 export function currentStage(events: StageEvent[]): StageEvent | null {
   for (let i = events.length - 1; i >= 0; i -= 1) {
     const stage = events[i].stage;

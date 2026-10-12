@@ -481,6 +481,7 @@ export function runAgainBody(run: RerunSource) {
   const base = {
     condition: run.condition,
     max_focus_steps: focusStepsFor(run),
+    verify_in_browser: false,
   };
   if (run.source_kind === "url")
     return { ...base, url: run.source, viewports: run.viewports };

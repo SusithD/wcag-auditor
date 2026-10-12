@@ -43,6 +43,7 @@ class RunCreate(BaseModel):
     viewports: list[Viewport] = Field(default_factory=_both_viewports, min_length=1)
     condition: Condition = "hybrid"
     max_focus_steps: int = Field(default=15, ge=5, le=30)
+    verify_in_browser: bool = False
 
 
 class RunCreated(BaseModel):
@@ -252,6 +253,8 @@ def build_router(settings: Settings) -> APIRouter:
             "--pdf" if settings.pdf else "--no-pdf",
         )
         viewports = list(dict.fromkeys(body.viewports))
+        if body.verify_in_browser and not body.url:
+            raise HTTPException(422, "Opening a browser window only applies to web address audits")
         if body.url:
             try:
                 url = normalise_url(body.url)
@@ -259,6 +262,14 @@ def build_router(settings: Settings) -> APIRouter:
                 raise HTTPException(422, str(exc)) from exc
             kind, source = "url", url
             argv += ["--url", url, "--viewports", ",".join(viewports)]
+            if body.verify_in_browser:
+                argv += [
+                    "--verify-in-browser",
+                    "--verify-timeout-s",
+                    str(settings.verify_timeout_s),
+                    "--profile-dir",
+                    str(settings.profile_dir),
+                ]
         elif body.upload_id:
             if (
                 not HEX.match(body.upload_id)
@@ -305,7 +316,12 @@ def build_router(settings: Settings) -> APIRouter:
                 )
             )
             session.commit()
-        request.app.state.jobs.submit(Job(run_id, argv))
+        env = (
+            {"AUDIT_EXTRA_HEADERS": settings.extra_headers_json}
+            if settings.extra_headers_json
+            else None
+        )
+        request.app.state.jobs.submit(Job(run_id, argv, env=env))
         return RunCreated(run_id=run_id)
 
     @router.get("/runs", response_model=list[RunSummary])

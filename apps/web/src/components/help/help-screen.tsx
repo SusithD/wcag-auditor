@@ -191,6 +191,7 @@ const SECTIONS = [
   { id: "methods", label: "Methods" },
   { id: "coverage", label: "Coverage states" },
   { id: "limits", label: "What this result does not mean" },
+  { id: "bot-checks", label: "Sites with bot protection" },
   { id: "protocol", label: "Protocol" },
 ];
 
@@ -342,6 +343,37 @@ export function HelpScreen() {
               {LIMITS.map((text) => (
                 <li key={text}>{text}</li>
               ))}
+            </ul>
+          </PanelBody>
+        </Section>
+
+        <Section id="bot-checks" title="Sites with bot protection">
+          <PanelBody className="grid gap-3 text-ink-2">
+            <p className="m-0">
+              If a site shows a bot check instead of the page, the audit stops
+              and says so. It never tries to hide that it is an automated tool
+              or to solve the check. There are three ways forward.
+            </p>
+            <ul className="m-0 grid list-disc gap-2 pl-5">
+              <li>
+                <strong className="text-ink">
+                  Ask the site owner to allow the audit.
+                </strong>{" "}
+                Every capture identifies itself with WCAGAuditor in the user
+                agent, and the audit can send a secret request header that the
+                owner matches in a Cloudflare custom rule with the Skip action.
+                The setup steps are in docs/BOT_PROTECTION.md.
+              </li>
+              <li>
+                <strong className="text-ink">Pass the check yourself.</strong>{" "}
+                Under Advanced on New audit, choose to open a browser window.
+                You complete the check there and the audit continues. This works
+                only when the audit service runs on your own computer.
+              </li>
+              <li>
+                <strong className="text-ink">Audit screenshots.</strong> Upload
+                full-page screenshots instead. Some criteria then need review.
+              </li>
             </ul>
           </PanelBody>
         </Section>

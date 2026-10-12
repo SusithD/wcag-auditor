@@ -2,12 +2,14 @@ import { describe, expect, it } from "vitest";
 import {
   buildSteps,
   capturedViewports,
+  clock,
   criteriaSoFar,
   currentStage,
   findingsSoFar,
   groupSpokenName,
   stageLabel,
   stepSpokenName,
+  verifyWait,
 } from "@/lib/stages";
 
 const ev = (
@@ -170,5 +172,27 @@ describe("spoken step names", () => {
       stepSpokenName(step("module:1.4.3", "1.4.3", "pending", "modules")),
     ).toBe("Criterion 1.4.3, waiting");
     expect(groupSpokenName("Criteria", "done")).toBe("Criteria, done");
+  });
+});
+
+describe("verifyWait", () => {
+  it("reports the latest wait until a capture event follows it", () => {
+    const waiting = [
+      ev("capture:desktop", "desktop"),
+      ev("waiting:verify", "desktop", "240"),
+      ev("waiting:verify", "desktop", "237"),
+    ];
+    expect(verifyWait(waiting)).toEqual({ viewport: "desktop", seconds: 237 });
+    expect(
+      verifyWait([...waiting, ev("captured:desktop", "desktop")]),
+    ).toBeNull();
+    expect(verifyWait([...waiting, ev("capture:mobile", "mobile")])).toBeNull();
+    expect(verifyWait([...waiting, ev("failed:run")])).toBeNull();
+    expect(verifyWait([])).toBeNull();
+  });
+
+  it("formats the time left", () => {
+    expect(clock(237)).toBe("3:57");
+    expect(clock(5)).toBe("0:05");
   });
 });

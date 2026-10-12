@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 
@@ -26,6 +26,8 @@ class Settings:
     study_ethics_approved: bool = False
     study_admin_token: str | None = None
     decided_by_name: str = "Local user"
+    extra_headers_json: str | None = field(default=None, repr=False)
+    verify_timeout_s: float = 300
 
     @property
     def catalogue_file(self) -> Path:
@@ -38,6 +40,16 @@ class Settings:
     @property
     def study_path(self) -> Path:
         return self.study_dir or Path(__file__).resolve().parents[3] / "study"
+
+    @property
+    def extra_header_names(self) -> list[str]:
+        from auditor.capture.identity import header_names, parse_extra_headers
+
+        return header_names(parse_extra_headers(self.extra_headers_json))
+
+    @property
+    def profile_dir(self) -> Path:
+        return self.data_dir / "browser-profile"
 
     @property
     def eval_dir(self) -> Path:
@@ -56,7 +68,7 @@ class Settings:
         data_dir = Path(os.environ.get("DATA_DIR", "./data")).resolve()
         default_root = Path(__file__).resolve().parents[3] / "fixtures"
         roots = os.environ.get("FOLDER_ROOTS")
-        return cls(
+        settings = cls(
             data_dir=data_dir,
             db_url=os.environ.get("DATABASE_URL", f"sqlite:///{data_dir / 'app.db'}"),
             folder_roots=tuple(Path(p).resolve() for p in roots.split(os.pathsep) if p)
@@ -78,4 +90,8 @@ class Settings:
             study_ethics_approved=os.environ.get("STUDY_ETHICS_APPROVED") == "1",
             study_admin_token=os.environ.get("STUDY_ADMIN_TOKEN") or None,
             decided_by_name=os.environ.get("DECIDED_BY_NAME") or "Local user",
+            extra_headers_json=os.environ.get("AUDIT_EXTRA_HEADERS") or None,
+            verify_timeout_s=float(os.environ.get("VERIFY_TIMEOUT_S", "300")),
         )
+        _ = settings.extra_header_names
+        return settings
