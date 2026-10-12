@@ -319,9 +319,7 @@ def test_sites_single_run_has_no_previous_and_no_delta(tmp_path: Path) -> None:
 def test_sites_show_the_finished_run_behind_a_newer_unfinished_one(tmp_path: Path) -> None:
     with client(tmp_path) as c:
         add_run(c, tmp_path, "a" * 32, "https://x.com", [{"key": "p1"}], age_days=3)
-        add_run(
-            c, tmp_path, "b" * 32, "https://x.com", [{"key": "p1"}, {"key": "p2"}], age_days=2
-        )
+        add_run(c, tmp_path, "b" * 32, "https://x.com", [{"key": "p1"}, {"key": "p2"}], age_days=2)
         add_run(c, tmp_path, "c" * 32, "https://x.com", [], status="cancelled", age_days=1)
         add_run(c, tmp_path, "d" * 32, "https://y.com", [], status="failed", age_days=1)
         rows = {r["site"]: r for r in c.get("/sites").json()}
