@@ -242,7 +242,8 @@ def test_a_finished_run_reports_per_criterion_counts_per_viewport(tmp_path: Path
         assert len(counted) == 1
         detail = json.loads(counted[0]["detail"])
         assert {"critical", "serious", "minor", "needs_review", "criteria"} <= detail.keys()
-        body = wait_for_terminal(c, run_id)
+        wait_for_terminal(c, run_id)
+        body = c.get(f"/runs/{run_id}").json()
         rows = body["criteria_counts"]
         assert {r["viewport"] for r in rows} <= {"mobile"}
         assert {r["sc"]: r["count"] for r in rows} == detail["criteria"]

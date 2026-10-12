@@ -117,6 +117,35 @@ export function findingsSoFar(events: StageEvent[]) {
   return total;
 }
 
+export type CriterionSoFar = {
+  sc: string;
+  total: number;
+  byViewport: Record<string, number>;
+};
+
+export function criteriaSoFar(events: StageEvent[]): CriterionSoFar[] {
+  const rows = new Map<string, CriterionSoFar>();
+  for (const ev of events) {
+    if (!ev.stage.startsWith("counts:") || !ev.detail) continue;
+    const viewport = ev.viewport ?? ev.stage.split(":")[1];
+    try {
+      const parsed = JSON.parse(ev.detail) as {
+        criteria?: Record<string, number>;
+      };
+      for (const [sc, n] of Object.entries(parsed.criteria ?? {})) {
+        if (!(n > 0)) continue;
+        const row = rows.get(sc) ?? { sc, total: 0, byViewport: {} };
+        row.total += n;
+        row.byViewport[viewport] = (row.byViewport[viewport] ?? 0) + n;
+        rows.set(sc, row);
+      }
+    } catch {}
+  }
+  return [...rows.values()].sort((a, b) =>
+    a.sc.localeCompare(b.sc, undefined, { numeric: true }),
+  );
+}
+
 export function capturedViewports(events: StageEvent[]): string[] {
   return events
     .filter((ev) => ev.stage.startsWith("captured:"))
