@@ -13,7 +13,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 from auditor import __version__ as auditor_version
-from auditor import versions
+from auditor import netguard, versions
 from auditor.capture.botcheck import BotCheck, BotCheckError, detect_bot_check, wait_until_clear
 from auditor.capture.focus import FOCUS_INFO_JS, FOCUS_START_JS, step_focus
 from auditor.capture.identity import (
@@ -143,20 +143,22 @@ class PlaywrightBrowser:
             )
         return self._browser.new_context(**options)
 
-    def _send_extra_headers(self, ctx: Any, url: str) -> None:
+    def _install_routing(self, ctx: Any, url: str) -> None:
         extra = self._extra_headers
 
-        def handle(route: Any) -> None:
-            if same_site(route.request.url, url):
-                route.continue_(headers={**route.request.headers, **extra})
+        def send(route: Any, request: Any) -> None:
+            if extra and same_site(request.url, url):
+                route.continue_(headers={**request.headers, **extra})
             else:
                 route.continue_()
 
-        ctx.route("**/*", handle)
+        if not netguard.env_allows_private_targets():
+            netguard.install_route_guard(ctx, on_allowed=send)
+        elif extra:
+            ctx.route("**/*", lambda route: send(route, route.request))
 
     def _open(self, ctx: Any, url: str) -> tuple[Any, int | None]:
-        if self._extra_headers:
-            self._send_extra_headers(ctx, url)
+        self._install_routing(ctx, url)
         page = ctx.pages[0] if self.profile_dir is not None and ctx.pages else ctx.new_page()
         page.set_default_timeout(self.timeout_ms)
         page.on("dialog", lambda d: d.dismiss())

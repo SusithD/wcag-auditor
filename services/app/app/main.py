@@ -7,7 +7,8 @@ from pathlib import Path
 
 from alembic import command
 from alembic.config import Config
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy import select
 
 from app.api import build_router, status_from_result
@@ -90,7 +91,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                         session.rollback()
                         logging.getLogger(__name__).exception("ingest of %s failed", result.run_id)
 
-        runner = JobRunner(on_finish, on_start, cfg.job_timeout_s)
+        runner = JobRunner(
+            on_finish,
+            on_start,
+            cfg.job_timeout_s,
+            {"ALLOW_PRIVATE_TARGETS": "1" if cfg.allow_private_targets else "0"},
+        )
         runner.start()
         app.state.jobs = runner
         try:
@@ -99,7 +105,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             await runner.stop()
             engine.dispose()
 
-    app = FastAPI(title="wcag-auditor", lifespan=lifespan)
+    hidden = {"docs_url": None, "redoc_url": None, "openapi_url": None} if cfg.production else {}
+    app = FastAPI(title="wcag-auditor", lifespan=lifespan, debug=False, **hidden)  # type: ignore[arg-type]
+
+    @app.exception_handler(Exception)
+    async def unhandled(request: Request, exc: Exception) -> JSONResponse:
+        logging.getLogger(__name__).exception("unhandled error on %s", request.url.path)
+        return JSONResponse({"detail": "Internal server error"}, status_code=500)
 
     @app.get("/health")
     def health() -> dict[str, str]:

@@ -46,6 +46,7 @@ def dry_run(out: Path) -> dict[str, Any]:
         folder_roots=(ROOT.resolve(),),
         pdf=False,
         study_admin_token=TOKEN,
+        study_per_minute=0,
     )
     headers = {"X-Study-Token": TOKEN}
     with TestClient(create_app(settings)) as c:
