@@ -65,3 +65,24 @@ def test_0004_adds_decision_columns_and_maps_ignored_to_dismissed(tmp_path: Path
     with engine.connect() as conn:
         statuses = {k: v for k, v in conn.execute(text("SELECT key, status FROM findings"))}
         assert statuses["f0"] == "ignored"
+
+
+def test_0005_adds_nullable_max_focus_steps_and_keeps_old_runs_null(tmp_path: Path) -> None:
+    url = f"sqlite:///{tmp_path / 'app.db'}"
+    cfg = Config(str(ALEMBIC_INI))
+    cfg.set_main_option("sqlalchemy.url", url)
+    command.upgrade(cfg, "0004")
+    engine = make_engine(url)
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                "INSERT INTO runs (id, created_at, source_kind, source, viewports, condition,"
+                " status, stage_status, versions) VALUES ('r', '2026-01-01', 'url', 'x', '[]',"
+                " 'hybrid', 'done', '{}', '{}')"
+            )
+        )
+    command.upgrade(cfg, "head")
+    columns = {c["name"]: c for c in inspect(engine).get_columns("runs")}
+    assert columns["max_focus_steps"]["nullable"] is True
+    with engine.begin() as conn:
+        assert conn.execute(text("SELECT max_focus_steps FROM runs")).scalar() is None

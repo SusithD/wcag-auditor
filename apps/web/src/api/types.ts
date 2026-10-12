@@ -861,6 +861,18 @@ export interface components {
        */
       hybrid_verdict: "automated" | "needs-review" | "not-assessable" | "none";
     };
+    /** CriterionCount */
+    CriterionCount: {
+      /**
+       * Viewport
+       * @enum {string}
+       */
+      viewport: "desktop" | "mobile";
+      /** Sc */
+      sc: string;
+      /** Count */
+      count: number;
+    };
     /** DebriefSubmission */
     DebriefSubmission: {
       /** Answers */
@@ -1334,6 +1346,10 @@ export interface components {
       /** Error */
       error: string | null;
       counts: components["schemas"]["SeverityCounts"];
+      /** Criteria Counts */
+      criteria_counts?: components["schemas"]["CriterionCount"][];
+      /** Max Focus Steps */
+      max_focus_steps?: number | null;
       /** Available Viewports */
       available_viewports: ("desktop" | "mobile")[];
     };

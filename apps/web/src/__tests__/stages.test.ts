@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildSteps,
   capturedViewports,
+  criteriaSoFar,
   currentStage,
   findingsSoFar,
   groupSpokenName,
@@ -106,6 +107,40 @@ describe("stage model", () => {
       minor: 3,
       needs_review: 4,
     });
+  });
+
+  it("totals findings per criterion across viewports and ignores old events", () => {
+    const events = [
+      ev(
+        "counts:desktop",
+        "desktop",
+        JSON.stringify({
+          critical: 1,
+          serious: 0,
+          minor: 0,
+          needs_review: 0,
+          criteria: { "2.4.7": 1, "1.4.3": 4 },
+        }),
+      ),
+      ev(
+        "counts:mobile",
+        "mobile",
+        JSON.stringify({
+          critical: 0,
+          serious: 2,
+          minor: 0,
+          needs_review: 0,
+          criteria: { "1.4.3": 2, "1.4.11": 0 },
+        }),
+      ),
+      ev("counts:legacy", "mobile", JSON.stringify({ minor: 3 })),
+      ev("counts:broken", "mobile", "{"),
+    ];
+    expect(criteriaSoFar(events)).toEqual([
+      { sc: "1.4.3", total: 6, byViewport: { desktop: 4, mobile: 2 } },
+      { sc: "2.4.7", total: 1, byViewport: { desktop: 1 } },
+    ]);
+    expect(criteriaSoFar([])).toEqual([]);
   });
 
   it("lists captured viewports and labels stages with their viewport", () => {

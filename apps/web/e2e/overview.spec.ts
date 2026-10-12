@@ -359,6 +359,75 @@ test("a partly failed capture shows an alert on the progress screen, not a toast
   await expect(page.getByText("Found so far")).toBeVisible();
 });
 
+test("the progress screen lists findings per criterion as viewports finish", async ({
+  page,
+}) => {
+  const id = "d".repeat(32);
+  await page.route(`**/api/runs/${id}`, (r) =>
+    r.fulfill({
+      json: run({
+        id,
+        status: "running",
+        counts: { critical: 0, serious: 0, minor: 0, needs_review: 0 },
+        available_viewports: [],
+      }),
+    }),
+  );
+  const ev = (stage: string, viewport: string | null, detail: string | null) =>
+    `event: stage\ndata: ${JSON.stringify({ stage, viewport, detail })}\n\n`;
+  await page.route(`**/api/runs/${id}/events`, (r) =>
+    r.fulfill({
+      contentType: "text/event-stream",
+      body:
+        ev("queued", null, null) +
+        ev(
+          "counts:desktop",
+          "desktop",
+          JSON.stringify({
+            critical: 1,
+            serious: 3,
+            minor: 0,
+            needs_review: 0,
+            criteria: { "1.4.3": 3, "2.4.7": 1 },
+          }),
+        ) +
+        ev("rules", "mobile", null),
+    }),
+  );
+  await page.goto(`/runs/${id}`);
+  const list = page.getByRole("list", { name: "Findings by criterion" });
+  await expect(list.getByRole("listitem")).toHaveCount(2);
+  await expect(list.getByRole("listitem").first()).toContainText(
+    "Contrast (minimum)",
+  );
+  await expect(list.getByRole("listitem").first()).toContainText("3");
+  await expect(page.getByText("Nothing found yet.")).toBeHidden();
+});
+
+test("the progress screen says nothing found while no criterion has findings", async ({
+  page,
+}) => {
+  const id = "c".repeat(32);
+  await page.route(`**/api/runs/${id}`, (r) =>
+    r.fulfill({
+      json: run({
+        id,
+        status: "running",
+        counts: { critical: 0, serious: 0, minor: 0, needs_review: 0 },
+        available_viewports: [],
+      }),
+    }),
+  );
+  await page.route(`**/api/runs/${id}/events`, (r) =>
+    r.fulfill({ contentType: "text/event-stream", body: "" }),
+  );
+  await page.goto(`/runs/${id}`);
+  await expect(page.getByText("Nothing found yet.")).toBeVisible();
+  await expect(
+    page.getByRole("list", { name: "Findings by criterion" }),
+  ).toHaveCount(0);
+});
+
 const LONG_SITE = {
   site: "real_com_003_desktop_20261004T054402Z",
   latest_run: run({

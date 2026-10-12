@@ -56,6 +56,12 @@ class SeverityCounts(BaseModel):
     needs_review: int = 0
 
 
+class CriterionCount(BaseModel):
+    viewport: Viewport
+    sc: str
+    count: int
+
+
 class RunSummary(BaseModel):
     id: str
     created_at: datetime
@@ -67,6 +73,8 @@ class RunSummary(BaseModel):
     stage_status: dict[str, Any]
     error: str | None
     counts: SeverityCounts
+    criteria_counts: list[CriterionCount] = Field(default_factory=list)
+    max_focus_steps: int | None = None
     available_viewports: list[Viewport]
 
 
@@ -134,8 +142,13 @@ def summarise_run(settings: Settings, row: Run) -> RunSummary:
     summary = _read_summary(settings.runs_dir / row.id)
     counts = SeverityCounts()
     available: list[Viewport] = []
+    criteria: list[CriterionCount] = []
     for vp, info in (summary.get("viewports") or {}).items():
         available.append(vp)
+        criteria.extend(
+            CriterionCount(viewport=vp, sc=sc, count=int(n))
+            for sc, n in (info.get("criteria") or {}).items()
+        )
         for key, value in info.get("counts", {}).items():
             setattr(counts, key, getattr(counts, key) + int(value))
     return RunSummary(
@@ -149,6 +162,8 @@ def summarise_run(settings: Settings, row: Run) -> RunSummary:
         stage_status=row.stage_status,
         error=row.error,
         counts=counts,
+        criteria_counts=criteria,
+        max_focus_steps=row.max_focus_steps,
         available_viewports=sorted(available),
     )
 
@@ -286,6 +301,7 @@ def build_router(settings: Settings) -> APIRouter:
                     condition=body.condition,
                     status="queued",
                     stage_status={},
+                    max_focus_steps=body.max_focus_steps,
                 )
             )
             session.commit()

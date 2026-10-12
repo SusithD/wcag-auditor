@@ -1,4 +1,5 @@
 import type { RunSummary } from "@/api/client";
+import { DEFAULT_FOCUS_STEPS } from "@/components/audit/audit-request";
 import {
   type CoverageCell,
   type Finding,
@@ -470,10 +471,17 @@ export function sourceParts(
 type RerunSource = Pick<
   RunSummary,
   "source_kind" | "source" | "condition" | "viewports"
->;
+> & { max_focus_steps?: number | null };
+
+export function focusStepsFor(run: Pick<RerunSource, "max_focus_steps">) {
+  return run.max_focus_steps ?? DEFAULT_FOCUS_STEPS;
+}
 
 export function runAgainBody(run: RerunSource) {
-  const base = { condition: run.condition, max_focus_steps: 15 };
+  const base = {
+    condition: run.condition,
+    max_focus_steps: focusStepsFor(run),
+  };
   if (run.source_kind === "url")
     return { ...base, url: run.source, viewports: run.viewports };
   if (run.source_kind === "upload")

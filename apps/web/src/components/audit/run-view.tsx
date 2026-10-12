@@ -13,10 +13,12 @@ import {
   Panel,
   PanelBody,
   PanelHeader,
+  ScCode,
   Status,
   StatusShape,
 } from "@/components/ds";
 import { PageTitle } from "@/components/page-title";
+import { focusStepsFor, scTitle } from "@/components/report/logic";
 import { ReportScreen } from "@/components/report/report-screen";
 import { PageCrumbs, WideContent } from "@/components/shell/shell-context";
 import {
@@ -50,6 +52,7 @@ import {
 import {
   buildSteps,
   capturedViewports,
+  criteriaSoFar,
   currentStage,
   findingsSoFar,
 } from "@/lib/stages";
@@ -168,6 +171,7 @@ function RunAgain({
     source: string;
     viewports: Viewport[];
     condition: "hybrid" | "rule_only";
+    max_focus_steps?: number | null;
   };
 }) {
   const router = useRouter();
@@ -180,7 +184,7 @@ function RunAgain({
         {
           viewports: run.viewports,
           condition: run.condition,
-          budget: DEFAULT_FOCUS_STEPS,
+          budget: focusStepsFor(run),
         },
         queryClient,
       ),
@@ -209,8 +213,9 @@ function RunAgain({
         Run again
       </Button>
       <p className="m-0 basis-full text-dense text-ink-3">
-        Uses the same viewports and method, and the default{" "}
-        {DEFAULT_FOCUS_STEPS} focus steps.
+        {run.max_focus_steps == null
+          ? `Uses the same viewports and method, and the default ${DEFAULT_FOCUS_STEPS} focus steps.`
+          : `Uses the same viewports, method and ${run.max_focus_steps} focus steps.`}
       </p>
       {error ? (
         <p role="alert" className="basis-full text-body text-critical">
@@ -416,6 +421,7 @@ export function RunView({ runId }: { runId: string }) {
   });
   const { position, total, done } = stepPosition(condensed);
   const sofar = findingsSoFar(events);
+  const byCriterion = criteriaSoFar(events);
   const failures = sofar.critical + sofar.serious + sofar.minor;
   const checked = criteriaChecked(raw);
   const found = (
@@ -566,6 +572,32 @@ export function RunView({ runId }: { runId: string }) {
             ) : (
               <p className="m-0 text-body text-ink-2">Nothing found yet.</p>
             )}
+            {byCriterion.length > 0 ? (
+              <ul
+                aria-label="Findings by criterion"
+                className="m-0 mt-3 flex list-none flex-col border-t border-line p-0"
+              >
+                {byCriterion.map((row) => (
+                  <li
+                    key={row.sc}
+                    className="flex min-h-9 items-center justify-between gap-3 border-b border-line py-1.5 last:border-b-0"
+                  >
+                    <span className="min-w-0">
+                      <ScCode code={row.sc} />{" "}
+                      <span className="text-ink">{scTitle(row.sc)}</span>
+                      {Object.keys(row.byViewport).length > 1 ? (
+                        <span className="block text-dense text-ink-3">
+                          {Object.entries(row.byViewport)
+                            .map(([vp, n]) => `${vp} ${n}`)
+                            .join(" · ")}
+                        </span>
+                      ) : null}
+                    </span>
+                    <span className="num font-semibold">{row.total}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
             <p className="mb-0 mt-3 text-dense text-ink-3">
               Counts update when each viewport finishes its checks.
             </p>
