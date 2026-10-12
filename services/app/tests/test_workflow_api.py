@@ -1,7 +1,9 @@
+import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, cast
 
+import pytest
 from app.models import CaptureRow, CoverageRow, FindingRow, Run, StudyRun
 from fastapi.testclient import TestClient
 from test_runs_api import client
@@ -325,3 +327,45 @@ def test_week_summary_empty(tmp_path: Path) -> None:
         body = c.get("/summary/week").json()
         assert body["audits_this_week"] == 0 and body["median_criteria_decided"] == 0
         assert body["running"] == [] and body["fixes_to_verify"] == {"findings": 0, "sites": 0}
+
+
+def fix_clock(monkeypatch: pytest.MonkeyPatch, instant: datetime) -> None:
+    monkeypatch.setattr(sys.modules[__name__], "NOW", instant)
+    monkeypatch.setattr("app.workflow_api._utcnow", lambda: instant)
+
+
+def week_counts(c: TestClient, offset: int | None) -> tuple[int, int]:
+    params = {} if offset is None else {"tz_offset_minutes": offset}
+    body = c.get("/summary/week", params=params).json()
+    return body["audits_this_week"], body["audits_last_week"]
+
+
+def test_week_summary_positive_offset_moves_sunday_night_into_the_next_week(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fix_clock(monkeypatch, datetime(2026, 10, 11, 23, 30, tzinfo=UTC))
+    with client(tmp_path) as c:
+        add_run(c, tmp_path, "a" * 32, "https://a.com", [], age_days=2.5 / 24)
+        add_run(c, tmp_path, "b" * 32, "https://b.com", [], age_days=1 / 24)
+        assert week_counts(c, None) == (2, 0)
+        assert week_counts(c, 0) == (2, 0)
+        assert week_counts(c, 120) == (1, 1)
+        assert week_counts(c, 600) == (2, 0)
+
+
+def test_week_summary_negative_offset_keeps_sunday_night_in_the_old_week(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fix_clock(monkeypatch, datetime(2026, 10, 12, 2, 0, tzinfo=UTC))
+    with client(tmp_path) as c:
+        add_run(c, tmp_path, "a" * 32, "https://a.com", [], age_days=14 / 24)
+        add_run(c, tmp_path, "b" * 32, "https://b.com", [], age_days=1 / 24)
+        assert week_counts(c, None) == (1, 1)
+        assert week_counts(c, -300) == (2, 0)
+        assert week_counts(c, -840) == (2, 0)
+
+
+def test_week_summary_rejects_an_offset_outside_the_real_timezones(tmp_path: Path) -> None:
+    with client(tmp_path) as c:
+        assert c.get("/summary/week", params={"tz_offset_minutes": 841}).status_code == 422
+        assert c.get("/summary/week", params={"tz_offset_minutes": "x"}).status_code == 422
