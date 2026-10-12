@@ -21,6 +21,7 @@ services:
       JOB_TIMEOUT_S: ${JOB_TIMEOUT_S:-900}
       TRUSTED_PROXIES: ${TRUSTED_PROXIES:-172.16.0.0/12}
       DECIDED_BY_NAME: ${DECIDED_BY_NAME:-Reviewer}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:?set INTERNAL_API_TOKEN in deploy/.env}
     volumes:
       - auditor_data:/data
 
@@ -36,6 +37,19 @@ services:
       - no-new-privileges:true
     environment:
       API_URL: http://api:8000
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:?set INTERNAL_API_TOKEN in deploy/.env}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?set BETTER_AUTH_SECRET in deploy/.env}
+      BETTER_AUTH_URL: https://${DOMAIN:?set DOMAIN in deploy/.env}
+      AUTH_DB_PATH: /data/auth.db
+      ADMIN_EMAILS: ${ADMIN_EMAILS:?set ADMIN_EMAILS in deploy/.env}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+      SMTP_URL: ${SMTP_URL:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+    volumes:
+      - web_data:/data
     depends_on:
       api:
         condition: service_healthy
@@ -52,8 +66,6 @@ services:
       - "${HTTPS_PORT:-443}:443/udp"
     environment:
       DOMAIN: ${DOMAIN:?set DOMAIN in deploy/.env}
-      ADMIN_USER: ${ADMIN_USER:?set ADMIN_USER in deploy/.env}
-      ADMIN_HASH: ${ADMIN_HASH:?set ADMIN_HASH in deploy/.env}
     volumes:
       - ./caddy:/etc/caddy:ro
       - caddy_data:/data
@@ -63,5 +75,6 @@ services:
 
 volumes:
   auditor_data:
+  web_data:
   caddy_data:
   caddy_config:

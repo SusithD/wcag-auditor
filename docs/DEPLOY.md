@@ -9,7 +9,7 @@ Two free ways to put the app on the internet. Both run the same three containers
 | A. Oracle Cloud Always Free VM (Ampere A1, arm64) | 0 | yes | the real thing, study participants |
 | B. Your Mac plus a Cloudflare Tunnel | 0 | only while the Mac is awake | a quick demo, a supervisor walkthrough |
 
-What the public sees: the study participant pages (`/study`, `/study/<code>`) and the API calls they make work without a login. Everything else, including `/study/admin`, the audit pages and the rest of the API, asks for the admin user name and password (HTTP basic auth, set in `.env`).
+What the public sees: the study participant pages (`/study`, `/study/<code>`) and the API calls they make work without a login. Everything else needs a signed-in account (invite-only, email and password, Google or GitHub). Accounts are handled by the app itself, not by Caddy; see [AUTH.md](AUTH.md).
 
 ## 0. What you need on your laptop
 
@@ -77,16 +77,22 @@ Caddy needs a host name to get a free HTTPS certificate. Two zero-effort choices
 ```
 cd ~/wcag-auditor/deploy
 cp .env.example .env
-docker run --rm caddy:2 caddy hash-password --plaintext 'choose-a-long-password'
+openssl rand -base64 32
+openssl rand -hex 32
 nano .env
 ```
 
-In `.env` set `DOMAIN`, `ADMIN_USER`, and paste the hash into `ADMIN_HASH` inside single quotes (the hash contains `$` characters, the quotes keep them literal). Set `STUDY_ADMIN_TOKEN` to a long random string (`openssl rand -hex 24`); it is the second lock on the study admin page. Leave `STUDY_ETHICS_APPROVED=0` until ethics approval is in place. Leave `TUNNEL_TOKEN` empty here.
+In `.env` set `DOMAIN`, `BETTER_AUTH_SECRET` (output of `openssl rand -base64 32`), `INTERNAL_API_TOKEN` (output of `openssl rand -hex 32`) and `ADMIN_EMAILS` (your email, comma separated for several). Optionally add the Google and GitHub client ids and secrets and the SMTP settings, see [AUTH.md](AUTH.md). Set `STUDY_ADMIN_TOKEN` to a long random string (`openssl rand -hex 24`); it is the second lock on the study admin page. Leave `STUDY_ETHICS_APPROVED=0` until ethics approval is in place. Leave `TUNNEL_TOKEN` empty here.
 
 | Variable | Meaning |
 | --- | --- |
 | `DOMAIN` | host name Caddy serves and gets a certificate for |
-| `ADMIN_USER`, `ADMIN_HASH` | basic auth for everything except the participant pages |
+| `BETTER_AUTH_SECRET` | signs sessions, required; changing it signs everyone out |
+| `INTERNAL_API_TOKEN` | shared secret between the web container and the api, required |
+| `ADMIN_EMAILS` | comma separated admin addresses, required; they can invite members |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | optional Google sign-in |
+| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | optional GitHub sign-in |
+| `SMTP_URL`, `MAIL_FROM` | optional email for password reset |
 | `STUDY_ADMIN_TOKEN` | header token required by the study admin API |
 | `STUDY_ETHICS_APPROVED` | `1` enables real (non-synthetic) participants |
 | `AUDIT_PDF` | `1` writes a PDF report per audit (slower), `0` skips it |
@@ -126,22 +132,25 @@ No restart is needed; each audit is a fresh process and picks the model up. With
 
 ### 9. Smoke checks
 
-Replace the domain and password with yours.
+Replace the domain with yours.
 
 ```
-curl -s -o /dev/null -w '%{http_code}\n' https://DOMAIN/api/health
-curl -s -u admin:PASSWORD https://DOMAIN/api/health
+curl -s -o /dev/null -w '%{http_code}\n' https://DOMAIN/api/auth/ok
 curl -s -o /dev/null -w '%{http_code}\n' https://DOMAIN/study
-curl -s -o /dev/null -w '%{http_code}\n' https://DOMAIN/study/admin
 ```
 
-Expected: `401`, `{"status":"ok"}`, `200`, `401`. Then open `https://DOMAIN/` in a browser, log in, choose New audit, enter `https://example.com`, and wait for the report (under a minute).
+Expected: `200` and `200`. Then first login:
+
+1. Open `https://DOMAIN/` in a browser. You are sent to the sign-in page.
+2. Sign up with an address listed in `ADMIN_EMAILS` (email and password, or Google or GitHub once configured).
+3. Open Settings, Members and invite your colleagues by email.
+4. Choose New audit, enter `https://example.com`, and wait for the report (under a minute).
 
 ### 10. Everyday operations
 
 - Logs: `docker compose logs -f api` (or `web`, `caddy`). Status: `docker compose ps`.
 - Update to the latest code: `bash scripts/deploy/update.sh` (git pull, rebuild, restart; the data volume is kept).
-- Backups: `bash scripts/deploy/backup.sh` writes a SQLite snapshot plus the runs and uploads folders to `~/wcag-auditor-backups/` and keeps the newest 7. Schedule it nightly with `crontab -e`:
+- Backups: `bash scripts/deploy/backup.sh` writes a SQLite snapshot plus the runs and uploads folders, and a separate snapshot of the accounts database (`auth.db`), to `~/wcag-auditor-backups/` and keeps the newest 7 of each. Schedule it nightly with `crontab -e`:
 
   ```
   30 2 * * * /home/ubuntu/wcag-auditor/scripts/deploy/backup.sh >> /home/ubuntu/backup.log 2>&1
@@ -165,14 +174,14 @@ The Mac must stay on, awake and connected whenever someone needs the site. Nothi
    cp .env.example .env
    ```
 
-   Fill `ADMIN_USER`, `ADMIN_HASH`, `STUDY_ADMIN_TOKEN` and `TUNNEL_TOKEN`. `DOMAIN` is not used in this mode.
+   Fill `DOMAIN` (the public host name from step 3, used for the sign-in URLs and OAuth callbacks), `BETTER_AUTH_SECRET`, `INTERNAL_API_TOKEN`, `ADMIN_EMAILS`, `STUDY_ADMIN_TOKEN` and `TUNNEL_TOKEN`.
 5. Start it and upload the model as in step 8 (the container name is the same):
 
    ```
    docker compose -f compose.tunnel.yaml up -d --build
    ```
 
-   In this mode only Cloudflare reaches the app: no host ports are published, and Caddy serves plain HTTP inside the compose network. Basic auth, the headers and the participant allow-list are identical to option A.
+   In this mode only Cloudflare reaches the app: no host ports are published, and Caddy serves plain HTTP inside the compose network. Sign-in and the headers are identical to option A.
 6. Mac settings: System Settings, Battery, prevent sleep while plugged in (or run `caffeinate -s`).
 
 Quick tunnel with no domain (random `trycloudflare.com` address that changes on every start): `docker run --rm --network wcag-auditor_default cloudflare/cloudflared:latest tunnel --no-autoupdate --url http://caddy:80`.

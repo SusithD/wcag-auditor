@@ -18,9 +18,6 @@ services:
     security_opt:
       - no-new-privileges:true
     command: caddy run --config /etc/caddy/Caddyfile.tunnel --adapter caddyfile
-    environment:
-      ADMIN_USER: ${ADMIN_USER:?set ADMIN_USER in deploy/.env}
-      ADMIN_HASH: ${ADMIN_HASH:?set ADMIN_HASH in deploy/.env}
     volumes:
       - ./caddy:/etc/caddy:ro
       - caddy_data:/data
@@ -40,5 +37,6 @@ services:
 
 volumes:
   auditor_data:
+  web_data:
   caddy_data:
   caddy_config:
