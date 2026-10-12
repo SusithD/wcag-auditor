@@ -1,0 +1,64 @@
+name: wcag-auditor
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile.api
+    image: wcag-auditor-api:local
+    init: true
+    restart: unless-stopped
+    shm_size: 1gb
+    mem_limit: 8g
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      AUDIT_PDF: ${AUDIT_PDF:-1}
+      STUDY_ADMIN_TOKEN: ${STUDY_ADMIN_TOKEN:-}
+      STUDY_ETHICS_APPROVED: ${STUDY_ETHICS_APPROVED:-0}
+      JOB_TIMEOUT_S: ${JOB_TIMEOUT_S:-900}
+      DECIDED_BY_NAME: ${DECIDED_BY_NAME:-Reviewer}
+    volumes:
+      - auditor_data:/data
+
+  web:
+    build:
+      context: ..
+      dockerfile: Dockerfile.web
+    image: wcag-auditor-web:local
+    init: true
+    restart: unless-stopped
+    mem_limit: 768m
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      API_URL: http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    mem_limit: 256m
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+      - "${HTTPS_PORT:-443}:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in deploy/.env}
+      ADMIN_USER: ${ADMIN_USER:?set ADMIN_USER in deploy/.env}
+      ADMIN_HASH: ${ADMIN_HASH:?set ADMIN_HASH in deploy/.env}
+    volumes:
+      - ./caddy:/etc/caddy:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+
+volumes:
+  auditor_data:
+  caddy_data:
+  caddy_config:
