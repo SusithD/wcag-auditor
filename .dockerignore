@@ -22,5 +22,6 @@ deploy/*
 !deploy/hf
 !deploy/caddy
 apps/web/e2e
+apps/web/playwright.config.ts
 apps/web/playwright-report
 apps/web/test-results
