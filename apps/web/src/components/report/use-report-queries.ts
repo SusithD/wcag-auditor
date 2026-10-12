@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, type RunSummary } from "@/api/client";
 import type { components } from "@/api/types";
 import type { Finding, Viewport } from "@/lib/report";
+import { runAgainBody } from "./logic";
 
 export type Delta = components["schemas"]["DeltaOut"];
 export type DecisionStatus = components["schemas"]["FindingPatch"]["status"];
@@ -93,13 +94,7 @@ export function useRunAgain(
   const client = useQueryClient();
   return useMutation({
     mutationFn: async () => {
-      const base = { condition: run.condition, max_focus_steps: 15 };
-      const body =
-        run.source_kind === "url"
-          ? { ...base, url: run.source, viewports: run.viewports }
-          : run.source_kind === "folder"
-            ? { ...base, folder: run.source }
-            : null;
+      const body = runAgainBody(run);
       if (!body) throw new Error("This source cannot be run again");
       const { data, error } = await api.POST("/runs", { body });
       if (error || !data)

@@ -2,6 +2,7 @@
 
 import { Monitor, Smartphone } from "lucide-react";
 import type { ReactNode } from "react";
+import { sourceParts } from "@/components/report/logic";
 import { PageCrumbs } from "@/components/shell";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { Viewport } from "@/lib/report";
@@ -43,6 +44,7 @@ export const VIEW_NAME: Record<RunView, string> = {
 export function RunHeader({
   runId,
   run,
+  pageUrl,
   viewport,
   available,
   current,
@@ -51,13 +53,21 @@ export function RunHeader({
 }: {
   runId: string;
   run: RunSubject;
+  pageUrl?: string;
   viewport: Viewport;
   available: Viewport[];
   current: RunView;
   onViewport: (vp: Viewport) => void;
   actions?: ReactNode;
 }) {
-  const { host, path } = subjectParts(run.source_kind, run.source);
+  const parts = sourceParts(
+    run.source_kind,
+    run.source,
+    pageUrl,
+    run.created_at,
+  );
+  const host = parts.host;
+  const path = parts.path ?? "";
   const ViewportIcon = viewport === "desktop" ? Monitor : Smartphone;
   return (
     <>

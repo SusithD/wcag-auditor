@@ -5,8 +5,14 @@
   what_failed: >-
     The text colour {fg} on {bg} has a contrast ratio of {ratio}:1; this text needs at least
     {threshold}:1.
+  what_failed_fallback: >-
+    This text does not have enough contrast against its background; it needs at least
+    {contrast_text}:1, or {contrast_large}:1 for large text.
   nearest_passing: >-
     Changing the text colour to {nearest} on {bg} reaches {threshold}:1 with the smallest change.
+  nearest_passing_fallback: >-
+    Darken the text or lighten its background until the contrast reaches {contrast_text}:1, or
+    {contrast_large}:1 for large text.
   fix_css: |-
     .element {
       color: {nearest};
@@ -126,6 +132,10 @@
   what_failed: >-
     This target is {w} x {h} CSS px and no exception applies; targets need to be at least
     {threshold} x {threshold} CSS px, or be spaced so that a {threshold} px circle centred on the
+    target does not reach another target or its circle.
+  what_failed_fallback: >-
+    This target is smaller than {threshold} x {threshold} CSS px and no exception applies; targets
+    need to be at least that size, or be spaced so that a {threshold} px circle centred on the
     target does not reach another target or its circle.
   nearest_passing: Make the target at least {threshold} x {threshold} CSS px.
   fix_css: |-

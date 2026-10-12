@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { RunSummary } from "@/api/client";
 import {
   bucketCriteria,
   contrastRatio,
@@ -7,6 +8,7 @@ import {
   fixDiff,
   foundBy,
   groupFindings,
+  hasPlaceholder,
   isEstimated,
   parseRatio,
   provenanceWords,
@@ -15,11 +17,13 @@ import {
   ruler,
   rulerLabel,
   rulerPosition,
+  runAgainBody,
   sentence,
   sourceParts,
   tally,
   verdictSentence,
   verdictText,
+  withoutPlaceholders,
 } from "@/components/report/logic";
 import type { CoverageCell, Finding } from "@/lib/report";
 
@@ -407,5 +411,68 @@ describe("header facts", () => {
     expect(relativeTime("2026-10-12T09:00:00Z", now)).toBe("3 h ago");
     expect(relativeTime("2026-10-10T12:00:00Z", now)).toBe("2 days ago");
     expect(relativeTime("not a date", now)).toBe("");
+  });
+});
+
+describe("placeholder guard", () => {
+  it("detects a lone question mark token but not prose", () => {
+    expect(hasPlaceholder("at least ? x ? CSS px")).toBe(true);
+    expect(hasPlaceholder("min-width: ?px;")).toBe(true);
+    expect(hasPlaceholder("a ratio of ?:1")).toBe(true);
+    expect(hasPlaceholder("Is this readable?")).toBe(false);
+  });
+
+  it("drops only the sentences that contain a placeholder", () => {
+    expect(
+      withoutPlaceholders(
+        "This target is 18 x 18 px. It needs ? px. Make it larger.",
+      ),
+    ).toBe("This target is 18 x 18 px. Make it larger.");
+  });
+});
+
+describe("run again body", () => {
+  const run: Pick<RunSummary, "condition" | "viewports"> = {
+    condition: "hybrid",
+    viewports: ["desktop"],
+  };
+  it("repeats a folder run with its stored condition and no viewports", () => {
+    expect(
+      runAgainBody({ ...run, source_kind: "folder", source: "/cap/a" }),
+    ).toEqual({
+      condition: "hybrid",
+      max_focus_steps: 15,
+      folder: "/cap/a",
+    });
+  });
+
+  it("repeats a url or upload run with its viewports", () => {
+    expect(
+      runAgainBody({ ...run, source_kind: "url", source: "https://a.test/" }),
+    ).toEqual({
+      condition: "hybrid",
+      max_focus_steps: 15,
+      url: "https://a.test/",
+      viewports: ["desktop"],
+    });
+    expect(
+      runAgainBody({ ...run, source_kind: "upload", source: "abc" }),
+    ).toMatchObject({
+      upload_id: "abc",
+      viewports: ["desktop"],
+    });
+  });
+});
+
+describe("upload source label", () => {
+  it("names an uploaded run by its date instead of the hash", () => {
+    expect(
+      sourceParts(
+        "upload",
+        "8ea5f76e95dd4f7c",
+        undefined,
+        "2026-10-11T10:00:00Z",
+      ),
+    ).toEqual({ host: "Uploaded screenshots, 11 Oct", path: null });
   });
 });

@@ -151,7 +151,7 @@ export function CriteriaRail({
   return (
     <nav
       aria-label="Criteria"
-      className="flex h-full flex-col overflow-y-auto p-3"
+      className="relative flex h-full flex-col overflow-y-auto p-3"
     >
       <h2 className="sr-only">Criteria</h2>
       <div className="mb-1 flex flex-col gap-2">
@@ -254,10 +254,12 @@ export function CriteriaRail({
                             </span>
                             <Level level={SC_LEVELS[sc] ?? "AA"} />
                             <span className="num text-right text-xs text-ink-2">
-                              {n > 0 ? n : ""}
+                              {n > 0 || bucket === "review" ? n : ""}
                               <span className="sr-only">
-                                {n > 0 ? " findings" : ""},{" "}
-                                {BUCKET_TITLES[bucket]}
+                                {n > 0 || bucket === "review"
+                                  ? ` ${n === 1 ? "finding" : "findings"}`
+                                  : ""}
+                                , {BUCKET_TITLES[bucket]}
                               </span>
                             </span>
                           </button>

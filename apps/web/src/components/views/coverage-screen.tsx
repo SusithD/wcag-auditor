@@ -89,6 +89,7 @@ export function CoverageScreen({ runId }: { runId: string }) {
       <RunHeader
         runId={runId}
         run={run.data}
+        pageUrl={overview.data?.url}
         viewport={viewport}
         available={available}
         current="coverage"

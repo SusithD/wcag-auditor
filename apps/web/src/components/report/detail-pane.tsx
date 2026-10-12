@@ -42,6 +42,7 @@ import {
   type FixDiff,
   fixDiff,
   foundBy,
+  hasPlaceholder,
   parseRatio,
   provenanceWords,
   ratioPair,
@@ -49,6 +50,7 @@ import {
   SC_LEVELS,
   scTitle,
   sentence,
+  withoutPlaceholders,
 } from "./logic";
 import { Seg } from "./seg";
 import type { DecisionVars } from "./use-report-queries";
@@ -116,7 +118,7 @@ function DiffView({ diff, label }: { diff: FixDiff; label: string }) {
         role="region"
         aria-label={label}
         tabIndex={0}
-        className="overflow-x-auto"
+        className="relative overflow-x-auto"
       >
         <div className="min-w-max">
           {diff.lines.map((line, i) => (
@@ -174,7 +176,8 @@ function FixSection({
     g?.fix_css || !g?.fix_html ? "css" : "html",
   );
   if (!g) return null;
-  const code = format === "css" ? g.fix_css : g.fix_html;
+  const rawCode = format === "css" ? g.fix_css : g.fix_html;
+  const code = hasPlaceholder(rawCode) ? "" : rawCode;
   const upper = format === "css" ? "CSS" : "HTML";
   const diff = fixDiff(format, code, finding.evidence_rows);
   return (
@@ -199,7 +202,9 @@ function FixSection({
           />
         ) : null}
       </div>
-      <p className="text-dense text-ink-2">{plainText(g.nearest_passing)}</p>
+      <p className="text-dense text-ink-2">
+        {withoutPlaceholders(plainText(g.nearest_passing))}
+      </p>
       {code ? (
         <>
           <DiffView diff={diff} label={`${upper} fix`} />
@@ -375,7 +380,7 @@ export function DetailPane({
       aria-labelledby="detail-h"
       className="flex h-full min-h-0 flex-col"
     >
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="relative min-h-0 flex-1 overflow-y-auto">
         <div className="flex flex-col gap-2.5 border-b border-line p-4">
           {onBack ? (
             <Button
@@ -432,7 +437,9 @@ export function DetailPane({
             </>
           ) : null}
           {g ? (
-            <p className="text-dense text-ink-2">{plainText(g.what_failed)}</p>
+            <p className="text-dense text-ink-2">
+              {withoutPlaceholders(plainText(g.what_failed))}
+            </p>
           ) : null}
           {reason ? (
             <div className="flex items-start gap-2.5 rounded-md bg-review-bg p-2.5 text-dense text-ink">

@@ -988,3 +988,56 @@ test("J and K are ignored when single-key shortcuts are off, and a fixed finding
   await page.getByRole("button", { name: "Reopen" }).click();
   await expect(page.getByTestId("decision-notice")).toHaveCount(0);
 });
+
+test("with a finding selected the sidebar stays at the viewport bottom after scrolling to the end", async ({
+  page,
+  request,
+}) => {
+  const id = await ensureRun(request, "mobile");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openReport(page, id);
+  await boxes(page).first().focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/f=f\d+/);
+  await page.evaluate(() =>
+    window.scrollTo(0, document.scrollingElement?.scrollHeight ?? 0),
+  );
+  const geometry = await page.evaluate(() => {
+    const root = document.scrollingElement as HTMLElement;
+    const shell = document.querySelector("aside")?.parentElement as HTMLElement;
+    const aside = document.querySelector("aside") as HTMLElement;
+    return {
+      scrollHeight: root.scrollHeight,
+      shellBottom: shell.getBoundingClientRect().bottom + window.scrollY,
+      innerHeight: window.innerHeight,
+      asideBottom: aside.getBoundingClientRect().bottom,
+    };
+  });
+  expect(Math.round(geometry.asideBottom)).toBe(geometry.innerHeight);
+  expect(geometry.scrollHeight).toBeLessThanOrEqual(
+    Math.ceil(geometry.shellBottom) + 1,
+  );
+});
+
+test("group by is kept in the URL and survives a reload, and a criterion link keeps the viewport", async ({
+  page,
+  request,
+}) => {
+  const id = await ensureRun(request, "mobile");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openReport(page, id);
+  const rail = page.getByRole("navigation", { name: "Criteria" });
+  const group = rail.getByRole("group", { name: "Group by" });
+  await group.getByRole("button", { name: "Severity" }).click();
+  await expect(page).toHaveURL(/group=severity/);
+  await page.reload();
+  await expect(group.getByRole("button", { name: "Severity" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await group.getByRole("button", { name: "Criterion" }).click();
+  await expect(page).not.toHaveURL(/group=/);
+  await rail.getByRole("button", { name: /2\.4\.13/ }).click();
+  await expect(page).toHaveURL(/sc=2\.4\.13/);
+  await expect(page).toHaveURL(/vp=mobile/);
+});

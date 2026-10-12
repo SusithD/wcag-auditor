@@ -144,7 +144,7 @@ export function ViewTabs({
   return (
     <nav
       aria-label="Report views"
-      className="mt-4 flex flex-nowrap gap-x-6 overflow-x-auto shadow-[inset_0_-1px_0_var(--line)]"
+      className="relative mt-4 flex flex-nowrap gap-x-6 overflow-x-auto shadow-[inset_0_-1px_0_var(--line)]"
     >
       {items.map((item) => (
         <Link

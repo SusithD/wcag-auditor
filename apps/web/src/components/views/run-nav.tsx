@@ -37,7 +37,7 @@ export function RunNav({
     <nav
       aria-label="Run views"
       className={cn(
-        "flex flex-nowrap gap-x-6 overflow-x-auto shadow-[inset_0_-1px_0_var(--line)] max-[720px]:gap-x-4",
+        "relative flex flex-nowrap gap-x-6 overflow-x-auto shadow-[inset_0_-1px_0_var(--line)] max-[720px]:gap-x-4",
         className,
       )}
     >
