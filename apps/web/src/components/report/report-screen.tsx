@@ -288,7 +288,7 @@ export function ReportScreen({
             <CollapsibleContent>
               <pre
                 tabIndex={0}
-                className="mt-2 overflow-auto rounded-md border border-line bg-subtle p-2 font-mono text-xs"
+                className="relative mt-2 overflow-auto rounded-md border border-line bg-subtle p-2 font-mono text-xs"
               >
                 {run.error}
               </pre>

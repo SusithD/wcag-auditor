@@ -235,7 +235,7 @@ export function FindingsTable({
         tabIndex={0}
         role="region"
         aria-label="Findings table"
-        className="min-h-0 flex-1 overflow-auto"
+        className="relative min-h-0 flex-1 overflow-auto"
         style={{ scrollPaddingTop: HEAD * 2 }}
       >
         <table

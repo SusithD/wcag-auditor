@@ -151,7 +151,7 @@ export function CriteriaRail({
   return (
     <nav
       aria-label="Criteria"
-      className="flex h-full flex-col overflow-y-auto p-3"
+      className="relative flex h-full flex-col overflow-y-auto p-3"
     >
       <h2 className="sr-only">Criteria</h2>
       <div className="mb-1 flex flex-col gap-2">

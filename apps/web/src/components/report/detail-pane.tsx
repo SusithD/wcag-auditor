@@ -116,7 +116,7 @@ function DiffView({ diff, label }: { diff: FixDiff; label: string }) {
         role="region"
         aria-label={label}
         tabIndex={0}
-        className="overflow-x-auto"
+        className="relative overflow-x-auto"
       >
         <div className="min-w-max">
           {diff.lines.map((line, i) => (
@@ -375,7 +375,7 @@ export function DetailPane({
       aria-labelledby="detail-h"
       className="flex h-full min-h-0 flex-col"
     >
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="relative min-h-0 flex-1 overflow-y-auto">
         <div className="flex flex-col gap-2.5 border-b border-line p-4">
           {onBack ? (
             <Button
