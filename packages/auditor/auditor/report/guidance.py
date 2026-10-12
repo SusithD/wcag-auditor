@@ -7,6 +7,7 @@ from typing import Any
 
 import yaml
 
+from auditor import protocol
 from auditor.modules.color import RGB, contrast_ratio, hex_of
 from auditor.schema import Finding
 
@@ -61,6 +62,8 @@ _AXE_FG = re.compile(r"foreground color: (#[0-9a-fA-F]{6})")
 _AXE_BG = re.compile(r"background color: (#[0-9a-fA-F]{6})")
 _AXE_EXPECTED = re.compile(r"Expected contrast ratio of ([\d.]+):1")
 _AXE_SIZE = re.compile(r"size \(([\d.]+)px by ([\d.]+)px")
+_AXE_FONT_PT = re.compile(r"font size: ([\d.]+)pt(?: \(([\d.]+)px\))?")
+_AXE_WEIGHT = re.compile(r"font weight: (\w+)")
 
 
 def axe_facts(summary: str) -> dict[str, Any]:
@@ -78,6 +81,14 @@ def axe_facts(summary: str) -> dict[str, Any]:
     size = _AXE_SIZE.search(summary)
     if size:
         facts.update(w=float(size.group(1)), h=float(size.group(2)))
+    font = _AXE_FONT_PT.search(summary)
+    if font:
+        px = float(font.group(2)) if font.group(2) else float(font.group(1)) * 96 / 72
+        lt = protocol.load().thresholds.large_text
+        weight = _AXE_WEIGHT.search(summary)
+        word = weight.group(1) if weight else ""
+        bold = word == "bold" or (word.isdigit() and int(word) >= lt.bold_weight)
+        facts["large_text"] = px >= lt.min_px or (bold and px >= lt.min_px_bold)
     return facts
 
 
@@ -109,39 +120,84 @@ def _context(f: Finding) -> dict[str, Any]:
     for key in ("w", "h"):
         if isinstance(ctx.get(key), float) and float(ctx[key]).is_integer():
             ctx[key] = int(ctx[key])
+    _protocol_defaults(f.sc, ctx)
     return ctx
 
 
+def _protocol_defaults(sc: str, ctx: dict[str, Any]) -> None:
+    th = protocol.load().thresholds
+    if sc in {"2.5.7", "2.5.8"}:
+        ctx.setdefault("threshold", th.target_size_px)
+    elif sc == "1.4.11":
+        ctx.setdefault("threshold", th.contrast.non_text)
+    elif sc == "1.4.3":
+        ctx.setdefault("contrast_text", th.contrast.text)
+        ctx.setdefault("contrast_large", th.contrast.large_text)
+        large = ctx.get("large_text")
+        if "threshold" not in ctx and isinstance(large, bool):
+            ctx["threshold"] = th.contrast.large_text if large else th.contrast.text
+
+
+def _fill(text: str, ctx: dict[str, Any]) -> str | None:
+    missing = False
+
+    def sub(m: re.Match[str]) -> str:
+        nonlocal missing
+        value = ctx.get(m.group(1))
+        if value is None or value == "":
+            missing = True
+            return ""
+        return str(value)
+
+    out = _PLACEHOLDER.sub(sub, text)
+    return None if missing else out
+
+
+def _without_unknowns(text: str, ctx: dict[str, Any]) -> str:
+    sentences = re.split(r"(?<=\.) ", text)
+    return " ".join(s for s in (_fill(x, ctx) for x in sentences) if s)
+
+
+def _field(entry: dict[str, Any], name: str, ctx: dict[str, Any], *, collapse: bool) -> str:
+    def prep(text: str) -> str:
+        return " ".join(text.split()) if collapse else text
+
+    primary = _fill(prep(str(entry.get(name) or "")), ctx)
+    if primary is not None:
+        return primary
+    fallback = entry.get(f"{name}_fallback")
+    if fallback:
+        filled = _fill(prep(str(fallback)), ctx)
+        if filled is not None:
+            return filled
+    return _without_unknowns(prep(str(entry.get(name) or "")), ctx) if collapse else ""
+
+
 def render(f: Finding) -> dict[str, Any]:
-    """Guidance for one finding with the evidence filled in (missing values stay as '?')."""
+    """Guidance for one finding with the evidence filled in; sentences whose values are unknown
+    are replaced by the entry's fallback wording or left out."""
     entry = load().get(f.guidance_key)
     if entry is None:
         return {}
     ctx = _context(f)
     fg = str(ctx.get("fg", ""))
     bg = str(ctx.get("bg", ""))
-    if f.sc == "1.4.3" and fg and bg:
-        ctx["nearest"] = (
-            nearest_passing(fg, bg, float(ctx.get("threshold", 0))) or "a darker colour"
-        )
+    if f.sc == "1.4.3" and fg and bg and ctx.get("threshold") is not None:
+        ctx["nearest"] = nearest_passing(fg, bg, float(ctx["threshold"])) or "a darker colour"
     if f.sc == "1.4.11":
         border, outside = str(ctx.get("border", "")), str(ctx.get("outside", ""))
         if border and outside:
             ctx["nearest"] = (
-                nearest_passing(border, outside, float(ctx.get("threshold", 0)))
-                or "a darker colour"
+                nearest_passing(border, outside, float(ctx["threshold"])) or "a darker colour"
             )
-
-    def fill(text: str) -> str:
-        return _PLACEHOLDER.sub(lambda m: str(ctx.get(m.group(1), "?")), text) if text else text
 
     return {
         "sc_title": entry["sc_title"],
         "level": entry["level"],
         "understanding": entry["understanding"],
-        "what_failed": fill(" ".join(str(entry["what_failed"]).split())),
-        "nearest_passing": fill(" ".join(str(entry["nearest_passing"]).split())),
-        "fix_css": fill(entry["fix_css"]),
-        "fix_html": fill(entry["fix_html"] or ""),
+        "what_failed": _field(entry, "what_failed", ctx, collapse=True),
+        "nearest_passing": _field(entry, "nearest_passing", ctx, collapse=True),
+        "fix_css": _field(entry, "fix_css", ctx, collapse=False),
+        "fix_html": _field(entry, "fix_html", ctx, collapse=False),
         "techniques": entry["techniques"],
     }

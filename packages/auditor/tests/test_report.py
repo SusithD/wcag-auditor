@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 from _fusion_cases import finding, hand_built
+from auditor import protocol
 from auditor.fusion import fuse
 from auditor.fusion.coverage import Inputs, build_coverage, pixel_verdicts, rule_verdicts
 from auditor.report import build, guidance
@@ -126,10 +127,70 @@ def test_guidance_fills_evidence_and_leaves_css_braces_alone() -> None:
     )
 
 
-def test_missing_evidence_shows_a_question_mark_not_a_crash() -> None:
+def test_missing_evidence_is_filled_from_the_protocol_or_worded_without_a_placeholder() -> None:
     f = finding("2.5.8", (0, 0, 18, 18), "serious", "automated", "pixel", key="2.5.8/target-size")
-    text = guidance.render(f)["what_failed"]
-    assert "18 x 18" in text and "at least ? x ?" in text
+    g = guidance.render(f)
+    size = protocol.load().thresholds.target_size_px
+    assert "This target is 18 x 18 CSS px" in g["what_failed"]
+    assert f"at least {size} x {size} CSS px" in g["what_failed"]
+    assert f"min-width: {size}px;" in g["fix_css"]
+
+
+def fixture_findings(sc: str) -> list[Finding]:
+    out: list[Finding] = []
+    for path in sorted((FIXTURES / "baseline_golden").glob("*.json")):
+        for raw in json.loads(path.read_text())["findings"]:
+            if raw.get("sc") != sc:
+                continue
+            box = raw["bbox"]
+            out.append(
+                finding(
+                    sc,
+                    (box["x"], box["y"], box["w"], box["h"]),
+                    "serious",
+                    "automated",
+                    "rule",
+                    1.0,
+                    key=f"{sc}/target-size" if sc == "2.5.8" else "1.4.3/contrast",
+                    evidence={"rule": {"summary": raw["summary"]}},
+                )
+            )
+    return out
+
+
+@pytest.mark.parametrize("sc", ["1.4.3", "2.5.8"])
+def test_guidance_for_fixture_findings_has_no_placeholder(sc: str) -> None:
+    findings = fixture_findings(sc)
+    assert findings
+    for f in findings:
+        g = guidance.render(f)
+        for field in ("what_failed", "nearest_passing", "fix_css", "fix_html"):
+            assert "?" not in g[field], (field, g[field])
+        assert g["what_failed"]
+
+
+def test_contrast_without_a_known_text_size_names_both_protocol_thresholds() -> None:
+    th = protocol.load().thresholds.contrast
+    rule = finding(
+        "1.4.3", (0, 0, 10, 10), "serious", "automated", "rule", 1.0, key="1.4.3/contrast"
+    ).model_copy(
+        update={"evidence": {"rule": {"summary": "contrast of 2.5 (foreground color: #999999)"}}}
+    )
+    g = guidance.render(rule)
+    assert f"{th.text}:1" in g["what_failed"] and f"{th.large_text}:1" in g["what_failed"]
+    assert "?" not in g["what_failed"] + g["nearest_passing"]
+
+
+def test_large_text_uses_the_large_text_threshold() -> None:
+    th = protocol.load().thresholds.contrast
+    summary = (
+        "Element has insufficient color contrast of 2.05 (foreground color: #aed6f1, "
+        "background color: #3498db, font size: 30.0pt (40px), font weight: normal)"
+    )
+    rule = finding(
+        "1.4.3", (0, 0, 10, 10), "serious", "automated", "rule", 1.0, key="1.4.3/contrast"
+    ).model_copy(update={"evidence": {"rule": {"summary": summary}}})
+    assert f"at least {th.large_text}:1" in guidance.render(rule)["what_failed"]
 
 
 def test_report_json_extends_the_run_and_still_validates_as_one(tmp_path: Path) -> None:
