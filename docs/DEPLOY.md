@@ -1,5 +1,7 @@
 # Deploying wcag-auditor for free
 
+Recommended free option: a Hugging Face Docker Space, see [DEPLOY_HF.md](DEPLOY_HF.md). The Oracle Cloud and Cloudflare Tunnel options below remain as alternatives.
+
 Two free ways to put the app on the internet. Both run the same three containers (api, web, caddy) from `deploy/compose.yaml`.
 
 | Option | Cost | Always on | Best for |

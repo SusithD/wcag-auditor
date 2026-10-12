@@ -1,0 +1,78 @@
+name: hf-space
+
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: hf-space
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    env:
+      HF_SPACE: ${{ vars.HF_SPACE }}
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+    steps:
+      - name: Check configuration
+        id: config
+        shell: bash
+        run: |
+          if [ -z "$HF_SPACE" ] || [ -z "$HF_TOKEN" ]; then
+            echo "::notice::Skipping the Hugging Face Space deploy: set the repository variable HF_SPACE and the secret HF_TOKEN to enable it."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.config.outputs.enabled == 'true'
+        with:
+          lfs: true
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Build the Space tree
+        if: steps.config.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          set -eu
+          out="$RUNNER_TEMP/space"
+          rm -rf "$out"
+          mkdir -p "$out/deploy" "$out/apps"
+          cp pyproject.toml uv.lock CHECK_CATALOGUE.md "$out/"
+          cp -R packages services fixtures study "$out/"
+          mkdir -p "$out/eval"
+          cp -R eval/detector "$out/eval/detector"
+          cp -R apps/web "$out/apps/web"
+          cp -R deploy/caddy deploy/hf "$out/deploy/"
+          cp Dockerfile.hf "$out/Dockerfile"
+          cp deploy/hf/README.space.md "$out/README.md"
+          rm -f "$out/deploy/hf/README.space.md"
+          find "$out" \( -name node_modules -o -name .next -o -name __pycache__ -o -name .venv -o -name '.env' -o -name '.env.*' -o -name '*.onnx' -o -name '*.pt' -o -name '*.db' \) -prune -exec rm -rf {} +
+          find "$out" -name '.env.example' -delete
+          test -f "$out/Dockerfile"
+          test -f "$out/README.md"
+          du -sh "$out"
+
+      - name: Push to the Space
+        if: steps.config.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          set -eu
+          echo "::add-mask::$HF_TOKEN"
+          cd "$RUNNER_TEMP/space"
+          git init --quiet -b main
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A
+          git commit --quiet -m "Deploy ${GITHUB_SHA::7}"
+          git push --quiet --force "https://hf:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE}" main:main 2>&1 | sed "s/${HF_TOKEN}/***/g"
+          test "${PIPESTATUS[0]}" -eq 0

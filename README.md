@@ -77,6 +77,11 @@ uv run uvicorn app.main:app --app-dir services/app                 # API on :800
 pnpm -C apps/web dev                                               # web app
 ```
 
+## Deploy
+
+- [docs/DEPLOY_HF.md](docs/DEPLOY_HF.md): recommended free option, a Hugging Face Docker Space (no card needed).
+- [docs/DEPLOY.md](docs/DEPLOY.md): Oracle Cloud Always Free VM or a Mac with a Cloudflare Tunnel.
+
 ## Documents
 
 | File | Purpose |
