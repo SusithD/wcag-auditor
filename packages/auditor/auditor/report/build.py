@@ -122,7 +122,7 @@ def evidence_rows(f: Finding) -> list[tuple[str, str]]:
     elif f.sc == "2.5.8":
         if ctx.get("w") is not None and ctx.get("h") is not None:
             add("Measured size", f"{ctx['w']} x {ctx['h']} px")
-        threshold = pixel.get("threshold") or 24
+        threshold = pixel.get("threshold") or ctx["threshold"]
         add("Required size", f"{threshold} x {threshold} px")
     elif f.sc == "2.5.7":
         add("Alternatives found", pixel.get("alternatives_found"))

@@ -326,3 +326,7 @@ State before M10: M0-M5, M1b and M10a merged and pushed. M10's full training run
   - All other criteria (1.4.3, 2.4.7, 2.4.11, 2.4.12, 2.4.13, 2.5.7) are identical to the no-detector run.
 - **Decision needed (NOT made here):** which run is the Chapter 5 headline. The no-detector run is the DOM-less benchmark baseline under ADR-012; the detector run is the full hybrid system as shipped. Both are committed; report both with this comparison. The secondary runs (automated-only, ring-exempt) and the stability check were not repeated with the detector.
 - The reason field added in 73a5954 (`needs_review_reason`) does not change any metric.
+
+## UI redesign
+
+- The study embed keeps its stimulus unchanged, so it does not show the 8 of 86 scope line (DESIGN_SPEC_V3 principle 5 exception; changing it would alter the ethics-reviewed stimulus).

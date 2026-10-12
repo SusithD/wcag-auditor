@@ -68,7 +68,7 @@ const ERROR_PATTERNS: [RegExp, string][] = [
   ],
   [
     /ERR_NAME_NOT_RESOLVED|ENOTFOUND|getaddrinfo|ERR_CONNECTION|ECONNREFUSED|ERR_ADDRESS|ERR_INTERNET_DISCONNECTED|net::ERR|dns/i,
-    "We could not reach that address. Check it and try again.",
+    "The tool could not reach that address. Check it and try again.",
   ],
 ];
 

@@ -1,41 +1,40 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import { api, TERMINAL } from "@/api/client";
+import {
+  DefinitionRows,
+  Level,
+  Meter,
+  Panel,
+  PanelBody,
+  PanelHeader,
+  ScCode,
+  StatusShape,
+} from "@/components/ds";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useFindings, useOverview } from "@/hooks/use-report-data";
 import { useCatalogue } from "@/hooks/use-run-views";
 import { emphasisSegments, plainWording } from "@/lib/coverage-text";
-import { type Finding, SC_LIST, SC_TITLES, type Viewport } from "@/lib/report";
-import { RunNav } from "./run-nav";
-import { focusOnMount, useViewportParam } from "./viewport-state";
+import { SC_LIST, SC_TITLES, type Viewport } from "@/lib/report";
+import {
+  CHANNELS,
+  type Channel,
+  findingsFor,
+  meterFor,
+  plural,
+  SC_LEVEL,
+  STATE_SHAPE,
+  STATE_WORD,
+  stateFor,
+  type Verdict,
+} from "./coverage-model";
+import { RunHeader } from "./run-header";
+import { ViewMessage } from "./view-message";
+import { useViewportParam } from "./viewport-state";
 
-const VERDICT = {
-  automated: { glyph: "●", text: "Automated verdict" },
-  "needs-review": { glyph: "◇", text: "Needs review" },
-  "not-assessable": { glyph: "—", text: "Not assessable" },
-  none: { glyph: "○", text: "No verdict" },
-} as const;
-
-type Channel = "rule" | "pixel" | "hybrid";
-const CHANNELS: { key: Channel; label: string }[] = [
-  { key: "rule", label: "Rule channel" },
-  { key: "pixel", label: "Pixel channel" },
-  { key: "hybrid", label: "Hybrid" },
-];
-
-function countFor(findings: Finding[], sc: string, channel: Channel) {
-  return findings.filter(
-    (f) =>
-      f.sc === sc &&
-      (channel === "hybrid" ||
-        f.provenance === "both" ||
-        (channel === "rule"
-          ? f.provenance === "rule"
-          : f.provenance === "pixel")),
-  ).length;
-}
+const SCOPE = "This tool checks 8 of the 86 WCAG 2.2 success criteria.";
 
 export function CoverageScreen({ runId }: { runId: string }) {
   const run = useQuery({
@@ -61,7 +60,7 @@ export function CoverageScreen({ runId }: { runId: string }) {
     return <Message title="This run has no report" />;
   if (!run.data || overview.isPending || findings.isPending || !viewport) {
     return (
-      <div className="p-6" aria-busy="true">
+      <div aria-busy="true">
         <title>Coverage - WCAG Auditor</title>
         <Skeleton className="h-64 w-full max-w-4xl" />
       </div>
@@ -73,75 +72,87 @@ export function CoverageScreen({ runId }: { runId: string }) {
   const cells = Object.fromEntries(
     overview.data.coverage.map((c) => [c.sc, c]),
   );
+  const verdictOf = (sc: string, channel: Channel): Verdict =>
+    cells[sc]?.[`${channel}_verdict`] ?? "none";
   const reliable = (channel: Channel) =>
-    overview.data.coverage.filter(
-      (c) => c[`${channel}_verdict`] === "automated",
-    ).length;
+    SC_LIST.filter((sc) => verdictOf(sc, channel) === "automated").length;
   const any = (channel: Channel) =>
-    overview.data.coverage.filter(
-      (c) =>
-        c[`${channel}_verdict`] !== "none" &&
-        c[`${channel}_verdict`] !== "not-assessable",
-    ).length;
+    SC_LIST.filter((sc) => {
+      const v = verdictOf(sc, channel);
+      return v !== "none" && v !== "not-assessable";
+    }).length;
+  const main: Channel = run.data.condition === "hybrid" ? "hybrid" : "rule";
+  const meter = meterFor(SC_LIST.map((sc) => verdictOf(sc, main)));
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-6 py-6">
-      <title>{`Coverage - ${overview.data.url}`}</title>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1
-            ref={focusOnMount}
-            tabIndex={-1}
-            className="text-h2 font-semibold outline-none"
-          >
-            Coverage
-          </h1>
-          <p className="font-mono text-label text-muted-foreground">
-            {overview.data.url}
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <RunNav runId={runId} current="coverage" query={`?vp=${viewport}`} />
-          {available.length > 1 ? (
-            <ToggleGroup
-              variant="outline"
-              size="sm"
-              value={[viewport]}
-              onValueChange={(v) => v[0] && setViewport(v[0] as Viewport)}
-              aria-label="Viewport"
-            >
-              {available.map((vp) => (
-                <ToggleGroupItem key={vp} value={vp}>
-                  {vp === "desktop" ? "Desktop" : "Mobile"}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          ) : null}
-        </div>
-      </div>
+    <div className="w-full">
+      <RunHeader
+        runId={runId}
+        run={run.data}
+        pageUrl={overview.data?.url}
+        viewport={viewport}
+        available={available}
+        current="coverage"
+        onViewport={setViewport}
+      />
 
-      <p
-        id="coverage-caption"
-        className="mt-4 pb-2 text-caption text-muted-foreground"
-      >
+      <Panel aria-labelledby="coverage-h" className="mt-6">
+        <PanelHeader
+          id="coverage-h"
+          title="Coverage"
+          right={
+            <span className="text-ink-3">
+              {main === "hybrid" ? "Detector and rules" : "Rules only"} verdicts
+            </span>
+          }
+        />
+        <PanelBody className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <Meter
+              decided={meter.decided}
+              review={meter.review}
+              undecided={meter.undecided}
+              className="w-40"
+            />
+            <p className="text-dense text-ink-2">
+              <span className="num">{meter.decided}</span> decided,{" "}
+              <span className="num">{meter.review}</span> to review,{" "}
+              <span className="num">{meter.undecided}</span> could not be
+              decided
+            </p>
+          </div>
+          <p className="text-dense text-ink-3">
+            {SCOPE}{" "}
+            <Link
+              href="/help"
+              className="font-medium text-accent underline underline-offset-3"
+            >
+              What this result does not mean
+            </Link>
+          </p>
+        </PanelBody>
+      </Panel>
+
+      <p id="coverage-caption" className="mt-6 pb-2 text-dense text-ink-2">
         Which channel returned a verdict for each criterion, and how many
         findings it produced
       </p>
-      <div
-        className="relative overflow-x-auto"
+      <Panel
+        as="div"
+        className="relative overflow-x-auto focus-visible:outline-2 focus-visible:outline-ring"
         role="region"
         aria-labelledby="coverage-caption"
         tabIndex={0}
       >
         <table
-          className="w-full border-collapse text-row"
+          className="w-full border-collapse text-dense"
           aria-labelledby="coverage-caption"
         >
           <thead>
-            <tr>
+            <tr className="h-9 border-b border-line">
               <th
                 scope="col"
-                className="border-b px-3 py-2 text-left font-medium"
+                className="px-4 text-left text-xs font-medium whitespace-nowrap text-ink-3"
               >
                 Success criterion
               </th>
@@ -149,7 +160,7 @@ export function CoverageScreen({ runId }: { runId: string }) {
                 <th
                   key={c.key}
                   scope="col"
-                  className="border-b px-3 py-2 text-left font-medium"
+                  className="px-3 text-left text-xs font-medium whitespace-nowrap text-ink-3"
                 >
                   {c.label}
                 </th>
@@ -158,23 +169,30 @@ export function CoverageScreen({ runId }: { runId: string }) {
           </thead>
           <tbody>
             {SC_LIST.map((sc) => (
-              <tr key={sc}>
+              <tr key={sc} className="h-12 border-b border-line">
                 <th
                   scope="row"
-                  className="border-b px-3 py-2 text-left font-normal"
+                  className="px-4 text-left font-normal whitespace-nowrap text-ink"
                 >
-                  <span className="font-mono text-label">{sc}</span>{" "}
-                  {SC_TITLES[sc]}
+                  <span className="inline-flex items-center gap-2">
+                    <span>
+                      <ScCode code={sc} /> {SC_TITLES[sc]}
+                    </span>
+                    {SC_LEVEL[sc] ? <Level level={SC_LEVEL[sc]} /> : null}
+                  </span>
                 </th>
                 {CHANNELS.map((c) => {
-                  const verdict = cells[sc]?.[`${c.key}_verdict`] ?? "none";
-                  const v = VERDICT[verdict];
+                  const found = findingsFor(findings.data, sc, c.key);
+                  const state = stateFor(verdictOf(sc, c.key), found);
                   return (
-                    <td key={c.key} className="border-b px-3 py-2">
-                      <span aria-hidden="true">{v.glyph}</span> {v.text}
+                    <td key={c.key} className="px-3 whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1.5 text-ink">
+                        <StatusShape kind={STATE_SHAPE[state]} />
+                        {STATE_WORD[state]}
+                      </span>
                       <span className="sr-only">, </span>
-                      <span className="ml-2 font-mono text-label text-muted-foreground">
-                        {countFor(findings.data, sc, c.key)} findings
+                      <span className="num ml-2 text-xs text-ink-3">
+                        {plural(found.length, "finding", "findings")}
                       </span>
                     </td>
                   );
@@ -183,12 +201,18 @@ export function CoverageScreen({ runId }: { runId: string }) {
             ))}
           </tbody>
           <tfoot>
-            <tr>
-              <th scope="row" className="px-3 py-2 text-left">
+            <tr className="h-10 bg-subtle">
+              <th
+                scope="row"
+                className="px-4 text-left font-medium whitespace-nowrap text-ink"
+              >
                 SCs with a reliable verdict
               </th>
               {CHANNELS.map((c) => (
-                <td key={c.key} className="px-3 py-2 font-mono text-label">
+                <td
+                  key={c.key}
+                  className="num px-3 whitespace-nowrap text-ink-2"
+                >
                   {reliable(c.key)} / 8 automated, {any(c.key)} / 8 with any
                   verdict
                 </td>
@@ -196,57 +220,77 @@ export function CoverageScreen({ runId }: { runId: string }) {
             </tr>
           </tfoot>
         </table>
-      </div>
+      </Panel>
 
-      <p className="mt-3 text-caption text-muted-foreground">
-        Legend: ● automated verdict · ◇ needs review · — not assessable · ○ no
-        verdict. Counts are findings on this viewport; the rule column counts
-        findings the rule channel contributed to.
-      </p>
+      <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-dense text-ink-2">
+        {(["failed", "review", "pass", "undecided"] as const).map((state) => (
+          <li key={state} className="inline-flex items-center gap-1.5">
+            <StatusShape kind={STATE_SHAPE[state]} />
+            {STATE_WORD[state]}
+          </li>
+        ))}
+        <li className="text-ink-3">
+          No verdict means the channel returned nothing for the criterion.
+          Counts are findings on this viewport; the rule column counts findings
+          the rule channel contributed to.
+        </li>
+      </ul>
 
       <section aria-labelledby="catalogue-h" className="mt-8">
-        <h2 id="catalogue-h" className="text-h3 font-semibold">
+        <h2 id="catalogue-h" className="t-section text-ink">
           What each criterion measures
         </h2>
         {catalogue.isPending ? (
-          <p className="mt-2 text-body text-muted-foreground" aria-busy="true">
+          <p className="mt-2 text-ink-3" aria-busy="true">
             Loading the check catalogue
           </p>
         ) : catalogue.isError ? (
-          <p className="mt-2 text-body text-muted-foreground">
+          <p className="mt-2 text-ink-3">
             The check catalogue is not available.
           </p>
         ) : (
           <>
-            <ul className="mt-2 space-y-2">
-              {catalogue.data.entries.map((e) => (
-                <li key={e.sc} className="rounded-lg border bg-card">
-                  <details className="group">
-                    <summary className="flex min-h-9 cursor-pointer items-center gap-2 px-3 text-body font-medium">
-                      <span className="font-mono text-label">{e.sc}</span>{" "}
-                      {e.name}
-                      <span className="ml-auto text-caption font-normal text-muted-foreground">
-                        Level {e.level}, {plainWording(e.detectability)}
-                      </span>
-                    </summary>
-                    <dl className="grid gap-2 px-3 pb-3 text-body sm:grid-cols-2">
-                      <Row label="Unit" value={e.unit} />
-                      <Row label="Inputs" value={e.inputs} />
-                      <Row
-                        label="Decision procedure"
-                        value={e.procedure}
-                        wide
+            <Panel as="div" className="mt-3">
+              <ul className="divide-y divide-line">
+                {catalogue.data.entries.map((e) => (
+                  <li key={e.sc}>
+                    <details>
+                      <summary className="flex min-h-11 cursor-pointer flex-wrap items-center gap-x-2 px-4 py-2 font-medium text-ink">
+                        <ScCode code={e.sc} /> {e.name}
+                        <span className="ml-auto text-dense font-normal text-ink-3">
+                          Level {e.level}, {plainWording(e.detectability)}
+                        </span>
+                      </summary>
+                      <DefinitionRows
+                        className="px-4 pb-2"
+                        rows={[
+                          { label: "Unit", value: plainWording(e.unit) },
+                          { label: "Inputs", value: plainWording(e.inputs) },
+                          {
+                            label: "Decision procedure",
+                            value: plainWording(e.procedure),
+                          },
+                          {
+                            label: "Threshold or rule",
+                            value: plainWording(e.threshold),
+                          },
+                          {
+                            label: "Tier when input present",
+                            value: plainWording(e.tier),
+                          },
+                          {
+                            label: "ACT or axe rule",
+                            value: plainWording(e.act),
+                          },
+                        ]}
                       />
-                      <Row label="Threshold or rule" value={e.threshold} wide />
-                      <Row label="Tier when input present" value={e.tier} />
-                      <Row label="ACT or axe rule" value={e.act} />
-                    </dl>
-                  </details>
-                </li>
-              ))}
-            </ul>
+                    </details>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
             {catalogue.data.coverage_claim ? (
-              <p className="mt-3 text-caption text-muted-foreground">
+              <p className="mt-3 text-dense text-ink-3">
                 {emphasisSegments(
                   plainWording(catalogue.data.coverage_claim),
                 ).map((seg) =>
@@ -265,35 +309,6 @@ export function CoverageScreen({ runId }: { runId: string }) {
   );
 }
 
-function Row({
-  label,
-  value: raw,
-  wide,
-}: {
-  label: string;
-  value: string;
-  wide?: boolean;
-}) {
-  const value = plainWording(raw);
-  return (
-    <div className={wide ? "sm:col-span-2" : undefined}>
-      <dt className="text-caption text-muted-foreground">{label}</dt>
-      <dd>{value}</dd>
-    </div>
-  );
-}
-
 function Message({ title }: { title: string }) {
-  return (
-    <div className="mx-auto max-w-160 px-6 py-12">
-      <title>{`${title} - Coverage`}</title>
-      <h1
-        ref={focusOnMount}
-        tabIndex={-1}
-        className="text-h2 font-semibold outline-none"
-      >
-        {title}
-      </h1>
-    </div>
-  );
+  return <ViewMessage title={title} view="Coverage" />;
 }

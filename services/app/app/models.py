@@ -29,6 +29,7 @@ class Run(Base):
     versions: Mapped[dict[str, Any]] = mapped_column(default=dict)
     protocol_sha: Mapped[str | None] = mapped_column(String)
     error: Mapped[str | None] = mapped_column(Text)
+    max_focus_steps: Mapped[int | None] = mapped_column(Integer)
 
 
 class CaptureRow(Base):
@@ -60,6 +61,10 @@ class FindingRow(Base):
     evidence: Mapped[dict[str, Any]] = mapped_column(default=dict)
     guidance_key: Mapped[str] = mapped_column(String)
     status: Mapped[str] = mapped_column(String, default="open")
+    decision_reason: Mapped[str | None] = mapped_column(Text)
+    decision_note: Mapped[str | None] = mapped_column(Text)
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    decided_by: Mapped[str | None] = mapped_column(String)
 
 
 class CoverageRow(Base):

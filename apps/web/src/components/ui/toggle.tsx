@@ -5,18 +5,20 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const toggleVariants = cva(
-  "group/toggle inline-flex items-center justify-center gap-1 rounded-lg border border-transparent text-sm font-medium whitespace-nowrap transition-all hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 aria-pressed:border-foreground aria-pressed:bg-muted aria-pressed:font-semibold aria-pressed:shadow-[inset_0_0_0_1px_var(--foreground)] data-[pressed]:border-foreground data-[pressed]:bg-muted data-[pressed]:font-semibold data-[pressed]:shadow-[inset_0_0_0_1px_var(--foreground)] dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/toggle inline-flex items-center justify-center gap-1.5 rounded-md border border-transparent text-dense/none font-medium whitespace-nowrap transition-colors duration-hover disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-critical [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
   {
     variants: {
       variant: {
-        default: "bg-transparent",
-        outline: "border-input bg-transparent hover:bg-muted",
+        default:
+          "bg-transparent text-ink-2 hover:bg-subtle hover:text-ink aria-pressed:bg-subtle aria-pressed:font-semibold aria-pressed:text-ink data-[pressed]:bg-subtle data-[pressed]:font-semibold data-[pressed]:text-ink",
+        outline:
+          "border-line-control bg-surface text-ink-2 shadow-btn hover:bg-subtle hover:text-ink aria-pressed:border-ring aria-pressed:bg-tint aria-pressed:font-semibold aria-pressed:text-ink data-[pressed]:border-ring data-[pressed]:bg-tint data-[pressed]:font-semibold data-[pressed]:text-ink",
+        seg: "rounded-sm bg-transparent text-ink-2 hover:text-ink aria-pressed:bg-surface aria-pressed:font-semibold aria-pressed:text-ink aria-pressed:shadow-[0_0_0_1px_var(--line),0_1px_2px_rgb(0_0_55/0.08)] data-[pressed]:bg-surface data-[pressed]:font-semibold data-[pressed]:text-ink data-[pressed]:shadow-[0_0_0_1px_var(--line),0_1px_2px_rgb(0_0_55/0.08)]",
       },
       size: {
-        default:
-          "h-8 min-w-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        sm: "h-[26px] min-w-[26px] rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-9 min-w-9 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        default: "h-[32px] min-w-[32px] px-3",
+        sm: "h-[28px] min-w-[28px] px-2.5",
+        lg: "h-[40px] min-w-[40px] px-4",
       },
     },
     defaultVariants: {

@@ -43,9 +43,7 @@ test("a queued run can be cancelled from the progress screen after confirming", 
   });
   const queuedId = (await second.json()).run_id;
   await page.goto(`/runs/${queuedId}`);
-  await expect(
-    page.getByRole("heading", { level: 1, name: "Auditing" }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await page.getByRole("button", { name: "Cancel audit" }).click();
   await page
     .getByRole("alertdialog")
@@ -77,9 +75,8 @@ test("progress shows the stepper, one live region and a cancel confirmation", as
   const created = await request.post("/api/runs", { data: { folder } });
   const { run_id } = await created.json();
   await page.goto(`/runs/${run_id}`);
-  await expect(
-    page.getByRole("navigation", { name: "Audit steps" }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Steps" })).toBeVisible();
+  await expect(page.getByRole("list", { name: "Steps" })).toBeVisible();
   await expect(page.locator("[role=status], output")).toHaveCount(1);
   await expect(page.locator('[aria-current="step"]').first()).toBeVisible();
   await page.getByRole("button", { name: "Cancel audit" }).click();
@@ -96,11 +93,11 @@ test("progress shows the stepper, one live region and a cancel confirmation", as
 test("the New Audit form can be completed with the keyboard alone", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/audit/new");
   await page.locator("form[data-ready=true]").waitFor();
-  const urlField = page.getByLabel("Web address");
+  const urlField = page.getByRole("textbox", { name: "Web address" });
 
-  async function tabTo(locator: ReturnType<typeof page.locator>, max = 14) {
+  async function tabTo(locator: ReturnType<typeof page.locator>, max = 40) {
     for (let i = 0; i < max; i += 1) {
       await page.keyboard.press("Tab");
       if (await locator.evaluate((el) => el === document.activeElement)) return;
@@ -120,14 +117,13 @@ test("the New Audit form can be completed with the keyboard alone", async ({
   await expect(urlField).not.toHaveAttribute("aria-invalid", "true");
 
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("button", { name: "Desktop" })).toBeFocused();
+  await expect(page.getByRole("checkbox", { name: /Desktop/ })).toBeFocused();
   await page.keyboard.press("Space");
-  await expect(page.getByRole("button", { name: "Desktop" })).toHaveAttribute(
-    "aria-pressed",
-    "false",
-  );
+  await expect(
+    page.getByRole("checkbox", { name: /Desktop/ }),
+  ).not.toBeChecked();
 
-  await tabTo(page.getByRole("button", { name: /^Audit/ }));
+  await tabTo(page.getByRole("button", { name: /^Run audit/ }));
   await page.keyboard.press("Enter");
   await page.waitForURL(/\/runs\/[0-9a-f]{32}$/);
   await expect(
@@ -143,42 +139,42 @@ test("the New Audit form can be completed with the keyboard alone", async ({
 test("selecting no viewport is rejected inline without leaving the page", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/audit/new");
   await page.locator("form[data-ready=true]").waitFor();
-  await page.getByLabel("Web address").fill("example.com");
-  await page.getByRole("button", { name: "Desktop" }).click();
-  await page.getByRole("button", { name: "Mobile" }).click();
-  await page.getByRole("button", { name: /^Audit/ }).click();
+  await page.getByRole("textbox", { name: "Web address" }).fill("example.com");
+  await page.getByRole("checkbox", { name: /Desktop/ }).uncheck();
+  await page.getByRole("checkbox", { name: /Mobile/ }).uncheck();
+  await page.getByRole("button", { name: /^Run audit/ }).click();
   await expect(page.locator("form [role=alert]")).toContainText(
     "at least one viewport",
   );
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/audit\/new$/);
 });
 
 test("text that is not a web address is rejected inline and keeps focus on the field", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/audit/new");
   await page.locator("form[data-ready=true]").waitFor();
-  const field = page.getByLabel("Web address");
+  const field = page.getByRole("textbox", { name: "Web address" });
   await field.fill("not a url ///");
-  await page.getByRole("button", { name: /^Audit/ }).click();
+  await page.getByRole("button", { name: /^Run audit/ }).click();
   await expect(
     page.getByText("Enter a full address such as https://example.com"),
   ).toBeVisible();
   await expect(field).toHaveAttribute("aria-invalid", "true");
   await expect(field).toBeFocused();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/audit\/new$/);
 });
 
-test("both viewport toggles are reachable with Tab", async ({ page }) => {
-  await page.goto("/");
+test("both viewport cards are reachable with Tab", async ({ page }) => {
+  await page.goto("/audit/new");
   await page.locator("form[data-ready=true]").waitFor();
-  await page.getByLabel("Web address").focus();
+  await page.getByRole("textbox", { name: "Web address" }).focus();
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("button", { name: "Desktop" })).toBeFocused();
+  await expect(page.getByRole("checkbox", { name: /Desktop/ })).toBeFocused();
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("button", { name: "Mobile" })).toBeFocused();
+  await expect(page.getByRole("checkbox", { name: /Mobile/ })).toBeFocused();
 });
 
 test("a failed run explains the problem in plain words and offers a way forward", async ({
@@ -208,15 +204,16 @@ test("a failed run explains the problem in plain words and offers a way forward"
   );
   await page.goto(`/runs/${id}`);
   await expect(page.locator("main").getByRole("alert")).toContainText(
-    "We could not reach that address. Check it and try again.",
+    "The tool could not reach that address. Check it and try again.",
   );
   await expect(page.getByText("Page.goto")).toBeHidden();
   await expect(page.getByText("What went wrong")).toBeFocused();
   await page.getByRole("button", { name: "Technical details" }).click();
   await expect(page.getByText(/ERR_NAME_NOT_RESOLVED/)).toBeVisible();
   await expect(page).toHaveTitle(/Audit failed - /);
+  await expect(page.getByRole("button", { name: "Run again" })).toBeVisible();
   await page.getByRole("link", { name: "Start a new audit" }).click();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/audit\/new$/);
 });
 
 test("an unknown run and an unknown page have their own titles and a way back", async ({
@@ -240,12 +237,105 @@ test("an unknown run and an unknown page have their own titles and a way back", 
 test("client navigation updates the title and moves focus to the heading", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/audit/new");
   await page.locator("form[data-ready=true]").waitFor();
   await page.getByRole("link", { name: "Evaluation" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
-  await expect(page).toHaveTitle("Evaluation");
+  await expect(page).toHaveTitle("Evaluation - WCAG Auditor");
   await expect(page.locator("head title")).toHaveCount(1);
   await page.getByRole("link", { name: "New audit" }).click();
   await expect(page).toHaveTitle("New audit - WCAG Auditor");
+});
+
+const PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==",
+  "base64",
+);
+
+async function mockUpload(page: import("@playwright/test").Page) {
+  await page.route("**/api/uploads", (r) =>
+    r.fulfill({ json: { upload_id: "u".repeat(32) } }),
+  );
+}
+
+test("Rules only is unavailable on the Screenshots tab and the form says why", async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    window.localStorage.setItem(
+      "wcag-auditor.settings",
+      JSON.stringify({ method: "rule_only" }),
+    ),
+  );
+  await page.goto("/audit/new");
+  await page.locator("form[data-ready=true]").waitFor();
+  const rules = page.getByRole("radio", { name: /Rules only/ });
+  await expect(rules).toBeChecked();
+  await page.getByRole("tab", { name: "Screenshots" }).click();
+  await expect(rules).toBeDisabled();
+  await expect(rules).not.toBeChecked();
+  await expect(
+    page.getByRole("radio", { name: /Detector and rules/ }),
+  ).toBeChecked();
+  await expect(page.locator("form output")).toContainText(
+    "Method changed to Detector and rules",
+  );
+  await expect(page.getByText(/Not available for screenshots/)).toBeVisible();
+  await page.getByRole("tab", { name: "Web address" }).click();
+  await expect(rules).toBeEnabled();
+});
+
+test("an API error from starting an audit shows inline as an alert", async ({
+  page,
+}) => {
+  await mockUpload(page);
+  await page.route("**/api/runs", (r) =>
+    r.request().method() === "POST"
+      ? r.fulfill({ status: 422, json: { detail: "Page could not be opened" } })
+      : r.fallback(),
+  );
+  await page.goto("/audit/new");
+  await page.locator("form[data-ready=true]").waitFor();
+  await page.getByRole("textbox", { name: "Web address" }).fill("example.com");
+  await page.getByRole("button", { name: /^Run audit/ }).click();
+  await expect(page.locator("form [role=alert]")).toHaveText(
+    "Page could not be opened",
+  );
+  await page.getByRole("tab", { name: "Screenshots" }).click();
+  await page
+    .locator("input[type=file]")
+    .setInputFiles({ name: "a.png", mimeType: "image/png", buffer: PNG });
+  await page.getByRole("button", { name: /^Run audit/ }).click();
+  await expect(page.locator("form [role=alert]")).toHaveText(
+    "Page could not be opened",
+  );
+  await expect(page).toHaveURL(/\/audit\/new$/);
+});
+
+test("Ctrl or Cmd+Enter submits from anywhere on New audit, but not over a dialog", async ({
+  page,
+}) => {
+  await mockUpload(page);
+  let posts = 0;
+  await page.route("**/api/runs", (r) => {
+    if (r.request().method() !== "POST") return r.fallback();
+    posts += 1;
+    return r.fulfill({ status: 422, json: { detail: "stop here" } });
+  });
+  await page.goto("/audit/new");
+  await page.locator("form[data-ready=true]").waitFor();
+  await page.getByRole("tab", { name: "Screenshots" }).click();
+  await page
+    .locator("input[type=file]")
+    .setInputFiles({ name: "a.png", mimeType: "image/png", buffer: PNG });
+  await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
+  await page.keyboard.press("ControlOrMeta+Enter");
+  await expect(page.locator("form [role=alert]")).toHaveText("stop here");
+  expect(posts).toBe(1);
+
+  await page.keyboard.press("ControlOrMeta+k");
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.keyboard.press("ControlOrMeta+Enter");
+  await page.waitForTimeout(300);
+  expect(posts).toBe(1);
 });

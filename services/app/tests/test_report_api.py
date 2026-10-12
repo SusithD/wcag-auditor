@@ -79,7 +79,7 @@ def test_statuses_survive_a_second_ingest_and_foreign_ids_are_isolated(tmp_path:
         fa = c.get(f"/runs/{run_a}/findings", params={"viewport": "mobile"}).json()
         fb = c.get(f"/runs/{run_b}/findings", params={"viewport": "mobile"}).json()
         assert fa[0]["key"] == fb[0]["key"] and fa[0]["id"] != fb[0]["id"]
-        for status in ("fixed", "ignored", "open", "fixed"):
+        for status in ("fixed", "unsure", "open", "fixed"):
             assert (
                 c.patch(f"/findings/{fa[0]['id']}", json={"status": status}).json()["status"]
                 == status
@@ -131,3 +131,31 @@ def test_findings_are_ingested_lazily_when_the_finish_hook_missed_them(tmp_path:
             session.commit()
         rows = c.get(f"/runs/{run_id}/findings", params={"viewport": "mobile"})
         assert rows.status_code == 200 and len(rows.json()) == 18
+
+
+def test_decisions_record_who_when_and_dismissal_needs_a_reason(tmp_path: Path) -> None:
+    with client(tmp_path, decided_by_name="Sam") as c:
+        run_id = finished_run(c)
+        first = c.get(f"/runs/{run_id}/findings", params={"viewport": "mobile"}).json()[0]
+        assert first["decision"]["status"] == "open" and first["decision"]["decided_at"] is None
+        url = f"/findings/{first['id']}"
+        assert c.patch(url, json={"status": "dismissed"}).status_code == 422
+        assert c.patch(url, json={"status": "dismissed", "reason": "  "}).status_code == 422
+        assert c.patch(url, json={"status": "ignored"}).status_code == 422
+        done = c.patch(url, json={"status": "dismissed", "reason": "Decorative", "note": "ok"})
+        body = done.json()
+        assert done.status_code == 200 and body["status"] == "dismissed"
+        assert body["decision"]["reason"] == "Decorative" and body["decision"]["note"] == "ok"
+        assert body["decision"]["decided_by"] == "Sam"
+        assert body["decision"]["decided_at"].endswith(("Z", "+00:00"))
+        confirmed = c.patch(url, json={"status": "confirmed"}).json()
+        assert confirmed["decision"]["reason"] is None and confirmed["decision"]["decided_at"]
+        reopened = c.patch(url, json={"status": "open", "reason": "x"}).json()
+        assert reopened["decision"] == {
+            "status": "open",
+            "reason": None,
+            "note": None,
+            "decided_at": None,
+            "decided_by": None,
+        }
+        assert first["needs_review_reason"] is None or isinstance(first["needs_review_reason"], str)

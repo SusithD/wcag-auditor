@@ -40,10 +40,8 @@ export function StudyRunner({ code }: { code: string }) {
     return (
       <div className="mx-auto max-w-160 px-6 py-12">
         <title>Participant code not found - study</title>
-        <h1 className="text-h2 font-semibold">
-          That participant code was not found
-        </h1>
-        <p className="mt-2 text-body text-muted-foreground">
+        <h1 className="t-page text-ink">That participant code was not found</h1>
+        <p className="mt-2 text-body text-ink-2">
           That code was not found. Check it against the card the researcher gave
           you, or ask them.
         </p>
@@ -70,7 +68,7 @@ export function StudyRunner({ code }: { code: string }) {
       {state.synthetic ? (
         <p
           role="note"
-          className="mb-4 rounded-md border bg-muted px-3 py-2 text-caption"
+          className="mb-4 rounded-md border-line bg-subtle border px-3 py-2 text-caption"
         >
           Synthetic session: no real participant data is collected.
         </p>

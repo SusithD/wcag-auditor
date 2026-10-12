@@ -76,7 +76,7 @@ for (const scheme of ["light", "dark"] as const) {
       );
       if (route.mock)
         await expect(
-          page.getByRole("img", { name: /Full-page screenshot/ }),
+          page.getByRole("img", { name: /Desktop capture of/ }),
         ).toBeVisible();
       const results = await new AxeBuilder({ page })
         .withTags(TAGS)
@@ -103,11 +103,11 @@ async function scan(page: Page) {
 for (const scheme of ["light", "dark"] as const) {
   test(`form states have zero axe violations (${scheme})`, async ({ page }) => {
     await page.emulateMedia({ colorScheme: scheme });
-    await page.goto("/");
+    await page.goto("/audit/new");
     await page.locator("form[data-ready=true]").waitFor();
     await page.getByRole("button", { name: "Advanced" }).click();
-    await page.getByLabel("Web address").fill("ftp://x");
-    await page.getByRole("button", { name: /^Audit/ }).click();
+    await page.getByRole("textbox", { name: "Web address" }).fill("ftp://x");
+    await page.getByRole("button", { name: /^Run audit/ }).click();
     await expect(page.getByText(/Enter a full address/)).toBeVisible();
     await scan(page);
     await page.getByRole("tab", { name: "Screenshots" }).click();
@@ -127,9 +127,7 @@ for (const scheme of ["light", "dark"] as const) {
     const firstId = (await first.json()).run_id;
     const secondId = (await second.json()).run_id;
     await page.goto(`/runs/${secondId}`);
-    await expect(
-      page.getByRole("navigation", { name: "Audit steps" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Steps" })).toBeVisible();
     await scan(page);
     await expect(
       page.getByRole("heading", { level: 1, name: "Audit report" }),
@@ -151,7 +149,7 @@ test.describe("phone width (390 x 844)", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
   test("home has zero axe violations at 390 px", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/audit/new");
     await page.locator("form[data-ready=true]").waitFor();
     await scan(page);
     await page.getByRole("button", { name: "Advanced" }).click();

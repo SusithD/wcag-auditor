@@ -3,6 +3,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import type { components } from "@/api/types";
+import { PageHeader, Panel, PanelBody, StatusShape } from "@/components/ds";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,6 +51,10 @@ export function StudyAdmin() {
     },
   });
 
+  useEffect(() => {
+    if (tasks.isSuccess) setToken("");
+  }, [tasks.isSuccess]);
+
   async function prepare() {
     const res = await fetch("/api/study/prepare", {
       method: "POST",
@@ -94,43 +99,55 @@ export function StudyAdmin() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-6 py-6">
+    <>
       <title>Study administration</title>
-      <h1 className="text-h2 font-semibold">Study administration</h1>
-      <p className="mt-1 text-body text-muted-foreground">
-        Researcher view: prepare the task pages, rate fixes against the rubric
-        and export the data.
-        {config.data && !config.data.ethics_approved
-          ? " Ethics approval is not recorded: only synthetic participants are enabled."
-          : ""}
-      </p>
-      <form
-        className="mt-4 flex max-w-md items-end gap-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          try {
-            sessionStorage.setItem(KEY, token);
-          } catch {
-            /* storage unavailable */
-          }
-          setSaved(token);
-        }}
-      >
-        <div className="flex-1">
-          <Label htmlFor="admin-token">Administration token</Label>
-          <Input
-            id="admin-token"
-            type="password"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            autoComplete="off"
-            className="mt-1"
-          />
-        </div>
-        <Button type="submit">Unlock</Button>
-      </form>
+      <PageHeader
+        title="Study administration"
+        description={
+          <>
+            Researcher view: prepare the task pages, rate fixes against the
+            rubric and export the data.
+            {config.data && !config.data.ethics_approved
+              ? " Ethics approval is not recorded: only synthetic participants are enabled."
+              : ""}
+          </>
+        }
+      />
+      <Panel className="max-w-md">
+        <PanelBody>
+          <form
+            className="flex items-end gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              try {
+                sessionStorage.setItem(KEY, token);
+              } catch {
+                /* storage unavailable */
+              }
+              setSaved(token);
+            }}
+          >
+            <div className="flex-1">
+              <Label htmlFor="admin-token">Administration token</Label>
+              <Input
+                id="admin-token"
+                type="password"
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                autoComplete="off"
+                className="mt-1"
+              />
+            </div>
+            <Button type="submit">Unlock</Button>
+          </form>
+        </PanelBody>
+      </Panel>
       {tasks.isError ? (
-        <p role="alert" className="mt-3 text-body text-destructive">
+        <p
+          role="alert"
+          className="mt-3 flex items-start gap-2 text-body text-ink"
+        >
+          <StatusShape kind="critical" className="mt-1" />
           {tasks.error.message}
         </p>
       ) : null}
@@ -146,7 +163,7 @@ export function StudyAdmin() {
             <Button variant="outline" onClick={prepare}>
               Prepare study pages
             </Button>
-            <span className="text-body" aria-live="polite">
+            <span className="text-body">
               {config.data
                 ? `${config.data.prepared} of ${config.data.total_runs} study pages ready`
                 : ""}
@@ -206,7 +223,7 @@ export function StudyAdmin() {
           </div>
         </>
       ) : null}
-    </div>
+    </>
   );
 }
 
@@ -253,7 +270,7 @@ function RatingRow({
               notes,
             )
           }
-          className="min-h-8 rounded-md border border-input bg-background px-2 text-body"
+          className="min-h-8 rounded-md border border-line-strong bg-surface px-2 text-body"
         >
           <option value="">Not rated</option>
           <option value="yes">Success</option>

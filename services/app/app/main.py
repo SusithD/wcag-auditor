@@ -13,12 +13,14 @@ from sqlalchemy import select
 from app.api import build_router, status_from_result
 from app.config import Settings
 from app.db import make_engine, make_session_factory
+from app.detector_api import build_detector_router
 from app.eval_api import build_eval_router, fail_eval, finish_eval, import_dirs, mark_running
 from app.ingest import ingest_run
 from app.jobs import JobResult, JobRunner
 from app.models import EvalRun, Run
 from app.report_api import build_report_router
 from app.study_api import build_study_router
+from app.workflow_api import build_workflow_router
 
 ALEMBIC_INI = Path(__file__).resolve().parents[1] / "alembic.ini"
 
@@ -104,8 +106,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"status": "ok"}
 
     app.include_router(build_report_router(cfg))
+    app.include_router(build_detector_router(cfg))
     app.include_router(build_eval_router(cfg))
     app.include_router(build_study_router(cfg))
+    app.include_router(build_workflow_router(cfg))
     app.include_router(build_router(cfg))
     return app
 

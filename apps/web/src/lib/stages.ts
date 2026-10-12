@@ -24,12 +24,12 @@ export type Step = {
 
 const FIXED = ["rules", "elements"] as const;
 const TAIL = ["fusion", "report"] as const;
-const LABELS: Record<string, string> = {
+export const STEP_LABELS: Record<string, string> = {
   queued: "Queued",
-  rules: "Rule channel",
-  elements: "Page elements",
-  fusion: "Fusion",
-  report: "Report",
+  rules: "Browser rules",
+  elements: "Find elements",
+  fusion: "Combine results",
+  report: "Write report",
 };
 
 export function stageLabel(stage: string, viewport: string | null): string {
@@ -40,7 +40,7 @@ export function stageLabel(stage: string, viewport: string | null): string {
     return `Criterion ${stage.slice(7)}${suffix}`;
   if (stage.startsWith("failed")) return `Failed${suffix}`;
   if (stage === "done") return "Done";
-  return `${LABELS[stage] ?? stage}${suffix}`;
+  return `${STEP_LABELS[stage] ?? stage}${suffix}`;
 }
 
 export function stepOrder(viewports: string[], captures: boolean): string[] {
@@ -94,7 +94,7 @@ export function buildSteps(
       ? `${id.slice(7)}`
       : id.startsWith("capture:")
         ? `Capture ${id.split(":")[1]}`
-        : (LABELS[id] ?? id);
+        : (STEP_LABELS[id] ?? id);
     return {
       id,
       label,
@@ -115,6 +115,35 @@ export function findingsSoFar(events: StageEvent[]) {
     } catch {}
   }
   return total;
+}
+
+export type CriterionSoFar = {
+  sc: string;
+  total: number;
+  byViewport: Record<string, number>;
+};
+
+export function criteriaSoFar(events: StageEvent[]): CriterionSoFar[] {
+  const rows = new Map<string, CriterionSoFar>();
+  for (const ev of events) {
+    if (!ev.stage.startsWith("counts:") || !ev.detail) continue;
+    const viewport = ev.viewport ?? ev.stage.split(":")[1];
+    try {
+      const parsed = JSON.parse(ev.detail) as {
+        criteria?: Record<string, number>;
+      };
+      for (const [sc, n] of Object.entries(parsed.criteria ?? {})) {
+        if (!(n > 0)) continue;
+        const row = rows.get(sc) ?? { sc, total: 0, byViewport: {} };
+        row.total += n;
+        row.byViewport[viewport] = (row.byViewport[viewport] ?? 0) + n;
+        rows.set(sc, row);
+      }
+    } catch {}
+  }
+  return [...rows.values()].sort((a, b) =>
+    a.sc.localeCompare(b.sc, undefined, { numeric: true }),
+  );
 }
 
 export function capturedViewports(events: StageEvent[]): string[] {

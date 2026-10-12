@@ -65,11 +65,15 @@ export function useSetStatus(runId: string, viewport: Viewport | undefined) {
   return useMutation({
     mutationFn: async (vars: {
       id: number;
-      status: "open" | "fixed" | "ignored";
+      status: "open" | "fixed" | "dismissed";
     }) => {
       const { data, error } = await api.PATCH("/findings/{finding_id}", {
         params: { path: { finding_id: vars.id } },
-        body: { status: vars.status },
+        body: {
+          status: vars.status,
+          reason:
+            vars.status === "dismissed" ? "Ignored in the report" : undefined,
+        },
       });
       if (error || !data) throw new Error("The status could not be saved");
       return data;
