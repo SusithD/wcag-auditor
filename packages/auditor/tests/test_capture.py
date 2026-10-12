@@ -328,7 +328,7 @@ def _synth_with_elements(tmp_path: Path, payload: str | None, origin: str) -> An
 
     from auditor.schema import Capture
 
-    src = next(FIXTURES.glob("synth/sc2-5-8/*"))
+    src = min(FIXTURES.glob("synth/sc2-5-8/*"))
     folder = tmp_path / "f"
     shutil.copytree(src, folder)
     meta = json.loads((folder / "meta.json").read_text())

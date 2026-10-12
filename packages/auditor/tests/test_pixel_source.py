@@ -83,13 +83,13 @@ def test_neighbouring_lines_are_not_merged() -> None:
 
 
 def test_selection_follows_adr_012() -> None:
-    synth = Capture.from_folder(next(FIXTURES.glob("synth/sc1-4-3/*")))
-    real = Capture.from_folder(next(FIXTURES.glob("real/real_com_003_desktop_*")))
+    synth = Capture.from_folder(min(FIXTURES.glob("synth/sc1-4-3/*")))
+    real = Capture.from_folder(min(FIXTURES.glob("real/real_com_003_desktop_*")))
     assert source_name(synth) == "dom" and source_name(real) == "pixel"
 
 
 def test_a_capture_with_stored_geometry_prefers_the_dom(tmp_path: Path) -> None:
-    real = next(FIXTURES.glob("real/real_com_003_desktop_*"))
+    real = min(FIXTURES.glob("real/real_com_003_desktop_*"))
     dest = tmp_path / real.name
     shutil.copytree(real, dest)
     (dest / "elements.json").write_text(json.dumps({"geometry_source": "capture", "elements": []}))
@@ -122,7 +122,7 @@ def source_for(
 
 
 def capture_in(tmp_path: Path) -> Capture:
-    base = Capture.from_folder(next(FIXTURES.glob("synth/sc1-4-3/*")))
+    base = Capture.from_folder(min(FIXTURES.glob("synth/sc1-4-3/*")))
     return base.model_copy(update={"path": tmp_path})
 
 
@@ -180,14 +180,14 @@ def test_the_ink_height_boundary_for_large_text(ink: int, large: bool | None) ->
     img = canvas()
     img[40:60, 22:298] = (0x99, 0x99, 0x99)
     el = Element(kind="text", bbox_css=BBox(x=20, y=20, w=280, h=60), style={"ink_height_px": ink})
-    capture = Capture.from_folder(next(FIXTURES.glob("synth/sc1-4-3/*")))
+    capture = Capture.from_folder(min(FIXTURES.glob("synth/sc1-4-3/*")))
     (f,) = sc_1_4_3.run(ModuleContext(capture, [el], img, protocol.load()))
     assert f.evidence["large_text"] is large
     assert f.tier == ("automated" if large else "needs-review")
 
 
 def test_a_corrupt_stored_geometry_falls_back_to_the_pixel_source(tmp_path: Path) -> None:
-    real = next(FIXTURES.glob("real/real_com_003_desktop_*"))
+    real = min(FIXTURES.glob("real/real_com_003_desktop_*"))
     dest = tmp_path / "bench" / real.name
     shutil.copytree(real, dest)
     (dest / "elements.json").write_text("{not json")
@@ -200,7 +200,7 @@ def test_a_corrupt_stored_geometry_falls_back_to_the_pixel_source(tmp_path: Path
 
 
 def test_ocr_reads_the_synthetic_fixture_text_inside_the_truth_block() -> None:
-    capture = Capture.from_folder(next(FIXTURES.glob("synth/sc1-4-3/*")))
+    capture = Capture.from_folder(min(FIXTURES.glob("synth/sc1-4-3/*")))
     lines = PixelElementSource().elements(capture)
     box = BBox.model_validate(
         json.loads((capture.path / "truth.json").read_text())["annotations"][0]["bbox"]
@@ -212,7 +212,7 @@ def test_ocr_reads_the_synthetic_fixture_text_inside_the_truth_block() -> None:
 
 @pytest.mark.parametrize("name", ["real_com_003_desktop", "real_com_011_mobile"])
 def test_a_real_page_is_read_within_the_runtime_budget(name: str) -> None:
-    capture = Capture.from_folder(next(FIXTURES.glob(f"real/{name}_*")))
+    capture = Capture.from_folder(min(FIXTURES.glob(f"real/{name}_*")))
     src = PixelElementSource()
     started = time.perf_counter()
     src.elements(capture)

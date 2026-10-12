@@ -30,7 +30,7 @@ def test_non_responsive_only_for_the_mobile_fixture() -> None:
 
 
 def test_non_responsive_negative_controls() -> None:
-    mobile = Capture.from_folder(next(FIXTURES.glob("real/real_com_011_mobile_*")))
+    mobile = Capture.from_folder(min(FIXTURES.glob("real/real_com_011_mobile_*")))
     assert is_non_responsive(mobile)
     assert mobile.layout is not None
     responsive = mobile.layout.model_copy(update={"has_meta_viewport": True})
@@ -41,7 +41,7 @@ def test_non_responsive_negative_controls() -> None:
 
 
 def test_compute_counts_focus_stops_and_sticky() -> None:
-    capture = Capture.from_folder(next(FIXTURES.glob("synth/sc2-5-8/*")))
+    capture = Capture.from_folder(min(FIXTURES.glob("synth/sc2-5-8/*")))
     box = BBox(x=0, y=0, w=10, h=10)
     plain = [Element(kind="button", bbox_css=box)]
     sticky = [*plain, Element(kind="sticky_region", bbox_css=box)]
@@ -56,7 +56,7 @@ def test_compute_counts_focus_stops_and_sticky() -> None:
 
 def test_golden_features_agree_with_capture_meta() -> None:
     for golden in GOLDEN.glob("*.json"):
-        folder = next(p.parent for p in FIXTURES.glob(f"**/{golden.stem}/meta.json"))
+        folder = min(p.parent for p in FIXTURES.glob(f"**/{golden.stem}/meta.json"))
         capture = Capture.from_folder(folder)
         feats = json.loads(golden.read_text())["features"]
         assert feats["focus_stop_count"] == len(capture.focus_steps)
@@ -65,7 +65,7 @@ def test_golden_features_agree_with_capture_meta() -> None:
 
 
 def test_compute_without_geometry_leaves_element_features_unset() -> None:
-    capture = Capture.from_folder(next(FIXTURES.glob("real/real_com_003_desktop_*")))
+    capture = Capture.from_folder(min(FIXTURES.glob("real/real_com_003_desktop_*")))
     feats = compute(capture, None)
     assert feats.element_density is None and feats.has_sticky is None
     assert feats.focus_stop_count == len(capture.focus_steps) > 0

@@ -103,7 +103,7 @@ class FakeDetector:
 
 
 def real_capture() -> Capture:
-    return Capture.from_folder(next(FIXTURES.glob("real/real_com_003_desktop_*")))
+    return Capture.from_folder(min(FIXTURES.glob("real/real_com_003_desktop_*")))
 
 
 def test_detector_source_keeps_non_text_classes_and_records_scores() -> None:

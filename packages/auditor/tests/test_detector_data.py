@@ -127,7 +127,7 @@ def test_prepare_writes_a_roboflow_dataset_and_screens_out_benchmark_pages(
     tmp_path: Path,
 ) -> None:
     rng = np.random.default_rng(1)
-    shot = next(FIXTURES.glob("real/real_com_003_desktop_*")) / "screenshot.png"
+    shot = min(FIXTURES.glob("real/real_com_003_desktop_*")) / "screenshot.png"
     with Image.open(shot) as full:
         leaked = full.convert("RGB").crop((0, 0, full.width, 900))
     fresh = [

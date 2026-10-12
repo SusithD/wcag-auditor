@@ -86,7 +86,7 @@ def test_element_dump_matches_golden(folder: Path) -> None:
 
 @pytest.mark.browser
 def test_synthetic_boxes_match_capture_and_truth() -> None:
-    folder = next(FIXTURES.glob("synth/sc2-5-8/*"))
+    folder = min(FIXTURES.glob("synth/sc2-5-8/*"))
     capture = Capture.from_folder(folder)
     truth = json.loads((folder / "truth.json").read_text())
     buttons = [e for e in DomElementSource().elements(capture) if e.kind == "button"]
@@ -124,7 +124,7 @@ body{margin:0;height:3000px}
 
 @pytest.mark.browser
 def test_inline_page_flags_and_regions(tmp_path: Path) -> None:
-    src = next(FIXTURES.glob("synth/sc2-5-8/*"))
+    src = min(FIXTURES.glob("synth/sc2-5-8/*"))
     (tmp_path / "dom.html").write_text(INLINE)
     (tmp_path / "meta.json").write_text((src / "meta.json").read_text())
     elements = DomElementSource().elements(Capture.from_folder(tmp_path))
@@ -169,7 +169,7 @@ SLIDERS = """<!doctype html><html><body style="margin:0">
 def test_slider_alternatives_use_the_nearest_ancestors_and_fixed_regions_list_their_controls(
     tmp_path: Path,
 ) -> None:
-    src = next(FIXTURES.glob("synth/sc2-5-8/*"))
+    src = min(FIXTURES.glob("synth/sc2-5-8/*"))
     (tmp_path / "dom.html").write_text(SLIDERS)
     (tmp_path / "meta.json").write_text((src / "meta.json").read_text())
     elements = DomElementSource().elements(Capture.from_folder(tmp_path))

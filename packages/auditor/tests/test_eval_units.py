@@ -68,7 +68,7 @@ def test_excluded_stops_are_dropped() -> None:
 
 
 def test_synthetic_focus_truth_maps_annotation_to_the_matching_stop() -> None:
-    folder = next(FIXTURES.glob("synth/sc2-4-13/*"))
+    folder = min(FIXTURES.glob("synth/sc2-4-13/*"))
     capture = Capture.from_folder(folder)
     truth = synthetic_truth(capture, json.loads((folder / "truth.json").read_text()))
     assert truth.scored_scs == {"2.4.13"} and truth.stratum == "synthetic"
@@ -76,7 +76,7 @@ def test_synthetic_focus_truth_maps_annotation_to_the_matching_stop() -> None:
 
 
 def test_synthetic_page_truth_scores_only_the_seeded_sc() -> None:
-    folder = next(FIXTURES.glob("synth/sc1-4-3/*"))
+    folder = min(FIXTURES.glob("synth/sc1-4-3/*"))
     capture = Capture.from_folder(folder)
     truth = synthetic_truth(capture, json.loads((folder / "truth.json").read_text()))
     assert truth.scored_scs == {"1.4.3"} and len(truth.page_boxes["1.4.3"]) == 1

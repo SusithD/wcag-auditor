@@ -51,7 +51,7 @@ def test_fixture_captures_and_truth_parse(meta: Path) -> None:
 
 
 def test_non_responsive_mobile_fixture_keeps_png_scale() -> None:
-    folder = next(FIXTURES.glob("real/real_com_011_mobile_*"))
+    folder = min(FIXTURES.glob("real/real_com_011_mobile_*"))
     capture = Capture.from_folder(folder)
     assert capture.viewport == "mobile"
     assert {s.png_scale for s in capture.focus_steps} == {0.398}

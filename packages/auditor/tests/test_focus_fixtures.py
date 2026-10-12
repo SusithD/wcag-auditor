@@ -12,7 +12,7 @@ FIXTURES = Path(__file__).resolve().parents[3] / "fixtures"
 
 
 def real_mobile() -> Capture:
-    return Capture.from_folder(next(FIXTURES.glob("real/real_com_011_mobile_*")))
+    return Capture.from_folder(min(FIXTURES.glob("real/real_com_011_mobile_*")))
 
 
 def test_non_responsive_mobile_fixture_areas_are_computed_in_css_px() -> None:
@@ -48,7 +48,7 @@ def test_non_responsive_mobile_findings_report_css_px_areas() -> None:
 def test_r5_fixture_two_pixel_ring_below_the_area_requirement_meets() -> None:
     from auditor.modules import sc_2_4_13
 
-    folder = next(FIXTURES.glob("synth/sc2-4-13/*_092_*"))
+    folder = min(FIXTURES.glob("synth/sc2-4-13/*_092_*"))
     capture = Capture.from_folder(folder)
     step = capture.focus_steps[0]
     assert json.loads((folder / "truth.json").read_text())["annotations"] == []
@@ -66,7 +66,7 @@ def test_r5_fixture_two_pixel_ring_below_the_area_requirement_meets() -> None:
 
 
 def test_o4_fixture_violation_is_reported_with_its_evidence() -> None:
-    folder = next(FIXTURES.glob("synth/sc2-4-13/*_091_*"))
+    folder = min(FIXTURES.glob("synth/sc2-4-13/*_091_*"))
     capture = Capture.from_folder(folder)
     (f,) = MODULES["2.4.13"](ModuleContext.load(capture, [], has_geometry=False))
     assert f.focus_index == 0 and f.evidence["strong_area_css"] == 0.0
@@ -74,7 +74,7 @@ def test_o4_fixture_violation_is_reported_with_its_evidence() -> None:
 
 
 def test_unstyled_default_ring_is_evaluated_by_default_and_exempt_when_the_switch_is_on() -> None:
-    folder = next(FIXTURES.glob("synth/sc2-4-7/*_047_*"))
+    folder = min(FIXTURES.glob("synth/sc2-4-7/*_047_*"))
     capture = Capture.from_folder(folder)
     proto = load()
     on = proto.model_copy(

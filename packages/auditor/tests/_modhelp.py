@@ -14,7 +14,7 @@ WHITE = (255, 255, 255)
 
 
 def capture() -> Capture:
-    return Capture.from_folder(next(FIXTURES.glob("synth/sc1-4-3/*")))
+    return Capture.from_folder(min(FIXTURES.glob("synth/sc1-4-3/*")))
 
 
 def canvas(w: int = 800, h: int = 300, color: tuple[int, int, int] = WHITE) -> np.ndarray:

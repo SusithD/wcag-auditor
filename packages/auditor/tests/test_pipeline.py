@@ -98,7 +98,7 @@ def test_rerunning_into_the_same_folder_removes_stale_outputs(tmp_path: Path) ->
 
 @pytest.mark.browser
 def test_hybrid_covers_all_eight_criteria_on_a_self_contained_page(tmp_path: Path) -> None:
-    folder = next(FIXTURES.glob("synth/sc2-5-8/*"))
+    folder = min(FIXTURES.glob("synth/sc2-5-8/*"))
     pipeline.run_folder(folder, tmp_path, "hybrid", pdf=False)
     data = json.loads((tmp_path / "report.json").read_text())
     assert data["reliable"]["hybrid"]["automated"] == 8
@@ -107,7 +107,7 @@ def test_hybrid_covers_all_eight_criteria_on_a_self_contained_page(tmp_path: Pat
 
 @pytest.mark.browser
 def test_hybrid_fuses_the_rule_and_pixel_findings_on_the_target_size_page(tmp_path: Path) -> None:
-    folder = next(FIXTURES.glob("synth/sc2-5-8/*"))
+    folder = min(FIXTURES.glob("synth/sc2-5-8/*"))
     run = pipeline.run_folder(folder, tmp_path, "hybrid", pdf=False)
     size = [f for f in run.findings if f.sc == "2.5.8"]
     assert len(size) == 4 and {f.provenance for f in size} == {"both"}
@@ -122,10 +122,10 @@ def test_generated_html_reports_pass_axe_with_zero_violations(scheme: str, tmp_p
 
     pipeline.run_folder(REAL[0], tmp_path / "real", "hybrid", pdf=False)
     pipeline.run_folder(
-        next(FIXTURES.glob("synth/sc2-4-13/*_091_*")), tmp_path / "synth", "hybrid", pdf=False
+        min(FIXTURES.glob("synth/sc2-4-13/*_091_*")), tmp_path / "synth", "hybrid", pdf=False
     )
     pipeline.run_folder(
-        next(FIXTURES.glob("synth/sc1-4-3/*")), tmp_path / "clean", "rule_only", pdf=False
+        min(FIXTURES.glob("synth/sc1-4-3/*")), tmp_path / "clean", "rule_only", pdf=False
     )
     axe = AXE_PATH.read_text(encoding="utf-8")
     tags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"]

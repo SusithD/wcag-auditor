@@ -23,8 +23,8 @@ jobs:
           cache-dependency-path: apps/web/pnpm-lock.yaml
       - run: uv sync --frozen --all-packages
       - run: pnpm -C apps/web install --frozen-lockfile
+      - run: uv run playwright install --with-deps chromium
+      - run: pnpm -C apps/web exec playwright install chromium
       - run: make check
       - run: pnpm -C apps/web build
-      - run: pnpm -C apps/web exec playwright install --with-deps chromium
-      - run: uv run playwright install chromium
       - run: pnpm -C apps/web e2e

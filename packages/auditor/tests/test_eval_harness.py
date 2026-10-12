@@ -113,7 +113,7 @@ def test_empty_benchmark_scores_nothing_without_crashing(tmp_path: Path) -> None
 
 def test_item_without_truth_is_counted_as_unlabelled(tmp_path: Path) -> None:
     bench = tmp_path / "bench"
-    src = next(FIXTURES.glob("real/real_com_003_desktop_*"))
+    src = min(FIXTURES.glob("real/real_com_003_desktop_*"))
     shutil.copytree(src, bench / src.name)
     (bench / src.name / "truth.json").unlink()
     metrics = run_eval(
@@ -126,7 +126,7 @@ def test_needs_review_findings_count_by_default_and_automated_only_excludes_them
     tmp_path: Path,
 ) -> None:
     bench = tmp_path / "bench"
-    src = next(FIXTURES.glob("synth/sc2-5-8/*"))
+    src = min(FIXTURES.glob("synth/sc2-5-8/*"))
     shutil.copytree(src, bench / src.name)
     findings = tmp_path / "rf"
     findings.mkdir()

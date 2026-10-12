@@ -65,7 +65,7 @@ def test_a_real_onnx_file_round_trips_through_onnxruntime(tmp_path: Path) -> Non
 
 
 def real_capture() -> Capture:
-    return Capture.from_folder(next(FIXTURES.glob("real/real_com_003_desktop_*")))
+    return Capture.from_folder(min(FIXTURES.glob("real/real_com_003_desktop_*")))
 
 
 def test_the_detector_source_reads_the_model_named_by_the_environment(

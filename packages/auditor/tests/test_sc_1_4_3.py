@@ -97,7 +97,7 @@ def test_empty_or_off_canvas_boxes_are_skipped() -> None:
 
 @pytest.mark.browser
 def test_synthetic_fixture_finding_lies_inside_the_truth_block() -> None:
-    folder = next(FIXTURES.glob("synth/sc1-4-3/*"))
+    folder = min(FIXTURES.glob("synth/sc1-4-3/*"))
     capture = Capture.from_folder(folder)
     truth = json.loads((folder / "truth.json").read_text())["annotations"][0]["bbox"]
     with DomElementSource() as source:

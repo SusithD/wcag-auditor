@@ -15,7 +15,7 @@ SA_TOOLS = REPO.parent / "04_Data_Collection" / "annotation" / "sa_tools.py"
 
 
 def mobile_capture() -> Capture:
-    return Capture.from_folder(next(FIXTURES.glob("real/real_com_011_mobile_*")))
+    return Capture.from_folder(min(FIXTURES.glob("real/real_com_011_mobile_*")))
 
 
 def load_sa_tools() -> Any:

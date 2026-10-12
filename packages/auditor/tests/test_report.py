@@ -17,7 +17,7 @@ SRC = Path(__file__).resolve().parents[1] / "auditor"
 
 
 def capture() -> Capture:
-    return Capture.from_folder(next(FIXTURES.glob("synth/sc2-4-13/*_091_*")))
+    return Capture.from_folder(min(FIXTURES.glob("synth/sc2-4-13/*_091_*")))
 
 
 def make_run(findings: list[Finding], condition: str = "hybrid") -> Run:
